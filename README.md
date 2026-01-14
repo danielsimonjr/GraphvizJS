@@ -1,6 +1,6 @@
 # GraphvizJS Desktop Client
 
-GraphvizJS Desktop Client is a desktop editor for [Graphviz](https://graphviz.org/) DOT diagrams with real-time preview, syntax highlighting, and SVG/PNG export. Built with Tauri, it pairs a CodeMirror-based authoring experience with a live preview powered by Graphviz WebAssembly, file management helpers, and zoom controls for both editor and preview.
+GraphvizJS is a desktop editor for [Graphviz](https://graphviz.org/) DOT diagrams with real-time preview, syntax highlighting, and SVG/PNG export. Built with Tauri, it pairs a CodeMirror-based authoring experience with a live preview powered by Graphviz WebAssembly, file management helpers, and zoom controls for both editor and preview.
 
 Based on [MermaidJS Desktop Client](https://github.com/skydiver/mermaidjs-desktop-client) by Martín M.
 
