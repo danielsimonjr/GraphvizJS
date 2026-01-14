@@ -1,0 +1,43 @@
+{
+  "name": "graphvizjs-desktop-client",
+  "version": "1.0.0",
+  "description": "Desktop editor for Graphviz DOT diagrams with real-time preview, syntax highlighting, and SVG/PNG export.",
+  "license": "MIT",
+  "author": {
+    "name": "Daniel Simon Jr.",
+    "email": "danielsimonjr@yahoo.com"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc && vite build",
+    "clean": "rimraf dist src-tauri/target",
+    "dev": "vite",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.10.1",
+    "@codemirror/language": "^6.12.1",
+    "@codemirror/state": "^6.5.3",
+    "@codemirror/view": "^6.39.7",
+    "@hpcc-js/wasm": "^2.22.4",
+    "@tauri-apps/api": "^2.9.1",
+    "@tauri-apps/plugin-dialog": "^2.4.2",
+    "@tauri-apps/plugin-fs": "^2.4.4",
+    "@tauri-apps/plugin-shell": "^2.3.3",
+    "@tauri-apps/plugin-store": "^2.4.1",
+    "codemirror": "^6.0.2",
+    "remixicon": "^4.7.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.10",
+    "@tauri-apps/cli": "^2.9.6",
+    "@types/node": "^25.0.3",
+    "rimraf": "^6.1.2",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0"
+  }
+}

@@ -1,0 +1,282 @@
+{
+  "phase": 1,
+  "sprint": 2,
+  "title": "Replace Preview Renderer",
+  "priority": "HIGH",
+  "effort": "15 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Core functionality - enables DOT diagram rendering in preview pane",
+  "targetMetrics": {
+    "rendering": {
+      "current": "Mermaid syntax renders diagrams",
+      "target": "DOT syntax renders diagrams via Graphviz WASM"
+    }
+  },
+  "tasks": [
+    {
+      "id": "1.2.1",
+      "category": "research",
+      "title": "Read and understand current render.ts",
+      "description": "Read the current render.ts file to understand the rendering interface, callback structure, and debounce logic before making changes.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/preview/render.ts"],
+      "testCategories": [],
+      "implementation": {
+        "purpose": "Understand the existing code structure to make minimal, targeted changes",
+        "keyDecisions": [
+          "Document callback structure: onRenderStart, onRenderSuccess, onRenderEmpty, onRenderError",
+          "Note the debounce timing and token-based cancellation pattern",
+          "Identify where mermaid.render() is called"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/preview/render.ts",
+          "details": "Use Read tool to view the entire file"
+        },
+        {
+          "step": 2,
+          "action": "Document the createRenderScheduler function signature",
+          "details": "Note all parameters and their types"
+        },
+        {
+          "step": 3,
+          "action": "Identify mermaid import and render call",
+          "details": "Find the exact lines that need to be changed"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Understand the callback structure",
+        "Know where mermaid is imported",
+        "Know where mermaid.render() is called",
+        "Understand the debounce and cancellation logic"
+      ]
+    },
+    {
+      "id": "1.2.2",
+      "category": "core",
+      "title": "Replace Mermaid imports with Graphviz",
+      "description": "Remove the mermaid import and add imports for the new Graphviz utility functions.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "agent": "haiku",
+      "files": ["src/preview/render.ts"],
+      "testCategories": ["typecheck"],
+      "implementation": {
+        "purpose": "Switch from Mermaid to Graphviz dependencies",
+        "keyDecisions": [
+          "Remove mermaid import entirely",
+          "Import renderDotToSvg from local graphviz utility"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Find mermaid import line",
+          "details": "Look for: import mermaid from 'mermaid' or similar"
+        },
+        {
+          "step": 2,
+          "action": "Remove mermaid import",
+          "details": "Delete the entire import line"
+        },
+        {
+          "step": 3,
+          "action": "Add Graphviz import",
+          "code": "import { renderDotToSvg } from './graphviz';"
+        },
+        {
+          "step": 4,
+          "action": "Verify no import errors",
+          "details": "Run: pnpm typecheck"
+        }
+      ],
+      "acceptanceCriteria": [
+        "No mermaid import in render.ts",
+        "renderDotToSvg imported from ./graphviz",
+        "No TypeScript import errors"
+      ]
+    },
+    {
+      "id": "1.2.3",
+      "category": "core",
+      "title": "Update the render function for Graphviz",
+      "description": "Replace the mermaid.render() call with renderDotToSvg() call, maintaining the same callback structure and error handling.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "agent": "haiku",
+      "files": ["src/preview/render.ts"],
+      "testCategories": ["typecheck", "manual"],
+      "implementation": {
+        "purpose": "Swap the rendering engine while preserving the debounce and callback patterns",
+        "keyDecisions": [
+          "Keep debounce logic intact",
+          "Keep token-based cancellation",
+          "renderDotToSvg returns SVG string directly (unlike Mermaid)",
+          "Maintain same callback invocations"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Find the mermaid.render() call",
+          "details": "Look for: await mermaid.render(...) or mermaid.render(...)"
+        },
+        {
+          "step": 2,
+          "action": "Replace with renderDotToSvg",
+          "details": "Change to: const svg = await renderDotToSvg(source);"
+        },
+        {
+          "step": 3,
+          "action": "Update SVG handling",
+          "details": "Mermaid returns {svg: string}, Graphviz returns string directly. Update accordingly."
+        },
+        {
+          "step": 4,
+          "action": "Preserve error handling",
+          "details": "Keep try/catch and call onRenderError on exceptions"
+        }
+      ],
+      "acceptanceCriteria": [
+        "mermaid.render() replaced with renderDotToSvg()",
+        "SVG string handled correctly",
+        "Error handling preserved",
+        "Debounce logic unchanged",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "1.2.4",
+      "category": "core",
+      "title": "Remove Mermaid initialization from main.ts",
+      "description": "Remove the mermaid.initialize() call and add Graphviz initialization at app startup.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/main.ts"],
+      "testCategories": ["typecheck", "manual"],
+      "implementation": {
+        "purpose": "Initialize Graphviz WASM instead of Mermaid at app startup",
+        "keyDecisions": [
+          "Remove mermaid import and initialization",
+          "Add initGraphviz() call early in bootstrap",
+          "Initialization is async, must await"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/main.ts",
+          "details": "Find mermaid import and mermaid.initialize() call"
+        },
+        {
+          "step": 2,
+          "action": "Remove mermaid import",
+          "details": "Delete: import mermaid from 'mermaid' or similar"
+        },
+        {
+          "step": 3,
+          "action": "Remove mermaid.initialize()",
+          "details": "Delete the mermaid.initialize({...}) call and its config object"
+        },
+        {
+          "step": 4,
+          "action": "Add Graphviz import",
+          "code": "import { initGraphviz } from './preview/graphviz';"
+        },
+        {
+          "step": 5,
+          "action": "Add initGraphviz() call",
+          "details": "In the bootstrap/init function, add: await initGraphviz();"
+        }
+      ],
+      "acceptanceCriteria": [
+        "No mermaid import in main.ts",
+        "No mermaid.initialize() call",
+        "initGraphviz imported and called",
+        "App initializes without errors"
+      ]
+    },
+    {
+      "id": "1.2.5",
+      "category": "core",
+      "title": "Update preview container SVG handling",
+      "description": "Update how SVG is inserted into the preview container. Mermaid uses element IDs, Graphviz returns raw SVG strings.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/preview/render.ts"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Correctly insert Graphviz SVG output into the preview pane",
+        "keyDecisions": [
+          "Use innerHTML to insert SVG string",
+          "Clear container before inserting",
+          "Graphviz SVG is a complete SVG element"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Find where SVG is inserted into preview container",
+          "details": "Look for innerHTML assignment or DOM manipulation"
+        },
+        {
+          "step": 2,
+          "action": "Update SVG insertion",
+          "code": "previewContainer.innerHTML = svg;"
+        },
+        {
+          "step": 3,
+          "action": "Remove any Mermaid-specific element ID handling",
+          "details": "Mermaid may have created elements with specific IDs - remove that logic"
+        },
+        {
+          "step": 4,
+          "action": "Test rendering",
+          "details": "Run pnpm dev and type a simple DOT graph to verify preview works"
+        }
+      ],
+      "acceptanceCriteria": [
+        "SVG inserted via innerHTML",
+        "No Mermaid-specific ID handling remains",
+        "Preview shows rendered DOT diagrams",
+        "Empty document handled correctly"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "All five tasks completed",
+    "No mermaid imports or calls in codebase",
+    "Graphviz initialized at startup",
+    "DOT diagrams render in preview pane",
+    "Debounce and cancellation still work",
+    "Callbacks still fire correctly",
+    "pnpm typecheck passes"
+  ],
+  "filesCreated": [],
+  "filesModified": [
+    "src/preview/render.ts",
+    "src/main.ts"
+  ],
+  "totalNewTests": 0,
+  "totalEstimatedHours": 0.5,
+  "dependencies": ["Sprint 1"],
+  "notes": [
+    "This sprint depends on Sprint 1 being completed",
+    "Test with simple DOT: digraph { A -> B }",
+    "If rendering fails, check browser console for WASM errors",
+    "Graphviz returns raw SVG string, not an object like Mermaid"
+  ]
+}

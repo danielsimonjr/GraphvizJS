@@ -1,0 +1,258 @@
+{
+  "phase": 1,
+  "sprint": 8,
+  "title": "Add Layout Engine Selector (Optional Enhancement)",
+  "priority": "LOW",
+  "effort": "15 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Enables users to switch between Graphviz layout engines (dot, neato, fdp, etc.)",
+  "targetMetrics": {
+    "layoutEngines": {
+      "current": "Only 'dot' layout engine",
+      "target": "All 8 Graphviz layout engines selectable"
+    }
+  },
+  "tasks": [
+    {
+      "id": "1.8.1",
+      "category": "ui",
+      "title": "Add layout engine dropdown to toolbar",
+      "description": "Add a select element to the toolbar for choosing the Graphviz layout engine.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/index.html"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Allow users to select different layout algorithms",
+        "keyDecisions": [
+          "Add select element with id='layout-engine'",
+          "Include all 8 layout engines with descriptions",
+          "Default to 'dot'"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/index.html",
+          "details": "Find the toolbar section"
+        },
+        {
+          "step": 2,
+          "action": "Add select element to toolbar",
+          "code": "<select id=\"layout-engine\" title=\"Layout Engine\">\n    <option value=\"dot\" selected>dot (hierarchical)</option>\n    <option value=\"neato\">neato (spring model)</option>\n    <option value=\"fdp\">fdp (force-directed)</option>\n    <option value=\"sfdp\">sfdp (scalable fdp)</option>\n    <option value=\"circo\">circo (circular)</option>\n    <option value=\"twopi\">twopi (radial)</option>\n    <option value=\"osage\">osage (array-based)</option>\n    <option value=\"patchwork\">patchwork (squarified)</option>\n</select>"
+        },
+        {
+          "step": 3,
+          "action": "Place appropriately in toolbar",
+          "details": "Add near other controls, possibly after save button"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Select element visible in toolbar",
+        "All 8 layout engines listed",
+        "dot is default selection"
+      ]
+    },
+    {
+      "id": "1.8.2",
+      "category": "core",
+      "title": "Create layout engine handler",
+      "description": "Create a new TypeScript module to handle layout engine selection.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "agent": "haiku",
+      "files": ["src/toolbar/layout-engine.ts"],
+      "testCategories": ["typecheck"],
+      "implementation": {
+        "purpose": "Provide functions to get/set layout engine and handle changes",
+        "keyDecisions": [
+          "Export setupLayoutEngine function",
+          "Export getCurrentEngine function",
+          "Use LayoutEngine type from graphviz.ts"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Create src/toolbar/layout-engine.ts",
+          "details": "Create new file for layout engine handling"
+        },
+        {
+          "step": 2,
+          "action": "Add imports and types",
+          "code": "import type { LayoutEngine } from '../preview/graphviz';"
+        },
+        {
+          "step": 3,
+          "action": "Add setupLayoutEngine function",
+          "code": "export function setupLayoutEngine(\n  onEngineChange: (engine: LayoutEngine) => void\n) {\n  const select = document.querySelector<HTMLSelectElement>('#layout-engine');\n  if (!select) return;\n\n  select.addEventListener('change', () => {\n    onEngineChange(select.value as LayoutEngine);\n  });\n}"
+        },
+        {
+          "step": 4,
+          "action": "Add getCurrentEngine function",
+          "code": "export function getCurrentEngine(): LayoutEngine {\n  const select = document.querySelector<HTMLSelectElement>('#layout-engine');\n  return (select?.value || 'dot') as LayoutEngine;\n}"
+        }
+      ],
+      "acceptanceCriteria": [
+        "File created with setupLayoutEngine and getCurrentEngine exports",
+        "Type imports from graphviz.ts",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "1.8.3",
+      "category": "core",
+      "title": "Integrate layout engine with renderer",
+      "description": "Update the render function to use the selected layout engine.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/preview/render.ts"],
+      "testCategories": ["typecheck"],
+      "implementation": {
+        "purpose": "Pass selected layout engine to Graphviz renderer",
+        "keyDecisions": [
+          "Import getCurrentEngine",
+          "Pass engine to renderDotToSvg call"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Add import for getCurrentEngine",
+          "code": "import { getCurrentEngine } from '../toolbar/layout-engine';"
+        },
+        {
+          "step": 2,
+          "action": "Update renderDotToSvg call",
+          "details": "Change from:\nconst svg = await renderDotToSvg(source);\nTo:\nconst svg = await renderDotToSvg(source, getCurrentEngine());"
+        }
+      ],
+      "acceptanceCriteria": [
+        "getCurrentEngine imported",
+        "Layout engine passed to renderDotToSvg",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "1.8.4",
+      "category": "core",
+      "title": "Wire up layout engine in main.ts",
+      "description": "Initialize the layout engine handler and trigger re-render on change.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/main.ts"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Connect layout engine UI to rendering pipeline",
+        "keyDecisions": [
+          "Call setupLayoutEngine in initialization",
+          "Trigger re-render when engine changes"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Add import for setupLayoutEngine",
+          "code": "import { setupLayoutEngine } from './toolbar/layout-engine';"
+        },
+        {
+          "step": 2,
+          "action": "Call setupLayoutEngine in bootstrap",
+          "details": "Add after editor initialization, before render scheduler setup"
+        },
+        {
+          "step": 3,
+          "action": "Wire to re-render",
+          "code": "setupLayoutEngine(() => {\n  // Trigger re-render with new engine\n  scheduleRender();\n});"
+        },
+        {
+          "step": 4,
+          "action": "Test engine switching",
+          "details": "Run pnpm dev, change engine, verify diagram re-renders with new layout"
+        }
+      ],
+      "acceptanceCriteria": [
+        "setupLayoutEngine called on init",
+        "Engine change triggers re-render",
+        "Different layouts visible when switching engines"
+      ]
+    },
+    {
+      "id": "1.8.5",
+      "category": "ui",
+      "title": "Style the layout dropdown",
+      "description": "Add CSS styling for the layout engine dropdown to match the toolbar aesthetic.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "agent": "haiku",
+      "files": ["src/styles.css"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Make dropdown visually consistent with toolbar",
+        "keyDecisions": [
+          "Match height with toolbar buttons",
+          "Use existing CSS variables",
+          "Add hover/focus states"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/styles.css",
+          "details": "Find toolbar styling section"
+        },
+        {
+          "step": 2,
+          "action": "Add dropdown styles",
+          "code": "#layout-engine {\n  height: 28px;\n  padding: 0 8px;\n  border: 1px solid var(--border-color);\n  border-radius: 4px;\n  background: var(--bg-color);\n  color: var(--text-color);\n  font-size: 12px;\n  cursor: pointer;\n}\n\n#layout-engine:hover {\n  border-color: var(--border-hover-color);\n}\n\n#layout-engine:focus {\n  outline: 2px solid var(--focus-color);\n  outline-offset: 1px;\n}"
+        },
+        {
+          "step": 3,
+          "action": "Verify styling",
+          "details": "Run pnpm dev and check dropdown appearance"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Dropdown matches toolbar aesthetic",
+        "Proper height alignment",
+        "Hover and focus states work"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "All five tasks completed",
+    "Layout engine dropdown visible in toolbar",
+    "Changing engine re-renders diagram",
+    "All 8 engines work correctly",
+    "Dropdown styled consistently"
+  ],
+  "filesCreated": [
+    "src/toolbar/layout-engine.ts"
+  ],
+  "filesModified": [
+    "src/index.html",
+    "src/preview/render.ts",
+    "src/main.ts",
+    "src/styles.css"
+  ],
+  "totalNewTests": 0,
+  "totalEstimatedHours": 0.5,
+  "dependencies": ["Sprint 2"],
+  "notes": [
+    "This sprint is OPTIONAL but adds significant value",
+    "Different engines produce very different layouts",
+    "neato/fdp work best for undirected graphs",
+    "dot works best for directed hierarchical graphs",
+    "Some graphs may not render well with certain engines"
+  ]
+}
