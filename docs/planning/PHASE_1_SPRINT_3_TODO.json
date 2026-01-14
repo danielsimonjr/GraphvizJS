@@ -1,0 +1,260 @@
+{
+  "phase": 1,
+  "sprint": 3,
+  "title": "Update Syntax Highlighting",
+  "priority": "MEDIUM",
+  "effort": "15 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Improves developer experience with proper DOT syntax highlighting in editor",
+  "targetMetrics": {
+    "highlighting": {
+      "current": "Mermaid keywords highlighted",
+      "target": "DOT keywords, attributes, and operators highlighted"
+    }
+  },
+  "tasks": [
+    {
+      "id": "1.3.1",
+      "category": "research",
+      "title": "Read current language.ts to understand structure",
+      "description": "Read the current language.ts file to understand the StreamLanguage implementation and token matching structure.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/editor/language.ts"],
+      "testCategories": [],
+      "implementation": {
+        "purpose": "Understand existing syntax highlighting implementation before modifying",
+        "keyDecisions": [
+          "Identify the keywords array location",
+          "Understand the token function structure",
+          "Note how different token types are returned"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/editor/language.ts",
+          "details": "View the entire file to understand structure"
+        },
+        {
+          "step": 2,
+          "action": "Document the keywords array",
+          "details": "Note all current Mermaid keywords"
+        },
+        {
+          "step": 3,
+          "action": "Document the token function",
+          "details": "Note how tokens are matched and what types are returned"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Understand StreamLanguage structure",
+        "Know location of keywords array",
+        "Understand token matching logic"
+      ]
+    },
+    {
+      "id": "1.3.2",
+      "category": "core",
+      "title": "Replace Mermaid keywords with DOT keywords",
+      "description": "Replace the Mermaid keywords array with DOT language keywords.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "agent": "haiku",
+      "files": ["src/editor/language.ts"],
+      "testCategories": ["typecheck"],
+      "implementation": {
+        "purpose": "Highlight DOT structural keywords correctly",
+        "keyDecisions": [
+          "Keywords: strict, graph, digraph, subgraph, node, edge",
+          "These are the core DOT language constructs"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Find the keywords array",
+          "details": "Locate the array containing Mermaid keywords"
+        },
+        {
+          "step": 2,
+          "action": "Replace with DOT keywords",
+          "code": "const keywords = [\n  'strict', 'graph', 'digraph', 'subgraph', 'node', 'edge',\n];"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Keywords array contains DOT keywords",
+        "No Mermaid keywords remain",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "1.3.3",
+      "category": "core",
+      "title": "Add DOT attribute keywords",
+      "description": "Add arrays for DOT attributes and shape names for enhanced syntax highlighting.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/editor/language.ts"],
+      "testCategories": ["typecheck"],
+      "implementation": {
+        "purpose": "Provide rich highlighting for DOT attribute names and shape values",
+        "keyDecisions": [
+          "Separate arrays for attributes and shapes",
+          "Cover most common attributes and all standard shapes"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Add attributes array after keywords",
+          "code": "const attributes = [\n  'label', 'shape', 'color', 'style', 'fillcolor', 'fontname', 'fontsize',\n  'fontcolor', 'bgcolor', 'rankdir', 'rank', 'weight', 'dir', 'arrowhead',\n  'arrowtail', 'headlabel', 'taillabel', 'width', 'height', 'fixedsize',\n  'pos', 'xlabel', 'tooltip', 'URL', 'target', 'splines', 'overlap',\n  'concentrate', 'compound', 'constraint', 'decorate', 'penwidth',\n];"
+        },
+        {
+          "step": 2,
+          "action": "Add shapes array",
+          "code": "const shapes = [\n  'box', 'ellipse', 'circle', 'oval', 'diamond', 'triangle', 'pentagon',\n  'hexagon', 'septagon', 'octagon', 'record', 'Mrecord', 'plaintext',\n  'point', 'egg', 'doublecircle', 'doubleoctagon', 'tripleoctagon',\n  'invtriangle', 'parallelogram', 'trapezium', 'house', 'invhouse',\n  'star', 'cylinder', 'note', 'tab', 'folder', 'box3d', 'component',\n];"
+        }
+      ],
+      "acceptanceCriteria": [
+        "attributes array defined with common DOT attributes",
+        "shapes array defined with DOT shape names",
+        "Arrays are accessible in token function"
+      ]
+    },
+    {
+      "id": "1.3.4",
+      "category": "core",
+      "title": "Update token matching for DOT syntax",
+      "description": "Rewrite the token function to recognize DOT language patterns including arrows, comments, strings, and brackets.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.2,
+      "agent": "haiku",
+      "files": ["src/editor/language.ts"],
+      "testCategories": ["typecheck", "manual"],
+      "implementation": {
+        "purpose": "Provide comprehensive syntax highlighting for DOT language",
+        "keyDecisions": [
+          "Match -> and -- as operators",
+          "Match // and /* */ as comments",
+          "Match quoted strings",
+          "Match HTML-like labels <...>",
+          "Match numbers",
+          "Match identifiers"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Find the token function",
+          "details": "Locate the token(stream, state) function"
+        },
+        {
+          "step": 2,
+          "action": "Add state for multiline comments",
+          "details": "Ensure state object can track inComment boolean"
+        },
+        {
+          "step": 3,
+          "action": "Rewrite token function body",
+          "details": "Implement matching for: whitespace, comments, strings, HTML labels, arrows, keywords, attributes, numbers, identifiers"
+        },
+        {
+          "step": 4,
+          "action": "Test token types returned",
+          "details": "Return 'keyword', 'operator', 'string', 'comment', 'number', 'variable', 'attribute' as appropriate"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Token function recognizes DOT patterns",
+        "Comments (// and /* */) highlight correctly",
+        "Strings highlight correctly",
+        "Arrows (-> --) highlight as operators",
+        "Keywords highlight correctly",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "1.3.5",
+      "category": "testing",
+      "title": "Test syntax highlighting",
+      "description": "Manually test that syntax highlighting works correctly for various DOT constructs.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": [],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Verify syntax highlighting works as expected",
+        "keyDecisions": [
+          "Test all token types",
+          "Verify colors are applied correctly"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Run development server",
+          "details": "Execute: pnpm dev"
+        },
+        {
+          "step": 2,
+          "action": "Test keyword highlighting",
+          "details": "Type: digraph, graph, subgraph, node, edge - should highlight as keywords"
+        },
+        {
+          "step": 3,
+          "action": "Test operator highlighting",
+          "details": "Type: A -> B and A -- B - arrows should highlight as operators"
+        },
+        {
+          "step": 4,
+          "action": "Test string highlighting",
+          "details": "Type: label=\"Hello World\" - string should highlight"
+        },
+        {
+          "step": 5,
+          "action": "Test comment highlighting",
+          "details": "Type: // comment and /* comment */ - should highlight as comments"
+        }
+      ],
+      "acceptanceCriteria": [
+        "digraph/graph highlight as keywords",
+        "-> and -- highlight as operators",
+        "Quoted strings highlight correctly",
+        "Comments highlight correctly",
+        "Numbers highlight correctly"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "All five tasks completed",
+    "DOT keywords highlight correctly",
+    "Operators highlight correctly",
+    "Strings and comments highlight correctly",
+    "No Mermaid-specific patterns remain",
+    "pnpm typecheck passes"
+  ],
+  "filesCreated": [],
+  "filesModified": [
+    "src/editor/language.ts"
+  ],
+  "totalNewTests": 0,
+  "totalEstimatedHours": 0.55,
+  "dependencies": [],
+  "notes": [
+    "This sprint can run in parallel with Sprint 2",
+    "CodeMirror StreamLanguage uses a state machine approach",
+    "Token types map to CSS classes for coloring",
+    "HTML labels (<...>) are valid in DOT and should highlight as strings"
+  ]
+}

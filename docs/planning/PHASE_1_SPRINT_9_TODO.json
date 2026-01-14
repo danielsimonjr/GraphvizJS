@@ -1,0 +1,316 @@
+{
+  "phase": 1,
+  "sprint": 9,
+  "title": "Testing and Bug Fixes",
+  "priority": "HIGH",
+  "effort": "15 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Ensures quality and catches any issues before production build",
+  "targetMetrics": {
+    "quality": {
+      "current": "Untested implementation",
+      "target": "All features tested and working"
+    }
+  },
+  "tasks": [
+    {
+      "id": "1.9.1",
+      "category": "testing",
+      "title": "Test basic rendering",
+      "description": "Test that basic DOT diagrams render correctly in the preview pane.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": [],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Verify core rendering functionality works",
+        "keyDecisions": [
+          "Test directed graphs (digraph)",
+          "Test undirected graphs (graph)",
+          "Test error handling"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Run development server",
+          "details": "Execute: pnpm dev"
+        },
+        {
+          "step": 2,
+          "action": "Test digraph rendering",
+          "details": "Type: digraph { A -> B } and verify preview shows diagram"
+        },
+        {
+          "step": 3,
+          "action": "Test graph rendering",
+          "details": "Type: graph { A -- B } and verify preview shows diagram"
+        },
+        {
+          "step": 4,
+          "action": "Test error handling",
+          "details": "Type invalid syntax and verify error message appears"
+        },
+        {
+          "step": 5,
+          "action": "Check console for errors",
+          "details": "Open DevTools and verify no JavaScript errors"
+        }
+      ],
+      "acceptanceCriteria": [
+        "digraph { A -> B } renders correctly",
+        "graph { A -- B } renders correctly",
+        "Invalid syntax shows error message",
+        "No JavaScript errors in console"
+      ]
+    },
+    {
+      "id": "1.9.2",
+      "category": "testing",
+      "title": "Test file operations",
+      "description": "Test all file operations: new, open, save, and export.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "agent": "haiku",
+      "files": [],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Verify all file operations work correctly",
+        "keyDecisions": [
+          "Test each operation",
+          "Verify file filters",
+          "Test unsaved changes prompt"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Test New (Ctrl+N)",
+          "details": "Create new diagram, verify default DOT content appears"
+        },
+        {
+          "step": 2,
+          "action": "Test Open (Ctrl+O)",
+          "details": "Open a .dot file, verify content loads and renders"
+        },
+        {
+          "step": 3,
+          "action": "Test Save (Ctrl+S)",
+          "details": "Save to a .dot file, verify file is created with correct content"
+        },
+        {
+          "step": 4,
+          "action": "Test Export PNG",
+          "details": "Export as PNG, verify file is saved correctly"
+        },
+        {
+          "step": 5,
+          "action": "Test Export PNG @2x",
+          "details": "Export as PNG @2x, verify file has @2x suffix"
+        },
+        {
+          "step": 6,
+          "action": "Test Export SVG",
+          "details": "Export as SVG, verify file is saved correctly"
+        },
+        {
+          "step": 7,
+          "action": "Test unsaved changes",
+          "details": "Make changes, try to close/new, verify prompt appears"
+        }
+      ],
+      "acceptanceCriteria": [
+        "New creates DOT content",
+        "Open loads .dot files",
+        "Save creates .dot files",
+        "PNG export works (1x and 2x)",
+        "SVG export works",
+        "Unsaved changes prompt works"
+      ]
+    },
+    {
+      "id": "1.9.3",
+      "category": "testing",
+      "title": "Test all examples",
+      "description": "Test that each example loads and renders correctly.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": [],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Verify all example diagrams work",
+        "keyDecisions": [
+          "Test each example",
+          "Verify content loads",
+          "Verify preview renders"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Open Examples dropdown",
+          "details": "Click the Examples button in toolbar"
+        },
+        {
+          "step": 2,
+          "action": "Test Directed Graph example",
+          "details": "Click, verify loads and renders"
+        },
+        {
+          "step": 3,
+          "action": "Test Undirected Graph example",
+          "details": "Click, verify loads and renders"
+        },
+        {
+          "step": 4,
+          "action": "Test Clusters example",
+          "details": "Click, verify loads and renders with cluster boxes"
+        },
+        {
+          "step": 5,
+          "action": "Test Styled Graph example",
+          "details": "Click, verify loads and renders with styling"
+        }
+      ],
+      "acceptanceCriteria": [
+        "All 4 examples appear in dropdown",
+        "Each example loads content into editor",
+        "Each example renders in preview",
+        "No console errors"
+      ]
+    },
+    {
+      "id": "1.9.4",
+      "category": "testing",
+      "title": "Test edge cases",
+      "description": "Test edge cases and unusual inputs.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "agent": "haiku",
+      "files": [],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Ensure robustness with unusual inputs",
+        "keyDecisions": [
+          "Test empty document",
+          "Test large graphs",
+          "Test special characters",
+          "Test HTML labels"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Test empty document",
+          "details": "Clear editor, verify no crash, preview shows empty or message"
+        },
+        {
+          "step": 2,
+          "action": "Test large graph",
+          "details": "Create graph with 20+ nodes, verify renders (may be slow)"
+        },
+        {
+          "step": 3,
+          "action": "Test special characters in labels",
+          "details": "Test: A [label=\"Hello <World> & 'Quotes'\"]"
+        },
+        {
+          "step": 4,
+          "action": "Test HTML labels",
+          "details": "Test: A [label=<<b>Bold</b>>]"
+        },
+        {
+          "step": 5,
+          "action": "Test multiple subgraphs",
+          "details": "Test graph with 3+ subgraphs"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Empty document handled gracefully",
+        "Large graphs render (performance acceptable)",
+        "Special characters in labels work",
+        "HTML labels render correctly",
+        "Multiple subgraphs work"
+      ]
+    },
+    {
+      "id": "1.9.5",
+      "category": "quality",
+      "title": "Run linter and fix issues",
+      "description": "Run the Biome linter and fix any code quality issues.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/"],
+      "testCategories": ["lint"],
+      "implementation": {
+        "purpose": "Ensure code quality before production build",
+        "keyDecisions": [
+          "Run pnpm lint",
+          "Fix any errors",
+          "Run pnpm lint:fix for auto-fixes"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Run linter check",
+          "details": "Execute: pnpm lint"
+        },
+        {
+          "step": 2,
+          "action": "Review any errors",
+          "details": "Note which files have issues"
+        },
+        {
+          "step": 3,
+          "action": "Run auto-fix",
+          "details": "Execute: pnpm lint:fix"
+        },
+        {
+          "step": 4,
+          "action": "Fix remaining issues manually",
+          "details": "Address any issues that couldn't be auto-fixed"
+        },
+        {
+          "step": 5,
+          "action": "Verify lint passes",
+          "details": "Run pnpm lint again, confirm no errors"
+        }
+      ],
+      "acceptanceCriteria": [
+        "pnpm lint completes with no errors",
+        "All auto-fixes applied",
+        "No manual fixes remaining"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "All five tasks completed",
+    "Basic rendering works",
+    "All file operations work",
+    "All examples work",
+    "Edge cases handled",
+    "Linter passes"
+  ],
+  "filesCreated": [],
+  "filesModified": [],
+  "totalNewTests": 0,
+  "totalEstimatedHours": 0.6,
+  "dependencies": ["Sprints 1-7"],
+  "notes": [
+    "This sprint should run after core implementation is complete",
+    "Document any bugs found for fixing",
+    "Some edge cases may reveal needed improvements",
+    "Focus on user-facing functionality"
+  ]
+}

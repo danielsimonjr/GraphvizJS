@@ -1,0 +1,262 @@
+{
+  "phase": 1,
+  "sprint": 7,
+  "title": "Update UI Text and Help Dialog",
+  "priority": "LOW",
+  "effort": "10 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Consistent branding - all UI text refers to Graphviz/DOT instead of Mermaid",
+  "targetMetrics": {
+    "branding": {
+      "current": "MermaidJS Desktop references throughout UI",
+      "target": "GraphvizJS Desktop references throughout UI"
+    }
+  },
+  "tasks": [
+    {
+      "id": "1.7.1",
+      "category": "ui",
+      "title": "Update index.html title and text",
+      "description": "Replace all Mermaid references in the HTML with Graphviz/DOT references.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/index.html"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Update visible UI text for correct branding",
+        "keyDecisions": [
+          "Change page title",
+          "Update any visible labels",
+          "Update tooltips"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/index.html",
+          "details": "View entire file to find all Mermaid references"
+        },
+        {
+          "step": 2,
+          "action": "Update page title",
+          "details": "Change <title>MermaidJS Desktop</title> to <title>GraphvizJS Desktop</title>"
+        },
+        {
+          "step": 3,
+          "action": "Search and replace Mermaid",
+          "details": "Find all occurrences of 'Mermaid' and replace with 'Graphviz' or 'DOT' as appropriate"
+        },
+        {
+          "step": 4,
+          "action": "Verify no Mermaid text remains",
+          "details": "Search file for 'mermaid' (case insensitive)"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Page title is 'GraphvizJS Desktop'",
+        "No visible 'Mermaid' text in UI",
+        "Tooltips updated if present"
+      ]
+    },
+    {
+      "id": "1.7.2",
+      "category": "ui",
+      "title": "Update help dialog content",
+      "description": "Update the help dialog to reference GraphvizJS and DOT instead of Mermaid.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "agent": "haiku",
+      "files": ["src/help/dialog.ts"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Help dialog should describe GraphvizJS Desktop",
+        "keyDecisions": [
+          "Update app name",
+          "Update description",
+          "Optionally add DOT syntax tips"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/help/dialog.ts",
+          "details": "View file to find help content"
+        },
+        {
+          "step": 2,
+          "action": "Update app name",
+          "details": "Change 'MermaidJS Desktop' to 'GraphvizJS Desktop'"
+        },
+        {
+          "step": 3,
+          "action": "Update description",
+          "details": "Change 'Mermaid diagrams' to 'Graphviz DOT diagrams'"
+        },
+        {
+          "step": 4,
+          "action": "Update any syntax references",
+          "details": "Replace Mermaid syntax mentions with DOT syntax"
+        },
+        {
+          "step": 5,
+          "action": "Test help dialog",
+          "details": "Run pnpm dev, press F1, verify content is correct"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Help dialog shows 'GraphvizJS Desktop'",
+        "Description mentions DOT diagrams",
+        "No Mermaid references in help content"
+      ]
+    },
+    {
+      "id": "1.7.3",
+      "category": "core",
+      "title": "Update status messages",
+      "description": "Update any status bar messages that reference Mermaid.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/main.ts"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Status messages should reference DOT format",
+        "keyDecisions": [
+          "Search for status message strings",
+          "Update Mermaid references to DOT"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Search for 'Mermaid' in src/main.ts",
+          "details": "Find any status message strings containing Mermaid"
+        },
+        {
+          "step": 2,
+          "action": "Update found messages",
+          "details": "Replace 'Mermaid' with 'DOT' in messages"
+        },
+        {
+          "step": 3,
+          "action": "Search other files",
+          "details": "Check src/preview/ and src/toolbar/ for status messages"
+        }
+      ],
+      "acceptanceCriteria": [
+        "No 'Mermaid' in status messages",
+        "Messages reference 'DOT' appropriately"
+      ]
+    },
+    {
+      "id": "1.7.4",
+      "category": "core",
+      "title": "Update error messages in render.ts",
+      "description": "Update error messages in the renderer to reference DOT syntax.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "agent": "haiku",
+      "files": ["src/preview/render.ts"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Error messages should help users fix DOT syntax",
+        "keyDecisions": [
+          "Change 'Invalid Mermaid syntax' to 'Invalid DOT syntax'",
+          "Update any other error text"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/preview/render.ts",
+          "details": "Find error message strings"
+        },
+        {
+          "step": 2,
+          "action": "Update error messages",
+          "details": "Change 'Mermaid' to 'DOT' in error messages"
+        },
+        {
+          "step": 3,
+          "action": "Test error display",
+          "details": "Type invalid DOT and verify error message is correct"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Error messages reference 'DOT syntax'",
+        "No 'Mermaid' in error messages"
+      ]
+    },
+    {
+      "id": "1.7.5",
+      "category": "core",
+      "title": "Update window title in main.ts",
+      "description": "If the window title is set dynamically, update it to use GraphvizJS Desktop.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "agent": "haiku",
+      "files": ["src/main.ts"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Dynamic window title should show correct app name",
+        "keyDecisions": [
+          "Find document.title assignments",
+          "Update to GraphvizJS Desktop"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Search for document.title in src/main.ts",
+          "details": "Find where window title is set dynamically"
+        },
+        {
+          "step": 2,
+          "action": "Update title prefix",
+          "details": "Change 'MermaidJS Desktop' to 'GraphvizJS Desktop'"
+        },
+        {
+          "step": 3,
+          "action": "Test dynamic title",
+          "details": "Open a file and verify title shows correct app name"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Window title shows 'GraphvizJS Desktop'",
+        "Filename is appended correctly",
+        "Unsaved indicator (*) works"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "All five tasks completed",
+    "No 'Mermaid' text visible in UI",
+    "Help dialog shows correct info",
+    "Error messages reference DOT",
+    "Window title is correct"
+  ],
+  "filesCreated": [],
+  "filesModified": [
+    "src/index.html",
+    "src/help/dialog.ts",
+    "src/main.ts",
+    "src/preview/render.ts"
+  ],
+  "totalNewTests": 0,
+  "totalEstimatedHours": 0.45,
+  "dependencies": [],
+  "notes": [
+    "This sprint can run in parallel with others",
+    "Search case-insensitively for 'mermaid'",
+    "Some references may be in comments - update those too",
+    "Keep user-facing text consistent and helpful"
+  ]
+}

@@ -1,0 +1,233 @@
+{
+  "phase": 1,
+  "sprint": 1,
+  "title": "Install Dependencies and Setup Renderer Infrastructure",
+  "priority": "HIGH",
+  "effort": "10 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Foundation for all Graphviz rendering - must be completed first",
+  "targetMetrics": {
+    "wasmLoading": {
+      "current": "No Graphviz support",
+      "target": "Graphviz WASM loads and initializes"
+    }
+  },
+  "tasks": [
+    {
+      "id": "1.1.1",
+      "category": "setup",
+      "title": "Install @hpcc-js/wasm package",
+      "description": "Run pnpm install to install the @hpcc-js/wasm dependency that was added to package.json. This package provides Graphviz compiled to WebAssembly.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["package.json"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Install the Graphviz WASM package that will replace Mermaid for diagram rendering",
+        "keyDecisions": [
+          "@hpcc-js/wasm chosen over viz.js for better maintenance and TypeScript support",
+          "Package already added to package.json, just needs installation"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Navigate to project directory",
+          "details": "cd C:/Users/e414639/Github/GraphvizJS"
+        },
+        {
+          "step": 2,
+          "action": "Run pnpm install",
+          "details": "Execute: pnpm install"
+        },
+        {
+          "step": 3,
+          "action": "Verify installation",
+          "details": "Check that node_modules/@hpcc-js/wasm exists"
+        }
+      ],
+      "acceptanceCriteria": [
+        "pnpm install completes without errors",
+        "node_modules/@hpcc-js/wasm directory exists",
+        "No version conflicts in package resolution"
+      ]
+    },
+    {
+      "id": "1.1.2",
+      "category": "core",
+      "title": "Create Graphviz renderer utility",
+      "description": "Create a new TypeScript file that wraps @hpcc-js/wasm and exports functions to initialize Graphviz and render DOT to SVG.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.25,
+      "agent": "haiku",
+      "files": ["src/preview/graphviz.ts"],
+      "testCategories": ["typecheck"],
+      "implementation": {
+        "purpose": "Create a clean abstraction layer for Graphviz rendering that can be used by the preview renderer",
+        "keyDecisions": [
+          "Singleton pattern for Graphviz instance to avoid multiple WASM loads",
+          "Support all 8 layout engines as a type union",
+          "Async initialization to handle WASM loading"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Create new file src/preview/graphviz.ts",
+          "details": "Create the file in the src/preview/ directory"
+        },
+        {
+          "step": 2,
+          "action": "Add Graphviz import",
+          "code": "import { Graphviz } from '@hpcc-js/wasm/graphviz';"
+        },
+        {
+          "step": 3,
+          "action": "Add singleton instance variable",
+          "code": "let graphvizInstance: Awaited<ReturnType<typeof Graphviz.load>> | null = null;"
+        },
+        {
+          "step": 4,
+          "action": "Add LayoutEngine type",
+          "code": "export type LayoutEngine = 'dot' | 'neato' | 'fdp' | 'sfdp' | 'circo' | 'twopi' | 'osage' | 'patchwork';"
+        },
+        {
+          "step": 5,
+          "action": "Add initGraphviz function",
+          "code": "export async function initGraphviz(): Promise<void> {\n  if (!graphvizInstance) {\n    graphvizInstance = await Graphviz.load();\n  }\n}"
+        },
+        {
+          "step": 6,
+          "action": "Add renderDotToSvg function",
+          "code": "export async function renderDotToSvg(\n  dotSource: string,\n  engine: LayoutEngine = 'dot'\n): Promise<string> {\n  if (!graphvizInstance) {\n    await initGraphviz();\n  }\n  return graphvizInstance!.layout(dotSource, 'svg', engine);\n}"
+        },
+        {
+          "step": 7,
+          "action": "Add isGraphvizReady function",
+          "code": "export function isGraphvizReady(): boolean {\n  return graphvizInstance !== null;\n}"
+        },
+        {
+          "step": 8,
+          "action": "Run TypeScript check",
+          "details": "Execute: pnpm typecheck"
+        }
+      ],
+      "acceptanceCriteria": [
+        "File src/preview/graphviz.ts exists",
+        "Exports initGraphviz, renderDotToSvg, isGraphvizReady, LayoutEngine",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "1.1.3",
+      "category": "config",
+      "title": "Update Vite config for WASM support",
+      "description": "Configure Vite to properly handle the @hpcc-js/wasm package which contains WebAssembly files.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["vite.config.ts"],
+      "testCategories": ["build"],
+      "implementation": {
+        "purpose": "Ensure Vite doesn't try to pre-bundle the WASM package which can cause issues",
+        "keyDecisions": [
+          "Add @hpcc-js/wasm to optimizeDeps.exclude",
+          "May need to add to ssr.noExternal if SSR is used"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read current vite.config.ts",
+          "details": "Examine the existing configuration structure"
+        },
+        {
+          "step": 2,
+          "action": "Add optimizeDeps configuration",
+          "details": "Add or update the optimizeDeps object with exclude array containing '@hpcc-js/wasm'"
+        },
+        {
+          "step": 3,
+          "action": "Test build",
+          "details": "Run: pnpm build to verify configuration works"
+        }
+      ],
+      "acceptanceCriteria": [
+        "vite.config.ts includes optimizeDeps.exclude with @hpcc-js/wasm",
+        "pnpm build completes without WASM-related errors"
+      ]
+    },
+    {
+      "id": "1.1.4",
+      "category": "config",
+      "title": "Update CSP in tauri.conf.json for WASM",
+      "description": "Update the Content Security Policy to allow WebAssembly execution, which is required for @hpcc-js/wasm to run.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src-tauri/tauri.conf.json"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Allow WASM execution in the Tauri webview by adding wasm-unsafe-eval to the CSP",
+        "keyDecisions": [
+          "Add 'wasm-unsafe-eval' to script-src directive",
+          "Keep existing CSP rules intact"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src-tauri/tauri.conf.json",
+          "details": "Find the app.security.csp field"
+        },
+        {
+          "step": 2,
+          "action": "Update CSP string",
+          "details": "Change from:\n\"csp\": \"default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:\"\nTo:\n\"csp\": \"default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:\""
+        },
+        {
+          "step": 3,
+          "action": "Verify JSON is valid",
+          "details": "Ensure the JSON file parses correctly after edit"
+        }
+      ],
+      "acceptanceCriteria": [
+        "CSP includes 'wasm-unsafe-eval' in script-src",
+        "tauri.conf.json is valid JSON",
+        "App runs without CSP violation errors in console"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "All four tasks completed",
+    "@hpcc-js/wasm package installed",
+    "src/preview/graphviz.ts exists with all exports",
+    "Vite configured for WASM",
+    "CSP allows WASM execution",
+    "pnpm build succeeds",
+    "pnpm typecheck passes"
+  ],
+  "filesCreated": [
+    "src/preview/graphviz.ts"
+  ],
+  "filesModified": [
+    "vite.config.ts",
+    "src-tauri/tauri.conf.json"
+  ],
+  "totalNewTests": 0,
+  "totalEstimatedHours": 0.55,
+  "dependencies": [],
+  "notes": [
+    "This sprint must be completed before Sprint 2",
+    "If WASM loading fails, check browser console for CSP errors",
+    "@hpcc-js/wasm is ~2MB and loads asynchronously",
+    "The graphviz.ts utility uses singleton pattern to avoid multiple WASM loads"
+  ]
+}

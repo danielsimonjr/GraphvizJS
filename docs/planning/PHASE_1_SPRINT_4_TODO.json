@@ -1,0 +1,217 @@
+{
+  "phase": 1,
+  "sprint": 4,
+  "title": "Update File Operations",
+  "priority": "MEDIUM",
+  "effort": "10 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Enables opening and saving .dot/.gv files instead of .mmd files",
+  "targetMetrics": {
+    "fileFormats": {
+      "current": ".mmd, .mermaid, .md extensions",
+      "target": ".dot, .gv extensions"
+    }
+  },
+  "tasks": [
+    {
+      "id": "1.4.1",
+      "category": "core",
+      "title": "Update open-diagram.ts file filters",
+      "description": "Update the file open dialog to filter for .dot and .gv files instead of Mermaid files.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/toolbar/open-diagram.ts"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Allow users to open Graphviz DOT files",
+        "keyDecisions": [
+          "Filter name: 'Graphviz DOT'",
+          "Extensions: ['dot', 'gv']"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/toolbar/open-diagram.ts",
+          "details": "Find the file dialog options with filters"
+        },
+        {
+          "step": 2,
+          "action": "Update filters array",
+          "details": "Change from:\nfilters: [{ name: 'Mermaid', extensions: ['mmd', 'mermaid', 'md'] }]\nTo:\nfilters: [{ name: 'Graphviz DOT', extensions: ['dot', 'gv'] }]"
+        },
+        {
+          "step": 3,
+          "action": "Test open dialog",
+          "details": "Run pnpm dev, press Ctrl+O, verify filter shows .dot and .gv"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Open dialog filters for .dot and .gv files",
+        "Filter name shows 'Graphviz DOT'",
+        "No .mmd references remain"
+      ]
+    },
+    {
+      "id": "1.4.2",
+      "category": "core",
+      "title": "Update save-diagram.ts file filters",
+      "description": "Update the file save dialog to default to .dot extension.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/toolbar/save-diagram.ts"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Save files with .dot extension by default",
+        "keyDecisions": [
+          "Default extension: .dot",
+          "Filter: Graphviz DOT files"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/toolbar/save-diagram.ts",
+          "details": "Find the save dialog options"
+        },
+        {
+          "step": 2,
+          "action": "Update filters array",
+          "details": "Change to: filters: [{ name: 'Graphviz DOT', extensions: ['dot'] }]"
+        },
+        {
+          "step": 3,
+          "action": "Update default filename if present",
+          "details": "Change any 'untitled.mmd' to 'untitled.dot'"
+        },
+        {
+          "step": 4,
+          "action": "Test save dialog",
+          "details": "Run pnpm dev, press Ctrl+S, verify default is .dot"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Save dialog defaults to .dot extension",
+        "Filter shows 'Graphviz DOT'",
+        "Default filename uses .dot extension"
+      ]
+    },
+    {
+      "id": "1.4.3",
+      "category": "core",
+      "title": "Update export-diagram.ts filename handling",
+      "description": "Update export filename generation to use .dot base name instead of .mmd.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/toolbar/export-diagram.ts"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Exported PNG/SVG files should reflect .dot source filename",
+        "keyDecisions": [
+          "Replace .mmd with .dot in filename handling",
+          "Export filenames: diagram.png, diagram.svg, diagram@2x.png"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/toolbar/export-diagram.ts",
+          "details": "Find where export filenames are generated"
+        },
+        {
+          "step": 2,
+          "action": "Search for .mmd references",
+          "details": "Find any hardcoded .mmd strings"
+        },
+        {
+          "step": 3,
+          "action": "Replace with .dot",
+          "details": "Update all .mmd references to .dot"
+        },
+        {
+          "step": 4,
+          "action": "Test export",
+          "details": "Export a diagram and verify filename is correct"
+        }
+      ],
+      "acceptanceCriteria": [
+        "No .mmd in export filenames",
+        "Default export name uses .dot base",
+        "PNG and SVG exports work correctly"
+      ]
+    },
+    {
+      "id": "1.4.4",
+      "category": "core",
+      "title": "Update new-diagram.ts default content",
+      "description": "Update the default content shown when creating a new diagram to be valid DOT syntax.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/toolbar/new-diagram.ts"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "New diagrams should start with valid DOT content",
+        "keyDecisions": [
+          "Simple digraph as default",
+          "Shows basic DOT syntax to users"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/toolbar/new-diagram.ts",
+          "details": "Find the default content string"
+        },
+        {
+          "step": 2,
+          "action": "Replace with DOT default",
+          "code": "const defaultContent = `digraph G {\n    A -> B\n    B -> C\n    C -> A\n}`;"
+        },
+        {
+          "step": 3,
+          "action": "Test new diagram",
+          "details": "Run pnpm dev, press Ctrl+N, verify DOT content appears"
+        }
+      ],
+      "acceptanceCriteria": [
+        "New diagram shows valid DOT content",
+        "No Mermaid syntax in default",
+        "Preview renders the default content"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "All four tasks completed",
+    "Open dialog filters for .dot/.gv",
+    "Save dialog defaults to .dot",
+    "Export filenames use .dot base",
+    "New diagram shows DOT content",
+    "No .mmd references in file operations"
+  ],
+  "filesCreated": [],
+  "filesModified": [
+    "src/toolbar/open-diagram.ts",
+    "src/toolbar/save-diagram.ts",
+    "src/toolbar/export-diagram.ts",
+    "src/toolbar/new-diagram.ts"
+  ],
+  "totalNewTests": 0,
+  "totalEstimatedHours": 0.4,
+  "dependencies": ["Sprint 2"],
+  "notes": [
+    "This sprint depends on Sprint 2 for rendering to work",
+    ".gv is an alternative Graphviz extension",
+    "Keep file operations simple - just change extensions",
+    "Default content should be simple but demonstrate DOT structure"
+  ]
+}

@@ -1,0 +1,261 @@
+{
+  "phase": 1,
+  "sprint": 10,
+  "title": "Production Build and Verification",
+  "priority": "HIGH",
+  "effort": "10 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Creates distributable application and verifies everything works in production",
+  "targetMetrics": {
+    "build": {
+      "current": "Development mode only",
+      "target": "Production .exe built and verified"
+    }
+  },
+  "tasks": [
+    {
+      "id": "1.10.1",
+      "category": "build",
+      "title": "Clean build artifacts",
+      "description": "Remove all previous build artifacts to ensure a clean build.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.02,
+      "agent": "haiku",
+      "files": [],
+      "testCategories": [],
+      "implementation": {
+        "purpose": "Ensure clean build without stale artifacts",
+        "keyDecisions": [
+          "Remove dist/ directory",
+          "Remove src-tauri/target/ directory"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Run clean command",
+          "details": "Execute: cd C:/Users/e414639/Github/GraphvizJS && pnpm clean"
+        },
+        {
+          "step": 2,
+          "action": "Verify directories removed",
+          "details": "Check that dist/ and src-tauri/target/ are gone"
+        }
+      ],
+      "acceptanceCriteria": [
+        "dist/ directory removed",
+        "src-tauri/target/ directory removed",
+        "No build artifacts remain"
+      ]
+    },
+    {
+      "id": "1.10.2",
+      "category": "build",
+      "title": "Run production build",
+      "description": "Build the production Tauri application.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "agent": "haiku",
+      "files": [],
+      "testCategories": ["build"],
+      "implementation": {
+        "purpose": "Create distributable application",
+        "keyDecisions": [
+          "Run pnpm tauri build",
+          "Monitor for errors",
+          "Note output location"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Run Tauri build",
+          "details": "Execute: cd C:/Users/e414639/Github/GraphvizJS && pnpm tauri build"
+        },
+        {
+          "step": 2,
+          "action": "Monitor for errors",
+          "details": "Watch build output for any compilation errors"
+        },
+        {
+          "step": 3,
+          "action": "Note output location",
+          "details": "Build outputs to: src-tauri/target/release/graphvizjs_desktop_client.exe"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Build completes without errors",
+        ".exe file created in target/release/",
+        "No TypeScript errors",
+        "No Rust compilation errors"
+      ]
+    },
+    {
+      "id": "1.10.3",
+      "category": "testing",
+      "title": "Test the built application",
+      "description": "Run the production build and verify all features work.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "agent": "haiku",
+      "files": [],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Verify production build works correctly",
+        "keyDecisions": [
+          "Launch the .exe directly",
+          "Test core features",
+          "Verify WASM loads in production"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Launch production build",
+          "details": "Run: C:/Users/e414639/Github/GraphvizJS/src-tauri/target/release/graphvizjs_desktop_client.exe"
+        },
+        {
+          "step": 2,
+          "action": "Test rendering",
+          "details": "Type a simple DOT graph and verify preview renders"
+        },
+        {
+          "step": 3,
+          "action": "Test file operations",
+          "details": "Test Save and Open with .dot files"
+        },
+        {
+          "step": 4,
+          "action": "Test examples",
+          "details": "Load each example and verify rendering"
+        },
+        {
+          "step": 5,
+          "action": "Test export",
+          "details": "Export as PNG and SVG"
+        }
+      ],
+      "acceptanceCriteria": [
+        "App launches without errors",
+        "WASM loads and renders diagrams",
+        "File operations work",
+        "Examples load correctly",
+        "Export works"
+      ]
+    },
+    {
+      "id": "1.10.4",
+      "category": "testing",
+      "title": "Verify window close fix is preserved",
+      "description": "Ensure the window close fix (from MermaidJS) still works in production.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "agent": "haiku",
+      "files": [],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Verify app terminates properly when closed",
+        "keyDecisions": [
+          "Click X button",
+          "Verify process exits",
+          "Check Task Manager if needed"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Launch app if not running",
+          "details": "Start the production .exe"
+        },
+        {
+          "step": 2,
+          "action": "Click X button to close",
+          "details": "Click the window close button"
+        },
+        {
+          "step": 3,
+          "action": "Verify process terminates",
+          "details": "Check Task Manager - no graphvizjs_desktop_client.exe should be running"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Clicking X closes the window",
+        "Process terminates completely",
+        "No orphan processes remain"
+      ]
+    },
+    {
+      "id": "1.10.5",
+      "category": "git",
+      "title": "Create initial git commit",
+      "description": "Commit all changes to the local git repository.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "agent": "haiku",
+      "files": [],
+      "testCategories": [],
+      "implementation": {
+        "purpose": "Save all work to version control",
+        "keyDecisions": [
+          "Stage all changes",
+          "Write comprehensive commit message",
+          "Do not push (user will decide)"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Check git status",
+          "details": "Execute: git status"
+        },
+        {
+          "step": 2,
+          "action": "Stage all changes",
+          "details": "Execute: git add ."
+        },
+        {
+          "step": 3,
+          "action": "Create commit",
+          "code": "git commit -m \"Initial GraphvizJS implementation\n\nConvert MermaidJS Desktop to GraphvizJS Desktop:\n- Replace mermaid with @hpcc-js/wasm for rendering\n- Update syntax highlighting for DOT language\n- Add DOT example diagrams\n- Update file dialogs for .dot/.gv extensions\n- Update all UI text references\n- Add layout engine selector\n\nBased on MermaidJS Desktop Client by Martín M.\n\nCo-Authored-By: Claude <noreply@anthropic.com>\""
+        },
+        {
+          "step": 4,
+          "action": "Verify commit",
+          "details": "Execute: git log -1 to see the commit"
+        }
+      ],
+      "acceptanceCriteria": [
+        "All changes staged",
+        "Commit created with descriptive message",
+        "git log shows the commit"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "All five tasks completed",
+    "Clean build succeeds",
+    "Production .exe works correctly",
+    "Window close terminates process",
+    "Initial commit created",
+    "Application ready for distribution"
+  ],
+  "filesCreated": [],
+  "filesModified": [],
+  "totalNewTests": 0,
+  "totalEstimatedHours": 0.42,
+  "dependencies": ["Sprints 1-9"],
+  "notes": [
+    "This is the final sprint",
+    "Build may take 5-10 minutes for Rust compilation",
+    "Production build is optimized and smaller than dev",
+    "Commit is local only - user decides when to push",
+    "Application is ready for GitHub release after this sprint"
+  ]
+}

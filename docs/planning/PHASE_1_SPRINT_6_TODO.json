@@ -1,0 +1,200 @@
+{
+  "phase": 1,
+  "sprint": 6,
+  "title": "Update Examples Menu and Glob Import",
+  "priority": "MEDIUM",
+  "effort": "5 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Enables loading DOT examples from the Examples dropdown menu",
+  "targetMetrics": {
+    "menu": {
+      "current": "7 Mermaid example menu items",
+      "target": "4 DOT example menu items"
+    }
+  },
+  "tasks": [
+    {
+      "id": "1.6.1",
+      "category": "core",
+      "title": "Update examples-menu.ts glob pattern",
+      "description": "Update the Vite glob import to load .dot files instead of .mmd files.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "agent": "haiku",
+      "files": ["src/toolbar/examples-menu.ts"],
+      "testCategories": ["typecheck"],
+      "implementation": {
+        "purpose": "Load DOT example files instead of Mermaid files",
+        "keyDecisions": [
+          "Change glob pattern from *.mmd to *.dot",
+          "Keep eager loading and raw query"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/toolbar/examples-menu.ts",
+          "details": "Find the import.meta.glob call"
+        },
+        {
+          "step": 2,
+          "action": "Update glob pattern",
+          "details": "Change from:\nimport.meta.glob('../examples/*.mmd', { eager: true, query: '?raw' })\nTo:\nimport.meta.glob('../examples/*.dot', { eager: true, query: '?raw' })"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Glob pattern matches *.dot files",
+        "No .mmd in glob pattern",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "1.6.2",
+      "category": "ui",
+      "title": "Update index.html examples menu items",
+      "description": "Update the examples dropdown menu in index.html to list DOT examples.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/index.html"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Show correct example names in the dropdown menu",
+        "keyDecisions": [
+          "Match data-example attributes to new filenames",
+          "Use descriptive labels for each example"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Read src/index.html",
+          "details": "Find the [data-menu=\"examples\"] section"
+        },
+        {
+          "step": 2,
+          "action": "Replace menu items",
+          "code": "<div data-menu=\"examples\" class=\"menu hidden\">\n    <button data-example=\"01-directed-graph\">Directed Graph</button>\n    <button data-example=\"02-undirected-graph\">Undirected Graph</button>\n    <button data-example=\"03-clusters\">Clusters</button>\n    <button data-example=\"04-styled-graph\">Styled Graph</button>\n</div>"
+        }
+      ],
+      "acceptanceCriteria": [
+        "4 example menu items matching DOT files",
+        "data-example attributes match filenames (without .dot)",
+        "Labels are descriptive"
+      ]
+    },
+    {
+      "id": "1.6.3",
+      "category": "cleanup",
+      "title": "Update any hardcoded example references",
+      "description": "Search for and update any hardcoded .mmd references in the toolbar code.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "agent": "haiku",
+      "files": ["src/toolbar/"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Ensure no .mmd references remain in source code",
+        "keyDecisions": [
+          "Search all toolbar files for .mmd",
+          "Update any found references to .dot"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Search for .mmd in src/",
+          "details": "Run: grep -r \"\\.mmd\" src/"
+        },
+        {
+          "step": 2,
+          "action": "Update any found references",
+          "details": "Replace .mmd with .dot in any matching files"
+        },
+        {
+          "step": 3,
+          "action": "Verify no references remain",
+          "details": "Re-run grep to confirm"
+        }
+      ],
+      "acceptanceCriteria": [
+        "No .mmd references in src/ directory",
+        "All file references use .dot"
+      ]
+    },
+    {
+      "id": "1.6.4",
+      "category": "testing",
+      "title": "Test examples loading",
+      "description": "Test that all example diagrams load correctly from the dropdown menu.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": [],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Verify examples feature works end-to-end",
+        "keyDecisions": [
+          "Test each example loads",
+          "Verify preview renders",
+          "Check no console errors"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Run development server",
+          "details": "Execute: pnpm dev"
+        },
+        {
+          "step": 2,
+          "action": "Open Examples dropdown",
+          "details": "Click the Examples button in toolbar"
+        },
+        {
+          "step": 3,
+          "action": "Test each example",
+          "details": "Click each example and verify: content loads in editor, preview renders diagram"
+        },
+        {
+          "step": 4,
+          "action": "Check console for errors",
+          "details": "Open browser DevTools and verify no errors"
+        }
+      ],
+      "acceptanceCriteria": [
+        "Examples dropdown shows 4 items",
+        "Clicking each example loads DOT content",
+        "Preview renders each diagram correctly",
+        "No console errors"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "All four tasks completed",
+    "Glob imports .dot files",
+    "Menu shows 4 DOT examples",
+    "All examples load and render",
+    "No .mmd references remain"
+  ],
+  "filesCreated": [],
+  "filesModified": [
+    "src/toolbar/examples-menu.ts",
+    "src/index.html"
+  ],
+  "totalNewTests": 0,
+  "totalEstimatedHours": 0.3,
+  "dependencies": ["Sprint 5"],
+  "notes": [
+    "This sprint depends on Sprint 5 (examples created)",
+    "data-example attribute should match filename without extension",
+    "Vite glob imports are resolved at build time",
+    "Test in both dev and build modes"
+  ]
+}

@@ -1,0 +1,234 @@
+{
+  "phase": 1,
+  "sprint": 5,
+  "title": "Create DOT Example Diagrams",
+  "priority": "MEDIUM",
+  "effort": "10 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Provides users with DOT diagram templates to learn from",
+  "targetMetrics": {
+    "examples": {
+      "current": "7 Mermaid .mmd examples",
+      "target": "4 DOT .dot examples"
+    }
+  },
+  "tasks": [
+    {
+      "id": "1.5.1",
+      "category": "cleanup",
+      "title": "Delete existing Mermaid examples",
+      "description": "Delete all .mmd example files from the src/examples/ directory.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "agent": "haiku",
+      "files": ["src/examples/"],
+      "testCategories": [],
+      "implementation": {
+        "purpose": "Remove Mermaid examples before adding DOT examples",
+        "keyDecisions": [
+          "Delete all .mmd files",
+          "Keep the examples directory"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "List existing examples",
+          "details": "Run: ls src/examples/ to see all files"
+        },
+        {
+          "step": 2,
+          "action": "Delete all .mmd files",
+          "details": "Run: rm src/examples/*.mmd"
+        },
+        {
+          "step": 3,
+          "action": "Verify directory is empty",
+          "details": "Run: ls src/examples/"
+        }
+      ],
+      "acceptanceCriteria": [
+        "All .mmd files deleted",
+        "src/examples/ directory still exists",
+        "No Mermaid content remains"
+      ]
+    },
+    {
+      "id": "1.5.2",
+      "category": "content",
+      "title": "Create basic directed graph example",
+      "description": "Create a DOT example showing a basic directed graph with nodes and edges.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/examples/01-directed-graph.dot"],
+      "testCategories": [],
+      "implementation": {
+        "purpose": "Show basic digraph syntax with labeled nodes and edges",
+        "keyDecisions": [
+          "Use digraph keyword",
+          "Show node definitions with labels and shapes",
+          "Show edge labels"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Create src/examples/01-directed-graph.dot",
+          "details": "Create new file with directed graph content"
+        },
+        {
+          "step": 2,
+          "action": "Add content",
+          "code": "digraph DirectedGraph {\n    rankdir=TB\n\n    // Node definitions\n    A [label=\"Start\" shape=ellipse]\n    B [label=\"Process 1\" shape=box]\n    C [label=\"Process 2\" shape=box]\n    D [label=\"Decision\" shape=diamond]\n    E [label=\"End\" shape=ellipse]\n\n    // Edges\n    A -> B\n    B -> C\n    C -> D\n    D -> B [label=\"retry\"]\n    D -> E [label=\"done\"]\n}"
+        }
+      ],
+      "acceptanceCriteria": [
+        "File created at src/examples/01-directed-graph.dot",
+        "Content is valid DOT syntax",
+        "Demonstrates nodes, edges, shapes, labels"
+      ]
+    },
+    {
+      "id": "1.5.3",
+      "category": "content",
+      "title": "Create undirected graph example",
+      "description": "Create a DOT example showing an undirected graph.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/examples/02-undirected-graph.dot"],
+      "testCategories": [],
+      "implementation": {
+        "purpose": "Show graph (undirected) syntax with -- edges",
+        "keyDecisions": [
+          "Use graph keyword (not digraph)",
+          "Use -- for edges (not ->)",
+          "Show neato layout option"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Create src/examples/02-undirected-graph.dot",
+          "details": "Create new file with undirected graph content"
+        },
+        {
+          "step": 2,
+          "action": "Add content",
+          "code": "graph UndirectedGraph {\n    layout=neato\n\n    // Social network example\n    Alice -- Bob\n    Alice -- Carol\n    Bob -- Carol\n    Bob -- Dave\n    Carol -- Eve\n    Dave -- Eve\n\n    // Styling\n    Alice [shape=circle color=red]\n    Bob [shape=circle color=blue]\n    Carol [shape=circle color=green]\n}"
+        }
+      ],
+      "acceptanceCriteria": [
+        "File created at src/examples/02-undirected-graph.dot",
+        "Uses graph keyword",
+        "Uses -- for edges",
+        "Shows color attributes"
+      ]
+    },
+    {
+      "id": "1.5.4",
+      "category": "content",
+      "title": "Create cluster/subgraph example",
+      "description": "Create a DOT example showing subgraphs (clusters).",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/examples/03-clusters.dot"],
+      "testCategories": [],
+      "implementation": {
+        "purpose": "Demonstrate subgraph/cluster syntax",
+        "keyDecisions": [
+          "Use subgraph cluster_X naming convention",
+          "Show cross-cluster edges",
+          "Demonstrate cluster styling"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Create src/examples/03-clusters.dot",
+          "details": "Create new file with cluster content"
+        },
+        {
+          "step": 2,
+          "action": "Add content",
+          "code": "digraph Clusters {\n    compound=true\n\n    subgraph cluster_0 {\n        label=\"Frontend\"\n        style=filled\n        color=lightblue\n\n        React -> Redux\n        Redux -> Components\n    }\n\n    subgraph cluster_1 {\n        label=\"Backend\"\n        style=filled\n        color=lightgreen\n\n        API -> Database\n        API -> Cache\n    }\n\n    // Cross-cluster edges\n    Components -> API [lhead=cluster_1]\n}"
+        }
+      ],
+      "acceptanceCriteria": [
+        "File created at src/examples/03-clusters.dot",
+        "Shows subgraph syntax",
+        "Clusters have labels and styling",
+        "Cross-cluster edge demonstrated"
+      ]
+    },
+    {
+      "id": "1.5.5",
+      "category": "content",
+      "title": "Create styled graph example",
+      "description": "Create a DOT example showing various styling options.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/examples/04-styled-graph.dot"],
+      "testCategories": [],
+      "implementation": {
+        "purpose": "Demonstrate rich styling capabilities of DOT",
+        "keyDecisions": [
+          "Show default node/edge styles",
+          "Show individual node overrides",
+          "Demonstrate colors, fonts, shapes"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Create src/examples/04-styled-graph.dot",
+          "details": "Create new file with styled graph content"
+        },
+        {
+          "step": 2,
+          "action": "Add content",
+          "code": "digraph StyledGraph {\n    // Graph attributes\n    bgcolor=white\n    rankdir=LR\n\n    // Default node style\n    node [shape=box style=\"filled,rounded\" fillcolor=lightyellow fontname=\"Arial\"]\n\n    // Default edge style\n    edge [color=gray fontsize=10]\n\n    // Nodes with custom styles\n    Start [shape=circle fillcolor=green fontcolor=white]\n    End [shape=doublecircle fillcolor=red fontcolor=white]\n\n    Process1 [label=\"Process\\nStep 1\"]\n    Process2 [label=\"Process\\nStep 2\"]\n\n    // Edges\n    Start -> Process1 [label=\"begin\"]\n    Process1 -> Process2 [label=\"next\" style=dashed]\n    Process2 -> End [label=\"finish\" penwidth=2]\n}"
+        }
+      ],
+      "acceptanceCriteria": [
+        "File created at src/examples/04-styled-graph.dot",
+        "Shows default node/edge statements",
+        "Demonstrates colors, shapes, fonts",
+        "Shows edge styling options"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "All five tasks completed",
+    "All .mmd files deleted",
+    "4 new .dot files created",
+    "All examples are valid DOT syntax",
+    "Examples demonstrate different DOT features"
+  ],
+  "filesCreated": [
+    "src/examples/01-directed-graph.dot",
+    "src/examples/02-undirected-graph.dot",
+    "src/examples/03-clusters.dot",
+    "src/examples/04-styled-graph.dot"
+  ],
+  "filesModified": [],
+  "totalNewTests": 0,
+  "totalEstimatedHours": 0.45,
+  "dependencies": [],
+  "notes": [
+    "This sprint can run in parallel with others",
+    "Examples should be educational and demonstrate DOT features",
+    "Keep examples simple enough to understand",
+    "Cluster names must start with 'cluster_' to render as boxes"
+  ]
+}
