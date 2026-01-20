@@ -1,0 +1,47 @@
+// Cluster Subgraph Example
+// Shows grouped components with clusters
+
+digraph Architecture {
+    compound=true;
+    rankdir=LR;
+
+    subgraph cluster_frontend {
+        label="Frontend";
+        style=filled;
+        fillcolor="#E8F4FD";
+        node [style=filled, fillcolor=white];
+
+        UI [label="User Interface"];
+        Router [label="Router"];
+        State [label="State Manager"];
+    }
+
+    subgraph cluster_backend {
+        label="Backend";
+        style=filled;
+        fillcolor="#FDF4E8";
+        node [style=filled, fillcolor=white];
+
+        API [label="API Server"];
+        Auth [label="Auth Service"];
+        Cache [label="Cache"];
+    }
+
+    subgraph cluster_data {
+        label="Data Layer";
+        style=filled;
+        fillcolor="#E8FDE8";
+        node [style=filled, fillcolor=white];
+
+        DB [label="Database", shape=cylinder];
+        Queue [label="Message Queue", shape=parallelogram];
+    }
+
+    UI -> Router;
+    Router -> State;
+    State -> API [ltail=cluster_frontend, lhead=cluster_backend];
+    API -> Auth;
+    API -> Cache;
+    Auth -> DB [ltail=cluster_backend, lhead=cluster_data];
+    API -> Queue;
+}

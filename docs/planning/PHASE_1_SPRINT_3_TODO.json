@@ -4,8 +4,8 @@
   "title": "Update Syntax Highlighting",
   "priority": "MEDIUM",
   "effort": "15 minutes",
-  "status": "pending",
-  "completedAt": null,
+  "status": "completed",
+  "completedAt": "2026-01-20",
   "implementationNotes": null,
   "impact": "Improves developer experience with proper DOT syntax highlighting in editor",
   "targetMetrics": {
@@ -20,7 +20,7 @@
       "category": "research",
       "title": "Read current language.ts to understand structure",
       "description": "Read the current language.ts file to understand the StreamLanguage implementation and token matching structure.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -62,7 +62,7 @@
       "category": "core",
       "title": "Replace Mermaid keywords with DOT keywords",
       "description": "Replace the Mermaid keywords array with DOT language keywords.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.05,
       "agent": "haiku",
@@ -98,7 +98,7 @@
       "category": "core",
       "title": "Add DOT attribute keywords",
       "description": "Add arrays for DOT attributes and shape names for enhanced syntax highlighting.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -134,7 +134,7 @@
       "category": "core",
       "title": "Update token matching for DOT syntax",
       "description": "Rewrite the token function to recognize DOT language patterns including arrows, comments, strings, and brackets.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.2,
       "agent": "haiku",
@@ -187,7 +187,7 @@
       "category": "testing",
       "title": "Test syntax highlighting",
       "description": "Manually test that syntax highlighting works correctly for various DOT constructs.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -195,10 +195,7 @@
       "testCategories": ["manual"],
       "implementation": {
         "purpose": "Verify syntax highlighting works as expected",
-        "keyDecisions": [
-          "Test all token types",
-          "Verify colors are applied correctly"
-        ]
+        "keyDecisions": ["Test all token types", "Verify colors are applied correctly"]
       },
       "stepByStep": [
         {
@@ -245,9 +242,7 @@
     "pnpm typecheck passes"
   ],
   "filesCreated": [],
-  "filesModified": [
-    "src/editor/language.ts"
-  ],
+  "filesModified": ["src/editor/language.ts"],
   "totalNewTests": 0,
   "totalEstimatedHours": 0.55,
   "dependencies": [],

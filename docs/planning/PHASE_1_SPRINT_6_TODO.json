@@ -4,8 +4,8 @@
   "title": "Update Examples Menu and Glob Import",
   "priority": "MEDIUM",
   "effort": "5 minutes",
-  "status": "pending",
-  "completedAt": null,
+  "status": "completed",
+  "completedAt": "2026-01-20",
   "implementationNotes": null,
   "impact": "Enables loading DOT examples from the Examples dropdown menu",
   "targetMetrics": {
@@ -20,7 +20,7 @@
       "category": "core",
       "title": "Update examples-menu.ts glob pattern",
       "description": "Update the Vite glob import to load .dot files instead of .mmd files.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.05,
       "agent": "haiku",
@@ -56,7 +56,7 @@
       "category": "ui",
       "title": "Update index.html examples menu items",
       "description": "Update the examples dropdown menu in index.html to list DOT examples.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -92,7 +92,7 @@
       "category": "cleanup",
       "title": "Update any hardcoded example references",
       "description": "Search for and update any hardcoded .mmd references in the toolbar code.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.05,
       "agent": "haiku",
@@ -100,10 +100,7 @@
       "testCategories": ["manual"],
       "implementation": {
         "purpose": "Ensure no .mmd references remain in source code",
-        "keyDecisions": [
-          "Search all toolbar files for .mmd",
-          "Update any found references to .dot"
-        ]
+        "keyDecisions": ["Search all toolbar files for .mmd", "Update any found references to .dot"]
       },
       "stepByStep": [
         {
@@ -122,17 +119,14 @@
           "details": "Re-run grep to confirm"
         }
       ],
-      "acceptanceCriteria": [
-        "No .mmd references in src/ directory",
-        "All file references use .dot"
-      ]
+      "acceptanceCriteria": ["No .mmd references in src/ directory", "All file references use .dot"]
     },
     {
       "id": "1.6.4",
       "category": "testing",
       "title": "Test examples loading",
       "description": "Test that all example diagrams load correctly from the dropdown menu.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -184,10 +178,7 @@
     "No .mmd references remain"
   ],
   "filesCreated": [],
-  "filesModified": [
-    "src/toolbar/examples-menu.ts",
-    "src/index.html"
-  ],
+  "filesModified": ["src/toolbar/examples-menu.ts", "src/index.html"],
   "totalNewTests": 0,
   "totalEstimatedHours": 0.3,
   "dependencies": ["Sprint 5"],

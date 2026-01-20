@@ -121,7 +121,7 @@ export function setupToolbarActions(options: ToolbarActionsOptions): void {
 }
 
 function loadExamples(): ExampleItem[] {
-  const modules = import.meta.glob('../examples/*.mmd', {
+  const modules = import.meta.glob('../examples/*.dot', {
     query: '?raw',
     import: 'default',
     eager: true,
@@ -129,7 +129,7 @@ function loadExamples(): ExampleItem[] {
 
   return Object.entries(modules)
     .map(([path, content]) => {
-      const match = path.match(/\/([^/]+)\.mmd$/);
+      const match = path.match(/\/([^/]+)\.dot$/);
       const id = match?.[1];
       if (!id) return null;
       const { order, name } = parseExampleId(id);

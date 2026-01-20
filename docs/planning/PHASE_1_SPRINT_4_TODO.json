@@ -4,8 +4,8 @@
   "title": "Update File Operations",
   "priority": "MEDIUM",
   "effort": "10 minutes",
-  "status": "pending",
-  "completedAt": null,
+  "status": "completed",
+  "completedAt": "2026-01-20",
   "implementationNotes": null,
   "impact": "Enables opening and saving .dot/.gv files instead of .mmd files",
   "targetMetrics": {
@@ -20,7 +20,7 @@
       "category": "core",
       "title": "Update open-diagram.ts file filters",
       "description": "Update the file open dialog to filter for .dot and .gv files instead of Mermaid files.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -28,10 +28,7 @@
       "testCategories": ["manual"],
       "implementation": {
         "purpose": "Allow users to open Graphviz DOT files",
-        "keyDecisions": [
-          "Filter name: 'Graphviz DOT'",
-          "Extensions: ['dot', 'gv']"
-        ]
+        "keyDecisions": ["Filter name: 'Graphviz DOT'", "Extensions: ['dot', 'gv']"]
       },
       "stepByStep": [
         {
@@ -61,7 +58,7 @@
       "category": "core",
       "title": "Update save-diagram.ts file filters",
       "description": "Update the file save dialog to default to .dot extension.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -69,10 +66,7 @@
       "testCategories": ["manual"],
       "implementation": {
         "purpose": "Save files with .dot extension by default",
-        "keyDecisions": [
-          "Default extension: .dot",
-          "Filter: Graphviz DOT files"
-        ]
+        "keyDecisions": ["Default extension: .dot", "Filter: Graphviz DOT files"]
       },
       "stepByStep": [
         {
@@ -107,7 +101,7 @@
       "category": "core",
       "title": "Update export-diagram.ts filename handling",
       "description": "Update export filename generation to use .dot base name instead of .mmd.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -153,7 +147,7 @@
       "category": "core",
       "title": "Update new-diagram.ts default content",
       "description": "Update the default content shown when creating a new diagram to be valid DOT syntax.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -161,10 +155,7 @@
       "testCategories": ["manual"],
       "implementation": {
         "purpose": "New diagrams should start with valid DOT content",
-        "keyDecisions": [
-          "Simple digraph as default",
-          "Shows basic DOT syntax to users"
-        ]
+        "keyDecisions": ["Simple digraph as default", "Shows basic DOT syntax to users"]
       },
       "stepByStep": [
         {

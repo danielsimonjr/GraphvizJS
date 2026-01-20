@@ -21,11 +21,11 @@ export function setupSaveDiagramAction(options: SaveDiagramOptions): void {
     try {
       if (!targetPath) {
         const picked = await showSaveDialog({
-          defaultPath: 'diagram.mmd',
+          defaultPath: 'diagram.dot',
           filters: [
             {
-              name: 'Mermaid Diagram',
-              extensions: ['mmd', 'mermaid', 'md'],
+              name: 'DOT Diagram',
+              extensions: ['dot', 'gv'],
             },
             { name: 'All Files', extensions: ['*'] },
           ],

@@ -20,8 +20,8 @@ export function setupOpenDiagramAction(options: OpenDiagramOptions): void {
       const selected = await showOpenDialog({
         filters: [
           {
-            name: 'Mermaid Diagram',
-            extensions: ['mmd', 'mermaid', 'md'],
+            name: 'DOT Diagram',
+            extensions: ['dot', 'gv'],
           },
           { name: 'All Files', extensions: ['*'] },
         ],

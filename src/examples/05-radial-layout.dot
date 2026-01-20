@@ -1,0 +1,37 @@
+// Radial Layout Example (twopi)
+// Organizational hierarchy in radial form
+
+digraph Organization {
+    layout=twopi;
+    ranksep=2;
+
+    node [shape=ellipse, style=filled];
+
+    CEO [fillcolor="#FF6B6B", fontcolor=white, label="CEO"];
+
+    CTO [fillcolor="#4ECDC4", label="CTO"];
+    CFO [fillcolor="#4ECDC4", label="CFO"];
+    COO [fillcolor="#4ECDC4", label="COO"];
+
+    Dev1 [fillcolor="#95E1D3", label="Dev Team 1"];
+    Dev2 [fillcolor="#95E1D3", label="Dev Team 2"];
+    QA [fillcolor="#95E1D3", label="QA Team"];
+    Finance [fillcolor="#95E1D3", label="Finance"];
+    HR [fillcolor="#95E1D3", label="HR"];
+    Ops [fillcolor="#95E1D3", label="Operations"];
+    Support [fillcolor="#95E1D3", label="Support"];
+
+    CEO -> CTO;
+    CEO -> CFO;
+    CEO -> COO;
+
+    CTO -> Dev1;
+    CTO -> Dev2;
+    CTO -> QA;
+
+    CFO -> Finance;
+    CFO -> HR;
+
+    COO -> Ops;
+    COO -> Support;
+}
