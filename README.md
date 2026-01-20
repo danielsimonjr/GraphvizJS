@@ -80,14 +80,23 @@ pnpm tauri build
 The project uses [Vitest](https://vitest.dev/) for unit testing with [happy-dom](https://github.com/nicholasribeiro/happy-dom) for DOM simulation.
 
 ```bash
-# Run tests
+# Run unit tests
 pnpm test
 
-# Run tests in watch mode
+# Run unit tests in watch mode
 pnpm test:watch
 
-# Run tests with coverage report
+# Run unit tests with coverage report
 pnpm test:coverage
+
+# Run E2E tests (requires dev server)
+pnpm test:e2e
+
+# Run E2E tests with visible browser
+pnpm test:e2e:headed
+
+# Run E2E tests in debug mode
+pnpm test:e2e:debug
 ```
 
 ### Coverage
@@ -109,6 +118,7 @@ Tests are organized to mirror the source structure:
 - `test/help/` – Help dialog tests
 - `test/utils/` – Utility function tests (debounce)
 - `test/mocks/` – Shared mocks for Tauri APIs and Graphviz WASM
+- `test/e2e/` – End-to-end tests with Playwright (app, rendering, file ops, export, examples, shortcuts)
 
 ## Project Structure
 
