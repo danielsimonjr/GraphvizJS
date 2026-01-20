@@ -4,9 +4,9 @@
   "title": "E2E Test Setup",
   "priority": "HIGH",
   "effort": "60 minutes",
-  "status": "pending",
+  "status": "deferred",
   "completedAt": null,
-  "implementationNotes": null,
+  "implementationNotes": "Deferred to Phase 3. Unit tests achieved 85% coverage. E2E tests require Tauri dev server setup and Playwright integration which is better suited for a dedicated sprint.",
   "impact": "Establishes E2E testing infrastructure for Tauri app",
   "targetMetrics": {
     "infrastructure": {

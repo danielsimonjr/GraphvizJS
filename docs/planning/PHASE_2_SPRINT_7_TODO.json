@@ -4,9 +4,9 @@
   "title": "E2E Feature Tests",
   "priority": "MEDIUM",
   "effort": "90 minutes",
-  "status": "pending",
+  "status": "deferred",
   "completedAt": null,
-  "implementationNotes": null,
+  "implementationNotes": "Deferred to Phase 3. Depends on Sprint 6 E2E infrastructure setup.",
   "impact": "Tests critical user workflows end-to-end",
   "targetMetrics": {
     "coverage": {
