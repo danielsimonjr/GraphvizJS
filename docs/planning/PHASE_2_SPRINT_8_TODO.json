@@ -1,0 +1,142 @@
+{
+  "phase": 2,
+  "sprint": 8,
+  "title": "Coverage & CI Integration",
+  "priority": "HIGH",
+  "effort": "45 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Ensures coverage targets met and CI runs tests automatically",
+  "targetMetrics": {
+    "coverage": {
+      "current": "Variable after implementation",
+      "target": "90%+ overall, all files at 80%+ minimum"
+    }
+  },
+  "tasks": [
+    {
+      "id": "2.8.1",
+      "category": "testing",
+      "title": "Run coverage report and identify gaps",
+      "description": "Generate coverage report and identify files below 90%.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "agent": "haiku",
+      "files": [],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Identify coverage gaps",
+        "keyDecisions": [
+          "Run pnpm test:coverage",
+          "Review uncovered lines",
+          "Prioritize critical paths"
+        ]
+      },
+      "acceptanceCriteria": ["Coverage report generated", "Gap analysis documented"]
+    },
+    {
+      "id": "2.8.2",
+      "category": "testing",
+      "title": "Fill coverage gaps",
+      "description": "Add tests for any uncovered critical paths.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.4,
+      "agent": "sonnet",
+      "files": ["test/**/*.test.ts"],
+      "testCategories": ["unit"],
+      "implementation": {
+        "purpose": "Reach 90% coverage target",
+        "keyDecisions": ["Focus on branch coverage", "Test error handling paths", "Test edge cases"]
+      },
+      "acceptanceCriteria": [
+        "All files at 80%+ coverage",
+        "Overall coverage at 90%+",
+        "Critical paths fully tested"
+      ]
+    },
+    {
+      "id": "2.8.3",
+      "category": "config",
+      "title": "Create GitHub Actions workflow",
+      "description": "Add CI workflow to run tests on push/PR.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.2,
+      "agent": "haiku",
+      "files": [".github/workflows/test.yml"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Automate test execution in CI",
+        "keyDecisions": [
+          "Run on push to main and PRs",
+          "Cache pnpm dependencies",
+          "Upload coverage report"
+        ]
+      },
+      "acceptanceCriteria": ["Workflow file created", "Runs unit tests", "Reports coverage"]
+    },
+    {
+      "id": "2.8.4",
+      "category": "documentation",
+      "title": "Update README with test instructions",
+      "description": "Document how to run tests and coverage.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["README.md"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Document testing for contributors",
+        "keyDecisions": ["Add Testing section to README", "Include coverage badge if possible"]
+      },
+      "acceptanceCriteria": ["README includes test commands", "Coverage target documented"]
+    },
+    {
+      "id": "2.8.5",
+      "category": "cleanup",
+      "title": "Final verification and commit",
+      "description": "Run all tests, verify coverage, commit Phase 2.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "agent": "haiku",
+      "files": [],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Verify Phase 2 completion",
+        "keyDecisions": [
+          "Run pnpm test",
+          "Run pnpm test:coverage",
+          "Run pnpm test:e2e",
+          "Commit all Phase 2 files"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All unit tests pass",
+        "All E2E tests pass",
+        "Coverage meets target",
+        "Phase 2 committed"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "90%+ overall coverage achieved",
+    "CI workflow runs tests automatically",
+    "README documents testing",
+    "All Phase 2 files committed"
+  ],
+  "filesCreated": [".github/workflows/test.yml"],
+  "filesModified": ["README.md", "test/**/*.test.ts"],
+  "totalNewTests": 0,
+  "totalEstimatedHours": 1.0,
+  "dependencies": ["Sprint 2.1-2.7"],
+  "notes": [
+    "Coverage gaps vary based on implementation",
+    "E2E tests may be excluded from CI initially",
+    "Consider coverage badge for README"
+  ]
+}

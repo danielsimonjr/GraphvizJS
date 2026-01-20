@@ -1,0 +1,142 @@
+{
+  "phase": 2,
+  "sprint": 7,
+  "title": "E2E Feature Tests",
+  "priority": "MEDIUM",
+  "effort": "90 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Tests critical user workflows end-to-end",
+  "targetMetrics": {
+    "coverage": {
+      "current": "Basic app tests only",
+      "target": "All major user flows covered"
+    }
+  },
+  "tasks": [
+    {
+      "id": "2.7.1",
+      "category": "testing",
+      "title": "Create rendering.spec.ts",
+      "description": "Test diagram rendering E2E with 6 test cases.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.4,
+      "agent": "sonnet",
+      "files": ["test/e2e/rendering.spec.ts"],
+      "testCategories": ["e2e"],
+      "testCases": [
+        "Typing DOT code updates preview",
+        "Invalid DOT shows error message",
+        "Empty editor shows empty state",
+        "Complex diagram renders correctly",
+        "Preview zoom controls work",
+        "Preview pans with mouse drag"
+      ],
+      "acceptanceCriteria": ["6 test cases pass", "Rendering flow verified"]
+    },
+    {
+      "id": "2.7.2",
+      "category": "testing",
+      "title": "Create file-operations.spec.ts",
+      "description": "Test file save/open E2E with 6 test cases.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.4,
+      "agent": "sonnet",
+      "files": ["test/e2e/file-operations.spec.ts"],
+      "testCategories": ["e2e"],
+      "testCases": [
+        "New diagram resets editor",
+        "Save dialog opens with .dot extension",
+        "Open dialog filters for .dot/.gv files",
+        "Loaded file content appears in editor",
+        "Window title updates with filename",
+        "Ctrl+S triggers save"
+      ],
+      "acceptanceCriteria": ["6 test cases pass", "File operations verified"]
+    },
+    {
+      "id": "2.7.3",
+      "category": "testing",
+      "title": "Create export.spec.ts",
+      "description": "Test export functionality E2E with 5 test cases.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.35,
+      "agent": "sonnet",
+      "files": ["test/e2e/export.spec.ts"],
+      "testCategories": ["e2e"],
+      "testCases": [
+        "Export menu opens on click",
+        "PNG export triggers save dialog",
+        "PNG @2x export triggers save dialog",
+        "SVG export triggers save dialog",
+        "Export uses diagram filename as default"
+      ],
+      "acceptanceCriteria": ["5 test cases pass", "Export flow verified"]
+    },
+    {
+      "id": "2.7.4",
+      "category": "testing",
+      "title": "Create examples.spec.ts",
+      "description": "Test examples menu E2E with 4 test cases.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.25,
+      "agent": "haiku",
+      "files": ["test/e2e/examples.spec.ts"],
+      "testCategories": ["e2e"],
+      "testCases": [
+        "Examples menu opens on click",
+        "Example selection loads content",
+        "Example renders in preview",
+        "Multiple examples can be loaded"
+      ],
+      "acceptanceCriteria": ["4 test cases pass", "Examples flow verified"]
+    },
+    {
+      "id": "2.7.5",
+      "category": "testing",
+      "title": "Create keyboard-shortcuts.spec.ts",
+      "description": "Test keyboard shortcuts E2E with 5 test cases.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.25,
+      "agent": "haiku",
+      "files": ["test/e2e/keyboard-shortcuts.spec.ts"],
+      "testCategories": ["e2e"],
+      "testCases": [
+        "Ctrl+N creates new diagram",
+        "Ctrl+O opens file dialog",
+        "Ctrl+S saves current diagram",
+        "F1 opens help dialog",
+        "Editor zoom shortcuts work"
+      ],
+      "acceptanceCriteria": ["5 test cases pass", "Shortcuts verified"]
+    }
+  ],
+  "successCriteria": [
+    "All five E2E test files created",
+    "26 E2E test cases pass",
+    "All major user flows covered",
+    "pnpm test:e2e passes"
+  ],
+  "filesCreated": [
+    "test/e2e/rendering.spec.ts",
+    "test/e2e/file-operations.spec.ts",
+    "test/e2e/export.spec.ts",
+    "test/e2e/examples.spec.ts",
+    "test/e2e/keyboard-shortcuts.spec.ts"
+  ],
+  "filesModified": [],
+  "totalNewTests": 26,
+  "totalEstimatedHours": 1.65,
+  "dependencies": ["Sprint 2.6"],
+  "notes": [
+    "File operations E2E may need mock filesystem",
+    "Export tests verify dialog opens, not file contents",
+    "Some tests may be flaky - add retries if needed"
+  ]
+}
