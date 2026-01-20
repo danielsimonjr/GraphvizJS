@@ -22,6 +22,7 @@ import {
   updateLevelDisplay,
 } from './preview/zoom';
 import { setupToolbarActions } from './toolbar/actions';
+import { getCurrentEngine, setupLayoutEngine } from './toolbar/layout-engine';
 import { setupToolbarShortcuts } from './toolbar/shortcuts';
 import {
   loadEditorZoom,
@@ -117,19 +118,22 @@ async function bootstrap(): Promise<void> {
   };
 
   const schedulePreviewRender = createPreview(previewElement, RENDER_DELAY, {
-    onRenderStart() {
-      status.rendering();
+    callbacks: {
+      onRenderStart() {
+        status.rendering();
+      },
+      onRenderSuccess() {
+        status.success('Preview updated successfully');
+        zoomController.applyZoom();
+      },
+      onRenderEmpty() {
+        status.info('Waiting for DOT markup...');
+      },
+      onRenderError(details) {
+        status.error(details);
+      },
     },
-    onRenderSuccess() {
-      status.success('Preview updated successfully');
-      zoomController.applyZoom();
-    },
-    onRenderEmpty() {
-      status.info('Waiting for DOT markup...');
-    },
-    onRenderError(details) {
-      status.error(details);
-    },
+    getEngine: getCurrentEngine,
   });
   const handleDocChange = (doc: string) => {
     isDocumentDirty = doc !== lastCommittedDoc;
@@ -213,6 +217,10 @@ async function bootstrap(): Promise<void> {
     newButton: newDiagramButton,
     openButton,
     saveButton,
+  });
+
+  setupLayoutEngine(() => {
+    schedulePreviewRender(editor.state.doc.toString());
   });
 
   setupHelpDialog(helpButton);

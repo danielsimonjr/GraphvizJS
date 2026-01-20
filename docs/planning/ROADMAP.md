@@ -10,13 +10,13 @@
 - [x] Help dialog with keyboard shortcuts
 - [x] Window state persistence
 
-## Future Features
+## Completed (Phase 3)
 
-### Layout Engine Selector (Sprint 8)
+### Layout Engine Selector (Sprint 1)
 
 **Priority:** Medium
-**Effort:** ~15 minutes
-**Status:** Planned
+**Effort:** ~30 minutes
+**Status:** Completed (2026-01-20)
 
 Add a toolbar dropdown to switch between Graphviz layout engines without editing DOT source.
 

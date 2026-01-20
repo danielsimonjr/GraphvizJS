@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { waitForAppReady, getEditorContent, selectors } from './helpers';
+import { expect, test } from '@playwright/test';
+import { getEditorContent, selectors, waitForAppReady } from './helpers';
 
 test.describe('Keyboard Shortcuts', () => {
   test.beforeEach(async ({ page }) => {

@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added - Phase 3: Feature Enhancements
+
+#### Layout Engine Selector (Sprint 1) - 8 tests
+- Toolbar dropdown to switch between all 8 Graphviz layout engines
+- layout-engine.ts: Setup and current engine retrieval functions
+- render.ts: Updated to accept and use selected layout engine
+- Styled dropdown matching toolbar aesthetic
+- Unit tests for layout engine handler (100% coverage)
+
 ### Added - Phase 2: Testing Infrastructure
 
 #### Test Infrastructure (Sprint 1)

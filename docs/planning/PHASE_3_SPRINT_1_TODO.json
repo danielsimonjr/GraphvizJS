@@ -1,0 +1,165 @@
+{
+  "phase": 3,
+  "sprint": 1,
+  "title": "Layout Engine Selector",
+  "priority": "MEDIUM",
+  "effort": "30 minutes",
+  "status": "completed",
+  "startedAt": "2026-01-20",
+  "completedAt": "2026-01-20",
+  "implementationNotes": "Added toolbar dropdown with all 8 Graphviz layout engines. Created layout-engine.ts handler with setupLayoutEngine and getCurrentEngine functions. Updated render.ts with PreviewOptions interface to support getEngine callback. Styled dropdown to match toolbar aesthetic. Added 8 unit tests with 100% coverage.",
+  "impact": "Enables users to switch between all 8 Graphviz layout engines from the toolbar",
+  "targetMetrics": {
+    "layoutEngines": {
+      "current": "All 8 Graphviz layout engines selectable",
+      "target": "All 8 Graphviz layout engines selectable"
+    }
+  },
+  "tasks": [
+    {
+      "id": "3.1.1",
+      "category": "ui",
+      "title": "Add layout engine dropdown to toolbar",
+      "description": "Add a select element to the toolbar for choosing the Graphviz layout engine.",
+      "status": "completed",
+      "implementationNotes": "Added select#layout-engine with all 8 engines (dot, neato, fdp, sfdp, circo, twopi, osage, patchwork) and descriptive labels. Placed after save button with toolbar-separator.",
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/index.html"],
+      "testCategories": ["manual"],
+      "acceptanceCriteria": [
+        "Select element visible in toolbar",
+        "All 8 layout engines listed",
+        "dot is default selection"
+      ]
+    },
+    {
+      "id": "3.1.2",
+      "category": "core",
+      "title": "Create layout engine handler",
+      "description": "Create a new TypeScript module to handle layout engine selection.",
+      "status": "completed",
+      "implementationNotes": "Created src/toolbar/layout-engine.ts with setupLayoutEngine(callback) and getCurrentEngine() functions. Imports LayoutEngine type from graphviz.ts.",
+      "estimatedHours": 0.15,
+      "agent": "haiku",
+      "files": ["src/toolbar/layout-engine.ts"],
+      "testCategories": ["typecheck", "unit"],
+      "acceptanceCriteria": [
+        "File created with setupLayoutEngine and getCurrentEngine exports",
+        "Type imports from graphviz.ts",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.1.3",
+      "category": "core",
+      "title": "Update render.ts to use selected engine",
+      "description": "Modify createPreview to accept and use the layout engine.",
+      "status": "completed",
+      "implementationNotes": "Added PreviewOptions interface with callbacks and getEngine properties. Updated createPreview to support both old API (just callbacks) and new API (PreviewOptions). Passes engine to renderDotToSvg.",
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/preview/render.ts"],
+      "testCategories": ["typecheck", "unit"],
+      "acceptanceCriteria": [
+        "createPreview accepts getEngine callback",
+        "Layout engine passed to renderDotToSvg",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.1.4",
+      "category": "core",
+      "title": "Wire up layout engine in main.ts",
+      "description": "Initialize the layout engine handler and trigger re-render on change.",
+      "status": "completed",
+      "implementationNotes": "Imported setupLayoutEngine and getCurrentEngine. Updated createPreview call to pass getEngine callback. Added setupLayoutEngine() to trigger schedulePreviewRender on engine change.",
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["src/main.ts"],
+      "testCategories": ["manual"],
+      "acceptanceCriteria": [
+        "setupLayoutEngine called on init",
+        "Engine change triggers re-render",
+        "Different layouts visible when switching engines"
+      ]
+    },
+    {
+      "id": "3.1.5",
+      "category": "ui",
+      "title": "Style the layout dropdown",
+      "description": "Add CSS styling for the layout engine dropdown to match the toolbar aesthetic.",
+      "status": "completed",
+      "implementationNotes": "Added .toolbar-separator and .toolbar-select styles. Matches toolbar button height (34px), border radius, colors. Includes hover and focus states. Dark mode support.",
+      "estimatedHours": 0.05,
+      "agent": "haiku",
+      "files": ["src/styles.css"],
+      "testCategories": ["manual"],
+      "acceptanceCriteria": [
+        "Dropdown matches toolbar aesthetic",
+        "Proper height alignment",
+        "Hover and focus states work"
+      ]
+    },
+    {
+      "id": "3.1.6",
+      "category": "testing",
+      "title": "Add unit tests for layout-engine.ts",
+      "description": "Create unit tests for the layout engine handler.",
+      "status": "completed",
+      "implementationNotes": "Created test/toolbar/layout-engine.test.ts with 8 tests covering getCurrentEngine (default, selected, missing element, all engines) and setupLayoutEngine (event listener, callback on change, all engines, missing element).",
+      "estimatedHours": 0.15,
+      "agent": "sonnet",
+      "files": ["test/toolbar/layout-engine.test.ts"],
+      "testCategories": ["unit"],
+      "acceptanceCriteria": [
+        "Tests for setupLayoutEngine",
+        "Tests for getCurrentEngine",
+        "Tests for engine change callback",
+        "80%+ coverage"
+      ]
+    },
+    {
+      "id": "3.1.7",
+      "category": "documentation",
+      "title": "Update documentation and commit",
+      "description": "Update CHANGELOG, ROADMAP, and commit changes.",
+      "status": "completed",
+      "implementationNotes": "Added Phase 3 section to CHANGELOG. Updated ROADMAP to show Layout Engine Selector as completed. Sprint JSON updated with all task completion notes.",
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["CHANGELOG.md", "docs/planning/ROADMAP.md"],
+      "testCategories": ["manual"],
+      "acceptanceCriteria": [
+        "CHANGELOG updated with new feature",
+        "ROADMAP shows feature as completed",
+        "Changes committed to GitHub"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "Layout engine dropdown visible in toolbar",
+    "Changing engine re-renders diagram with new layout",
+    "All 8 engines work correctly",
+    "Dropdown styled consistently with toolbar",
+    "Unit tests pass with 80%+ coverage"
+  ],
+  "filesCreated": ["src/toolbar/layout-engine.ts", "test/toolbar/layout-engine.test.ts"],
+  "filesModified": [
+    "src/index.html",
+    "src/preview/render.ts",
+    "src/main.ts",
+    "src/styles.css",
+    "CHANGELOG.md",
+    "docs/planning/ROADMAP.md"
+  ],
+  "totalNewTests": 8,
+  "totalEstimatedHours": 0.75,
+  "dependencies": ["Phase 2 complete"],
+  "notes": [
+    "Different engines produce very different layouts",
+    "neato/fdp work best for undirected graphs",
+    "dot works best for directed hierarchical graphs",
+    "Some graphs may not render well with certain engines"
+  ]
+}

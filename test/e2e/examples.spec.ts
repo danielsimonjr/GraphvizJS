@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { waitForAppReady, waitForPreviewUpdate, getEditorContent, selectors } from './helpers';
+import { expect, test } from '@playwright/test';
+import { getEditorContent, selectors, waitForAppReady, waitForPreviewUpdate } from './helpers';
 
 test.describe('Examples Menu', () => {
   test.beforeEach(async ({ page }) => {
@@ -30,7 +30,7 @@ test.describe('Examples Menu', () => {
 
   test('example selection loads content into editor', async ({ page }) => {
     // Get initial content
-    const initialContent = await getEditorContent(page);
+    const _initialContent = await getEditorContent(page);
 
     // Open examples menu
     const examplesBtn = page.locator(selectors.examplesBtn);
@@ -90,7 +90,7 @@ test.describe('Examples Menu', () => {
     await example.click();
     await waitForPreviewUpdate(page);
 
-    const firstContent = await getEditorContent(page);
+    const _firstContent = await getEditorContent(page);
 
     // Load second example
     await examplesBtn.click();
@@ -98,7 +98,7 @@ test.describe('Examples Menu', () => {
     await example.click();
     await waitForPreviewUpdate(page);
 
-    const secondContent = await getEditorContent(page);
+    const _secondContent = await getEditorContent(page);
 
     // Contents should be different (unless same example)
     // At minimum, both should render without error

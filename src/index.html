@@ -39,6 +39,22 @@
             >
               <i class="ri-save-3-line" aria-hidden="true"></i>
             </button>
+            <div class="toolbar-separator"></div>
+            <select
+              id="layout-engine"
+              class="toolbar-select"
+              title="Layout Engine"
+              aria-label="Layout engine"
+            >
+              <option value="dot" selected>dot (hierarchical)</option>
+              <option value="neato">neato (spring model)</option>
+              <option value="fdp">fdp (force-directed)</option>
+              <option value="sfdp">sfdp (scalable fdp)</option>
+              <option value="circo">circo (circular)</option>
+              <option value="twopi">twopi (radial)</option>
+              <option value="osage">osage (array-based)</option>
+              <option value="patchwork">patchwork (squarified)</option>
+            </select>
           </div>
           <div class="toolbar-right">
             <div class="toolbar-dropdown" data-dropdown="examples">

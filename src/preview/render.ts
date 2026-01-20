@@ -1,4 +1,5 @@
 import { debounce } from '../utils/debounce';
+import type { LayoutEngine } from './graphviz';
 import { renderDotToSvg } from './graphviz';
 
 export type PreviewScheduler = (doc: string) => void;
@@ -10,11 +11,25 @@ export interface PreviewStatusCallbacks {
   onRenderError?: (details: string) => void;
 }
 
+export interface PreviewOptions {
+  callbacks?: PreviewStatusCallbacks;
+  getEngine?: () => LayoutEngine;
+}
+
 export function createPreview(
   previewEl: HTMLElement,
   delay: number,
-  callbacks: PreviewStatusCallbacks = {}
+  callbacksOrOptions: PreviewStatusCallbacks | PreviewOptions = {}
 ): PreviewScheduler {
+  // Support both old and new API signatures
+  const isNewApi = 'callbacks' in callbacksOrOptions || 'getEngine' in callbacksOrOptions;
+  const options: PreviewOptions = isNewApi
+    ? (callbacksOrOptions as PreviewOptions)
+    : { callbacks: callbacksOrOptions as PreviewStatusCallbacks };
+
+  const callbacks = options.callbacks ?? {};
+  const getEngine = options.getEngine ?? (() => 'dot' as LayoutEngine);
+
   let latestToken = 0;
   const debouncedRender = debounce(async (source: string, token: number) => {
     if (token !== latestToken) return;
@@ -27,7 +42,8 @@ export function createPreview(
     }
 
     try {
-      const svg = await renderDotToSvg(trimmed);
+      const engine = getEngine();
+      const svg = await renderDotToSvg(trimmed, engine);
       if (token !== latestToken) return;
       previewEl.classList.remove('preview-empty', 'preview-error');
       previewEl.innerHTML = svg;

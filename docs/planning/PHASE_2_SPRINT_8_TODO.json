@@ -98,7 +98,12 @@
     "All Phase 2 files committed"
   ],
   "filesCreated": [".github/workflows/test.yml", "CHANGELOG.md"],
-  "filesModified": ["README.md", "vitest.config.ts", "test/help/dialog.test.ts", "test/window/state.test.ts"],
+  "filesModified": [
+    "README.md",
+    "vitest.config.ts",
+    "test/help/dialog.test.ts",
+    "test/window/state.test.ts"
+  ],
   "totalNewTests": 8,
   "totalEstimatedHours": 1.0,
   "dependencies": ["Sprint 2.1-2.7"],

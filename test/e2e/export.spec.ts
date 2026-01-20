@@ -1,5 +1,11 @@
-import { test, expect } from '@playwright/test';
-import { waitForAppReady, openExportMenu, setEditorContent, waitForPreviewUpdate, selectors } from './helpers';
+import { expect, test } from '@playwright/test';
+import {
+  openExportMenu,
+  selectors,
+  setEditorContent,
+  waitForAppReady,
+  waitForPreviewUpdate,
+} from './helpers';
 
 test.describe('Export Functionality', () => {
   test.beforeEach(async ({ page }) => {
@@ -25,7 +31,9 @@ test.describe('Export Functionality', () => {
   test('export menu contains PNG @2x option', async ({ page }) => {
     await openExportMenu(page);
 
-    const png2xOption = page.locator('.export-menu button:has-text("2x"), .export-menu button:has-text("@2x")');
+    const png2xOption = page.locator(
+      '.export-menu button:has-text("2x"), .export-menu button:has-text("@2x")'
+    );
     await expect(png2xOption).toBeVisible();
   });
 
@@ -52,7 +60,7 @@ test.describe('Export Functionality', () => {
     await openExportMenu(page);
 
     // Set up download handler (export triggers download in browser)
-    const downloadPromise = page.waitForEvent('download', { timeout: 5000 }).catch(() => null);
+    const _downloadPromise = page.waitForEvent('download', { timeout: 5000 }).catch(() => null);
 
     // Click SVG export (least complex)
     const svgOption = page.locator('.export-menu button:has-text("SVG")');
