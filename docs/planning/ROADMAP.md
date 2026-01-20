@@ -51,13 +51,195 @@ graph G {
 
 ---
 
-### Potential Future Enhancements
+## Future Enhancements
 
-- [ ] Dark mode theme
-- [ ] Recent files list
-- [ ] Auto-save / recovery
-- [ ] Multiple tabs/documents
-- [ ] DOT syntax validation/linting
-- [ ] Export to PDF
-- [ ] Graph statistics panel
-- [ ] Custom node/edge templates
+### Dark Mode Theme
+
+**Priority:** High
+**Effort:** ~45 minutes
+**Status:** Planned
+
+Add system-aware dark mode with manual toggle for the entire application.
+
+**Implementation:**
+1. Create CSS custom properties for light/dark color schemes in `style.css`
+2. Add `src/theme/mode.ts` to detect system preference via `prefers-color-scheme`
+3. Create toggle button in toolbar (sun/moon icon)
+4. Update CodeMirror theme in `src/editor/theme.ts` with dark variant
+5. Persist preference in Tauri store
+6. Apply theme class to `<html>` element for CSS cascade
+
+**Files to modify:** `style.css`, `index.html`, `src/editor/theme.ts`, `src/window/state.ts`
+**Files to create:** `src/theme/mode.ts`
+
+---
+
+### Recent Files List
+
+**Priority:** High
+**Effort:** ~30 minutes
+**Status:** Planned
+
+Show recently opened files in a dropdown menu for quick access.
+
+**Implementation:**
+1. Store recent file paths (max 10) in Tauri store
+2. Create `src/toolbar/recent-files.ts` with menu component
+3. Add "Recent Files" submenu to File menu or toolbar dropdown
+4. Update `open-diagram.ts` to add opened files to recent list
+5. Handle missing files gracefully (remove from list if not found)
+6. Add keyboard shortcut (Ctrl+Shift+O) to open recent files menu
+
+**Files to modify:** `index.html`, `src/toolbar/open-diagram.ts`, `src/window/state.ts`
+**Files to create:** `src/toolbar/recent-files.ts`
+
+---
+
+### Auto-Save / Recovery
+
+**Priority:** Medium
+**Effort:** ~45 minutes
+**Status:** Planned
+
+Automatically save drafts and recover unsaved work after crashes.
+
+**Implementation:**
+1. Create `src/autosave/manager.ts` for periodic draft saving
+2. Store drafts in app data directory with timestamps
+3. Save draft every 30 seconds if content changed (debounced)
+4. On startup, check for recovery files newer than last save
+5. Prompt user to recover or discard unsaved drafts
+6. Clean up old drafts (older than 7 days)
+
+**Files to create:** `src/autosave/manager.ts`, `src/autosave/recovery.ts`
+**Files to modify:** `src/main.ts`, `src/toolbar/save-diagram.ts`
+
+---
+
+### Multiple Tabs/Documents
+
+**Priority:** Medium
+**Effort:** ~2 hours
+**Status:** Planned
+
+Support multiple open documents in a tabbed interface.
+
+**Implementation:**
+1. Create `src/tabs/manager.ts` for tab state management
+2. Add tab bar component above editor in `index.html`
+3. Each tab maintains: content, file path, dirty state, scroll position
+4. Update toolbar actions to operate on active tab
+5. Add keyboard shortcuts: Ctrl+T (new tab), Ctrl+W (close tab), Ctrl+Tab (switch)
+6. Sync preview with active tab's content
+7. Confirm before closing dirty tabs
+
+**Files to create:** `src/tabs/manager.ts`, `src/tabs/tab-bar.ts`
+**Files to modify:** `index.html`, `style.css`, `src/main.ts`, all toolbar actions
+
+**Complexity:** This is a significant refactor affecting editor state management.
+
+---
+
+### DOT Syntax Validation/Linting
+
+**Priority:** Medium
+**Effort:** ~1 hour
+**Status:** Planned
+
+Real-time DOT syntax validation with inline error markers.
+
+**Implementation:**
+1. Create `src/editor/linting.ts` using CodeMirror's lint extension
+2. Parse DOT with Graphviz WASM in validation mode (no render)
+3. Extract error line/column from Graphviz error messages
+4. Display inline squiggles and gutter markers
+5. Show error details in tooltip on hover
+6. Debounce validation to avoid excessive parsing
+
+**Files to create:** `src/editor/linting.ts`
+**Files to modify:** `src/editor/setup.ts`, `src/preview/graphviz.ts`
+
+**Note:** Graphviz error messages vary in format; parsing may need heuristics.
+
+---
+
+### Export to PDF
+
+**Priority:** Low
+**Effort:** ~30 minutes
+**Status:** Planned
+
+Add PDF export option alongside SVG and PNG.
+
+**Implementation:**
+1. Add PDF option to export menu in `index.html`
+2. Create `src/toolbar/export-pdf.ts` handler
+3. Use SVG-to-PDF conversion (jsPDF + svg2pdf.js or similar)
+4. Apply same padding/background as PNG export
+5. Support page size selection (A4, Letter, fit-to-content)
+
+**Dependencies:** May require additional npm package (jspdf, svg2pdf.js)
+**Files to create:** `src/toolbar/export-pdf.ts`
+**Files to modify:** `index.html`, `src/toolbar/export-menu.ts`
+
+---
+
+### Graph Statistics Panel
+
+**Priority:** Low
+**Effort:** ~45 minutes
+**Status:** Planned
+
+Display graph metrics (node count, edge count, etc.) in a collapsible panel.
+
+**Implementation:**
+1. Create `src/stats/panel.ts` for statistics calculation and display
+2. Parse rendered SVG to count nodes (`<g class="node">`) and edges (`<g class="edge">`)
+3. Extract graph attributes from DOT source (directed/undirected, strict, etc.)
+4. Display in collapsible panel below preview or in status bar
+5. Update stats on each successful render
+
+**Metrics to display:**
+- Node count
+- Edge count
+- Graph type (digraph/graph)
+- Subgraph/cluster count
+- Layout engine used
+
+**Files to create:** `src/stats/panel.ts`
+**Files to modify:** `index.html`, `style.css`, `src/preview/render.ts`
+
+---
+
+### Custom Node/Edge Templates
+
+**Priority:** Low
+**Effort:** ~1.5 hours
+**Status:** Planned
+
+Provide template snippets for common node and edge styles.
+
+**Implementation:**
+1. Create `src/templates/library.ts` with predefined DOT snippets
+2. Add "Insert Template" dropdown to toolbar
+3. Categories: Nodes (box, circle, record, HTML), Edges (arrow styles, labels), Clusters
+4. Insert template at cursor position in editor
+5. Support user-defined templates stored in app config
+6. Template preview on hover in dropdown
+
+**Files to create:** `src/templates/library.ts`, `src/templates/menu.ts`
+**Files to modify:** `index.html`, `src/editor/setup.ts`
+
+**Example templates:**
+```dot
+// Record node
+node [shape=record, label="{Title|field1|field2}"]
+
+// HTML node
+node [shape=none, label=<
+  <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+    <TR><TD>Header</TD></TR>
+    <TR><TD>Content</TD></TR>
+  </TABLE>
+>]
+```
