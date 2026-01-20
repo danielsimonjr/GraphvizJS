@@ -52,13 +52,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - E2E helpers with common utilities (waitForAppReady, selectors, etc.)
 - Test scripts: `pnpm test:e2e`, `pnpm test:e2e:headed`, `pnpm test:e2e:debug`
 
-#### E2E Feature Tests (Sprint 7) - 50 tests
+#### E2E Feature Tests (Sprints 6-7) - 50 tests
 - app.spec.ts: App launch, toolbar buttons (12 tests)
 - rendering.spec.ts: DOT rendering, preview zoom, layout engines (6 tests)
 - file-operations.spec.ts: New, open, save, dirty state (6 tests)
-- export.spec.ts: Export menu, format options, keyboard nav (10 tests)
-- examples.spec.ts: Examples menu, selection, loading (8 tests)
-- keyboard-shortcuts.spec.ts: File shortcuts, editor zoom, help (14 tests)
+- export.spec.ts: Export menu, format options, keyboard nav (9 tests)
+- examples.spec.ts: Examples menu, selection, loading (7 tests)
+- keyboard-shortcuts.spec.ts: File shortcuts, editor zoom, help (10 tests)
+- Note: E2E tests timeout on app initialization - need selector/timing adjustments
 
 #### CI/CD (Sprint 8)
 - GitHub Actions workflow for unit tests (`.github/workflows/test.yml`)
