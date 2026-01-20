@@ -11,8 +11,9 @@ Based on [MermaidJS Desktop Client](https://github.com/skydiver/mermaidjs-deskto
 3. [Getting Started](#getting-started)
 4. [Building](#building)
 5. [Tooling](#tooling)
-6. [Project Structure](#project-structure)
-7. [Acknowledgements](#acknowledgements)
+6. [Testing](#testing)
+7. [Project Structure](#project-structure)
+8. [Acknowledgements](#acknowledgements)
 
 ## Features
 
@@ -73,6 +74,41 @@ pnpm tauri build
 - `pnpm lint` – Run [Biome](https://biomejs.dev/) linter and formatter checks
 - `pnpm lint:fix` – Automatically apply Biome fixes
 - `pnpm typecheck` – Type-check TypeScript without emitting files
+
+## Testing
+
+The project uses [Vitest](https://vitest.dev/) for unit testing with [happy-dom](https://github.com/nicholasribeiro/happy-dom) for DOM simulation.
+
+```bash
+# Run tests
+pnpm test
+
+# Run tests in watch mode
+pnpm test:watch
+
+# Run tests with coverage report
+pnpm test:coverage
+```
+
+### Coverage
+
+Coverage reports are generated in HTML and LCOV formats in the `coverage/` directory. Current coverage thresholds:
+- Lines: 80%
+- Functions: 80%
+- Branches: 70%
+- Statements: 80%
+
+### Test Structure
+
+Tests are organized to mirror the source structure:
+- `test/editor/` – Editor component tests (language, theme, zoom)
+- `test/preview/` – Preview rendering tests (graphviz, render, zoom)
+- `test/toolbar/` – Toolbar action tests (file operations, export, menus)
+- `test/workspace/` – Workspace resize tests
+- `test/window/` – Window state persistence tests
+- `test/help/` – Help dialog tests
+- `test/utils/` – Utility function tests (debounce)
+- `test/mocks/` – Shared mocks for Tauri APIs and Graphviz WASM
 
 ## Project Structure
 

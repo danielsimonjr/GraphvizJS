@@ -94,5 +94,58 @@ describe('window/state', () => {
       // Should not throw
       await expect(persistWindowState(store, appWindow)).resolves.not.toThrow();
     });
+
+    it('saves all window state properties', async () => {
+      const appWindow = mockWindow.getCurrentWindow();
+      const { persistWindowState } = await import('../../src/window/state');
+      await persistWindowState(store, appWindow);
+
+      expect(mockStore.set).toHaveBeenCalledWith(
+        'windowState',
+        expect.objectContaining({
+          width: expect.any(Number),
+          height: expect.any(Number),
+          x: expect.any(Number),
+          y: expect.any(Number),
+          maximized: expect.any(Boolean),
+        })
+      );
+    });
+  });
+
+  describe('setupWindowPersistence()', () => {
+    it('registers resize and move listeners', async () => {
+      const appWindow = mockWindow.getCurrentWindow();
+      const { setupWindowPersistence } = await import('../../src/window/state');
+
+      await setupWindowPersistence(store, appWindow, 100);
+
+      expect(appWindow.onResized).toHaveBeenCalled();
+      expect(appWindow.onMoved).toHaveBeenCalled();
+      expect(appWindow.onCloseRequested).toHaveBeenCalled();
+    });
+
+    it('persists state on close request', async () => {
+      const appWindow = mockWindow.getCurrentWindow();
+
+      // Capture the close handler
+      let closeHandler: ((event: { preventDefault: () => void }) => Promise<void>) | null = null;
+      appWindow.onCloseRequested.mockImplementation(async (handler) => {
+        closeHandler = handler;
+        return () => undefined;
+      });
+
+      const { setupWindowPersistence } = await import('../../src/window/state');
+      await setupWindowPersistence(store, appWindow, 100);
+
+      // Simulate close request
+      const mockEvent = { preventDefault: vi.fn() };
+      if (closeHandler) {
+        await closeHandler(mockEvent);
+      }
+
+      expect(mockEvent.preventDefault).toHaveBeenCalled();
+      expect(appWindow.close).toHaveBeenCalled();
+    });
   });
 });

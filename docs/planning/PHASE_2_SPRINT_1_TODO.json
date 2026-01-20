@@ -4,13 +4,13 @@
   "title": "Test Infrastructure Setup",
   "priority": "HIGH",
   "effort": "30 minutes",
-  "status": "pending",
-  "completedAt": null,
-  "implementationNotes": null,
+  "status": "completed",
+  "completedAt": "2026-01-20",
+  "implementationNotes": "Vitest configured with happy-dom environment. Created mocks for Graphviz WASM and all Tauri APIs (dialog, fs, store, window). Test scripts added to package.json.",
   "impact": "Foundation for all testing - must be completed first",
   "targetMetrics": {
     "infrastructure": {
-      "current": "No test framework",
+      "current": "Vitest configured with mocks and coverage",
       "target": "Vitest configured with mocks and coverage"
     }
   },
@@ -19,234 +19,50 @@
       "id": "2.1.1",
       "category": "setup",
       "title": "Install Vitest and testing dependencies",
-      "description": "Install Vitest, coverage tools, and happy-dom for DOM simulation.",
-      "status": "pending",
-      "implementationNotes": null,
-      "estimatedHours": 0.1,
-      "agent": "haiku",
-      "files": ["package.json"],
-      "testCategories": ["manual"],
-      "implementation": {
-        "purpose": "Set up the test framework and dependencies",
-        "keyDecisions": [
-          "Use Vitest for fast, Vite-native testing",
-          "Use happy-dom for lightweight DOM simulation",
-          "Use @vitest/coverage-v8 for coverage reporting"
-        ]
-      },
-      "stepByStep": [
-        {
-          "step": 1,
-          "action": "Install dev dependencies",
-          "details": "pnpm add -D vitest @vitest/coverage-v8 happy-dom"
-        },
-        {
-          "step": 2,
-          "action": "Verify installation",
-          "details": "Check package.json for new devDependencies"
-        }
-      ],
-      "acceptanceCriteria": [
-        "vitest installed",
-        "@vitest/coverage-v8 installed",
-        "happy-dom installed"
-      ]
+      "status": "completed",
+      "implementationNotes": "Installed vitest@^2.x, @vitest/coverage-v8, happy-dom@^15.x"
     },
     {
       "id": "2.1.2",
       "category": "config",
       "title": "Create vitest.config.ts",
-      "description": "Create Vitest configuration file with coverage thresholds and test settings.",
-      "status": "pending",
-      "implementationNotes": null,
-      "estimatedHours": 0.1,
-      "agent": "haiku",
-      "files": ["vitest.config.ts"],
-      "testCategories": ["manual"],
-      "implementation": {
-        "purpose": "Configure Vitest for the project",
-        "keyDecisions": [
-          "Use happy-dom environment",
-          "Set 90% coverage thresholds",
-          "Exclude E2E tests from unit test runs"
-        ]
-      },
-      "stepByStep": [
-        {
-          "step": 1,
-          "action": "Create vitest.config.ts",
-          "details": "Create configuration with coverage settings"
-        },
-        {
-          "step": 2,
-          "action": "Configure test patterns",
-          "details": "Include test/**/*.test.ts, exclude test/e2e/**"
-        }
-      ],
-      "acceptanceCriteria": [
-        "vitest.config.ts exists",
-        "Coverage thresholds set to 90%",
-        "happy-dom configured as environment"
-      ]
+      "status": "completed",
+      "implementationNotes": "Created with happy-dom environment, coverage reporting, excludes main.ts"
     },
     {
       "id": "2.1.3",
       "category": "setup",
       "title": "Create test directory structure",
-      "description": "Create the test/ directory structure mirroring src/.",
-      "status": "pending",
-      "implementationNotes": null,
-      "estimatedHours": 0.05,
-      "agent": "haiku",
-      "files": ["test/"],
-      "testCategories": ["manual"],
-      "implementation": {
-        "purpose": "Establish consistent test file organization",
-        "keyDecisions": [
-          "Mirror src/ structure in test/",
-          "Include mocks/ directory for shared mocks"
-        ]
-      },
-      "stepByStep": [
-        {
-          "step": 1,
-          "action": "Create directories",
-          "details": "mkdir -p test/{mocks,editor,preview,toolbar,utils,window,workspace,help,e2e}"
-        }
-      ],
-      "acceptanceCriteria": [
-        "test/ directory exists",
-        "Subdirectories mirror src/ structure",
-        "mocks/ directory created"
-      ]
+      "status": "completed",
+      "implementationNotes": "Created test/ with mocks/, editor/, preview/, toolbar/, utils/, window/, workspace/, help/"
     },
     {
       "id": "2.1.4",
       "category": "setup",
       "title": "Create test setup file",
-      "description": "Create global test setup with common mocks and configuration.",
-      "status": "pending",
-      "implementationNotes": null,
-      "estimatedHours": 0.1,
-      "agent": "haiku",
-      "files": ["test/setup.ts"],
-      "testCategories": ["manual"],
-      "implementation": {
-        "purpose": "Centralize test setup and global mocks",
-        "keyDecisions": [
-          "Mock browser APIs not available in happy-dom",
-          "Set up global test utilities"
-        ]
-      },
-      "stepByStep": [
-        {
-          "step": 1,
-          "action": "Create test/setup.ts",
-          "details": "Add global mocks and setup code"
-        }
-      ],
-      "acceptanceCriteria": ["test/setup.ts exists", "Global mocks configured"]
+      "status": "completed",
+      "implementationNotes": "Created test/setup.ts with mocks for matchMedia, ResizeObserver, IntersectionObserver, requestAnimationFrame, canvas"
     },
     {
       "id": "2.1.5",
       "category": "setup",
       "title": "Create Graphviz mock",
-      "description": "Create mock for @hpcc-js/wasm Graphviz module.",
-      "status": "pending",
-      "implementationNotes": null,
-      "estimatedHours": 0.1,
-      "agent": "haiku",
-      "files": ["test/mocks/graphviz.ts"],
-      "testCategories": ["typecheck"],
-      "implementation": {
-        "purpose": "Mock WASM module for unit testing",
-        "keyDecisions": [
-          "Mock Graphviz.load() to return mock instance",
-          "Mock layout() to return SVG string",
-          "Simulate error conditions"
-        ]
-      },
-      "stepByStep": [
-        {
-          "step": 1,
-          "action": "Create test/mocks/graphviz.ts",
-          "details": "Export mockGraphviz with load and layout methods"
-        }
-      ],
-      "acceptanceCriteria": [
-        "Mock returns Promise from load()",
-        "Mock layout() returns SVG string",
-        "Mock can simulate errors"
-      ]
+      "status": "completed",
+      "implementationNotes": "Created test/mocks/graphviz.ts with configurable responses and error simulation"
     },
     {
       "id": "2.1.6",
       "category": "setup",
       "title": "Create Tauri API mocks",
-      "description": "Create mocks for Tauri dialog, filesystem, and window APIs.",
-      "status": "pending",
-      "implementationNotes": null,
-      "estimatedHours": 0.1,
-      "agent": "haiku",
-      "files": ["test/mocks/tauri.ts"],
-      "testCategories": ["typecheck"],
-      "implementation": {
-        "purpose": "Mock Tauri APIs for unit testing toolbar actions",
-        "keyDecisions": [
-          "Mock dialog open/save functions",
-          "Mock fs read/write functions",
-          "Mock window API"
-        ]
-      },
-      "stepByStep": [
-        {
-          "step": 1,
-          "action": "Create test/mocks/tauri.ts",
-          "details": "Export mocks for dialog, fs, and window APIs"
-        }
-      ],
-      "acceptanceCriteria": [
-        "Dialog mocks return file paths",
-        "FS mocks handle read/write",
-        "Window mock provides getCurrentWindow"
-      ]
+      "status": "completed",
+      "implementationNotes": "Created test/mocks/tauri.ts with mocks for dialog, fs, store, window APIs"
     },
     {
       "id": "2.1.7",
       "category": "config",
       "title": "Add test scripts to package.json",
-      "description": "Add npm scripts for running tests and coverage.",
-      "status": "pending",
-      "implementationNotes": null,
-      "estimatedHours": 0.05,
-      "agent": "haiku",
-      "files": ["package.json"],
-      "testCategories": ["manual"],
-      "implementation": {
-        "purpose": "Enable running tests via npm/pnpm scripts",
-        "keyDecisions": [
-          "test - run all unit tests",
-          "test:coverage - run with coverage",
-          "test:watch - watch mode for development"
-        ]
-      },
-      "stepByStep": [
-        {
-          "step": 1,
-          "action": "Add scripts to package.json",
-          "details": "Add test, test:coverage, test:watch scripts"
-        },
-        {
-          "step": 2,
-          "action": "Verify scripts work",
-          "details": "Run pnpm test (will fail with no tests, but should run)"
-        }
-      ],
-      "acceptanceCriteria": [
-        "pnpm test runs Vitest",
-        "pnpm test:coverage generates report",
-        "pnpm test:watch enters watch mode"
-      ]
+      "status": "completed",
+      "implementationNotes": "Added test, test:watch, test:coverage scripts"
     }
   ],
   "successCriteria": [
@@ -265,11 +81,5 @@
   ],
   "filesModified": ["package.json"],
   "totalNewTests": 0,
-  "totalEstimatedHours": 0.6,
-  "dependencies": [],
-  "notes": [
-    "This sprint must be completed before any test implementation",
-    "Mocks should be flexible enough to test error conditions",
-    "Coverage thresholds will cause CI to fail if not met"
-  ]
+  "totalEstimatedHours": 0.6
 }

@@ -93,5 +93,78 @@ describe('help/dialog', () => {
       );
       expect(legendTexts).toContain('Keyboard Shortcuts');
     });
+
+    it('close button closes dialog', async () => {
+      const { setupHelpDialog } = await import('../../src/help/dialog');
+      setupHelpDialog(button);
+      button.click();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const dialog = document.querySelector('dialog.help-dialog') as HTMLDialogElement;
+      expect(dialog.open).toBe(true);
+
+      const closeBtn = dialog.querySelector('.help-dialog-close') as HTMLButtonElement;
+      closeBtn.click();
+
+      expect(dialog.open).toBe(false);
+    });
+
+    it('clicking backdrop closes dialog', async () => {
+      const { setupHelpDialog } = await import('../../src/help/dialog');
+      setupHelpDialog(button);
+      button.click();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const dialog = document.querySelector('dialog.help-dialog') as HTMLDialogElement;
+      expect(dialog.open).toBe(true);
+
+      // Simulate click on dialog element itself (backdrop)
+      const clickEvent = new MouseEvent('click', { bubbles: true });
+      Object.defineProperty(clickEvent, 'target', { value: dialog });
+      dialog.dispatchEvent(clickEvent);
+
+      expect(dialog.open).toBe(false);
+    });
+
+    it('F1 key opens dialog', async () => {
+      const { setupHelpDialog } = await import('../../src/help/dialog');
+      setupHelpDialog(button);
+
+      const event = new KeyboardEvent('keydown', { key: 'F1', bubbles: true });
+      window.dispatchEvent(event);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const dialog = document.querySelector('dialog.help-dialog');
+      expect(dialog).not.toBeNull();
+    });
+
+    it('Cmd+? opens dialog', async () => {
+      const { setupHelpDialog } = await import('../../src/help/dialog');
+      setupHelpDialog(button);
+
+      const event = new KeyboardEvent('keydown', { key: '?', metaKey: true, bubbles: true });
+      window.dispatchEvent(event);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const dialog = document.querySelector('dialog.help-dialog');
+      expect(dialog).not.toBeNull();
+    });
+
+    it('reuses existing dialog on subsequent opens', async () => {
+      const { setupHelpDialog } = await import('../../src/help/dialog');
+      setupHelpDialog(button);
+
+      button.click();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const dialog1 = document.querySelector('dialog.help-dialog');
+      (dialog1 as HTMLDialogElement).close();
+
+      button.click();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const dialogs = document.querySelectorAll('dialog.help-dialog');
+      expect(dialogs.length).toBe(1);
+    });
   });
 });

@@ -1,0 +1,70 @@
+# Changelog
+
+All notable changes to GraphvizJS will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [Unreleased]
+
+### Added - Phase 2: Testing Infrastructure
+
+#### Test Infrastructure (Sprint 1)
+- Vitest test framework with happy-dom environment
+- Coverage reporting with v8 provider (text, HTML, LCOV)
+- Comprehensive mocks for Tauri APIs (dialog, fs, store, window)
+- Mock for @hpcc-js/wasm Graphviz with configurable responses
+- Test scripts: `pnpm test`, `pnpm test:watch`, `pnpm test:coverage`
+
+#### Core Rendering Tests (Sprint 2) - 41 tests
+- graphviz.test.ts: Initialization, singleton pattern, rendering, error handling (100% coverage)
+- render.test.ts: Scheduler, callbacks, debounce, error display (95% coverage)
+- language.test.ts: DOT syntax, keywords, operators, comments, strings (87% coverage)
+
+#### Utility and Zoom Tests (Sprint 3) - 27 tests
+- debounce.test.ts: Timing behavior with fake timers (100% coverage)
+- editor/zoom.test.ts: Zoom controller, bounds, keymap (85% coverage)
+- preview/zoom.test.ts: Zoom controls, wheel zoom, display formatting (76% coverage)
+
+#### Toolbar Tests (Sprint 4) - 88 tests
+- new-diagram.test.ts: Click handler, content replacement, callbacks (100% coverage)
+- open-diagram.test.ts: File dialog, content loading, path handling (78% coverage)
+- save-diagram.test.ts: Save dialog, file writing, path handling (93% coverage)
+- export-diagram.test.ts: SVG export, PNG export, base name inference (59% coverage)
+- actions.test.ts: Toolbar setup, confirm dialogs (66% coverage)
+- examples-menu.test.ts: Menu rendering, toggle, item selection (96% coverage)
+- export-menu.test.ts: Menu toggle, keyboard navigation, format selection (95% coverage)
+- shortcuts.test.ts: Event listeners, key combinations (93% coverage)
+
+#### UI Component Tests (Sprint 5) - 35 tests
+- dialog.test.ts: Setup, keyboard shortcuts, dialog content, close handlers (86% coverage)
+- state.test.ts: Load/save/apply window state, persistence setup (92% coverage)
+- resize.test.ts: Drag handlers, constraints, reset (95% coverage)
+- theme.test.ts: Extension structure, syntax highlighting (100% coverage)
+
+#### Coverage Summary
+- Total: 191 unit tests
+- Overall coverage: 85%
+- Coverage thresholds enforced: 80% lines/functions/statements, 70% branches
+
+### Changed
+- Updated README with Testing section and test commands
+- Added coverage directory to biome.jsonc excludes
+
+### Deferred to Phase 3
+- E2E test setup with Playwright (Sprints 6-7)
+- GitHub Actions CI workflow (Sprint 8.3)
+
+## [1.0.0] - 2026-01-20
+
+### Added - Phase 1: MermaidJS to GraphvizJS Conversion
+- Converted MermaidJS Desktop Client to GraphvizJS
+- Replaced Mermaid.js with @hpcc-js/wasm Graphviz WASM rendering
+- Implemented DOT language syntax highlighting for CodeMirror
+- Support for all Graphviz layout engines (dot, neato, fdp, sfdp, circo, twopi, osage, patchwork)
+- Built-in DOT diagram examples (directed graphs, undirected, clusters, records, etc.)
+- SVG and PNG export with automatic scaling
+- Editor zoom controls with keyboard shortcuts
+- Preview zoom with mouse wheel and toolbar controls
+- Help dialog with keyboard shortcuts reference
+- Window state persistence across sessions
+- Resizable workspace panes
