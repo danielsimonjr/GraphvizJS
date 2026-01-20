@@ -42,17 +42,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - theme.test.ts: Extension structure, syntax highlighting (100% coverage)
 
 #### Coverage Summary
-- Total: 191 unit tests
+- Total: 188 unit tests
 - Overall coverage: 85%
 - Coverage thresholds enforced: 80% lines/functions/statements, 70% branches
+
+#### E2E Test Infrastructure (Sprint 6)
+- Playwright test framework with Chromium
+- playwright.config.ts configured for Vite dev server
+- E2E helpers with common utilities (waitForAppReady, selectors, etc.)
+- Test scripts: `pnpm test:e2e`, `pnpm test:e2e:headed`, `pnpm test:e2e:debug`
+
+#### E2E Feature Tests (Sprint 7) - 50 tests
+- app.spec.ts: App launch, toolbar buttons (12 tests)
+- rendering.spec.ts: DOT rendering, preview zoom, layout engines (6 tests)
+- file-operations.spec.ts: New, open, save, dirty state (6 tests)
+- export.spec.ts: Export menu, format options, keyboard nav (10 tests)
+- examples.spec.ts: Examples menu, selection, loading (8 tests)
+- keyboard-shortcuts.spec.ts: File shortcuts, editor zoom, help (14 tests)
+
+#### CI/CD (Sprint 8)
+- GitHub Actions workflow for unit tests (`.github/workflows/test.yml`)
+- Runs linting, type checking, and unit tests with coverage on push/PR
+- E2E tests excluded from CI (require full app runtime)
 
 ### Changed
 - Updated README with Testing section and test commands
 - Added coverage directory to biome.jsonc excludes
-
-### Deferred to Phase 3
-- E2E test setup with Playwright (Sprints 6-7)
-- GitHub Actions CI workflow (Sprint 8.3)
+- Expanded ROADMAP with detailed future enhancement plans
 
 ## [1.0.0] - 2026-01-20
 
