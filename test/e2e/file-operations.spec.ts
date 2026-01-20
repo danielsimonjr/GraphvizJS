@@ -1,5 +1,11 @@
-import { test, expect } from '@playwright/test';
-import { waitForAppReady, setEditorContent, getEditorContent, waitForPreviewUpdate, selectors } from './helpers';
+import { expect, test } from '@playwright/test';
+import {
+  getEditorContent,
+  selectors,
+  setEditorContent,
+  waitForAppReady,
+  waitForPreviewUpdate,
+} from './helpers';
 
 test.describe('File Operations', () => {
   test.beforeEach(async ({ page }) => {
@@ -60,9 +66,9 @@ test.describe('File Operations', () => {
 
   test('Ctrl+S triggers save action', async ({ page }) => {
     // Set up dialog handler to catch save dialog
-    let saveDialogOpened = false;
+    let _saveDialogOpened = false;
     page.on('dialog', async (dialog) => {
-      saveDialogOpened = true;
+      _saveDialogOpened = true;
       await dialog.dismiss();
     });
 

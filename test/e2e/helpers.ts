@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 
 /**
  * Wait for the app to fully initialize (editor and preview loaded)
@@ -65,7 +65,9 @@ export async function getPreviewError(page: Page): Promise<string | null> {
  * Click a toolbar button by its ID or aria-label
  */
 export async function clickToolbarButton(page: Page, identifier: string): Promise<void> {
-  const button = page.locator(`#toolbar button#${identifier}, #toolbar button[aria-label="${identifier}"]`);
+  const button = page.locator(
+    `#toolbar button#${identifier}, #toolbar button[aria-label="${identifier}"]`
+  );
   await button.click();
 }
 

@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { waitForAppReady, selectors } from './helpers';
+import { expect, test } from '@playwright/test';
+import { selectors, waitForAppReady } from './helpers';
 
 test.describe('App Launch', () => {
   test.beforeEach(async ({ page }) => {

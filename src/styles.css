@@ -356,6 +356,49 @@ body.dark .toolbar-button {
   pointer-events: none;
 }
 
+.toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background: rgba(15, 23, 42, 0.12);
+  margin: 0 0.25rem;
+}
+
+body.dark .toolbar-separator {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.toolbar-select {
+  height: 34px;
+  padding: 0 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.9);
+  color: inherit;
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+body.dark .toolbar-select {
+  background: rgba(17, 24, 39, 0.6);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.toolbar-select:hover {
+  border-color: rgba(59, 130, 246, 0.45);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.2);
+}
+
+.toolbar-select:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 1px;
+  border-color: rgba(59, 130, 246, 0.45);
+}
+
 .panel {
   border-radius: 12px;
   padding: 1.5rem;

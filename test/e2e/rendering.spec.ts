@@ -1,5 +1,11 @@
-import { test, expect } from '@playwright/test';
-import { waitForAppReady, setEditorContent, waitForPreviewUpdate, hasPreviewError, selectors } from './helpers';
+import { expect, test } from '@playwright/test';
+import {
+  hasPreviewError,
+  selectors,
+  setEditorContent,
+  waitForAppReady,
+  waitForPreviewUpdate,
+} from './helpers';
 
 test.describe('Diagram Rendering', () => {
   test.beforeEach(async ({ page }) => {
