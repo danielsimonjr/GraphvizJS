@@ -22,9 +22,9 @@ export function setupHelpDialog(button: HTMLButtonElement | null): void {
         <div class="help-dialog-body">
           <fieldset class="help-section">
             <legend>About</legend>
-            <p class="about-description">Desktop editor for Mermaid diagrams with real-time preview, syntax highlighting, and SVG/PNG export.</p>
+            <p class="about-description">Desktop editor for Graphviz DOT diagrams with real-time preview, syntax highlighting, and SVG/PNG export.</p>
             <div class="about-actions">
-              <button type="button" class="about-button" data-url="https://github.com/skydiver/mermaidjs-desktop-client">
+              <button type="button" class="about-button" data-url="https://github.com/danielsimonjr/graphvizjs-desktop">
                 <i class="ri-github-fill" aria-hidden="true"></i>
                 View Source
               </button>
@@ -63,15 +63,13 @@ export function setupHelpDialog(button: HTMLButtonElement | null): void {
           </fieldset>
           <fieldset class="help-section">
             <legend>Examples</legend>
-            <p class="examples-description">Load sample diagrams from the Examples menu in the toolbar to explore different Mermaid diagram types:</p>
+            <p class="examples-description">Load sample diagrams from the Examples menu in the toolbar to explore different Graphviz layout engines:</p>
             <ul class="examples-list">
-              <li>Flowchart</li>
-              <li>Class Diagram</li>
-              <li>Sequence Diagram</li>
-              <li>Entity Relationship</li>
-              <li>State Diagram</li>
-              <li>Gantt Chart</li>
-              <li>Git Graph</li>
+              <li>Directed Graph (dot)</li>
+              <li>Undirected Graph (neato)</li>
+              <li>Force-Directed (fdp)</li>
+              <li>Circular Layout (circo)</li>
+              <li>Radial Layout (twopi)</li>
             </ul>
           </fieldset>
         </div>

@@ -1,0 +1,21 @@
+// Directed Graph Example (dot layout)
+// Shows a simple workflow with decisions
+
+digraph G {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+
+    Start [shape=ellipse, label="Start"];
+    Process [label="Process Data"];
+    Decision [shape=diamond, label="Valid?"];
+    Success [label="Success", style="filled", fillcolor="#90EE90"];
+    Retry [label="Retry"];
+    End [shape=ellipse, label="End"];
+
+    Start -> Process;
+    Process -> Decision;
+    Decision -> Success [label="Yes"];
+    Decision -> Retry [label="No"];
+    Retry -> Process;
+    Success -> End;
+}

@@ -3,10 +3,9 @@ import { Compartment, EditorState, StateEffect } from '@codemirror/state';
 import { keymap } from '@codemirror/view';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { basicSetup, EditorView } from 'codemirror';
-import mermaid from 'mermaid';
 import 'remixicon/fonts/remixicon.css';
 
-import { createMermaidLanguage } from './editor/language';
+import { createDotLanguage } from './editor/language';
 import { createEditorTheme } from './editor/theme';
 import {
   createEditorZoomController,
@@ -14,6 +13,7 @@ import {
   createEditorZoomKeymap,
 } from './editor/zoom';
 import { setupHelpDialog } from './help/dialog';
+import { initGraphviz } from './preview/graphviz';
 import { createPreview } from './preview/render';
 import {
   createZoomController,
@@ -31,15 +31,21 @@ import {
 } from './window/state';
 import { initHorizontalResize } from './workspace/resize';
 
-const DEFAULT_SNIPPET = `graph TD
-    A[Start] --> B{Is it working?}
-    B -- Yes --> C[Great!]
-    B -- Not yet --> D[Keep iterating]`;
+const DEFAULT_SNIPPET = `digraph G {
+    Start -> Decision [label="check"];
+    Decision -> Great [label="Yes"];
+    Decision -> Iterate [label="Not yet"];
+
+    Start [shape=ellipse];
+    Decision [shape=diamond, label="Is it working?"];
+    Great [shape=box, label="Great!"];
+    Iterate [shape=box, label="Keep iterating"];
+}`;
 
 const RENDER_DELAY = 300;
 const WINDOW_PERSIST_DELAY = 400;
 
-const MERMAID_LANGUAGE = createMermaidLanguage();
+const DOT_LANGUAGE = createDotLanguage();
 const EDITOR_THEME = createEditorTheme();
 
 window.addEventListener('DOMContentLoaded', bootstrap);
@@ -74,10 +80,7 @@ async function bootstrap(): Promise<void> {
     return;
   }
 
-  mermaid.initialize({
-    startOnLoad: false,
-    securityLevel: 'strict',
-  });
+  await initGraphviz();
 
   const appWindow = getCurrentWindow();
   const store = await loadSettingsStore();
@@ -122,7 +125,7 @@ async function bootstrap(): Promise<void> {
       zoomController.applyZoom();
     },
     onRenderEmpty() {
-      status.info('Waiting for Mermaid markup...');
+      status.info('Waiting for DOT markup...');
     },
     onRenderError(details) {
       status.error(details);
@@ -224,7 +227,7 @@ function createEditor(
 ): EditorView {
   const extensions = [
     basicSetup,
-    MERMAID_LANGUAGE,
+    DOT_LANGUAGE,
     EditorView.lineWrapping,
     EDITOR_THEME,
     keymap.of([indentWithTab]),

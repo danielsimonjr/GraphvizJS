@@ -1,0 +1,28 @@
+// Undirected Graph Example (neato layout)
+// Network topology diagram
+
+graph Network {
+    layout=neato;
+    overlap=false;
+    splines=true;
+
+    node [shape=circle, style=filled, fillcolor="#87CEEB"];
+
+    Server [shape=box, fillcolor="#FFD700", label="Server"];
+    Router [shape=diamond, fillcolor="#FFA500", label="Router"];
+
+    PC1 [label="PC 1"];
+    PC2 [label="PC 2"];
+    PC3 [label="PC 3"];
+    Laptop1 [label="Laptop 1"];
+    Laptop2 [label="Laptop 2"];
+
+    Server -- Router;
+    Router -- PC1;
+    Router -- PC2;
+    Router -- PC3;
+    Router -- Laptop1;
+    Router -- Laptop2;
+
+    PC1 -- PC2 [style=dashed, label="backup"];
+}

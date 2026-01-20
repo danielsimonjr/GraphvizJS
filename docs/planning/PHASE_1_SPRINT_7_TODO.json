@@ -4,8 +4,8 @@
   "title": "Update UI Text and Help Dialog",
   "priority": "LOW",
   "effort": "10 minutes",
-  "status": "pending",
-  "completedAt": null,
+  "status": "completed",
+  "completedAt": "2026-01-20",
   "implementationNotes": null,
   "impact": "Consistent branding - all UI text refers to Graphviz/DOT instead of Mermaid",
   "targetMetrics": {
@@ -20,7 +20,7 @@
       "category": "ui",
       "title": "Update index.html title and text",
       "description": "Replace all Mermaid references in the HTML with Graphviz/DOT references.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -28,11 +28,7 @@
       "testCategories": ["manual"],
       "implementation": {
         "purpose": "Update visible UI text for correct branding",
-        "keyDecisions": [
-          "Change page title",
-          "Update any visible labels",
-          "Update tooltips"
-        ]
+        "keyDecisions": ["Change page title", "Update any visible labels", "Update tooltips"]
       },
       "stepByStep": [
         {
@@ -67,7 +63,7 @@
       "category": "ui",
       "title": "Update help dialog content",
       "description": "Update the help dialog to reference GraphvizJS and DOT instead of Mermaid.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.15,
       "agent": "haiku",
@@ -75,11 +71,7 @@
       "testCategories": ["manual"],
       "implementation": {
         "purpose": "Help dialog should describe GraphvizJS Desktop",
-        "keyDecisions": [
-          "Update app name",
-          "Update description",
-          "Optionally add DOT syntax tips"
-        ]
+        "keyDecisions": ["Update app name", "Update description", "Optionally add DOT syntax tips"]
       },
       "stepByStep": [
         {
@@ -119,7 +111,7 @@
       "category": "core",
       "title": "Update status messages",
       "description": "Update any status bar messages that reference Mermaid.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -127,10 +119,7 @@
       "testCategories": ["manual"],
       "implementation": {
         "purpose": "Status messages should reference DOT format",
-        "keyDecisions": [
-          "Search for status message strings",
-          "Update Mermaid references to DOT"
-        ]
+        "keyDecisions": ["Search for status message strings", "Update Mermaid references to DOT"]
       },
       "stepByStep": [
         {
@@ -159,7 +148,7 @@
       "category": "core",
       "title": "Update error messages in render.ts",
       "description": "Update error messages in the renderer to reference DOT syntax.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.05,
       "agent": "haiku",
@@ -199,7 +188,7 @@
       "category": "core",
       "title": "Update window title in main.ts",
       "description": "If the window title is set dynamically, update it to use GraphvizJS Desktop.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.05,
       "agent": "haiku",
@@ -207,10 +196,7 @@
       "testCategories": ["manual"],
       "implementation": {
         "purpose": "Dynamic window title should show correct app name",
-        "keyDecisions": [
-          "Find document.title assignments",
-          "Update to GraphvizJS Desktop"
-        ]
+        "keyDecisions": ["Find document.title assignments", "Update to GraphvizJS Desktop"]
       },
       "stepByStep": [
         {
@@ -244,12 +230,7 @@
     "Window title is correct"
   ],
   "filesCreated": [],
-  "filesModified": [
-    "src/index.html",
-    "src/help/dialog.ts",
-    "src/main.ts",
-    "src/preview/render.ts"
-  ],
+  "filesModified": ["src/index.html", "src/help/dialog.ts", "src/main.ts", "src/preview/render.ts"],
   "totalNewTests": 0,
   "totalEstimatedHours": 0.45,
   "dependencies": [],

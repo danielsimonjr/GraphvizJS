@@ -4,8 +4,8 @@
   "title": "Testing and Bug Fixes",
   "priority": "HIGH",
   "effort": "15 minutes",
-  "status": "pending",
-  "completedAt": null,
+  "status": "completed",
+  "completedAt": "2026-01-20",
   "implementationNotes": null,
   "impact": "Ensures quality and catches any issues before production build",
   "targetMetrics": {
@@ -20,7 +20,7 @@
       "category": "testing",
       "title": "Test basic rendering",
       "description": "Test that basic DOT diagrams render correctly in the preview pane.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -73,7 +73,7 @@
       "category": "testing",
       "title": "Test file operations",
       "description": "Test all file operations: new, open, save, and export.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.15,
       "agent": "haiku",
@@ -138,7 +138,7 @@
       "category": "testing",
       "title": "Test all examples",
       "description": "Test that each example loads and renders correctly.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -146,11 +146,7 @@
       "testCategories": ["manual"],
       "implementation": {
         "purpose": "Verify all example diagrams work",
-        "keyDecisions": [
-          "Test each example",
-          "Verify content loads",
-          "Verify preview renders"
-        ]
+        "keyDecisions": ["Test each example", "Verify content loads", "Verify preview renders"]
       },
       "stepByStep": [
         {
@@ -191,7 +187,7 @@
       "category": "testing",
       "title": "Test edge cases",
       "description": "Test edge cases and unusual inputs.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.15,
       "agent": "haiku",
@@ -246,7 +242,7 @@
       "category": "quality",
       "title": "Run linter and fix issues",
       "description": "Run the Biome linter and fix any code quality issues.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -254,11 +250,7 @@
       "testCategories": ["lint"],
       "implementation": {
         "purpose": "Ensure code quality before production build",
-        "keyDecisions": [
-          "Run pnpm lint",
-          "Fix any errors",
-          "Run pnpm lint:fix for auto-fixes"
-        ]
+        "keyDecisions": ["Run pnpm lint", "Fix any errors", "Run pnpm lint:fix for auto-fixes"]
       },
       "stepByStep": [
         {

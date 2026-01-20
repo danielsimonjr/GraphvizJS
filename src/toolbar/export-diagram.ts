@@ -1,8 +1,8 @@
 import { save as showSaveDialog } from '@tauri-apps/plugin-dialog';
 import { writeFile, writeTextFile } from '@tauri-apps/plugin-fs';
 import type { EditorView } from 'codemirror';
-import mermaid from 'mermaid';
 
+import { renderDotToSvg } from '../preview/graphviz';
 import type { ExportFormat } from './export-menu';
 
 interface ExportDiagramOptions {
@@ -90,36 +90,27 @@ async function exportAsPng(
 }
 
 async function renderDiagram(source: string): Promise<RenderedDiagram> {
-  const renderId = `export-${Date.now()}`;
+  const svgString = await renderDotToSvg(source);
+
+  // Parse the SVG string to get dimensions
   const container = document.createElement('div');
   container.style.position = 'absolute';
   container.style.left = '-9999px';
   container.style.top = '-9999px';
-  container.style.overflow = 'hidden';
-  container.style.pointerEvents = 'none';
   container.style.visibility = 'hidden';
   document.body.appendChild(container);
 
   try {
-    const { svg } = await mermaid.render(renderId, source, container);
-    let svgElement = container.querySelector('svg');
+    container.innerHTML = svgString;
+    const svgElement = container.querySelector('svg');
 
     if (!svgElement) {
-      const tempWrapper = document.createElement('div');
-      tempWrapper.innerHTML = svg;
-      const parsed = tempWrapper.querySelector('svg');
-      if (!parsed) {
-        throw new Error('Mermaid render did not produce an SVG element.');
-      }
-      container.appendChild(parsed);
-      svgElement = parsed;
+      throw new Error('Graphviz render did not produce an SVG element.');
     }
 
     return normalizeSvg(svgElement);
   } finally {
     container.remove();
-    const leftover = document.getElementById(renderId);
-    leftover?.remove();
   }
 }
 

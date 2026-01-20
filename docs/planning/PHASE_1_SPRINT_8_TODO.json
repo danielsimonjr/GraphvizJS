@@ -4,7 +4,7 @@
   "title": "Add Layout Engine Selector (Optional Enhancement)",
   "priority": "LOW",
   "effort": "15 minutes",
-  "status": "pending",
+  "status": "skipped",
   "completedAt": null,
   "implementationNotes": null,
   "impact": "Enables users to switch between Graphviz layout engines (dot, neato, fdp, etc.)",
@@ -20,7 +20,7 @@
       "category": "ui",
       "title": "Add layout engine dropdown to toolbar",
       "description": "Add a select element to the toolbar for choosing the Graphviz layout engine.",
-      "status": "pending",
+      "status": "skipped",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -62,7 +62,7 @@
       "category": "core",
       "title": "Create layout engine handler",
       "description": "Create a new TypeScript module to handle layout engine selection.",
-      "status": "pending",
+      "status": "skipped",
       "implementationNotes": null,
       "estimatedHours": 0.15,
       "agent": "haiku",
@@ -109,7 +109,7 @@
       "category": "core",
       "title": "Integrate layout engine with renderer",
       "description": "Update the render function to use the selected layout engine.",
-      "status": "pending",
+      "status": "skipped",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -117,10 +117,7 @@
       "testCategories": ["typecheck"],
       "implementation": {
         "purpose": "Pass selected layout engine to Graphviz renderer",
-        "keyDecisions": [
-          "Import getCurrentEngine",
-          "Pass engine to renderDotToSvg call"
-        ]
+        "keyDecisions": ["Import getCurrentEngine", "Pass engine to renderDotToSvg call"]
       },
       "stepByStep": [
         {
@@ -145,7 +142,7 @@
       "category": "core",
       "title": "Wire up layout engine in main.ts",
       "description": "Initialize the layout engine handler and trigger re-render on change.",
-      "status": "pending",
+      "status": "skipped",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -191,7 +188,7 @@
       "category": "ui",
       "title": "Style the layout dropdown",
       "description": "Add CSS styling for the layout engine dropdown to match the toolbar aesthetic.",
-      "status": "pending",
+      "status": "skipped",
       "implementationNotes": null,
       "estimatedHours": 0.05,
       "agent": "haiku",
@@ -236,15 +233,8 @@
     "All 8 engines work correctly",
     "Dropdown styled consistently"
   ],
-  "filesCreated": [
-    "src/toolbar/layout-engine.ts"
-  ],
-  "filesModified": [
-    "src/index.html",
-    "src/preview/render.ts",
-    "src/main.ts",
-    "src/styles.css"
-  ],
+  "filesCreated": ["src/toolbar/layout-engine.ts"],
+  "filesModified": ["src/index.html", "src/preview/render.ts", "src/main.ts", "src/styles.css"],
   "totalNewTests": 0,
   "totalEstimatedHours": 0.5,
   "dependencies": ["Sprint 2"],

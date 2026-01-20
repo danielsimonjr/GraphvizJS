@@ -1,0 +1,24 @@
+// Circular Layout Example (circo)
+// Shows relationships in a circular arrangement
+
+digraph Team {
+    layout=circo;
+
+    node [shape=box, style="filled,rounded", fillcolor="#FFE4B5"];
+
+    Alice [label="Alice\n(Lead)"];
+    Bob [label="Bob\n(Dev)"];
+    Carol [label="Carol\n(Dev)"];
+    David [label="David\n(QA)"];
+    Eve [label="Eve\n(Design)"];
+    Frank [label="Frank\n(DevOps)"];
+
+    Alice -> Bob [label="reviews"];
+    Alice -> Carol [label="reviews"];
+    Bob -> David [label="submits to"];
+    Carol -> David [label="submits to"];
+    Eve -> Bob [label="designs for"];
+    Eve -> Carol [label="designs for"];
+    Frank -> Alice [label="deploys for"];
+    David -> Frank [label="approves"];
+}

@@ -2,99 +2,129 @@ import type { StringStream } from '@codemirror/language';
 import { StreamLanguage } from '@codemirror/language';
 import type { Extension } from '@codemirror/state';
 
-const MERMAID_KEYWORDS = [
-  'graph',
-  'flowchart',
-  'sequenceDiagram',
-  'classDiagram',
-  'stateDiagram',
-  'erDiagram',
-  'journey',
-  'gantt',
-  'pie',
-  'mindmap',
-  'timeline',
-  'gitGraph',
-  'quadrantChart',
-  'requirementDiagram',
-  'subgraph',
-  'end',
-  'click',
-  'linkStyle',
+const DOT_KEYWORDS = ['graph', 'digraph', 'subgraph', 'node', 'edge', 'strict'] as const;
+
+export type DotKeyword = (typeof DOT_KEYWORDS)[number];
+
+const DOT_ATTRIBUTES = [
+  'label',
+  'color',
+  'bgcolor',
+  'fillcolor',
+  'fontcolor',
+  'fontname',
+  'fontsize',
+  'shape',
   'style',
-  'class',
-  'direction',
-  'tb',
-  'td',
-  'lr',
-  'rl',
-  'bt',
-  'note',
-  'rect',
-  'call',
-  'section',
-  'loop',
-  'alt',
-  'opt',
-  'par',
-  'and',
+  'width',
+  'height',
+  'rank',
+  'rankdir',
+  'size',
+  'ratio',
+  'margin',
+  'pad',
+  'splines',
+  'overlap',
+  'concentrate',
+  'compound',
+  'arrowhead',
+  'arrowtail',
+  'dir',
+  'headlabel',
+  'taillabel',
+  'penwidth',
+  'pos',
+  'xlabel',
+  'tooltip',
+  'URL',
+  'href',
 ] as const;
 
-export type MermaidKeyword = (typeof MERMAID_KEYWORDS)[number];
+const ARROW_TOKENS = ['->', '--'];
 
-const ARROW_TOKENS = ['-.->', '-->', '<--', '==>', '<==', '.->', '->', '<-', '=='];
-
-export function createMermaidLanguage(): Extension {
-  const keywordSet = new Set(MERMAID_KEYWORDS.map((word: MermaidKeyword) => word.toLowerCase()));
-  const operatorPattern = /[-+*/=<>!]+/;
+export function createDotLanguage(): Extension {
+  const keywordSet = new Set(DOT_KEYWORDS.map((word: DotKeyword) => word.toLowerCase()));
+  const attributeSet = new Set(DOT_ATTRIBUTES.map((attr) => attr.toLowerCase()));
 
   return StreamLanguage.define({
     token(stream: StringStream) {
       if (stream.eatSpace()) return null;
 
-      if (stream.match('%%')) {
+      // Single-line comment
+      if (stream.match('//')) {
+        stream.skipToEnd();
+        return 'comment';
+      }
+
+      // Multi-line comment start
+      if (stream.match('/*')) {
+        while (!stream.eol()) {
+          if (stream.match('*/')) break;
+          stream.next();
+        }
+        return 'comment';
+      }
+
+      // C-style preprocessor (sometimes used)
+      if (stream.match('#')) {
         stream.skipToEnd();
         return 'comment';
       }
 
       const next = stream.peek();
-      if (next === '"' || next === "'") {
+      if (next === '"') {
         stream.next();
-        readQuoted(stream, next);
+        readQuoted(stream, '"');
         return 'string';
       }
 
-      if (stream.match(/[#.][A-Za-z_][\w-]*/)) {
-        return 'attributeName';
+      // HTML-like labels <>
+      if (next === '<') {
+        stream.next();
+        let depth = 1;
+        while (!stream.eol() && depth > 0) {
+          const ch = stream.next();
+          if (ch === '<') depth++;
+          else if (ch === '>') depth--;
+        }
+        return 'string';
       }
 
-      if (matchArrowToken(stream) || stream.match(':::')) {
+      // Arrow operators
+      if (matchArrowToken(stream)) {
         return 'operator';
       }
 
-      if (stream.match(/[{}\[\]()]/)) {
-        return 'bracket';
+      // Brackets and punctuation
+      if (stream.match(/[{}\[\]();,=]/)) {
+        return 'punctuation';
       }
 
-      if (stream.match(operatorPattern)) {
-        return 'operator';
-      }
-
-      if (stream.match(/\d+(\.\d+)?/)) {
+      // Numbers
+      if (stream.match(/-?\d+(\.\d+)?/)) {
         return 'number';
       }
 
-      if (stream.match(/[A-Za-z_][\w-]*/)) {
+      // Identifiers (keywords, attributes, or node names)
+      if (stream.match(/[A-Za-z_][A-Za-z0-9_]*/)) {
         const word = stream.current().toLowerCase();
-        return keywordSet.has(word) ? 'keyword' : 'variableName';
+        if (keywordSet.has(word)) return 'keyword';
+        if (attributeSet.has(word)) return 'attributeName';
+        return 'variableName';
+      }
+
+      // Colon for port syntax
+      if (stream.match(':')) {
+        return 'operator';
       }
 
       stream.next();
       return null;
     },
     languageData: {
-      commentTokens: { line: '%%' },
-      closeBrackets: { brackets: '()[]{}"\'`' },
+      commentTokens: { line: '//', block: { open: '/*', close: '*/' } },
+      closeBrackets: { brackets: '()[]{}"' },
     },
   });
 }

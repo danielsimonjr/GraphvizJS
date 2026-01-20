@@ -4,9 +4,9 @@
   "title": "Install Dependencies and Setup Renderer Infrastructure",
   "priority": "HIGH",
   "effort": "10 minutes",
-  "status": "pending",
-  "completedAt": null,
-  "implementationNotes": null,
+  "status": "completed",
+  "completedAt": "2026-01-20",
+  "implementationNotes": "Import corrected to '@hpcc-js/wasm' (not '@hpcc-js/wasm/graphviz'). All tasks completed successfully.",
   "impact": "Foundation for all Graphviz rendering - must be completed first",
   "targetMetrics": {
     "wasmLoading": {
@@ -20,7 +20,7 @@
       "category": "setup",
       "title": "Install @hpcc-js/wasm package",
       "description": "Run pnpm install to install the @hpcc-js/wasm dependency that was added to package.json. This package provides Graphviz compiled to WebAssembly.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -61,7 +61,7 @@
       "category": "core",
       "title": "Create Graphviz renderer utility",
       "description": "Create a new TypeScript file that wraps @hpcc-js/wasm and exports functions to initialize Graphviz and render DOT to SVG.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.25,
       "agent": "haiku",
@@ -128,7 +128,7 @@
       "category": "config",
       "title": "Update Vite config for WASM support",
       "description": "Configure Vite to properly handle the @hpcc-js/wasm package which contains WebAssembly files.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -168,7 +168,7 @@
       "category": "config",
       "title": "Update CSP in tauri.conf.json for WASM",
       "description": "Update the Content Security Policy to allow WebAssembly execution, which is required for @hpcc-js/wasm to run.",
-      "status": "pending",
+      "status": "completed",
       "implementationNotes": null,
       "estimatedHours": 0.1,
       "agent": "haiku",
@@ -214,13 +214,8 @@
     "pnpm build succeeds",
     "pnpm typecheck passes"
   ],
-  "filesCreated": [
-    "src/preview/graphviz.ts"
-  ],
-  "filesModified": [
-    "vite.config.ts",
-    "src-tauri/tauri.conf.json"
-  ],
+  "filesCreated": ["src/preview/graphviz.ts"],
+  "filesModified": ["vite.config.ts", "src-tauri/tauri.conf.json"],
   "totalNewTests": 0,
   "totalEstimatedHours": 0.55,
   "dependencies": [],
