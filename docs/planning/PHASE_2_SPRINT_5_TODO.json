@@ -1,0 +1,119 @@
+{
+  "phase": 2,
+  "sprint": 5,
+  "title": "UI Component Tests",
+  "priority": "MEDIUM",
+  "effort": "60 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Tests help dialog, window state, workspace resize, and editor theme",
+  "targetMetrics": {
+    "coverage": {
+      "current": "0%",
+      "target": "90%+ for help/, window/, workspace/, editor/theme.ts"
+    }
+  },
+  "tasks": [
+    {
+      "id": "2.5.1",
+      "category": "testing",
+      "title": "Create dialog.test.ts",
+      "description": "Test help dialog with 5 test cases.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.25,
+      "agent": "haiku",
+      "files": ["test/help/dialog.test.ts"],
+      "testCategories": ["unit"],
+      "testCases": [
+        "setupHelpDialog() - registers F1 listener",
+        "F1 press - shows dialog",
+        "Dialog - contains app info",
+        "Dialog - contains keyboard shortcuts",
+        "Close button - hides dialog"
+      ],
+      "acceptanceCriteria": ["5 test cases pass", "90%+ coverage"]
+    },
+    {
+      "id": "2.5.2",
+      "category": "testing",
+      "title": "Create state.test.ts",
+      "description": "Test window state persistence with 6 test cases.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.3,
+      "agent": "haiku",
+      "files": ["test/window/state.test.ts"],
+      "testCategories": ["unit"],
+      "testCases": [
+        "loadWindowState() - returns default state if none saved",
+        "loadWindowState() - loads saved state from store",
+        "saveWindowState() - saves position and size",
+        "saveWindowState() - saves maximized state",
+        "applyWindowState() - sets window position",
+        "applyWindowState() - sets window size"
+      ],
+      "acceptanceCriteria": ["6 test cases pass", "90%+ coverage"]
+    },
+    {
+      "id": "2.5.3",
+      "category": "testing",
+      "title": "Create resize.test.ts",
+      "description": "Test workspace resize with 5 test cases.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.25,
+      "agent": "haiku",
+      "files": ["test/workspace/resize.test.ts"],
+      "testCategories": ["unit"],
+      "testCases": [
+        "setupWorkspaceResize() - attaches drag handlers",
+        "Drag - updates pane widths",
+        "Drag - respects min width constraints",
+        "Double-click - resets to default ratio",
+        "Resize - updates CSS custom properties"
+      ],
+      "acceptanceCriteria": ["5 test cases pass", "90%+ coverage"]
+    },
+    {
+      "id": "2.5.4",
+      "category": "testing",
+      "title": "Create theme.test.ts",
+      "description": "Test editor theme with 3 test cases.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.2,
+      "agent": "haiku",
+      "files": ["test/editor/theme.test.ts"],
+      "testCategories": ["unit"],
+      "testCases": [
+        "createEditorTheme() - returns Extension",
+        "Theme - includes syntax highlighting colors",
+        "Theme - includes editor styling"
+      ],
+      "acceptanceCriteria": ["3 test cases pass", "90%+ coverage"]
+    }
+  ],
+  "successCriteria": [
+    "All four test files created",
+    "19 total test cases pass",
+    "UI component files at 90%+ coverage",
+    "pnpm test passes"
+  ],
+  "filesCreated": [
+    "test/help/dialog.test.ts",
+    "test/window/state.test.ts",
+    "test/workspace/resize.test.ts",
+    "test/editor/theme.test.ts"
+  ],
+  "filesModified": [],
+  "totalNewTests": 19,
+  "totalEstimatedHours": 1.0,
+  "dependencies": ["Sprint 2.1"],
+  "notes": [
+    "Window state tests need Tauri store mock",
+    "Resize tests need mouse event simulation",
+    "Theme tests mainly verify Extension structure"
+  ]
+}

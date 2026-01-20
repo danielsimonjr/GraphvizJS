@@ -1,0 +1,155 @@
+{
+  "phase": 2,
+  "sprint": 6,
+  "title": "E2E Test Setup",
+  "priority": "HIGH",
+  "effort": "60 minutes",
+  "status": "pending",
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Establishes E2E testing infrastructure for Tauri app",
+  "targetMetrics": {
+    "infrastructure": {
+      "current": "No E2E framework",
+      "target": "Playwright configured for Tauri testing"
+    }
+  },
+  "tasks": [
+    {
+      "id": "2.6.1",
+      "category": "setup",
+      "title": "Install Playwright and Tauri driver",
+      "description": "Install Playwright and @playwright/test for E2E testing.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "agent": "haiku",
+      "files": ["package.json"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Set up E2E testing dependencies",
+        "keyDecisions": [
+          "Use Playwright for cross-platform testing",
+          "Use @tauri-apps/api for app control"
+        ]
+      },
+      "stepByStep": [
+        {
+          "step": 1,
+          "action": "Install dev dependencies",
+          "details": "pnpm add -D @playwright/test"
+        },
+        {
+          "step": 2,
+          "action": "Install Playwright browsers",
+          "details": "npx playwright install"
+        }
+      ],
+      "acceptanceCriteria": ["@playwright/test installed", "Playwright browsers installed"]
+    },
+    {
+      "id": "2.6.2",
+      "category": "config",
+      "title": "Create playwright.config.ts",
+      "description": "Create Playwright configuration for Tauri E2E testing.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "agent": "haiku",
+      "files": ["playwright.config.ts"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Configure Playwright for Tauri app testing",
+        "keyDecisions": [
+          "Configure webServer to start Tauri dev",
+          "Set appropriate timeouts for app startup",
+          "Configure screenshot and video on failure"
+        ]
+      },
+      "acceptanceCriteria": [
+        "playwright.config.ts exists",
+        "Configured for Tauri dev server",
+        "Screenshot on failure enabled"
+      ]
+    },
+    {
+      "id": "2.6.3",
+      "category": "setup",
+      "title": "Create E2E test directory structure",
+      "description": "Create the test/e2e/ directory with helper utilities.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["test/e2e/", "test/e2e/helpers.ts"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Establish E2E test organization",
+        "keyDecisions": ["Create helpers for common operations", "Include page object patterns"]
+      },
+      "acceptanceCriteria": ["test/e2e/ directory exists", "helpers.ts with common utilities"]
+    },
+    {
+      "id": "2.6.4",
+      "category": "testing",
+      "title": "Create app.spec.ts",
+      "description": "Test basic app launch and UI with 6 test cases.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.3,
+      "agent": "sonnet",
+      "files": ["test/e2e/app.spec.ts"],
+      "testCategories": ["e2e"],
+      "testCases": [
+        "App launches successfully",
+        "Editor pane is visible",
+        "Preview pane is visible",
+        "Toolbar is present",
+        "Default snippet renders on load",
+        "Window title shows 'GraphvizJS'"
+      ],
+      "acceptanceCriteria": ["6 test cases pass", "App starts without errors"]
+    },
+    {
+      "id": "2.6.5",
+      "category": "config",
+      "title": "Add E2E scripts to package.json",
+      "description": "Add npm scripts for running E2E tests.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "agent": "haiku",
+      "files": ["package.json"],
+      "testCategories": ["manual"],
+      "implementation": {
+        "purpose": "Enable running E2E tests via npm scripts",
+        "keyDecisions": [
+          "test:e2e - run all E2E tests",
+          "test:e2e:headed - run with visible browser",
+          "test:e2e:debug - run in debug mode"
+        ]
+      },
+      "acceptanceCriteria": [
+        "pnpm test:e2e runs Playwright",
+        "pnpm test:e2e:headed shows browser",
+        "pnpm test:e2e:debug enables debugging"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "Playwright installed and configured",
+    "E2E directory structure created",
+    "Basic app tests pass",
+    "E2E scripts work"
+  ],
+  "filesCreated": ["playwright.config.ts", "test/e2e/helpers.ts", "test/e2e/app.spec.ts"],
+  "filesModified": ["package.json"],
+  "totalNewTests": 6,
+  "totalEstimatedHours": 0.8,
+  "dependencies": ["Sprint 2.1"],
+  "notes": [
+    "E2E tests require built Tauri app or dev server",
+    "May need to increase timeouts for CI",
+    "Consider running E2E separately from unit tests"
+  ]
+}
