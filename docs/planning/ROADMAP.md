@@ -163,6 +163,24 @@ Real-time DOT syntax validation with inline error markers.
 
 ---
 
+### Export to SVG File
+
+**Priority:** Low
+**Effort:** ~15 minutes
+**Status:** Planned
+
+Save the rendered diagram as a standalone `.svg` file via the native save dialog.
+
+**Implementation:**
+1. Add "Save as SVG" option to export menu in `index.html`
+2. Use existing `renderDotToSvg()` output
+3. Write SVG string to file via Tauri `fs` plugin and `dialog.save()`
+4. Default filename from current file path or `diagram.svg`
+
+**Files to modify:** `index.html`, `src/toolbar/export-diagram.ts`, `src/toolbar/export-menu.ts`
+
+---
+
 ### Export to PDF
 
 **Priority:** Low

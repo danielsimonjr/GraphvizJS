@@ -1,0 +1,201 @@
+{
+  "phase": 3,
+  "sprint": 2,
+  "title": "Auto-Save / Recovery",
+  "priority": "MEDIUM",
+  "effort": "45 minutes",
+  "status": "planned",
+  "startedAt": null,
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Prevents data loss by periodically saving drafts and recovering unsaved work after crashes",
+  "targetMetrics": {
+    "autosave": {
+      "current": "No auto-save; unsaved work lost on crash",
+      "target": "Drafts saved every 30s; recovery prompt on startup"
+    }
+  },
+  "tasks": [
+    {
+      "id": "3.2.1",
+      "category": "core",
+      "title": "Create autosave manager",
+      "description": "Create src/autosave/manager.ts to handle periodic draft saving. Uses the existing debounce utility and Tauri Store API. Saves editor content to a 'draftContent' key in the settings store every 30 seconds when content has changed. Tracks a 'draftTimestamp' and 'draftFilePath' alongside the content.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.25,
+      "files": ["src/autosave/manager.ts"],
+      "testCategories": ["typecheck", "unit"],
+      "acceptanceCriteria": [
+        "Exports setupAutosave(options) function",
+        "Saves draft content to Tauri store on debounced interval (30s)",
+        "Only saves when content has changed since last autosave",
+        "Stores draftContent, draftTimestamp, and draftFilePath keys",
+        "Exports clearDraft() to remove recovery data after manual save",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.2.2",
+      "category": "core",
+      "title": "Create recovery module",
+      "description": "Create src/autosave/recovery.ts to check for and restore unsaved drafts on startup. Reads draftContent/draftTimestamp/draftFilePath from the Tauri store. If a draft exists and is newer than 'lastSavedAt', prompts the user to recover or discard. Handles cleanup of stale drafts older than 7 days.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.25,
+      "files": ["src/autosave/recovery.ts"],
+      "testCategories": ["typecheck", "unit"],
+      "acceptanceCriteria": [
+        "Exports checkForRecovery(store) function returning recovery data or null",
+        "Exports promptRecovery(data) function that shows confirm dialog",
+        "Exports cleanupStaleDrafts(store, maxAgeDays) function",
+        "Returns null if no draft or draft is older than 7 days",
+        "Uses @tauri-apps/plugin-dialog for confirm prompt",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.2.3",
+      "category": "core",
+      "title": "Wire up autosave in main.ts",
+      "description": "Integrate autosave manager and recovery module into main.ts bootstrap flow. On startup: check for recovery, prompt user, then start autosave. On manual save: clear draft. On new diagram: clear draft and reset autosave.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "files": ["src/main.ts"],
+      "testCategories": ["typecheck", "manual"],
+      "acceptanceCriteria": [
+        "checkForRecovery called during bootstrap before editor focus",
+        "If recovery accepted, editor content replaced with draft",
+        "setupAutosave called after editor initialization",
+        "commitDocument triggers clearDraft when saved",
+        "New diagram action resets autosave state",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.2.4",
+      "category": "core",
+      "title": "Update save-diagram to clear drafts on save",
+      "description": "After a successful manual save, call clearDraft() to remove the recovery data from the store. This prevents stale recovery prompts on next startup.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "files": ["src/toolbar/save-diagram.ts"],
+      "testCategories": ["typecheck", "unit"],
+      "acceptanceCriteria": [
+        "clearDraft called after successful writeTextFile",
+        "No recovery prompt after clean save and restart",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.2.5",
+      "category": "ui",
+      "title": "Add autosave status indicator",
+      "description": "Show a subtle status indicator in the footer when autosave occurs. Use the existing status controller pattern (status.info or status.success). Display 'Draft saved' briefly after each autosave.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "files": ["src/main.ts"],
+      "testCategories": ["manual"],
+      "acceptanceCriteria": [
+        "Status bar briefly shows 'Draft saved' after autosave",
+        "Does not overwrite error or rendering status messages",
+        "Subtle and non-distracting"
+      ]
+    },
+    {
+      "id": "3.2.6",
+      "category": "testing",
+      "title": "Add unit tests for autosave manager",
+      "description": "Create test/autosave/manager.test.ts with tests covering: setup, debounced saving, content-change detection, clearDraft, and store interaction. Mock Tauri store API.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.2,
+      "files": ["test/autosave/manager.test.ts"],
+      "testCategories": ["unit"],
+      "acceptanceCriteria": [
+        "Tests for setupAutosave initialization",
+        "Tests for debounced draft saving",
+        "Tests that unchanged content is not re-saved",
+        "Tests for clearDraft removing store keys",
+        "Tests for store.set and store.save calls",
+        "80%+ coverage"
+      ]
+    },
+    {
+      "id": "3.2.7",
+      "category": "testing",
+      "title": "Add unit tests for recovery module",
+      "description": "Create test/autosave/recovery.test.ts with tests covering: no draft found, valid draft recovery, stale draft cleanup (>7 days), user accepts/declines recovery, and error handling.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.2,
+      "files": ["test/autosave/recovery.test.ts"],
+      "testCategories": ["unit"],
+      "acceptanceCriteria": [
+        "Tests for checkForRecovery with no draft",
+        "Tests for checkForRecovery with valid draft",
+        "Tests for stale draft cleanup (>7 days)",
+        "Tests for promptRecovery accept/decline",
+        "Tests for error handling on store read failure",
+        "80%+ coverage"
+      ]
+    },
+    {
+      "id": "3.2.8",
+      "category": "documentation",
+      "title": "Update documentation and commit",
+      "description": "Update CHANGELOG with autosave feature, update ROADMAP status, and commit all changes.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "files": ["CHANGELOG.md", "docs/planning/ROADMAP.md"],
+      "testCategories": ["manual"],
+      "acceptanceCriteria": [
+        "CHANGELOG updated with autosave feature details",
+        "ROADMAP shows Auto-Save / Recovery as completed",
+        "Changes committed to GitHub"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "Drafts automatically saved every 30 seconds when content changes",
+    "Recovery prompt shown on startup if unsaved draft exists",
+    "User can accept or discard recovered draft",
+    "Manual save clears draft data",
+    "Stale drafts older than 7 days are cleaned up",
+    "Status bar shows brief 'Draft saved' indicator",
+    "All unit tests pass with 80%+ coverage",
+    "No regression in existing 196 tests"
+  ],
+  "filesCreated": [
+    "src/autosave/manager.ts",
+    "src/autosave/recovery.ts",
+    "test/autosave/manager.test.ts",
+    "test/autosave/recovery.test.ts"
+  ],
+  "filesModified": [
+    "src/main.ts",
+    "src/toolbar/save-diagram.ts",
+    "CHANGELOG.md",
+    "docs/planning/ROADMAP.md"
+  ],
+  "totalNewTests": 16,
+  "totalEstimatedHours": 1.25,
+  "dependencies": ["Phase 3 Sprint 1 complete", "Tauri Store plugin available"],
+  "storeKeys": {
+    "draftContent": "The editor content saved periodically",
+    "draftTimestamp": "ISO 8601 timestamp of last autosave",
+    "draftFilePath": "File path at time of autosave (or null for unsaved)"
+  },
+  "notes": [
+    "Uses existing Tauri Store plugin (settings.store) - no new dependencies",
+    "Reuses debounce utility from src/utils/debounce.ts",
+    "30-second interval balances data safety vs store write frequency",
+    "Recovery prompt uses @tauri-apps/plugin-dialog confirm dialog",
+    "Draft cleared on manual save to avoid false recovery prompts",
+    "Stale drafts (>7 days) auto-cleaned to prevent store bloat"
+  ]
+}
