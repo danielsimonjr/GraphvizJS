@@ -196,6 +196,9 @@ async function bootstrap(): Promise<void> {
         }
         handleDocChange(recoveryData.content);
       }
+      // Clear draft regardless of user choice: accepting restores the content,
+      // declining means the user intentionally discarded it. Either way, we don't
+      // want the same recovery prompt on next startup.
       await clearDraft(store);
     }
   }
@@ -220,6 +223,12 @@ async function bootstrap(): Promise<void> {
       return isDocumentDirty;
     },
     commitDocument,
+    onNew() {
+      // Clear autosave draft when starting a new diagram to prevent false recovery
+      if (store) {
+        clearDraft(store);
+      }
+    },
     onPathChange(path) {
       const previousPath = currentFilePath;
       currentFilePath = path;
@@ -247,15 +256,16 @@ async function bootstrap(): Promise<void> {
   });
 
   // Start autosave (draft saved every 30s when content changes)
+  let _stopAutosave: (() => void) | null = null;
   if (store) {
-    setupAutosave(
+    _stopAutosave = setupAutosave(
       {
         store,
         getContent: () => editor.state.doc.toString(),
         getFilePath: () => currentFilePath,
       },
       () => {
-        status.info('Draft saved');
+        status.success('Draft saved');
       }
     );
   }

@@ -133,6 +133,65 @@ describe('render', () => {
     });
   });
 
+  describe('Backward-compatible API (PreviewStatusCallbacks)', () => {
+    it('works when passing callbacks directly (old API)', async () => {
+      const { createPreview } = await import('../../src/preview/render');
+      const onRenderSuccess = vi.fn();
+      // Old API: pass PreviewStatusCallbacks directly, not wrapped in { callbacks }
+      const scheduler = createPreview(previewEl, 100, { onRenderSuccess });
+
+      scheduler('digraph { a -> b }');
+      await vi.advanceTimersByTimeAsync(100);
+
+      expect(onRenderSuccess).toHaveBeenCalledTimes(1);
+    });
+
+    it('works when passing PreviewOptions with callbacks (new API)', async () => {
+      const { createPreview } = await import('../../src/preview/render');
+      const onRenderSuccess = vi.fn();
+      // New API: wrap in { callbacks }
+      const scheduler = createPreview(previewEl, 100, {
+        callbacks: { onRenderSuccess },
+      });
+
+      scheduler('digraph { a -> b }');
+      await vi.advanceTimersByTimeAsync(100);
+
+      expect(onRenderSuccess).toHaveBeenCalledTimes(1);
+    });
+
+    it('uses custom engine from getEngine option', async () => {
+      const graphvizModule = await import('../../src/preview/graphviz');
+      const renderSpy = vi.spyOn(graphvizModule, 'renderDotToSvg');
+
+      const { createPreview } = await import('../../src/preview/render');
+      const scheduler = createPreview(previewEl, 0, {
+        callbacks: {},
+        getEngine: () => 'neato',
+      });
+
+      scheduler('graph { a -- b }');
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(renderSpy).toHaveBeenCalledWith('graph { a -- b }', 'neato');
+      renderSpy.mockRestore();
+    });
+
+    it('defaults to dot engine when getEngine not provided', async () => {
+      const graphvizModule = await import('../../src/preview/graphviz');
+      const renderSpy = vi.spyOn(graphvizModule, 'renderDotToSvg');
+
+      const { createPreview } = await import('../../src/preview/render');
+      const scheduler = createPreview(previewEl, 0);
+
+      scheduler('digraph { a -> b }');
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(renderSpy).toHaveBeenCalledWith('digraph { a -> b }', 'dot');
+      renderSpy.mockRestore();
+    });
+  });
+
   describe('Preview element', () => {
     it('updates classList correctly', async () => {
       const { createPreview } = await import('../../src/preview/render');
