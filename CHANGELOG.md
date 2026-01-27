@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added - Phase 3: Feature Enhancements
 
+#### Auto-Save / Recovery (Sprint 2) - 21 tests
+- Periodic autosave of editor drafts every 30 seconds (only when content changed)
+- Startup recovery check with user prompt to restore or discard unsaved work
+- Stale draft cleanup (drafts older than 7 days auto-removed)
+- Draft cleared on manual save to prevent false recovery prompts
+- Status bar shows brief "Draft saved" indicator after autosave
+- Unit tests for autosave manager (10 tests) and recovery module (11 tests)
+
 #### Layout Engine Selector (Sprint 1) - 8 tests
 - Toolbar dropdown to switch between all 8 Graphviz layout engines
 - layout-engine.ts: Setup and current engine retrieval functions
