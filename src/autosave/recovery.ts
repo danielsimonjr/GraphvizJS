@@ -1,11 +1,11 @@
 import { confirm } from '@tauri-apps/plugin-dialog';
 import type { Store } from '@tauri-apps/plugin-store';
-
-const DRAFT_CONTENT_KEY = 'draftContent';
-const DRAFT_TIMESTAMP_KEY = 'draftTimestamp';
-const DRAFT_FILE_PATH_KEY = 'draftFilePath';
-
-const MAX_DRAFT_AGE_DAYS = 7;
+import {
+  DRAFT_CONTENT_KEY,
+  DRAFT_FILE_PATH_KEY,
+  DRAFT_TIMESTAMP_KEY,
+  MAX_DRAFT_AGE_DAYS,
+} from './constants';
 
 export interface RecoveryData {
   content: string;

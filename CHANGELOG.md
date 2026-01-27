@@ -59,7 +59,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - theme.test.ts: Extension structure, syntax highlighting (100% coverage)
 
 #### Coverage Summary
-- Total: 188 unit tests
+- Total: 221 unit tests (196 from Phase 2 + 25 from Phase 3)
 - Overall coverage: 85%
 - Coverage thresholds enforced: 80% lines/functions/statements, 70% branches
 

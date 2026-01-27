@@ -1,10 +1,10 @@
 import type { Store } from '@tauri-apps/plugin-store';
-
-const DRAFT_CONTENT_KEY = 'draftContent';
-const DRAFT_TIMESTAMP_KEY = 'draftTimestamp';
-const DRAFT_FILE_PATH_KEY = 'draftFilePath';
-
-const AUTOSAVE_INTERVAL = 30_000;
+import {
+  AUTOSAVE_INTERVAL,
+  DRAFT_CONTENT_KEY,
+  DRAFT_FILE_PATH_KEY,
+  DRAFT_TIMESTAMP_KEY,
+} from './constants';
 
 export interface AutosaveOptions {
   store: Store;
