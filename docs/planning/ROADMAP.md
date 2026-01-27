@@ -99,7 +99,7 @@ Show recently opened files in a dropdown menu for quick access.
 
 **Priority:** Medium
 **Effort:** ~45 minutes
-**Status:** Planned
+**Status:** Completed (2026-01-27)
 
 Automatically save drafts and recover unsaved work after crashes.
 

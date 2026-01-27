@@ -5,6 +5,8 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 import { basicSetup, EditorView } from 'codemirror';
 import 'remixicon/fonts/remixicon.css';
 
+import { clearDraft, setupAutosave } from './autosave/manager';
+import { checkForRecovery, promptRecovery } from './autosave/recovery';
 import { createDotLanguage } from './editor/language';
 import { createEditorTheme } from './editor/theme';
 import {
@@ -145,6 +147,9 @@ async function bootstrap(): Promise<void> {
     isDocumentDirty = false;
     if (options?.saved) {
       lastSavedAt = new Date();
+      if (store) {
+        clearDraft(store);
+      }
     } else if (!currentFilePath) {
       lastSavedAt = null;
     }
@@ -176,6 +181,24 @@ async function bootstrap(): Promise<void> {
   });
 
   commitDocument(editor.state.doc.toString());
+
+  // Check for unsaved draft recovery before focusing editor
+  if (store) {
+    const recoveryData = await checkForRecovery(store);
+    if (recoveryData) {
+      const shouldRecover = await promptRecovery(recoveryData);
+      if (shouldRecover) {
+        editor.dispatch({
+          changes: { from: 0, to: editor.state.doc.length, insert: recoveryData.content },
+        });
+        if (recoveryData.filePath) {
+          currentFilePath = recoveryData.filePath;
+        }
+        handleDocChange(recoveryData.content);
+      }
+      await clearDraft(store);
+    }
+  }
 
   editor.focus();
   host.dataset.editor = 'mounted';
@@ -222,6 +245,20 @@ async function bootstrap(): Promise<void> {
   setupLayoutEngine(() => {
     schedulePreviewRender(editor.state.doc.toString());
   });
+
+  // Start autosave (draft saved every 30s when content changes)
+  if (store) {
+    setupAutosave(
+      {
+        store,
+        getContent: () => editor.state.doc.toString(),
+        getFilePath: () => currentFilePath,
+      },
+      () => {
+        status.info('Draft saved');
+      }
+    );
+  }
 
   setupHelpDialog(helpButton);
 }
