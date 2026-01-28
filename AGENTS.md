@@ -1,216 +1,90 @@
 # AGENTS.md - GraphvizJS Desktop Client
 
+This file provides guidance to AI coding agents working in this repository. For Claude Code specifically, see `.claude/CLAUDE.md` which contains additional detail.
+
+## Quick Reference
+
+```bash
+pnpm install                # Install dependencies
+pnpm dev                    # Frontend dev server (localhost:5173)
+pnpm tauri dev              # Full desktop app with hot reload
+pnpm build                  # TypeScript compile + Vite bundle
+pnpm tauri build            # Production installer
+
+pnpm test                   # Unit tests (Vitest + happy-dom)
+pnpm test:watch             # Watch mode
+pnpm test:coverage          # With coverage report
+pnpm test:e2e               # Playwright E2E (requires dev server running)
+
+pnpm lint                   # Biome linter/formatter check
+pnpm lint:fix               # Auto-fix
+pnpm typecheck              # tsc --noEmit
+```
+
+Single test file: `npx vitest run test/toolbar/actions.test.ts`
+Single E2E test: `npx playwright test test/e2e/rendering.spec.ts`
+
 ## Project Overview
 
-Cross-platform desktop app for creating Graphviz DOT diagrams with live preview. Built with Tauri 2 (Rust) + TypeScript/Vite frontend. Uses @hpcc-js/wasm for client-side Graphviz rendering.
-
-## Prerequisites
-
-- **Node.js** 18+ (LTS recommended)
-- **Rust** (latest stable) - required for Tauri
-- **pnpm** - package manager (not npm/yarn)
-- Platform-specific Tauri dependencies: https://tauri.app/start/prerequisites/
-
-## Git Workflow
-
-- **Main branch**: `master`
-- **Release branches**: `release/x.x.x` format
-- Keep commits focused and descriptive
-- Run `pnpm lint:fix` before committing
-
-## Build & Run
-
-```bash
-pnpm install          # Install dependencies
-pnpm tauri dev        # Development with hot reload
-pnpm tauri build      # Production build (.app/.exe/.deb)
-pnpm build            # Frontend-only build
-```
-
-## Code Quality
-
-```bash
-pnpm lint:check       # Check with Biome
-pnpm lint:fix         # Auto-fix issues
-pnpm lint:format      # Format code
-```
-
-## Code Style (Biome)
-
-- 2-space indentation
-- Single quotes
-- Trailing commas (all)
-- 100-char line width
-- No semicolons where optional
-- Prefer `const` over `let`, never use `var`
+Tauri 2 desktop app for editing Graphviz DOT diagrams with live preview. TypeScript/Vite frontend with CodeMirror 6 editor and `@hpcc-js/wasm` for client-side Graphviz WebAssembly rendering. Rust backend is thin — only plugin setup and window restore.
 
 ## Architecture
 
-### Frontend (`src/`)
-
-| Directory | Purpose |
-|-----------|---------|
-| `editor/` | CodeMirror configuration, DOT syntax highlighting, theme |
-| `preview/` | Graphviz WASM rendering with debounce |
-| `toolbar/` | File operations (new/open/save/export) |
-| `workspace/` | Resizable pane management |
-| `window/` | Window state persistence |
-| `utils/` | Shared utilities |
-| `examples/` | Diagram templates (.dot files) |
-
-Entry point: `src/main.ts`
-
-### Backend (`src-tauri/`)
-
-- `src/lib.rs` - App setup, plugin initialization, window state restoration
-- `src/main.rs` - Binary entry point
-- `tauri.conf.json` - Tauri configuration
-
-## Key Patterns
-
 ### State Management
 
-- **Document state**: Tracked in `main.ts` (`lastCommittedDoc`, `isDocumentDirty`, `currentFilePath`)
-- **Window state**: Persisted via Tauri Store plugin
-- **Editor state**: Managed by CodeMirror EditorState
+All app state lives as closure variables inside `bootstrap()` in `src/main.ts`: `currentFilePath`, `isDocumentDirty`, `lastCommittedDoc`, `lastSavedAt`. There is no global store or event bus. The `commitDocument()` function is the single transition point for marking content as clean.
 
-### Debouncing
+### Module Pattern
 
-- Preview rendering: 300ms debounce to prevent excessive re-renders
-- Window state persistence: 400ms debounce for position/size updates
+Each `src/` subdirectory exports setup functions that receive DOM elements and callbacks as options objects. Modules never import each other laterally — all wiring happens in `main.ts`.
 
-### Rendering
+- **editor/** — CodeMirror extensions (DOT language, theme, font zoom)
+- **preview/** — Graphviz WASM init, debounced SVG rendering (300ms), preview zoom
+- **toolbar/** — One module per action (`new-diagram.ts`, `open-diagram.ts`, `save-diagram.ts`, `export-diagram.ts`, `export-menu.ts`, `examples-menu.ts`, `layout-engine.ts`, `shortcuts.ts`), orchestrated by `actions.ts`
+- **autosave/** — Periodic draft saving (`manager.ts`) and crash recovery (`recovery.ts`) via Tauri Store
+- **workspace/** — Resizable pane divider
+- **window/** — Window state persistence via Tauri Store
+- **examples/** — `.dot` template files, loaded via Vite `import.meta.glob` with `?raw` query
 
-Uses @hpcc-js/wasm for Graphviz rendering:
-- Supports all layout engines: dot, neato, fdp, sfdp, circo, twopi, osage, patchwork
-- Outputs SVG for preview and export
-- WebAssembly-based, runs entirely in browser
+### Rendering Pipeline
 
-### Toolbar Actions
+Editor doc changes → 300ms debounce → `schedulePreviewRender(doc)` → Graphviz WASM renders with selected layout engine (`getCurrentEngine()`) → SVG injected into preview host → zoom reapplied.
 
-Each action in `src/toolbar/` follows the pattern:
-- Export a setup function that takes dependencies (editor, callbacks)
-- Attach event listeners to toolbar buttons
-- Handle confirmations for unsaved changes
+### Tauri Plugins
 
-## Conventions
+`@tauri-apps/plugin-dialog` (file dialogs), `@tauri-apps/plugin-fs` (read/write), `@tauri-apps/plugin-store` (key-value persistence), `@tauri-apps/plugin-shell` (shell commands).
 
-### File Naming
+### Vite
 
-- Kebab-case for files: `open-diagram.ts`, `examples-menu.ts`
-- One module per feature/concern
+Root is `src/` (not project root). Entry point is `src/index.html`. `@hpcc-js/wasm` is excluded from `optimizeDeps`.
 
-### Imports
+## Code Style (Biome)
 
-- Use Vite's glob imports for dynamic loading (see `actions.ts`)
-- Tauri plugins imported from `@tauri-apps/plugin-*`
-
-### DOM Elements
-
-- Query selectors use specific attributes: `[data-action="new"]`, `[data-menu="examples"]`
-- Status messages displayed in `#status-message` footer element
-
-### Error Handling
-
-- Graphviz errors shown in preview container with user-friendly message
-- File operation errors caught and can display in status bar
-
-## Tauri Plugins Used
-
-- `@tauri-apps/plugin-dialog` - Native file dialogs
-- `@tauri-apps/plugin-fs` - Filesystem read/write
-- `@tauri-apps/plugin-store` - Persistent key-value storage
-
-## Security Notes
-
-- File access only through explicit Tauri plugin calls
-- No eval or dynamic code execution
+- 2-space indent, single quotes, semicolons always, trailing commas (ES5)
+- 100 char line width, LF line endings
+- `const` over `let`, no `var`, no explicit `any`
+- Kebab-case file names (`open-diagram.ts`, `examples-menu.ts`)
+- DOM queries use `data-` attributes: `[data-action="new-diagram"]`, `[data-menu="examples"]`
 
 ## Testing
 
-No test framework currently configured. Consider adding Vitest for frontend tests.
+- **Unit**: Vitest + happy-dom. Tests mirror source under `test/`. Shared mocks in `test/mocks/`. Global setup in `test/setup.ts` mocks `matchMedia`, `ResizeObserver`, `IntersectionObserver`, `requestAnimationFrame`, canvas context.
+- **E2E**: Playwright in `test/e2e/`. Excluded from Vitest runs.
+- **Coverage**: 80% lines/functions/statements, 70% branches. `src/main.ts` excluded.
 
-## Dependencies to Know
+## Git
 
-- **CodeMirror 6**: Modular editor - extensions in `editor/`
-- **@hpcc-js/wasm**: Graphviz WebAssembly - config in `main.ts`
-- **RemixIcon**: Icon font - classes like `ri-file-add-line`
+- Main branch: `master`
+- Run `pnpm lint:fix` before committing
 
-## Version Management
+## Version Sync
 
-Version is defined in TWO places (keep in sync):
-- `package.json` → `version`
-- `src-tauri/tauri.conf.json` → `version`
+Update version in **both** `package.json` and `src-tauri/tauri.conf.json`.
 
-Current version: 1.0.0
+## Adding Features
 
-## Export Specifications
+**Toolbar action**: Create `src/toolbar/your-action.ts` → add button in `src/index.html` with `data-action` → wire in `src/toolbar/actions.ts`.
 
-### PNG Export
-- **Minimum dimensions**: 512px (1x), 1024px (2x)
-- **Padding**: 10px around diagram
-- **Background**: White (#ffffff)
-- **Scaling**: Auto-scales up if below minimum
-- **File suffix**: `@2x` added for 2x exports
+**Example diagram**: Add numbered `.dot` to `src/examples/` → add menu item in `src/index.html` under `[data-menu="examples"]`.
 
-### SVG Export
-- Direct Graphviz SVG output
-- Padding: 10px
-- Preserves aspect ratio
-
-## Adding New Features
-
-### New Toolbar Action
-
-1. Create `src/toolbar/your-action.ts`
-2. Export a setup function: `export function setupYourAction({ editor, ... }) { ... }`
-3. Add button to `src/index.html` with `data-action="your-action"`
-4. Import and call setup in `src/toolbar/actions.ts`
-
-### New Example Diagram
-
-1. Add `.dot` file to `src/examples/` with numeric prefix (e.g., `08-cluster.dot`)
-2. Add menu item in `src/index.html` under `[data-menu="examples"]`
-3. Examples are loaded via Vite glob: `import.meta.glob('../examples/*.dot', { eager: true, query: '?raw' })`
-
-### New Export Format
-
-1. Add format to `ExportFormat` type in `src/toolbar/export-menu.ts`
-2. Add menu item in `src/index.html` under `[data-menu="export"]`
-3. Handle new format in `src/toolbar/export-diagram.ts` `createExportHandler`
-
-## Troubleshooting
-
-### Common Issues
-
-- **"Cannot find module '@tauri-apps/...'"**: Run `pnpm install`
-- **Tauri build fails**: Check Rust toolchain is installed and up to date
-- **Preview not rendering**: Check browser console for DOT syntax errors
-- **Window state not saving**: Check Tauri Store plugin is initialized in `lib.rs`
-
-### Debug Commands
-
-```bash
-pnpm tauri dev         # Dev mode with console output
-pnpm tauri build --debug   # Debug build with symbols
-```
-
-## File Extensions
-
-- `.dot` - Primary DOT diagram extension
-- `.gv` - Alternative Graphviz extension (supported in open dialog)
-
-## DOT Syntax Reference
-
-### Keywords
-`digraph`, `graph`, `subgraph`, `node`, `edge`, `strict`
-
-### Common Attributes
-`label`, `shape`, `color`, `style`, `fillcolor`, `fontname`, `fontsize`, `rankdir`, `rank`, `weight`
-
-### Shapes
-`box`, `ellipse`, `circle`, `diamond`, `record`, `plaintext`, `point`, `polygon`
-
-### Edge Types
-- `->` - Directed edge (digraph)
-- `--` - Undirected edge (graph)
+**Export format**: Add to `ExportFormat` type in `export-menu.ts` → add HTML menu item → handle in `export-diagram.ts`.

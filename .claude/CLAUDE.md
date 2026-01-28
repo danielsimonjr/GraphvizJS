@@ -1,170 +1,100 @@
-# GraphvizJS Desktop Client
+# CLAUDE.md
 
-Cross-platform desktop application for creating, editing, and exporting Graphviz DOT diagrams.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Version**: 1.0.0
-**License**: MIT
-**Based on**: MermaidJS Desktop Client by Martín M. (skydiver)
+## Overview
 
-## Technology Stack
+GraphvizJS is a Tauri 2 desktop app for editing Graphviz DOT diagrams with live preview. The frontend is TypeScript/Vite with CodeMirror 6 for editing and `@hpcc-js/wasm` for client-side Graphviz rendering via WebAssembly. Based on [MermaidJS Desktop Client](https://github.com/skydiver/mermaidjs-desktop-client).
 
-| Layer | Technologies |
-|-------|-------------|
-| Frontend | TypeScript 5.9, Vite 7.3, CodeMirror 6, @hpcc-js/wasm (Graphviz) |
-| Desktop | Tauri 2.9 (Rust backend) |
-| Icons | RemixIcon 4.7 |
-| Linting | Biome 2.3 |
-| Package Manager | pnpm |
-
-## Project Structure
-
-```
-GraphvizJS/
-├── src/                    # Frontend TypeScript/Vite source
-│   ├── main.ts            # App bootstrap & state management
-│   ├── index.html         # UI shell with toolbar & workspace
-│   ├── editor/            # CodeMirror config & DOT syntax
-│   ├── preview/           # Diagram rendering with Graphviz WASM
-│   ├── toolbar/           # File operations & menu handlers
-│   ├── workspace/         # Resizable pane layout
-│   ├── window/            # Window state persistence
-│   ├── help/              # Help dialog
-│   ├── utils/             # Debounce utility
-│   └── examples/          # Built-in .dot templates
-├── src-tauri/              # Tauri Rust backend
-│   ├── src/lib.rs         # App init, plugin setup, window restore
-│   ├── src/main.rs        # Entry point
-│   ├── tauri.conf.json    # Tauri configuration
-│   ├── Cargo.toml         # Rust dependencies
-│   └── icons/             # App icons
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-└── biome.jsonc
-```
-
-## Build Commands
+## Commands
 
 ```bash
-# Install dependencies
-pnpm install
+pnpm install                # Install dependencies
+pnpm dev                    # Frontend-only dev server (http://localhost:5173)
+pnpm tauri dev              # Full desktop app with hot reload
+pnpm build                  # TypeScript compile + Vite bundle
+pnpm tauri build            # Production installer (.exe, .app, .deb)
 
-# Development (browser only)
-pnpm dev                    # http://localhost:5173
+pnpm test                   # Unit tests (Vitest + happy-dom)
+pnpm test:watch             # Unit tests in watch mode
+pnpm test:coverage          # Unit tests with coverage report
+pnpm test:e2e               # E2E tests (Playwright, requires dev server)
 
-# Development (full desktop app with hot reload)
-pnpm tauri dev
-
-# Production build
-pnpm build                  # Bundle frontend
-pnpm tauri build            # Create installer (.exe, .app, .deb)
-
-# Code quality
-pnpm lint                   # Check with Biome
-pnpm lint:fix               # Auto-fix issues
-pnpm typecheck              # TypeScript check
-
-# Clean build artifacts
-pnpm clean
+pnpm lint                   # Biome check
+pnpm lint:fix               # Biome auto-fix
+pnpm typecheck              # tsc --noEmit
+pnpm clean                  # Remove dist/ and src-tauri/target/
 ```
 
-## Prerequisites
+Run a single unit test file: `npx vitest run test/preview/render.test.ts`
+Run a single E2E test: `npx playwright test test/e2e/rendering.spec.ts`
 
-- Node.js 18+
-- pnpm
-- Rust toolchain (rustc, cargo) - for Tauri builds only
-- MSVC Build Tools (Windows) - for Tauri builds
+## Architecture
 
-## Key Files
+### Bootstrap Flow (`src/main.ts`)
 
-| File | Purpose |
-|------|---------|
-| `src/main.ts` | App bootstrap, CodeMirror init, state management |
-| `src/editor/language.ts` | DOT syntax highlighting |
-| `src/preview/render.ts` | Graphviz WASM rendering |
-| `src/toolbar/export-diagram.ts` | PNG/SVG export engine |
-| `src-tauri/src/lib.rs` | Tauri plugin setup, window persistence |
-| `src-tauri/tauri.conf.json` | App config, CSP, bundle settings |
+The app bootstraps on `DOMContentLoaded` via a single `bootstrap()` function that:
+1. Initializes Graphviz WASM (`initGraphviz`)
+2. Loads persisted window state and settings from Tauri Store
+3. Creates zoom controllers (preview + editor)
+4. Creates the CodeMirror editor with DOT language support
+5. Checks for autosave recovery drafts and prompts user
+6. Wires up toolbar actions, keyboard shortcuts, layout engine selector, and autosave
+
+State is managed via closures in `bootstrap()` — `currentFilePath`, `isDocumentDirty`, `lastCommittedDoc`, `lastSavedAt` are local variables, not a global store. The `commitDocument()` function is the central point for marking content as "clean."
+
+### Module Boundaries
+
+Each `src/` subdirectory exports setup functions that receive DOM elements and callbacks. There is no shared global state or event bus — modules communicate through the callback options passed from `main.ts`.
+
+- **editor/** — CodeMirror extensions: DOT language grammar (`language.ts`), theme (`theme.ts`), font zoom (`zoom.ts`)
+- **preview/** — Graphviz WASM init (`graphviz.ts`), debounced SVG rendering (`render.ts`), preview zoom (`zoom.ts`)
+- **toolbar/** — Each action is a separate module: `new-diagram.ts`, `open-diagram.ts`, `save-diagram.ts`, `export-diagram.ts`, `export-menu.ts`, `examples-menu.ts`, `layout-engine.ts`, `shortcuts.ts`. Orchestrated by `actions.ts`.
+- **autosave/** — Periodic draft saving (`manager.ts`) and crash recovery (`recovery.ts`). Uses Tauri Store with keys defined in `constants.ts`.
+- **workspace/** — Horizontal resizable pane divider
+- **window/** — Window position/size persistence via Tauri Store
+- **examples/** — `.dot` files loaded via `import.meta.glob` (Vite eager glob import with `?raw` query)
+
+### Rendering Pipeline
+
+Editor changes trigger a debounced render (300ms). `createPreview()` returns a `schedulePreviewRender(doc)` function. The render uses the currently selected layout engine (dot, neato, fdp, etc.) via `getCurrentEngine()`. Output is SVG injected into the preview host element.
+
+### Tauri Integration
+
+Native capabilities are accessed through Tauri plugins — `@tauri-apps/plugin-dialog` for file dialogs, `@tauri-apps/plugin-fs` for read/write, `@tauri-apps/plugin-store` for key-value persistence, `@tauri-apps/plugin-shell` for shell commands. The Rust backend (`src-tauri/src/lib.rs`) only configures plugins and restores window state.
+
+### Vite Configuration
+
+The Vite root is `src/` (not project root). HTML entry point is `src/index.html`. The `@hpcc-js/wasm` package is excluded from dependency optimization (`optimizeDeps.exclude`).
+
+## Testing
+
+Unit tests use **Vitest** with **happy-dom** for DOM simulation. Test files mirror the source structure under `test/`. Global test setup (`test/setup.ts`) mocks browser APIs not available in happy-dom: `matchMedia`, `ResizeObserver`, `IntersectionObserver`, `requestAnimationFrame`, and `HTMLCanvasElement` context methods.
+
+Shared mocks for Tauri APIs and Graphviz WASM live in `test/mocks/`.
+
+E2E tests use **Playwright** and are excluded from the Vitest run (`test/e2e/` directory).
+
+Coverage thresholds: 80% lines/functions/statements, 70% branches. `src/main.ts` is excluded from coverage.
+
+## Code Style
+
+Enforced by **Biome** (not ESLint/Prettier):
+- 2-space indent, single quotes, semicolons always, trailing commas (ES5)
+- 100 char line width, LF line endings
+- `const` over `let`, no `var`, no `any`
+- Biome excludes `src-tauri/`, `dist/`, `coverage/`
 
 ## Version Synchronization
 
-**CRITICAL**: Version must be updated in TWO locations:
-- `package.json` → `"version": "x.x.x"`
-- `src-tauri/tauri.conf.json` → `"version": "x.x.x"`
-
-## DOT Syntax Keywords
-
-Key DOT language elements for syntax highlighting:
-- Keywords: `digraph`, `graph`, `subgraph`, `node`, `edge`, `strict`
-- Attributes: `label`, `shape`, `color`, `style`, `fillcolor`, `fontname`, `fontsize`, `rankdir`, `rank`, `weight`
-- Shapes: `box`, `ellipse`, `circle`, `diamond`, `record`, `plaintext`, `point`, `polygon`
-- Arrows: `->`, `--`
-- Compass points: `n`, `ne`, `e`, `se`, `s`, `sw`, `w`, `nw`, `c`
+Version must be updated in **two** locations:
+- `package.json` → `"version"`
+- `src-tauri/tauri.conf.json` → `"version"`
 
 ## Adding Features
 
-### New Toolbar Action
-1. Create `src/toolbar/your-action.ts` with `export function setupYourAction(...)`
-2. Add button to `src/index.html` with `data-action="your-action"`
-3. Import and call setup in `src/toolbar/actions.ts`
+**New toolbar action**: Create `src/toolbar/your-action.ts` with a setup function, add a button to `src/index.html` with `data-action="your-action"`, import and wire in `src/toolbar/actions.ts`.
 
-### New Example Diagram
-1. Add `.dot` file to `src/examples/` with numeric prefix (e.g., `08-cluster.dot`)
-2. Add menu item in `src/index.html` under `[data-menu="examples"]`
-3. Loaded automatically via Vite glob import
+**New example diagram**: Add numbered `.dot` file to `src/examples/` (e.g., `08-cluster.dot`), add menu item in `src/index.html` under `[data-menu="examples"]`. Auto-loaded via Vite glob import.
 
-### New Export Format
-1. Add to `ExportFormat` type in `src/toolbar/export-menu.ts`
-2. Add menu item in HTML
-3. Handle in `src/toolbar/export-diagram.ts`
-
-## Graphviz Rendering
-
-Uses `@hpcc-js/wasm` for client-side Graphviz rendering:
-- Supports all Graphviz layout engines (dot, neato, fdp, sfdp, circo, twopi, osage, patchwork)
-- Outputs SVG for preview and export
-- WebAssembly-based, runs entirely in browser
-
-## Code Style (Biome)
-
-- 2-space indentation
-- Single quotes
-- Trailing commas (ES5)
-- 100 char line width
-- Semicolons always
-- Prefer `const`, no `var`
-- LF line endings
-
-## Tauri Plugins Used
-
-| Plugin | Purpose |
-|--------|---------|
-| `tauri-plugin-dialog` | Native file open/save dialogs |
-| `tauri-plugin-fs` | Filesystem read/write |
-| `tauri-plugin-store` | Window state persistence |
-| `tauri-plugin-shell` | Shell command execution |
-
-## Supported File Formats
-
-- `.dot` (primary)
-- `.gv` (Graphviz)
-
-## Export Capabilities
-
-| Format | Details |
-|--------|---------|
-| PNG 1x | Min 512px, white background, 10px padding |
-| PNG 2x | Min 1024px, `@2x` suffix |
-| SVG | Direct Graphviz SVG output |
-
-## Security
-
-- CSP headers restrict inline scripts
-- File access only through Tauri plugin APIs
-
-## Debugging
-
-```bash
-pnpm tauri dev              # Dev with console output
-pnpm tauri build --debug    # Debug build with symbols
-```
+**New export format**: Add to `ExportFormat` type in `src/toolbar/export-menu.ts`, add HTML menu item, handle in `src/toolbar/export-diagram.ts`.
