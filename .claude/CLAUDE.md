@@ -19,6 +19,8 @@ pnpm test                   # Unit tests (Vitest + happy-dom)
 pnpm test:watch             # Unit tests in watch mode
 pnpm test:coverage          # Unit tests with coverage report
 pnpm test:e2e               # E2E tests (Playwright, requires dev server)
+pnpm test:e2e:headed        # E2E tests with visible browser
+pnpm test:e2e:debug         # E2E tests in debug mode
 
 pnpm lint                   # Biome check
 pnpm lint:fix               # Biome auto-fix
@@ -54,6 +56,8 @@ Each `src/` subdirectory exports setup functions that receive DOM elements and c
 - **autosave/** — Periodic draft saving (`manager.ts`) and crash recovery (`recovery.ts`). Supports multi-tab drafts via `tabDrafts` store key. Uses Tauri Store with keys defined in `constants.ts`.
 - **workspace/** — Horizontal resizable pane divider
 - **window/** — Window position/size persistence via Tauri Store
+- **help/** — Help dialog with keyboard shortcuts and app info (`dialog.ts`)
+- **utils/** — Shared utilities (`debounce.ts`)
 - **examples/** — `.dot` files loaded via `import.meta.glob` (Vite eager glob import with `?raw` query)
 
 ### Rendering Pipeline
