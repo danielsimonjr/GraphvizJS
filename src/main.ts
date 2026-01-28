@@ -212,20 +212,22 @@ async function bootstrap(): Promise<void> {
 
   /** Create a new tab with content and optional file path. Returns the tab or null if at limit. */
   function createNewTab(content: string, filePath: string | null = null): TabState | null {
-    if (tabManager.getTabCount() >= MAX_TABS) {
+    const editorView = createTabEditor(content, true);
+    const tab = tabManager.createTab({ content, filePath, editorView });
+    if (!tab) {
+      // At tab limit -- destroy the orphan editor and notify user
+      editorView.destroy();
       status.info(`Maximum ${MAX_TABS} tabs reached`);
       return null;
     }
 
-    // Hide current active tab's editor
-    const currentTab = tabManager.getActiveTab();
-    if (currentTab?.editorView) {
-      currentTab.editorView.dom.style.display = 'none';
+    // Hide current tab's editor (the new tab is now active)
+    const allTabs = tabManager.getAllTabs();
+    for (const t of allTabs) {
+      if (t.id !== tab.id && t.editorView) {
+        t.editorView.dom.style.display = 'none';
+      }
     }
-
-    const editorView = createTabEditor(content, true);
-    const tab = tabManager.createTab({ content, filePath, editorView });
-    if (!tab) return null;
 
     // Set up editor zoom for the new editor
     const editorZoom = createEditorZoomController(
@@ -272,13 +274,23 @@ async function bootstrap(): Promise<void> {
     schedulePreviewRender(newTab.editorView.state.doc.toString());
   }
 
-  /** Close a tab by ID. */
-  function closeTab(tabId: string): void {
+  /** Close a tab by ID. Prompts if dirty. */
+  async function closeTab(tabId: string): Promise<void> {
     // Cannot close the last tab
     if (tabManager.getTabCount() <= 1) return;
 
     const tab = tabManager.getTab(tabId);
     if (!tab) return;
+
+    // Confirm before closing a dirty tab
+    if (tab.isDirty) {
+      const { confirm } = await import('@tauri-apps/plugin-dialog');
+      const proceed = await confirm('This tab has unsaved changes. Close anyway?', {
+        title: 'Unsaved Changes',
+        kind: 'warning',
+      });
+      if (!proceed) return;
+    }
 
     // Destroy the editor DOM
     if (tab.editorView) {
@@ -360,7 +372,6 @@ async function bootstrap(): Promise<void> {
     getEditor() {
       return tabManager.getActiveTab()!.editorView!;
     },
-    schedulePreviewRender,
     newDiagramButton,
     openButton,
     saveButton,
@@ -374,6 +385,9 @@ async function bootstrap(): Promise<void> {
     },
     onOpen(content, path) {
       createNewTab(content, path);
+    },
+    onLoadExample(content) {
+      createNewTab(content);
     },
     onPathChange(path) {
       const tab = tabManager.getActiveTab();

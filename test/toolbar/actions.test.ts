@@ -58,7 +58,7 @@ describe('toolbar/actions', () => {
       expect(() => {
         setupToolbarActions({
           getEditor: () => editor,
-          schedulePreviewRender: vi.fn(),
+
           newDiagramButton,
           openButton,
           saveButton,
@@ -69,6 +69,7 @@ describe('toolbar/actions', () => {
           commitDocument: vi.fn(),
           onNew: vi.fn(),
           onOpen: vi.fn(),
+          onLoadExample: vi.fn(),
           onPathChange: vi.fn(),
           getPath: () => null,
         });
@@ -81,7 +82,7 @@ describe('toolbar/actions', () => {
       expect(() => {
         setupToolbarActions({
           getEditor: () => editor,
-          schedulePreviewRender: vi.fn(),
+
           newDiagramButton: null,
           openButton: null,
           saveButton: null,
@@ -92,6 +93,7 @@ describe('toolbar/actions', () => {
           commitDocument: vi.fn(),
           onNew: vi.fn(),
           onOpen: vi.fn(),
+          onLoadExample: vi.fn(),
           onPathChange: vi.fn(),
           getPath: () => null,
         });
@@ -181,6 +183,7 @@ describe('toolbar/actions', () => {
         commitDocument,
         onNew: vi.fn(),
         onOpen: vi.fn(),
+        onLoadExample: vi.fn(),
         onPathChange,
         getPath: () => null,
       });
