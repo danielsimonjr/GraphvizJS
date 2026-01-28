@@ -116,11 +116,11 @@ Automatically save drafts and recover unsaved work after crashes.
 
 ---
 
-### Multiple Tabs/Documents
+### Multiple Tabs/Documents (Sprint 3)
 
 **Priority:** Medium
 **Effort:** ~2 hours
-**Status:** Planned
+**Status:** Completed (2026-01-27)
 
 Support multiple open documents in a tabbed interface.
 
@@ -136,11 +136,11 @@ Support multiple open documents in a tabbed interface.
 **Files to create:** `src/tabs/manager.ts`, `src/tabs/tab-bar.ts`
 **Files to modify:** `index.html`, `style.css`, `src/main.ts`, all toolbar actions
 
-**Complexity:** This is a significant refactor affecting editor state management.
+**Reference:** See `docs/planning/PHASE_3_SPRINT_3_TODO.json` for detailed implementation steps.
 
 ---
 
-### DOT Syntax Validation/Linting
+### DOT Syntax Validation/Linting (Sprint 4)
 
 **Priority:** Medium
 **Effort:** ~1 hour
@@ -149,15 +149,19 @@ Support multiple open documents in a tabbed interface.
 Real-time DOT syntax validation with inline error markers.
 
 **Implementation:**
-1. Create `src/editor/linting.ts` using CodeMirror's lint extension
-2. Parse DOT with Graphviz WASM in validation mode (no render)
-3. Extract error line/column from Graphviz error messages
-4. Display inline squiggles and gutter markers
-5. Show error details in tooltip on hover
-6. Debounce validation to avoid excessive parsing
+1. Install `@codemirror/lint` package
+2. Add `validateDot()` function to `src/preview/graphviz.ts` for error-only validation
+3. Create `src/editor/linting.ts` using CodeMirror's `linter()` and `lintGutter()`
+4. Parse error line/column from Graphviz error messages using regex heuristics
+5. Map errors to CodeMirror `Diagnostic` objects with correct positions
+6. Wire lint extension into `createTabEditor()` in `main.ts`
+7. Style lint gutter markers, squiggles, and tooltips
+8. Debounce validation (500ms) independently from preview rendering
 
 **Files to create:** `src/editor/linting.ts`
-**Files to modify:** `src/editor/setup.ts`, `src/preview/graphviz.ts`
+**Files to modify:** `src/preview/graphviz.ts`, `src/main.ts`, `src/styles.css`
+
+**Reference:** See `docs/planning/PHASE_3_SPRINT_4_TODO.json` for detailed implementation steps.
 
 **Note:** Graphviz error messages vary in format; parsing may need heuristics.
 
