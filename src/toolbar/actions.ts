@@ -10,7 +10,6 @@ const EXAMPLES = loadExamples();
 
 export interface ToolbarActionsOptions {
   getEditor: () => EditorView;
-  schedulePreviewRender: (doc: string) => void;
   newDiagramButton: HTMLButtonElement | null;
   openButton: HTMLButtonElement | null;
   saveButton: HTMLButtonElement | null;
@@ -21,6 +20,7 @@ export interface ToolbarActionsOptions {
   commitDocument: (doc: string, options?: { saved?: boolean }) => void;
   onNew: () => void;
   onOpen: (content: string, path: string) => void;
+  onLoadExample: (content: string) => void;
   onPathChange: (path: string | null) => void;
   getPath: () => string | null;
 }
@@ -28,7 +28,6 @@ export interface ToolbarActionsOptions {
 export function setupToolbarActions(options: ToolbarActionsOptions): void {
   const {
     getEditor,
-    schedulePreviewRender,
     newDiagramButton,
     openButton,
     saveButton,
@@ -78,14 +77,7 @@ export function setupToolbarActions(options: ToolbarActionsOptions): void {
       menu: examplesMenu,
       items: EXAMPLES,
       onSelect: (content) => {
-        // Load example into the active tab's editor
-        const editor = getEditor();
-        editor.dispatch({
-          changes: { from: 0, to: editor.state.doc.length, insert: content },
-        });
-        schedulePreviewRender(content);
-        onPathChange(null);
-        commitDocument(content);
+        options.onLoadExample(content);
       },
     });
   }

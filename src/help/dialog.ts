@@ -9,6 +9,11 @@ export function setupHelpDialog(button: HTMLButtonElement | null): void {
   async function createDialog(): Promise<HTMLDialogElement> {
     const [appName, appVersion] = await Promise.all([getName(), getVersion()]);
 
+    const userAgentData = (navigator as Navigator & { userAgentData?: { platform: string } })
+      .userAgentData;
+    const platform = userAgentData?.platform ?? navigator.platform;
+    const mod = /mac/i.test(platform) ? 'Cmd' : 'Ctrl';
+
     const el = document.createElement('dialog');
     el.className = 'help-dialog';
     el.innerHTML = `
@@ -35,17 +40,17 @@ export function setupHelpDialog(button: HTMLButtonElement | null): void {
             <div class="shortcut-group">
               <h4>File</h4>
               <dl class="shortcut-list">
-                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>N</kbd></dt><dd>New diagram</dd></div>
-                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>O</kbd></dt><dd>Open file</dd></div>
-                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>S</kbd></dt><dd>Save file</dd></div>
+                <div class="shortcut-item"><dt><kbd>${mod}</kbd>+<kbd>N</kbd></dt><dd>New diagram</dd></div>
+                <div class="shortcut-item"><dt><kbd>${mod}</kbd>+<kbd>O</kbd></dt><dd>Open file</dd></div>
+                <div class="shortcut-item"><dt><kbd>${mod}</kbd>+<kbd>S</kbd></dt><dd>Save file</dd></div>
               </dl>
             </div>
             <div class="shortcut-group">
               <h4>Editor Zoom</h4>
               <dl class="shortcut-list">
-                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>=</kbd></dt><dd>Zoom in</dd></div>
-                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>-</kbd></dt><dd>Zoom out</dd></div>
-                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>0</kbd></dt><dd>Reset zoom</dd></div>
+                <div class="shortcut-item"><dt><kbd>${mod}</kbd>+<kbd>=</kbd></dt><dd>Zoom in</dd></div>
+                <div class="shortcut-item"><dt><kbd>${mod}</kbd>+<kbd>-</kbd></dt><dd>Zoom out</dd></div>
+                <div class="shortcut-item"><dt><kbd>${mod}</kbd>+<kbd>0</kbd></dt><dd>Reset zoom</dd></div>
               </dl>
             </div>
             <div class="shortcut-group">
@@ -57,10 +62,10 @@ export function setupHelpDialog(button: HTMLButtonElement | null): void {
             <div class="shortcut-group">
               <h4>Tabs</h4>
               <dl class="shortcut-list">
-                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>T</kbd></dt><dd>New tab</dd></div>
-                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>W</kbd></dt><dd>Close tab</dd></div>
-                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>Tab</kbd></dt><dd>Next tab</dd></div>
-                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>Tab</kbd></dt><dd>Previous tab</dd></div>
+                <div class="shortcut-item"><dt><kbd>${mod}</kbd>+<kbd>T</kbd></dt><dd>New tab</dd></div>
+                <div class="shortcut-item"><dt><kbd>${mod}</kbd>+<kbd>W</kbd></dt><dd>Close tab</dd></div>
+                <div class="shortcut-item"><dt><kbd>${mod}</kbd>+<kbd>Tab</kbd></dt><dd>Next tab</dd></div>
+                <div class="shortcut-item"><dt><kbd>${mod}</kbd>+<kbd>Shift</kbd>+<kbd>Tab</kbd></dt><dd>Previous tab</dd></div>
               </dl>
             </div>
             <div class="shortcut-group">
