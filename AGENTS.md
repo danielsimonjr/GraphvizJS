@@ -32,7 +32,7 @@ Tauri 2 desktop app for editing Graphviz DOT diagrams with live preview. TypeScr
 
 ### State Management
 
-All app state lives as closure variables inside `bootstrap()` in `src/main.ts`: `currentFilePath`, `isDocumentDirty`, `lastCommittedDoc`, `lastSavedAt`. There is no global store or event bus. The `commitDocument()` function is the single transition point for marking content as clean.
+State is managed via a `TabManager` instance in `bootstrap()` (`src/main.ts`). Each tab holds its own `TabState` (filePath, isDirty, lastCommittedDoc, lastSavedAt, editorView, editorZoomLevel). There is no global store or event bus. The `commitDocument()` function delegates to the active tab. Only the active tab's editor is visible (others hidden via `display:none`).
 
 ### Module Pattern
 
