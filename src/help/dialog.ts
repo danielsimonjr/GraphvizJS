@@ -55,6 +55,15 @@ export function setupHelpDialog(button: HTMLButtonElement | null): void {
               </dl>
             </div>
             <div class="shortcut-group">
+              <h4>Tabs</h4>
+              <dl class="shortcut-list">
+                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>T</kbd></dt><dd>New tab</dd></div>
+                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>W</kbd></dt><dd>Close tab</dd></div>
+                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>Tab</kbd></dt><dd>Next tab</dd></div>
+                <div class="shortcut-item"><dt><kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>Tab</kbd></dt><dd>Previous tab</dd></div>
+              </dl>
+            </div>
+            <div class="shortcut-group">
               <h4>General</h4>
               <dl class="shortcut-list">
                 <div class="shortcut-item"><dt><kbd>F1</kbd></dt><dd>Open help</dd></div>

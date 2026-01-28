@@ -28,7 +28,7 @@ describe('toolbar/save-diagram', () => {
       const { setupSaveDiagramAction } = await import('../../src/toolbar/save-diagram');
       const addEventListenerSpy = vi.spyOn(button, 'addEventListener');
       setupSaveDiagramAction({
-        editor,
+        getEditor: () => editor,
         button,
         getPath: () => null,
         onPathChange: vi.fn(),
@@ -41,7 +41,7 @@ describe('toolbar/save-diagram', () => {
       const { setupSaveDiagramAction } = await import('../../src/toolbar/save-diagram');
       expect(() => {
         setupSaveDiagramAction({
-          editor,
+          getEditor: () => editor,
           button: null,
           getPath: () => null,
           onPathChange: vi.fn(),
@@ -55,7 +55,7 @@ describe('toolbar/save-diagram', () => {
     it('opens save dialog with .dot default', async () => {
       const { setupSaveDiagramAction } = await import('../../src/toolbar/save-diagram');
       setupSaveDiagramAction({
-        editor,
+        getEditor: () => editor,
         button,
         getPath: () => null,
         onPathChange: vi.fn(),
@@ -77,7 +77,7 @@ describe('toolbar/save-diagram', () => {
 
       const { setupSaveDiagramAction } = await import('../../src/toolbar/save-diagram');
       setupSaveDiagramAction({
-        editor,
+        getEditor: () => editor,
         button,
         getPath: () => null,
         onPathChange: vi.fn(),
@@ -96,7 +96,7 @@ describe('toolbar/save-diagram', () => {
       const onPathChange = vi.fn();
       const { setupSaveDiagramAction } = await import('../../src/toolbar/save-diagram');
       setupSaveDiagramAction({
-        editor,
+        getEditor: () => editor,
         button,
         getPath: () => null,
         onPathChange,
@@ -112,7 +112,7 @@ describe('toolbar/save-diagram', () => {
     it('uses existing path if available (save vs save-as)', async () => {
       const { setupSaveDiagramAction } = await import('../../src/toolbar/save-diagram');
       setupSaveDiagramAction({
-        editor,
+        getEditor: () => editor,
         button,
         getPath: () => '/existing/path.dot',
         onPathChange: vi.fn(),
@@ -133,7 +133,7 @@ describe('toolbar/save-diagram', () => {
       const onPathChange = vi.fn();
       const { setupSaveDiagramAction } = await import('../../src/toolbar/save-diagram');
       setupSaveDiagramAction({
-        editor,
+        getEditor: () => editor,
         button,
         getPath: () => null,
         onPathChange,

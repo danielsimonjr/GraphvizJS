@@ -8,6 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added - Phase 3: Feature Enhancements
 
+#### Multiple Tabs / Documents (Sprint 3) - 48 tests
+- Tabbed interface supporting up to 10 simultaneous open documents
+- TabManager class: pure state container managing tab lifecycle (create, close, switch, navigate)
+- Tab bar UI with filename display, dirty indicator, close button, and new tab button
+- Each tab has independent state: content, file path, dirty flag, save timestamp, editor instance
+- Each tab gets its own CodeMirror EditorView (hidden via display:none when inactive) to preserve undo history
+- Keyboard shortcuts: Ctrl+T (new tab), Ctrl+W (close tab), Ctrl+Tab/Ctrl+Shift+Tab (cycle tabs)
+- Multi-tab autosave: all tab drafts saved as serialized object under 'tabDrafts' store key
+- Multi-tab recovery: restores all tabs from previous session with legacy format fallback
+- Opening files and examples always create new tabs (removed shouldReplace pattern)
+- Toolbar actions (save, export) operate on active tab via getEditor() accessor
+- Tab bar styled with dark/light theme support, horizontal scroll overflow
+- Unit tests for TabManager (33 tests) and tab-bar component (15 tests)
+- Updated existing toolbar tests for new multi-tab API signatures
+
 #### Auto-Save / Recovery (Sprint 2) - 21 tests
 - Periodic autosave of editor drafts every 30 seconds (only when content changed)
 - Startup recovery check with user prompt to restore or discard unsaved work
@@ -59,7 +74,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - theme.test.ts: Extension structure, syntax highlighting (100% coverage)
 
 #### Coverage Summary
-- Total: 221 unit tests (196 from Phase 2 + 25 from Phase 3)
+- Total: 262 unit tests (196 from Phase 2 + 66 from Phase 3)
 - Overall coverage: 85%
 - Coverage thresholds enforced: 80% lines/functions/statements, 70% branches
 

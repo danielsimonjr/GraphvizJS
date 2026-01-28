@@ -3,6 +3,9 @@ export const DRAFT_CONTENT_KEY = 'draftContent';
 export const DRAFT_TIMESTAMP_KEY = 'draftTimestamp';
 export const DRAFT_FILE_PATH_KEY = 'draftFilePath';
 
+/** Store key for multi-tab draft data (array of tab drafts). */
+export const TAB_DRAFTS_KEY = 'tabDrafts';
+
 /** Maximum age (in days) before a draft is considered stale and auto-cleaned. */
 export const MAX_DRAFT_AGE_DAYS = 7;
 

@@ -5,8 +5,8 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 import { basicSetup, EditorView } from 'codemirror';
 import 'remixicon/fonts/remixicon.css';
 
-import { clearDraft, setupAutosave } from './autosave/manager';
-import { checkForRecovery, promptRecovery } from './autosave/recovery';
+import { clearDraft, setupMultiTabAutosave } from './autosave/manager';
+import { checkForMultiTabRecovery, promptMultiTabRecovery } from './autosave/recovery';
 import { createDotLanguage } from './editor/language';
 import { createEditorTheme } from './editor/theme';
 import {
@@ -23,6 +23,9 @@ import {
   setupZoomControls,
   updateLevelDisplay,
 } from './preview/zoom';
+import type { TabState } from './tabs/manager';
+import { MAX_TABS, TabManager } from './tabs/manager';
+import { renderTabBar, setupTabBar } from './tabs/tab-bar';
 import { setupToolbarActions } from './toolbar/actions';
 import { getCurrentEngine, setupLayoutEngine } from './toolbar/layout-engine';
 import { setupToolbarShortcuts } from './toolbar/shortcuts';
@@ -78,6 +81,7 @@ async function bootstrap(): Promise<void> {
   const zoomResetBtn = document.querySelector<HTMLButtonElement>('[data-action="zoom-reset"]');
   const zoomLevelDisplay = document.querySelector<HTMLSpanElement>('[data-zoom-level]');
   const helpButton = document.querySelector<HTMLButtonElement>('[data-action="help"]');
+  const tabBarContainer = document.querySelector<HTMLElement>('.tab-bar');
 
   if (!host || !previewElement) {
     return;
@@ -106,19 +110,6 @@ async function bootstrap(): Promise<void> {
   const status = createStatusController(statusMessage);
   const fileStatus = createFileStatusController(statusFile);
 
-  let lastCommittedDoc = DEFAULT_SNIPPET;
-  let isDocumentDirty = false;
-  let lastSavedAt: Date | null = null;
-  let currentFilePath: string | null = null;
-
-  const updateFileStatus = () => {
-    fileStatus.update({
-      path: currentFilePath,
-      dirty: isDocumentDirty,
-      lastSavedAt,
-    });
-  };
-
   const schedulePreviewRender = createPreview(previewElement, RENDER_DELAY, {
     callbacks: {
       onRenderStart() {
@@ -137,64 +128,221 @@ async function bootstrap(): Promise<void> {
     },
     getEngine: getCurrentEngine,
   });
-  const handleDocChange = (doc: string) => {
-    isDocumentDirty = doc !== lastCommittedDoc;
-    updateFileStatus();
-  };
 
-  const commitDocument = (doc: string, options?: { saved?: boolean }) => {
-    lastCommittedDoc = doc;
-    isDocumentDirty = false;
+  // ── Tab Manager ──────────────────────────────────────────────────
+  const tabManager = new TabManager();
+
+  const { extension: zoomExtension, compartment: zoomCompartment } = createEditorZoomExtension();
+  const savedEditorZoom = store ? await loadEditorZoom(store) : null;
+
+  /** Create a CodeMirror editor for a tab and attach it to the editor host. */
+  function createTabEditor(initialDoc: string, visible: boolean): EditorView {
+    const extensions = [
+      basicSetup,
+      DOT_LANGUAGE,
+      EditorView.lineWrapping,
+      EDITOR_THEME,
+      keymap.of([indentWithTab]),
+      zoomExtension,
+      EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          const activeTab = tabManager.getActiveTab();
+          if (activeTab && activeTab.editorView === update.view) {
+            const nextDoc = update.state.doc.toString();
+            schedulePreviewRender(nextDoc);
+            handleDocChange(activeTab, nextDoc);
+          }
+        }
+      }),
+    ];
+
+    const state = EditorState.create({ doc: initialDoc, extensions });
+    const editorView = new EditorView({ parent: host!, state });
+
+    // Hide inactive tab editors
+    if (!visible) {
+      editorView.dom.style.display = 'none';
+    }
+
+    return editorView;
+  }
+
+  /** Update dirty state for a tab. */
+  function handleDocChange(tab: TabState, doc: string): void {
+    tab.isDirty = doc !== tab.lastCommittedDoc;
+    updateFileStatus();
+    refreshTabBar();
+  }
+
+  /** Mark a tab's document as committed (clean). */
+  function commitDocument(doc: string, options?: { saved?: boolean }): void {
+    const tab = tabManager.getActiveTab();
+    if (!tab) return;
+
+    tab.lastCommittedDoc = doc;
+    tab.isDirty = false;
     if (options?.saved) {
-      lastSavedAt = new Date();
+      tab.lastSavedAt = new Date();
       if (store) {
         clearDraft(store);
       }
-    } else if (!currentFilePath) {
-      lastSavedAt = null;
+    } else if (!tab.filePath) {
+      tab.lastSavedAt = null;
     }
     updateFileStatus();
-  };
+    refreshTabBar();
+  }
 
-  const { extension: zoomExtension, compartment: zoomCompartment } = createEditorZoomExtension();
-  const editor = createEditor(
-    host,
-    DEFAULT_SNIPPET,
-    schedulePreviewRender,
-    handleDocChange,
-    zoomExtension
-  );
+  /** Update the file status bar from the active tab. */
+  function updateFileStatus(): void {
+    const tab = tabManager.getActiveTab();
+    if (!tab) return;
+    fileStatus.update({
+      path: tab.filePath,
+      dirty: tab.isDirty,
+      lastSavedAt: tab.lastSavedAt,
+    });
+  }
 
-  const savedEditorZoom = store ? await loadEditorZoom(store) : null;
-  const editorZoomController = createEditorZoomController(
-    editor,
-    zoomCompartment,
-    (level) => {
-      if (store) {
-        saveEditorZoom(store, level);
-      }
-    },
-    savedEditorZoom ?? undefined
-  );
-  editor.dispatch({
-    effects: StateEffect.appendConfig.of(createEditorZoomKeymap(editorZoomController)),
-  });
+  /** Re-render the tab bar UI. */
+  function refreshTabBar(): void {
+    if (!tabBarContainer) return;
+    renderTabBar(tabManager.getAllTabs(), tabManager.getActiveTabId(), tabBarContainer);
+  }
 
-  commitDocument(editor.state.doc.toString());
+  /** Create a new tab with content and optional file path. Returns the tab or null if at limit. */
+  function createNewTab(content: string, filePath: string | null = null): TabState | null {
+    if (tabManager.getTabCount() >= MAX_TABS) {
+      status.info(`Maximum ${MAX_TABS} tabs reached`);
+      return null;
+    }
+
+    // Hide current active tab's editor
+    const currentTab = tabManager.getActiveTab();
+    if (currentTab?.editorView) {
+      currentTab.editorView.dom.style.display = 'none';
+    }
+
+    const editorView = createTabEditor(content, true);
+    const tab = tabManager.createTab({ content, filePath, editorView });
+    if (!tab) return null;
+
+    // Set up editor zoom for the new editor
+    const editorZoom = createEditorZoomController(
+      editorView,
+      zoomCompartment,
+      (level) => {
+        if (store) saveEditorZoom(store, level);
+      },
+      savedEditorZoom ?? undefined
+    );
+    editorView.dispatch({
+      effects: StateEffect.appendConfig.of(createEditorZoomKeymap(editorZoom)),
+    });
+
+    tab.lastCommittedDoc = content;
+
+    refreshTabBar();
+    updateFileStatus();
+    schedulePreviewRender(content);
+    editorView.focus();
+
+    return tab;
+  }
+
+  /** Switch to a tab by ID. */
+  function switchToTab(tabId: string): void {
+    const currentTab = tabManager.getActiveTab();
+    if (currentTab?.id === tabId) return;
+
+    // Hide current editor
+    if (currentTab?.editorView) {
+      currentTab.editorView.dom.style.display = 'none';
+    }
+
+    const newTab = tabManager.setActiveTab(tabId);
+    if (!newTab?.editorView) return;
+
+    // Show new editor
+    newTab.editorView.dom.style.display = '';
+    newTab.editorView.focus();
+
+    refreshTabBar();
+    updateFileStatus();
+    schedulePreviewRender(newTab.editorView.state.doc.toString());
+  }
+
+  /** Close a tab by ID. */
+  function closeTab(tabId: string): void {
+    // Cannot close the last tab
+    if (tabManager.getTabCount() <= 1) return;
+
+    const tab = tabManager.getTab(tabId);
+    if (!tab) return;
+
+    // Destroy the editor DOM
+    if (tab.editorView) {
+      tab.editorView.destroy();
+    }
+
+    const newActiveTab = tabManager.closeTab(tabId);
+    if (newActiveTab?.editorView) {
+      newActiveTab.editorView.dom.style.display = '';
+      newActiveTab.editorView.focus();
+      schedulePreviewRender(newActiveTab.editorView.state.doc.toString());
+    }
+
+    refreshTabBar();
+    updateFileStatus();
+  }
+
+  // ── Tab bar setup ────────────────────────────────────────────────
+  if (tabBarContainer) {
+    setupTabBar({
+      container: tabBarContainer,
+      callbacks: {
+        onTabSwitch: switchToTab,
+        onTabClose: closeTab,
+        onNewTab: () => createNewTab(DEFAULT_SNIPPET),
+      },
+    });
+  }
+
+  // ── Create initial tab ──────────────────────────────────────────
+  const initialTab = createNewTab(DEFAULT_SNIPPET);
+  if (!initialTab) return;
+
+  commitDocument(initialTab.editorView!.state.doc.toString());
 
   // Check for unsaved draft recovery before focusing editor
   if (store) {
-    const recoveryData = await checkForRecovery(store);
+    const recoveryData = await checkForMultiTabRecovery(store);
     if (recoveryData) {
-      const shouldRecover = await promptRecovery(recoveryData);
+      const shouldRecover = await promptMultiTabRecovery(recoveryData);
       if (shouldRecover) {
-        editor.dispatch({
-          changes: { from: 0, to: editor.state.doc.length, insert: recoveryData.content },
-        });
-        if (recoveryData.filePath) {
-          currentFilePath = recoveryData.filePath;
+        // Restore first tab into the initial tab
+        const firstDraft = recoveryData.tabs[0];
+        if (firstDraft) {
+          const editor = initialTab.editorView!;
+          editor.dispatch({
+            changes: { from: 0, to: editor.state.doc.length, insert: firstDraft.content },
+          });
+          if (firstDraft.filePath) {
+            initialTab.filePath = firstDraft.filePath;
+          }
+          handleDocChange(initialTab, firstDraft.content);
         }
-        handleDocChange(recoveryData.content);
+
+        // Restore additional tabs
+        for (let i = 1; i < recoveryData.tabs.length; i++) {
+          const draft = recoveryData.tabs[i];
+          createNewTab(draft.content, draft.filePath);
+        }
+
+        // Switch back to first tab
+        if (recoveryData.tabs.length > 1) {
+          switchToTab(initialTab.id);
+        }
       }
       // Clear draft regardless of user choice: accepting restores the content,
       // declining means the user intentionally discarded it. Either way, we don't
@@ -203,14 +351,15 @@ async function bootstrap(): Promise<void> {
     }
   }
 
-  editor.focus();
+  initialTab.editorView!.focus();
   host.dataset.editor = 'mounted';
   previewElement.dataset.preview = 'ready';
-  schedulePreviewRender(editor.state.doc.toString());
   initHorizontalResize(workspace, editorPane, previewPane, divider);
 
   setupToolbarActions({
-    editor,
+    getEditor() {
+      return tabManager.getActiveTab()!.editorView!;
+    },
     schedulePreviewRender,
     newDiagramButton,
     openButton,
@@ -219,50 +368,65 @@ async function bootstrap(): Promise<void> {
     exportMenu,
     examplesButton,
     examplesMenu,
-    isDirty() {
-      return isDocumentDirty;
-    },
     commitDocument,
     onNew() {
-      // Clear autosave draft when starting a new diagram to prevent false recovery
-      if (store) {
-        clearDraft(store);
-      }
+      createNewTab(DEFAULT_SNIPPET);
+    },
+    onOpen(content, path) {
+      createNewTab(content, path);
     },
     onPathChange(path) {
-      const previousPath = currentFilePath;
-      currentFilePath = path;
-      if (path === null) {
-        lastSavedAt = null;
-      } else if (path !== previousPath) {
-        lastSavedAt = null;
+      const tab = tabManager.getActiveTab();
+      if (!tab) return;
+      const previousPath = tab.filePath;
+      tab.filePath = path;
+      if (path === null || path !== previousPath) {
+        tab.lastSavedAt = null;
       }
       updateFileStatus();
+      refreshTabBar();
     },
     getPath() {
-      return currentFilePath;
+      return tabManager.getActiveTab()?.filePath ?? null;
     },
-    defaultSnippet: DEFAULT_SNIPPET,
   });
 
   setupToolbarShortcuts({
     newButton: newDiagramButton,
     openButton,
     saveButton,
+    onNewTab: () => createNewTab(DEFAULT_SNIPPET),
+    onCloseTab: () => {
+      const tab = tabManager.getActiveTab();
+      if (tab) closeTab(tab.id);
+    },
+    onNextTab: () => {
+      const next = tabManager.getNextTab();
+      if (next) switchToTab(next.id);
+    },
+    onPreviousTab: () => {
+      const prev = tabManager.getPreviousTab();
+      if (prev) switchToTab(prev.id);
+    },
   });
 
   setupLayoutEngine(() => {
-    schedulePreviewRender(editor.state.doc.toString());
+    const tab = tabManager.getActiveTab();
+    if (tab?.editorView) {
+      schedulePreviewRender(tab.editorView.state.doc.toString());
+    }
   });
 
-  // Start autosave (draft saved every 30s when content changes)
-  let _stopAutosave: (() => void) | null = null;
+  // Start autosave (all tabs saved every 30s when content changes)
   if (store) {
-    _stopAutosave = setupAutosave(
+    setupMultiTabAutosave(
       {
         store,
-        getContent: () => editor.state.doc.toString(),
-        getFilePath: () => currentFilePath,
+        getTabDrafts: () =>
+          tabManager.getAllTabs().map((tab) => ({
+            content: tab.editorView?.state.doc.toString() ?? '',
+            filePath: tab.filePath,
+          })),
       },
       () => {
         status.success('Draft saved');
@@ -271,43 +435,6 @@ async function bootstrap(): Promise<void> {
   }
 
   setupHelpDialog(helpButton);
-}
-
-function createEditor(
-  host: HTMLElement,
-  initialDoc: string,
-  schedulePreviewRender: (doc: string) => void,
-  onDocChange?: (doc: string) => void,
-  zoomExtension?: ReturnType<Compartment['of']>
-): EditorView {
-  const extensions = [
-    basicSetup,
-    DOT_LANGUAGE,
-    EditorView.lineWrapping,
-    EDITOR_THEME,
-    keymap.of([indentWithTab]),
-    EditorView.updateListener.of((update) => {
-      if (update.docChanged) {
-        const nextDoc = update.state.doc.toString();
-        schedulePreviewRender(nextDoc);
-        onDocChange?.(nextDoc);
-      }
-    }),
-  ];
-
-  if (zoomExtension) {
-    extensions.push(zoomExtension);
-  }
-
-  const state = EditorState.create({
-    doc: initialDoc,
-    extensions,
-  });
-
-  return new EditorView({
-    parent: host,
-    state,
-  });
 }
 
 type StatusLevel = 'idle' | 'loading' | 'success' | 'error' | 'info';

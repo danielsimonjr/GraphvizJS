@@ -1,4 +1,3 @@
-import { ask } from '@tauri-apps/plugin-dialog';
 import type { EditorView } from 'codemirror';
 import { type ExampleItem, setupExamplesMenu } from './examples-menu';
 import { createExportHandler } from './export-diagram';
@@ -10,7 +9,7 @@ import { setupSaveDiagramAction } from './save-diagram';
 const EXAMPLES = loadExamples();
 
 export interface ToolbarActionsOptions {
-  editor: EditorView;
+  getEditor: () => EditorView;
   schedulePreviewRender: (doc: string) => void;
   newDiagramButton: HTMLButtonElement | null;
   openButton: HTMLButtonElement | null;
@@ -19,17 +18,16 @@ export interface ToolbarActionsOptions {
   exportMenu: HTMLDivElement | null;
   examplesButton: HTMLButtonElement | null;
   examplesMenu: HTMLDivElement | null;
-  isDirty: () => boolean;
   commitDocument: (doc: string, options?: { saved?: boolean }) => void;
-  onNew?: () => void;
+  onNew: () => void;
+  onOpen: (content: string, path: string) => void;
   onPathChange: (path: string | null) => void;
   getPath: () => string | null;
-  defaultSnippet: string;
 }
 
 export function setupToolbarActions(options: ToolbarActionsOptions): void {
   const {
-    editor,
+    getEditor,
     schedulePreviewRender,
     newDiagramButton,
     openButton,
@@ -38,49 +36,23 @@ export function setupToolbarActions(options: ToolbarActionsOptions): void {
     exportMenu,
     examplesButton,
     examplesMenu,
-    isDirty,
     commitDocument,
     onPathChange,
     getPath,
-    defaultSnippet,
   } = options;
 
   setupNewDiagramAction({
-    editor,
-    schedulePreviewRender,
     button: newDiagramButton,
-    defaultSnippet,
-    onPathChange,
-    shouldReplace: async () => {
-      if (!isDirty()) {
-        return true;
-      }
-      return confirmReplace('Overwrite the current diagram with a blank template?');
-    },
-    onNew(doc) {
-      commitDocument(doc);
-      options.onNew?.();
-    },
+    onNew: options.onNew,
   });
 
   setupOpenDiagramAction({
-    editor,
-    schedulePreviewRender,
     button: openButton,
-    onPathChange,
-    shouldReplace: async () => {
-      if (!isDirty()) {
-        return true;
-      }
-      return confirmReplace('Replace the current diagram with the selected file?');
-    },
-    onOpen(doc) {
-      commitDocument(doc);
-    },
+    onOpen: options.onOpen,
   });
 
   setupSaveDiagramAction({
-    editor,
+    getEditor,
     button: saveButton,
     getPath,
     onPathChange,
@@ -90,7 +62,7 @@ export function setupToolbarActions(options: ToolbarActionsOptions): void {
   });
 
   const handleExport = createExportHandler({
-    editor,
+    getEditor,
     getPath,
   });
 
@@ -105,18 +77,15 @@ export function setupToolbarActions(options: ToolbarActionsOptions): void {
       button: examplesButton,
       menu: examplesMenu,
       items: EXAMPLES,
-      onSelect: async (content) => {
-        if (isDirty()) {
-          const proceed = await confirmReplace('Replace the current diagram with this example?');
-          if (!proceed) {
-            return;
-          }
-        }
+      onSelect: (content) => {
+        // Load example into the active tab's editor
+        const editor = getEditor();
         editor.dispatch({
           changes: { from: 0, to: editor.state.doc.length, insert: content },
         });
         schedulePreviewRender(content);
         onPathChange(null);
+        commitDocument(content);
       },
     });
   }
@@ -168,18 +137,4 @@ function parseExampleId(rawId: string): { name: string; order: number } {
     };
   }
   return { name: rawId, order: Number.MAX_SAFE_INTEGER };
-}
-
-async function confirmReplace(message: string): Promise<boolean> {
-  try {
-    const result = await ask(message, {
-      title: 'Discard unsaved changes?',
-      kind: 'warning',
-    });
-    return result;
-  } catch (error) {
-    console.warn('Unable to show confirmation dialog', error);
-    // Fail-safe: prevent destructive action if dialog fails
-    return false;
-  }
 }

@@ -37,11 +37,11 @@ The app bootstraps on `DOMContentLoaded` via a single `bootstrap()` function tha
 1. Initializes Graphviz WASM (`initGraphviz`)
 2. Loads persisted window state and settings from Tauri Store
 3. Creates zoom controllers (preview + editor)
-4. Creates the CodeMirror editor with DOT language support
-5. Checks for autosave recovery drafts and prompts user
-6. Wires up toolbar actions, keyboard shortcuts, layout engine selector, and autosave
+4. Creates the TabManager and initial tab with CodeMirror editor
+5. Checks for multi-tab autosave recovery and prompts user
+6. Wires up tab bar, toolbar actions, keyboard shortcuts, layout engine selector, and autosave
 
-State is managed via closures in `bootstrap()` — `currentFilePath`, `isDocumentDirty`, `lastCommittedDoc`, `lastSavedAt` are local variables, not a global store. The `commitDocument()` function is the central point for marking content as "clean."
+State is managed via a `TabManager` instance in `bootstrap()`. Each tab holds its own `TabState` (filePath, isDirty, lastCommittedDoc, lastSavedAt, editorView, editorZoomLevel). The `commitDocument()` function delegates to the active tab. Only the active tab's editor is visible (others hidden via `display:none`).
 
 ### Module Boundaries
 
@@ -50,7 +50,8 @@ Each `src/` subdirectory exports setup functions that receive DOM elements and c
 - **editor/** — CodeMirror extensions: DOT language grammar (`language.ts`), theme (`theme.ts`), font zoom (`zoom.ts`)
 - **preview/** — Graphviz WASM init (`graphviz.ts`), debounced SVG rendering (`render.ts`), preview zoom (`zoom.ts`)
 - **toolbar/** — Each action is a separate module: `new-diagram.ts`, `open-diagram.ts`, `save-diagram.ts`, `export-diagram.ts`, `export-menu.ts`, `examples-menu.ts`, `layout-engine.ts`, `shortcuts.ts`. Orchestrated by `actions.ts`.
-- **autosave/** — Periodic draft saving (`manager.ts`) and crash recovery (`recovery.ts`). Uses Tauri Store with keys defined in `constants.ts`.
+- **tabs/** — Multi-tab management: `manager.ts` (TabManager class, TabState interface), `tab-bar.ts` (tab bar UI rendering and event delegation)
+- **autosave/** — Periodic draft saving (`manager.ts`) and crash recovery (`recovery.ts`). Supports multi-tab drafts via `tabDrafts` store key. Uses Tauri Store with keys defined in `constants.ts`.
 - **workspace/** — Horizontal resizable pane divider
 - **window/** — Window position/size persistence via Tauri Store
 - **examples/** — `.dot` files loaded via `import.meta.glob` (Vite eager glob import with `?raw` query)
