@@ -1,0 +1,244 @@
+{
+  "phase": 3,
+  "sprint": 4,
+  "title": "DOT Syntax Validation/Linting",
+  "priority": "MEDIUM",
+  "effort": "1 hour",
+  "status": "planned",
+  "startedAt": null,
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Provides real-time DOT syntax validation with inline error markers, gutter icons, and hover tooltips so users can fix syntax errors without waiting for the preview to fail",
+  "targetMetrics": {
+    "validation": {
+      "current": "Errors only visible when Graphviz render fails, shown in preview pane as plain text",
+      "target": "Inline squiggly underlines, gutter markers, and hover tooltips in the editor with line/column precision"
+    }
+  },
+  "architectureNotes": {
+    "currentState": "Graphviz errors are caught in render.ts catch block and displayed in the preview pane. Error details come from @hpcc-js/wasm Error.message. No CodeMirror lint extension is installed. Editor extensions are: basicSetup, DOT language, line wrapping, theme, keymap, zoom, update listener. The @codemirror/lint package is not installed.",
+    "targetState": "A new @codemirror/lint extension is added to each editor. A linter function calls Graphviz WASM in a try/catch to detect syntax errors without rendering. Error messages are parsed for line/column numbers using regex heuristics. Diagnostics are mapped to CodeMirror Diagnostic objects with from/to positions, severity, and message. The linter is debounced to avoid excessive parsing. The lint gutter shows error markers. Hovering squiggles shows error details in a tooltip.",
+    "keyDecisions": [
+      "Use @codemirror/lint package (linter() + lintGutter()) for the CodeMirror integration",
+      "Reuse existing Graphviz WASM singleton from graphviz.ts for validation (same .layout() call, just catch errors)",
+      "Create a dedicated validateDot() function in graphviz.ts that returns error info instead of SVG",
+      "Parse error messages with regex patterns to extract line/column when available",
+      "Fall back to marking the entire document if line/column cannot be extracted",
+      "Debounce validation independently from preview rendering (500ms default)",
+      "Lint extension is added to createTabEditor extensions array in main.ts",
+      "Error panel (lintGutter) appears in the editor gutter alongside line numbers",
+      "Validation uses the currently selected layout engine (same as preview)"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "3.4.1",
+      "category": "setup",
+      "title": "Install @codemirror/lint package",
+      "description": "Add @codemirror/lint as a dependency. This package provides the linter(), lintGutter(), and Diagnostic types needed for inline error display in CodeMirror 6.",
+      "status": "planned",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "files": ["package.json"],
+      "testCategories": ["typecheck"],
+      "acceptanceCriteria": [
+        "@codemirror/lint added to dependencies in package.json",
+        "pnpm install succeeds",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.4.2",
+      "category": "core",
+      "title": "Add validateDot() function to graphviz.ts",
+      "description": "Add a validateDot(dotSource, engine) function to src/preview/graphviz.ts that attempts to render the DOT source and returns structured error information. On success, returns null. On failure, returns { message: string, line?: number, column?: number }. This separates validation from rendering so the linter can validate without touching the DOM. Parse the error message from @hpcc-js/wasm to extract line/column numbers using regex patterns. Common error formats from Graphviz: 'Error: <stdin>: syntax error in line N', 'Error: <stdin>: syntax error in line N near ...', and variations. Export a DotValidationError interface.",
+      "status": "planned",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "files": ["src/preview/graphviz.ts"],
+      "testCategories": ["typecheck", "unit"],
+      "acceptanceCriteria": [
+        "Exports DotValidationError interface with message, line?, column? fields",
+        "Exports validateDot(dotSource, engine) async function",
+        "Returns null for valid DOT source",
+        "Returns DotValidationError with parsed line/column for invalid DOT",
+        "Falls back to message-only (no line/column) when parsing fails",
+        "Uses existing Graphviz WASM singleton (no separate initialization)",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.4.3",
+      "category": "core",
+      "title": "Create src/editor/linting.ts with CodeMirror lint integration",
+      "description": "Create src/editor/linting.ts that exports a createDotLinter(options) function returning a CodeMirror Extension. Use @codemirror/lint's linter() function with a source callback that calls validateDot(). Map DotValidationError to CodeMirror Diagnostic objects (from, to, severity: 'error', message). When line number is available, convert to character offset using the EditorView's document. When line is not available, mark position 0 to end-of-first-line. Also export lintGutter() from the same module for gutter markers. The linter options should include delay (default 500ms) for debouncing. Accept a getEngine callback to use the current layout engine for validation.",
+      "status": "planned",
+      "implementationNotes": null,
+      "estimatedHours": 0.2,
+      "files": ["src/editor/linting.ts"],
+      "testCategories": ["typecheck", "unit"],
+      "acceptanceCriteria": [
+        "Exports createDotLinter(options) returning Extension",
+        "Options include getEngine callback for layout engine selection",
+        "Calls validateDot() with current editor content",
+        "Maps DotValidationError to CodeMirror Diagnostic with correct from/to positions",
+        "Line-number errors map to correct character offsets in the document",
+        "Unknown-position errors mark first line",
+        "Returns empty diagnostics array for valid DOT",
+        "lintGutter() extension included for gutter markers",
+        "Configurable debounce delay (default 500ms)",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.4.4",
+      "category": "integration",
+      "title": "Wire lint extension into main.ts createTabEditor",
+      "description": "Import createDotLinter from src/editor/linting.ts in main.ts. Add the lint extension and lintGutter to the extensions array in createTabEditor(). Pass getCurrentEngine as the getEngine option so validation uses the same layout engine as preview. The lint extension goes after the DOT language extension in the array.",
+      "status": "planned",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "files": ["src/main.ts"],
+      "testCategories": ["typecheck", "manual"],
+      "acceptanceCriteria": [
+        "createDotLinter imported and added to editor extensions",
+        "lintGutter added to editor extensions",
+        "getEngine passes getCurrentEngine from main.ts scope",
+        "Lint extension positioned after DOT language extension",
+        "Validation uses currently selected layout engine",
+        "pnpm typecheck passes",
+        "Manual: error squiggles appear for invalid DOT syntax"
+      ]
+    },
+    {
+      "id": "3.4.5",
+      "category": "styling",
+      "title": "Style lint markers and tooltips",
+      "description": "Add CSS styles for the lint UI elements in styles.css. CodeMirror lint provides default styling but it needs to match the app aesthetic. Style the lint gutter icon (red circle/dot for errors), the squiggly underline (red wavy line), and the tooltip panel (dark background, readable text, positioned near the error). The tooltip should be readable in both the current light theme and not conflict with future dark mode.",
+      "status": "planned",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "files": ["src/styles.css"],
+      "testCategories": ["manual"],
+      "acceptanceCriteria": [
+        "Lint gutter icons visible and styled (red dot/circle for errors)",
+        "Squiggly underlines visible under error regions",
+        "Tooltip panel readable with appropriate contrast",
+        "Tooltip positioned correctly near error location",
+        "Styles don't conflict with existing editor theme",
+        "Manual: visual appearance is clean and consistent"
+      ]
+    },
+    {
+      "id": "3.4.6",
+      "category": "testing",
+      "title": "Add unit tests for validateDot()",
+      "description": "Create test/preview/validate.test.ts with tests for the validateDot function. Mock the Graphviz WASM instance to return errors with known formats. Test: valid DOT returns null, syntax error returns DotValidationError with parsed line number, error without line number returns message-only, various Graphviz error message formats are parsed correctly.",
+      "status": "planned",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "files": ["test/preview/validate.test.ts"],
+      "testCategories": ["unit"],
+      "acceptanceCriteria": [
+        "Tests for valid DOT returning null",
+        "Tests for syntax error with line number extraction",
+        "Tests for error without parseable line number",
+        "Tests for multiple Graphviz error message formats",
+        "Tests for empty/whitespace-only input",
+        "Tests for engine parameter being passed through",
+        "80%+ coverage on validateDot and error parsing"
+      ]
+    },
+    {
+      "id": "3.4.7",
+      "category": "testing",
+      "title": "Add unit tests for createDotLinter()",
+      "description": "Create test/editor/linting.test.ts with tests for the linting extension. Mock validateDot to return controlled results. Test: linter returns empty diagnostics for valid DOT, linter returns diagnostic with correct positions for errors with line numbers, linter returns document-start diagnostic for unknown-position errors, getEngine callback is used.",
+      "status": "planned",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "files": ["test/editor/linting.test.ts"],
+      "testCategories": ["unit"],
+      "acceptanceCriteria": [
+        "Tests for linter returning empty diagnostics on valid DOT",
+        "Tests for diagnostic with correct from/to offsets for line-number errors",
+        "Tests for diagnostic covering first line when position unknown",
+        "Tests for diagnostic severity set to 'error'",
+        "Tests for diagnostic message matching error details",
+        "Tests for getEngine callback being called",
+        "80%+ coverage on createDotLinter"
+      ]
+    },
+    {
+      "id": "3.4.8",
+      "category": "documentation",
+      "title": "Update documentation and commit",
+      "description": "Update CHANGELOG with DOT syntax validation feature details. Update ROADMAP to mark DOT Syntax Validation/Linting as completed. Update CLAUDE.md architecture notes to mention the linting module. Update sprint JSON with implementation notes. Commit all changes.",
+      "status": "planned",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "files": [
+        "CHANGELOG.md",
+        "docs/planning/ROADMAP.md",
+        "docs/planning/PHASE_3_SPRINT_4_TODO.json",
+        ".claude/CLAUDE.md"
+      ],
+      "testCategories": ["manual"],
+      "acceptanceCriteria": [
+        "CHANGELOG updated with syntax validation feature details",
+        "ROADMAP shows DOT Syntax Validation/Linting as completed with date",
+        "CLAUDE.md editor module description includes linting.ts",
+        "Sprint JSON updated with implementation notes and completion date",
+        "All tests pass",
+        "Changes committed to GitHub"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "Invalid DOT syntax shows red squiggly underlines in the editor",
+    "Lint gutter shows error markers for lines with errors",
+    "Hovering error markers or squiggles shows error details in a tooltip",
+    "Validation uses the currently selected layout engine",
+    "Valid DOT shows no lint markers",
+    "Validation is debounced (500ms) to avoid excessive parsing",
+    "Each tab validates independently",
+    "Lint extension does not interfere with preview rendering",
+    "All unit tests pass with 80%+ coverage on new code",
+    "No regression in existing tests"
+  ],
+  "filesCreated": [
+    "src/editor/linting.ts",
+    "test/preview/validate.test.ts",
+    "test/editor/linting.test.ts"
+  ],
+  "filesModified": [
+    "package.json",
+    "src/preview/graphviz.ts",
+    "src/main.ts",
+    "src/styles.css",
+    "CHANGELOG.md",
+    "docs/planning/ROADMAP.md",
+    ".claude/CLAUDE.md"
+  ],
+  "totalNewTests": 15,
+  "totalEstimatedHours": 0.95,
+  "dependencies": ["Phase 3 Sprint 3 complete", "@codemirror/lint package", "@hpcc-js/wasm Graphviz singleton"],
+  "errorMessageFormats": [
+    "Error: <stdin>: syntax error in line N",
+    "Error: <stdin>: syntax error in line N near 'token'",
+    "Error: <stdin>: syntax error in line N scanning a ...",
+    "syntax error in line N",
+    "Warning: <stdin>: ...",
+    "Error: ... in line N ..."
+  ],
+  "notes": [
+    "@codemirror/lint is a separate package that needs to be installed (not part of codemirror base)",
+    "Graphviz WASM error messages have inconsistent formats - regex parsing needs multiple patterns",
+    "validateDot() reuses the existing WASM singleton, no separate initialization needed",
+    "The linter debounce (500ms) is independent from the preview render debounce (300ms)",
+    "Lint extension must be added to createTabEditor so each tab gets its own linter instance",
+    "Line numbers from Graphviz are 1-based; CodeMirror positions are 0-based offsets - conversion needed",
+    "If Graphviz WASM is not yet loaded, validation should return no diagnostics (not block)",
+    "The lint tooltip uses CodeMirror's built-in tooltip system, no custom tooltip needed"
+  ]
+}
