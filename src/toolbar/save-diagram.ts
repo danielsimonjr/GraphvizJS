@@ -3,7 +3,7 @@ import { writeTextFile } from '@tauri-apps/plugin-fs';
 import type { EditorView } from 'codemirror';
 
 interface SaveDiagramOptions {
-  editor: EditorView;
+  getEditor: () => EditorView;
   button: HTMLButtonElement | null;
   getPath: () => string | null;
   onPathChange: (path: string | null) => void;
@@ -11,11 +11,11 @@ interface SaveDiagramOptions {
 }
 
 export function setupSaveDiagramAction(options: SaveDiagramOptions): void {
-  const { editor, button, getPath, onPathChange, onSave } = options;
+  const { getEditor, button, getPath, onPathChange, onSave } = options;
   if (!button) return;
 
   button.addEventListener('click', async () => {
-    const documentContent = editor.state.doc.toString();
+    const documentContent = getEditor().state.doc.toString();
     let targetPath = getPath();
 
     try {

@@ -38,7 +38,7 @@ describe('toolbar/export-diagram', () => {
     it('returns a function', async () => {
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => null,
       });
       expect(typeof handler).toBe('function');
@@ -51,7 +51,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => null,
       });
 
@@ -67,7 +67,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => null,
       });
 
@@ -84,7 +84,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => null,
       });
 
@@ -104,7 +104,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => null,
       });
 
@@ -124,7 +124,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => '/path/to/myfile.dot',
       });
 
@@ -144,7 +144,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => null,
       });
 
@@ -160,7 +160,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => null,
       });
 
@@ -178,7 +178,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => null,
       });
 
@@ -198,7 +198,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => null,
       });
 
@@ -220,7 +220,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => '/path/to/file.dot',
       });
 
@@ -240,7 +240,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => '/path/to/noextension',
       });
 
@@ -260,7 +260,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => '',
       });
 
@@ -280,7 +280,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => '   ',
       });
 
@@ -300,7 +300,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => 'C:\\Users\\test\\documents\\graph.gv',
       });
 
@@ -328,7 +328,7 @@ describe('toolbar/export-diagram', () => {
 
       const { createExportHandler } = await import('../../src/toolbar/export-diagram');
       const handler = createExportHandler({
-        editor,
+        getEditor: () => editor,
         getPath: () => null,
       });
 

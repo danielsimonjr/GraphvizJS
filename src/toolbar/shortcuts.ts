@@ -6,6 +6,10 @@ export interface ToolbarShortcutsOptions {
   newButton?: HTMLButtonElement | null;
   openButton?: HTMLButtonElement | null;
   saveButton?: HTMLButtonElement | null;
+  onNewTab?: () => void;
+  onCloseTab?: () => void;
+  onNextTab?: () => void;
+  onPreviousTab?: () => void;
 }
 
 export function setupToolbarShortcuts(options: ToolbarShortcutsOptions): () => void {
@@ -37,6 +41,28 @@ export function setupToolbarShortcuts(options: ToolbarShortcutsOptions): () => v
 
     if (key === 'n' && trigger(options.newButton)) {
       event.preventDefault();
+      return;
+    }
+
+    if (key === 't' && !event.shiftKey && options.onNewTab) {
+      event.preventDefault();
+      options.onNewTab();
+      return;
+    }
+
+    if (key === 'w' && !event.shiftKey && options.onCloseTab) {
+      event.preventDefault();
+      options.onCloseTab();
+      return;
+    }
+
+    if (key === 'tab' && options.onNextTab && options.onPreviousTab) {
+      event.preventDefault();
+      if (event.shiftKey) {
+        options.onPreviousTab();
+      } else {
+        options.onNextTab();
+      }
     }
   };
 

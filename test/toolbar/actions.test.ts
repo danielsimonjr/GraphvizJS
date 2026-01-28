@@ -1,6 +1,6 @@
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import '../mocks/graphviz';
 import '../mocks/tauri';
 import { resetMockGraphviz } from '../mocks/graphviz';
@@ -57,7 +57,7 @@ describe('toolbar/actions', () => {
 
       expect(() => {
         setupToolbarActions({
-          editor,
+          getEditor: () => editor,
           schedulePreviewRender: vi.fn(),
           newDiagramButton,
           openButton,
@@ -66,11 +66,11 @@ describe('toolbar/actions', () => {
           exportMenu,
           examplesButton,
           examplesMenu,
-          isDirty: () => false,
           commitDocument: vi.fn(),
+          onNew: vi.fn(),
+          onOpen: vi.fn(),
           onPathChange: vi.fn(),
           getPath: () => null,
-          defaultSnippet: 'digraph {}',
         });
       }).not.toThrow();
     });
@@ -80,7 +80,7 @@ describe('toolbar/actions', () => {
 
       expect(() => {
         setupToolbarActions({
-          editor,
+          getEditor: () => editor,
           schedulePreviewRender: vi.fn(),
           newDiagramButton: null,
           openButton: null,
@@ -89,24 +89,23 @@ describe('toolbar/actions', () => {
           exportMenu: null,
           examplesButton: null,
           examplesMenu: null,
-          isDirty: () => false,
           commitDocument: vi.fn(),
+          onNew: vi.fn(),
+          onOpen: vi.fn(),
           onPathChange: vi.fn(),
           getPath: () => null,
-          defaultSnippet: 'digraph {}',
         });
       }).not.toThrow();
     });
   });
 
   describe('New diagram action', () => {
-    it('does not confirm when not dirty', async () => {
+    it('calls onNew when button is clicked', async () => {
       const { setupToolbarActions } = await import('../../src/toolbar/actions');
-      const onPathChange = vi.fn();
-      const commitDocument = vi.fn();
+      const onNew = vi.fn();
 
       setupToolbarActions({
-        editor,
+        getEditor: () => editor,
         schedulePreviewRender: vi.fn(),
         newDiagramButton,
         openButton,
@@ -115,77 +114,17 @@ describe('toolbar/actions', () => {
         exportMenu,
         examplesButton,
         examplesMenu,
-        isDirty: () => false,
-        commitDocument,
-        onPathChange,
-        getPath: () => null,
-        defaultSnippet: 'digraph { new }',
-      });
-
-      newDiagramButton.click();
-      await new Promise((r) => setTimeout(r, 50));
-
-      // Should not show confirm dialog when not dirty
-      expect(mockDialog.ask).not.toHaveBeenCalled();
-      expect(onPathChange).toHaveBeenCalledWith(null);
-    });
-
-    it('confirms when dirty', async () => {
-      mockDialog.ask.mockResolvedValue(true);
-
-      const { setupToolbarActions } = await import('../../src/toolbar/actions');
-      const onPathChange = vi.fn();
-
-      setupToolbarActions({
-        editor,
-        schedulePreviewRender: vi.fn(),
-        newDiagramButton,
-        openButton,
-        saveButton,
-        exportButton,
-        exportMenu,
-        examplesButton,
-        examplesMenu,
-        isDirty: () => true,
         commitDocument: vi.fn(),
-        onPathChange,
+        onNew,
+        onOpen: vi.fn(),
+        onPathChange: vi.fn(),
         getPath: () => null,
-        defaultSnippet: 'digraph { new }',
       });
 
       newDiagramButton.click();
       await new Promise((r) => setTimeout(r, 50));
 
-      expect(mockDialog.ask).toHaveBeenCalled();
-    });
-
-    it('cancels when user declines confirm', async () => {
-      mockDialog.ask.mockResolvedValue(false);
-
-      const { setupToolbarActions } = await import('../../src/toolbar/actions');
-      const onPathChange = vi.fn();
-
-      setupToolbarActions({
-        editor,
-        schedulePreviewRender: vi.fn(),
-        newDiagramButton,
-        openButton,
-        saveButton,
-        exportButton,
-        exportMenu,
-        examplesButton,
-        examplesMenu,
-        isDirty: () => true,
-        commitDocument: vi.fn(),
-        onPathChange,
-        getPath: () => null,
-        defaultSnippet: 'digraph { new }',
-      });
-
-      newDiagramButton.click();
-      await new Promise((r) => setTimeout(r, 50));
-
-      expect(onPathChange).not.toHaveBeenCalled();
+      expect(onNew).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -198,7 +137,7 @@ describe('toolbar/actions', () => {
       const { setupToolbarActions } = await import('../../src/toolbar/actions');
 
       setupToolbarActions({
-        editor,
+        getEditor: () => editor,
         schedulePreviewRender: vi.fn(),
         newDiagramButton,
         openButton,
@@ -207,11 +146,11 @@ describe('toolbar/actions', () => {
         exportMenu,
         examplesButton,
         examplesMenu,
-        isDirty: () => false,
         commitDocument: vi.fn(),
+        onNew: vi.fn(),
+        onOpen: vi.fn(),
         onPathChange: vi.fn(),
         getPath: () => null,
-        defaultSnippet: 'digraph {}',
       });
 
       openButton.click();
@@ -222,7 +161,7 @@ describe('toolbar/actions', () => {
   });
 
   describe('Save action', () => {
-    it('saves document and calls commitDocument with saved flag', async () => {
+    it('saves document when save button is clicked', async () => {
       mockDialog.save.mockResolvedValue('/path/to/file.dot');
 
       const { setupToolbarActions } = await import('../../src/toolbar/actions');
@@ -230,7 +169,7 @@ describe('toolbar/actions', () => {
       const onPathChange = vi.fn();
 
       setupToolbarActions({
-        editor,
+        getEditor: () => editor,
         schedulePreviewRender: vi.fn(),
         newDiagramButton,
         openButton,
@@ -239,11 +178,11 @@ describe('toolbar/actions', () => {
         exportMenu,
         examplesButton,
         examplesMenu,
-        isDirty: () => false,
         commitDocument,
+        onNew: vi.fn(),
+        onOpen: vi.fn(),
         onPathChange,
         getPath: () => null,
-        defaultSnippet: 'digraph {}',
       });
 
       saveButton.click();
@@ -258,7 +197,7 @@ describe('toolbar/actions', () => {
       const { setupToolbarActions } = await import('../../src/toolbar/actions');
 
       setupToolbarActions({
-        editor,
+        getEditor: () => editor,
         schedulePreviewRender: vi.fn(),
         newDiagramButton,
         openButton,
@@ -267,11 +206,11 @@ describe('toolbar/actions', () => {
         exportMenu,
         examplesButton,
         examplesMenu,
-        isDirty: () => false,
         commitDocument: vi.fn(),
+        onNew: vi.fn(),
+        onOpen: vi.fn(),
         onPathChange: vi.fn(),
         getPath: () => null,
-        defaultSnippet: 'digraph {}',
       });
 
       exportButton.click();

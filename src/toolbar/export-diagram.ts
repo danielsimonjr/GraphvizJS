@@ -6,7 +6,7 @@ import { renderDotToSvg } from '../preview/graphviz';
 import type { ExportFormat } from './export-menu';
 
 interface ExportDiagramOptions {
-  editor: EditorView;
+  getEditor: () => EditorView;
   getPath: () => string | null;
 }
 
@@ -20,9 +20,9 @@ const PNG_MIN_BASE = 512;
 const PNG_MIN_DOUBLE = 1024;
 const EXPORT_PADDING = 10;
 
-export function createExportHandler({ editor, getPath }: ExportDiagramOptions) {
+export function createExportHandler({ getEditor, getPath }: ExportDiagramOptions) {
   return async (format: ExportFormat) => {
-    const documentContent = editor.state.doc.toString().trim();
+    const documentContent = getEditor().state.doc.toString().trim();
     if (!documentContent.length) {
       console.warn('Cannot export an empty diagram.');
       return;
