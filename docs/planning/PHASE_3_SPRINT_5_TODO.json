@@ -1,0 +1,274 @@
+{
+  "phase": 3,
+  "sprint": 5,
+  "title": "Recent Files List",
+  "priority": "HIGH",
+  "effort": "30 minutes",
+  "status": "pending",
+  "startedAt": null,
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Enables quick access to recently opened files via a toolbar dropdown, improving workflow efficiency for users who frequently switch between diagrams",
+  "targetMetrics": {
+    "recentFiles": {
+      "current": "Users must navigate file system each time to reopen previously worked-on files",
+      "target": "One-click access to last 10 opened files from a toolbar dropdown"
+    }
+  },
+  "architectureNotes": {
+    "currentState": "File opening is handled by open-diagram.ts which uses Tauri dialog.open() to show a file picker. There is no tracking of previously opened files. The Tauri Store is used for window state and autosave drafts but not for recent files. TabManager.openFile() handles loading file content into tabs.",
+    "targetState": "A new recent-files.ts module manages a list of up to 10 recently opened file paths stored in Tauri Store. A dropdown button in the toolbar shows the list with filenames (tooltip shows full path). Clicking a recent file opens it in a new tab via TabManager. The list is updated whenever a file is opened or saved-as. Missing files are gracefully removed from the list when clicked.",
+    "keyDecisions": [
+      "Store recent files as array of paths in Tauri Store under 'recentFiles' key",
+      "Maximum 10 recent files, oldest removed when limit exceeded",
+      "Display filename only in dropdown, full path in tooltip for space efficiency",
+      "Open recent files in new tab (consistent with multi-tab workflow)",
+      "Check file existence when clicked, remove from list if not found (don't block UI on startup)",
+      "Add keyboard shortcut Ctrl+Shift+O to open recent files dropdown",
+      "Update recent files list on file open AND save-as (not just open)",
+      "Recent files dropdown uses same menu pattern as export/examples menus"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "3.5.1",
+      "category": "core",
+      "title": "Create src/toolbar/recent-files.ts module",
+      "description": "Create the recent files management module with functions to load, save, add, and remove recent file paths. Use Tauri Store for persistence. Export: loadRecentFiles(store): Promise<string[]>, saveRecentFiles(store, paths): Promise<void>, addRecentFile(store, path): Promise<void>, removeRecentFile(store, path): Promise<void>. The addRecentFile function should move existing entries to the top (most recent) and enforce the 10-file limit.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "files": ["src/toolbar/recent-files.ts"],
+      "testCategories": ["typecheck", "unit"],
+      "acceptanceCriteria": [
+        "Exports loadRecentFiles(store) returning Promise<string[]>",
+        "Exports saveRecentFiles(store, paths) returning Promise<void>",
+        "Exports addRecentFile(store, path) that adds path to front of list",
+        "addRecentFile moves existing path to front if already in list (no duplicates)",
+        "addRecentFile enforces max 10 files limit (removes oldest)",
+        "Exports removeRecentFile(store, path) that removes path from list",
+        "Uses 'recentFiles' key in Tauri Store",
+        "Handles store errors gracefully (returns empty array on load failure)",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.5.2",
+      "category": "ui",
+      "title": "Add recent files dropdown to index.html",
+      "description": "Add a dropdown button and menu to the toolbar in index.html for recent files. Use the same pattern as the export menu: button with aria-haspopup, hidden menu div with role='menu', menu items with role='menuitem'. The button should show a clock/history icon or 'Recent' text. Menu items will be dynamically populated. Include an empty state message 'No recent files' when list is empty.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "files": ["src/index.html"],
+      "testCategories": ["manual"],
+      "acceptanceCriteria": [
+        "Button added to toolbar with id='recent-files-btn'",
+        "Button has aria-haspopup='menu' and aria-expanded='false'",
+        "Menu div with id='recent-files-menu' and role='menu'",
+        "Menu hidden by default (hidden attribute)",
+        "Menu positioned correctly relative to button",
+        "Empty state element with class 'recent-files-empty' for 'No recent files' message",
+        "Button styled consistently with other toolbar buttons"
+      ]
+    },
+    {
+      "id": "3.5.3",
+      "category": "core",
+      "title": "Create setupRecentFilesMenu() function",
+      "description": "Add setupRecentFilesMenu() function to recent-files.ts that wires up the dropdown menu behavior. Similar to setupExportMenu pattern: toggle on click, close on outside click/Escape, arrow key navigation. The function should accept options: { button, menu, store, onSelect }. It should populate menu items dynamically from the recent files list. Each menu item shows filename with data-path attribute for full path, and title attribute for tooltip. Include logic to refresh the menu when opened.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "files": ["src/toolbar/recent-files.ts"],
+      "testCategories": ["typecheck", "unit"],
+      "acceptanceCriteria": [
+        "Exports setupRecentFilesMenu(options) function",
+        "Options include button, menu, store, onSelect callback",
+        "Menu toggles open/closed on button click",
+        "Menu closes on outside click",
+        "Menu closes on Escape key",
+        "Arrow keys navigate menu items",
+        "Menu items populated from loadRecentFiles() when menu opens",
+        "Each menu item shows filename extracted from path",
+        "Each menu item has title attribute with full path",
+        "Each menu item has data-path attribute with full path",
+        "Empty state shown when no recent files",
+        "onSelect callback called with full path when item clicked",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.5.4",
+      "category": "integration",
+      "title": "Wire recent files menu in main.ts",
+      "description": "Import and call setupRecentFilesMenu() in main.ts bootstrap function. Pass the button, menu, store, and an onSelect callback that opens the file in a new tab using TabManager. The callback should: check if file exists, remove from recent list if not found, otherwise create new tab and load file content.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "files": ["src/main.ts"],
+      "testCategories": ["typecheck", "manual"],
+      "acceptanceCriteria": [
+        "setupRecentFilesMenu imported and called in bootstrap()",
+        "Button and menu elements passed from DOM queries",
+        "Store instance passed for persistence",
+        "onSelect callback opens file in new tab via TabManager",
+        "onSelect checks file existence before opening",
+        "Missing files removed from recent list with removeRecentFile()",
+        "Error shown to user if file not found (console.warn or notification)",
+        "pnpm typecheck passes",
+        "Manual: clicking recent file opens it in new tab"
+      ]
+    },
+    {
+      "id": "3.5.5",
+      "category": "integration",
+      "title": "Update open-diagram.ts to add to recent files",
+      "description": "Modify openDiagram() in open-diagram.ts to call addRecentFile() after successfully opening a file. The store instance needs to be passed to the open diagram handler or accessed from a shared location. Also update save-diagram.ts to add to recent files on Save As (when a new path is chosen).",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "files": ["src/toolbar/open-diagram.ts", "src/toolbar/save-diagram.ts"],
+      "testCategories": ["typecheck", "unit"],
+      "acceptanceCriteria": [
+        "openDiagram handler calls addRecentFile() after successful file open",
+        "save-diagram Save As calls addRecentFile() when new path is saved",
+        "Store instance accessible to both handlers",
+        "Recent file added before returning from handler (not blocking)",
+        "Errors in addRecentFile don't break file open/save flow",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.5.6",
+      "category": "keyboard",
+      "title": "Add Ctrl+Shift+O keyboard shortcut",
+      "description": "Add keyboard shortcut Ctrl+Shift+O (Cmd+Shift+O on Mac) to open the recent files dropdown. Update shortcuts.ts to register the shortcut. The shortcut should open the dropdown and focus the first menu item, same as clicking the button.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "files": ["src/toolbar/shortcuts.ts"],
+      "testCategories": ["typecheck", "manual"],
+      "acceptanceCriteria": [
+        "Ctrl+Shift+O opens recent files dropdown",
+        "Cmd+Shift+O works on Mac",
+        "Dropdown opens and first item is focused",
+        "Shortcut works from editor focus",
+        "No conflict with other shortcuts",
+        "pnpm typecheck passes",
+        "Manual: keyboard shortcut opens recent files menu"
+      ]
+    },
+    {
+      "id": "3.5.7",
+      "category": "styling",
+      "title": "Style recent files dropdown",
+      "description": "Add CSS styles for the recent files dropdown in styles.css. Style the button, menu container, menu items (including hover/focus states), and empty state message. Match the visual style of the export and examples menus for consistency.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "files": ["src/styles.css"],
+      "testCategories": ["manual"],
+      "acceptanceCriteria": [
+        "Recent files button styled consistently with toolbar",
+        "Dropdown menu positioned correctly below button",
+        "Menu items have hover and focus states",
+        "Menu items show filename with ellipsis for long names",
+        "Tooltip shows full path on hover",
+        "Empty state message styled appropriately",
+        "Styles match export/examples menus for consistency",
+        "Manual: dropdown looks clean and consistent"
+      ]
+    },
+    {
+      "id": "3.5.8",
+      "category": "testing",
+      "title": "Add unit tests for recent-files.ts",
+      "description": "Create test/toolbar/recent-files.test.ts with tests for all exported functions. Mock Tauri Store. Test: loadRecentFiles returns empty array when no data, loadRecentFiles returns stored paths, addRecentFile adds to front of list, addRecentFile moves existing to front, addRecentFile enforces 10-file limit, removeRecentFile removes path, setupRecentFilesMenu wires up correctly.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "files": ["test/toolbar/recent-files.test.ts"],
+      "testCategories": ["unit"],
+      "acceptanceCriteria": [
+        "Tests for loadRecentFiles returning empty array",
+        "Tests for loadRecentFiles returning stored data",
+        "Tests for addRecentFile adding new path to front",
+        "Tests for addRecentFile moving existing path to front",
+        "Tests for addRecentFile enforcing 10-file limit",
+        "Tests for removeRecentFile removing path",
+        "Tests for setupRecentFilesMenu menu toggle behavior",
+        "Tests for menu item click calling onSelect",
+        "80%+ coverage on recent-files.ts"
+      ]
+    },
+    {
+      "id": "3.5.9",
+      "category": "documentation",
+      "title": "Update documentation and commit",
+      "description": "Update ROADMAP to mark Recent Files List as completed. Update CLAUDE.md to mention recent-files.ts in toolbar module. Update help dialog to show Ctrl+Shift+O shortcut. Commit all changes.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "files": [
+        "docs/planning/ROADMAP.md",
+        ".claude/CLAUDE.md",
+        "src/help/dialog.ts"
+      ],
+      "testCategories": ["manual"],
+      "acceptanceCriteria": [
+        "ROADMAP shows Recent Files List as completed with date",
+        "CLAUDE.md toolbar module description includes recent-files.ts",
+        "Help dialog shows Ctrl+Shift+O shortcut for recent files",
+        "Sprint JSON updated with implementation notes",
+        "All tests pass",
+        "Changes committed"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "Recent files dropdown appears in toolbar",
+    "Clicking dropdown shows list of up to 10 recently opened files",
+    "Files shown as filename only with full path in tooltip",
+    "Clicking a recent file opens it in a new tab",
+    "Missing files are removed from list when clicked",
+    "Opening a file adds it to recent files list",
+    "Save As adds new path to recent files list",
+    "Ctrl+Shift+O keyboard shortcut opens dropdown",
+    "Empty state shown when no recent files",
+    "Recent files persist across app restarts",
+    "All unit tests pass with 80%+ coverage on new code"
+  ],
+  "filesCreated": [
+    "src/toolbar/recent-files.ts",
+    "test/toolbar/recent-files.test.ts"
+  ],
+  "filesModified": [
+    "src/index.html",
+    "src/main.ts",
+    "src/toolbar/open-diagram.ts",
+    "src/toolbar/save-diagram.ts",
+    "src/toolbar/shortcuts.ts",
+    "src/styles.css",
+    "src/help/dialog.ts",
+    "docs/planning/ROADMAP.md",
+    ".claude/CLAUDE.md"
+  ],
+  "totalEstimatedHours": 0.85,
+  "dependencies": [
+    "Phase 3 Sprint 4 complete",
+    "Tauri Store plugin",
+    "TabManager for opening files in new tabs"
+  ],
+  "storeKeys": {
+    "recentFiles": "Array of file path strings, max 10 entries, most recent first"
+  },
+  "notes": [
+    "Recent files are stored as full paths, not relative paths",
+    "File existence is checked on click, not on menu open (avoid blocking UI)",
+    "The dropdown follows same interaction pattern as export/examples menus",
+    "Opening same file twice moves it to top of list (no duplicates)",
+    "Save As updates recent files; regular Save does not (path unchanged)",
+    "Consider: Clear Recent Files option in menu (future enhancement)"
+  ]
+}
