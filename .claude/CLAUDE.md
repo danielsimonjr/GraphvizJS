@@ -49,7 +49,7 @@ State is managed via a `TabManager` instance in `bootstrap()`. Each tab holds it
 
 Each `src/` subdirectory exports setup functions that receive DOM elements and callbacks. There is no shared global state or event bus — modules communicate through the callback options passed from `main.ts`.
 
-- **editor/** — CodeMirror extensions: DOT language grammar (`language.ts`), theme (`theme.ts`), font zoom (`zoom.ts`)
+- **editor/** — CodeMirror extensions: DOT language grammar (`language.ts`), theme (`theme.ts`), font zoom (`zoom.ts`), syntax linting (`linting.ts`)
 - **preview/** — Graphviz WASM init (`graphviz.ts`), debounced SVG rendering (`render.ts`), preview zoom (`zoom.ts`)
 - **toolbar/** — Each action is a separate module: `new-diagram.ts`, `open-diagram.ts`, `save-diagram.ts`, `export-diagram.ts`, `export-menu.ts`, `examples-menu.ts`, `layout-engine.ts`, `shortcuts.ts`. Orchestrated by `actions.ts`.
 - **tabs/** — Multi-tab management: `manager.ts` (TabManager class, TabState interface), `tab-bar.ts` (tab bar UI rendering and event delegation)

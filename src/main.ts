@@ -8,6 +8,7 @@ import 'remixicon/fonts/remixicon.css';
 import { clearDraft, setupMultiTabAutosave } from './autosave/manager';
 import { checkForMultiTabRecovery, promptMultiTabRecovery } from './autosave/recovery';
 import { createDotLanguage } from './editor/language';
+import { createDotLinter, lintGutter } from './editor/linting';
 import { createEditorTheme } from './editor/theme';
 import {
   createEditorZoomController,
@@ -140,6 +141,8 @@ async function bootstrap(): Promise<void> {
     const extensions = [
       basicSetup,
       DOT_LANGUAGE,
+      createDotLinter({ getEngine: getCurrentEngine }),
+      lintGutter(),
       EditorView.lineWrapping,
       EDITOR_THEME,
       keymap.of([indentWithTab]),
