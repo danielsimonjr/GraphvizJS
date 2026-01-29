@@ -1,10 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getCurrentEngine, setupLayoutEngine } from '../../src/toolbar/layout-engine';
+import {
+  getCurrentEngine,
+  resetLayoutEngineCache,
+  setupLayoutEngine,
+} from '../../src/toolbar/layout-engine';
 
 describe('toolbar/layout-engine', () => {
   let selectElement: HTMLSelectElement;
 
   beforeEach(() => {
+    // Reset the cached select element between tests
+    resetLayoutEngineCache();
     // Create and append select element to document
     selectElement = document.createElement('select');
     selectElement.id = 'layout-engine';
@@ -101,10 +107,45 @@ describe('toolbar/layout-engine', () => {
 
     it('does nothing when select element not found', () => {
       document.body.innerHTML = '';
+      resetLayoutEngineCache();
       const callback = vi.fn();
 
       // Should not throw
       expect(() => setupLayoutEngine(callback)).not.toThrow();
+    });
+  });
+
+  describe('resetLayoutEngineCache()', () => {
+    it('clears cached select element', () => {
+      // First call caches the element
+      expect(getCurrentEngine()).toBe('dot');
+
+      // Remove element from DOM and reset cache
+      document.body.innerHTML = '';
+      resetLayoutEngineCache();
+
+      // Should return default since element is gone
+      expect(getCurrentEngine()).toBe('dot');
+    });
+
+    it('allows re-caching after reset', () => {
+      // Cache initial element
+      getCurrentEngine();
+
+      // Create a new select with different value
+      document.body.innerHTML = '';
+      resetLayoutEngineCache();
+
+      const newSelect = document.createElement('select');
+      newSelect.id = 'layout-engine';
+      const option = document.createElement('option');
+      option.value = 'neato';
+      option.selected = true;
+      newSelect.appendChild(option);
+      document.body.appendChild(newSelect);
+
+      // Should find new element after reset
+      expect(getCurrentEngine()).toBe('neato');
     });
   });
 });
