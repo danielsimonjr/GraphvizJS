@@ -1,8 +1,16 @@
+import { forceLinting } from '@codemirror/lint';
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
-import { forceLinting } from '@codemirror/lint';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { DotValidationError } from '../../src/preview/graphviz';
+
+/** Captured diagnostic structure for testing */
+interface CapturedDiagnostic {
+  from: number;
+  to: number;
+  severity: string;
+  message: string;
+}
 
 // Use vi.hoisted to create the mock before vi.mock is hoisted
 const { mockValidateDot } = vi.hoisted(() => ({
@@ -75,11 +83,11 @@ describe('editor/linting', () => {
     async function runLinter(
       doc: string,
       validationResult: DotValidationError | null
-    ): Promise<{ diagnostics: any[]; view: EditorView }> {
+    ): Promise<{ diagnostics: CapturedDiagnostic[]; view: EditorView }> {
       mockValidateDot.mockResolvedValue(validationResult);
 
       // Captured diagnostics
-      const capturedDiagnostics: any[] = [];
+      const capturedDiagnostics: CapturedDiagnostic[] = [];
 
       const linterExt = createDotLinter({
         getEngine: mockGetEngine,
@@ -99,7 +107,7 @@ describe('editor/linting', () => {
                 typeof value[0].severity === 'string'))
           ) {
             capturedDiagnostics.length = 0;
-            capturedDiagnostics.push(...value);
+            capturedDiagnostics.push(...(value as CapturedDiagnostic[]));
           }
         }
         return null;

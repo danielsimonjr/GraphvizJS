@@ -151,5 +151,169 @@ describe('autosave/manager', () => {
       const { clearDraft } = await import('../../src/autosave/manager');
       await expect(clearDraft(store)).resolves.not.toThrow();
     });
+
+    it('deletes tabDrafts key as well', async () => {
+      const { clearDraft } = await import('../../src/autosave/manager');
+      await clearDraft(store);
+
+      expect(mockStore.delete).toHaveBeenCalledWith('tabDrafts');
+    });
+  });
+
+  describe('setupMultiTabAutosave()', () => {
+    it('returns a cleanup function', async () => {
+      const { setupMultiTabAutosave } = await import('../../src/autosave/manager');
+      const cleanup = setupMultiTabAutosave({
+        store,
+        getTabDrafts: () => [{ content: 'digraph {}', filePath: null }],
+      });
+      expect(typeof cleanup).toBe('function');
+      cleanup();
+    });
+
+    it('saves tab drafts after interval when content changes', async () => {
+      const { setupMultiTabAutosave } = await import('../../src/autosave/manager');
+      const cleanup = setupMultiTabAutosave({
+        store,
+        getTabDrafts: () => [
+          { content: 'digraph { A -> B }', filePath: '/tmp/test.dot' },
+          { content: 'graph { X -- Y }', filePath: null },
+        ],
+      });
+
+      await vi.advanceTimersByTimeAsync(30_000);
+
+      expect(mockStore.set).toHaveBeenCalledWith(
+        'tabDrafts',
+        expect.objectContaining({
+          tabs: [
+            { content: 'digraph { A -> B }', filePath: '/tmp/test.dot' },
+            { content: 'graph { X -- Y }', filePath: null },
+          ],
+          timestamp: expect.any(String),
+        })
+      );
+      expect(mockStore.save).toHaveBeenCalled();
+      cleanup();
+    });
+
+    it('does not re-save when content is unchanged', async () => {
+      const { setupMultiTabAutosave } = await import('../../src/autosave/manager');
+      const tabs = [{ content: 'digraph {}', filePath: null }];
+      const cleanup = setupMultiTabAutosave({
+        store,
+        getTabDrafts: () => tabs,
+      });
+
+      // First interval: saves
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(mockStore.save).toHaveBeenCalledTimes(1);
+
+      // Second interval: same content, should not save again
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(mockStore.save).toHaveBeenCalledTimes(1);
+
+      cleanup();
+    });
+
+    it('saves again when content changes', async () => {
+      const { setupMultiTabAutosave } = await import('../../src/autosave/manager');
+      let tabs = [{ content: 'v1', filePath: null }];
+      const cleanup = setupMultiTabAutosave({
+        store,
+        getTabDrafts: () => tabs,
+      });
+
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(mockStore.save).toHaveBeenCalledTimes(1);
+
+      // Change content
+      tabs = [{ content: 'v2', filePath: null }];
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(mockStore.save).toHaveBeenCalledTimes(2);
+
+      cleanup();
+    });
+
+    it('calls onDraftSaved callback after saving', async () => {
+      const onDraftSaved = vi.fn();
+      const { setupMultiTabAutosave } = await import('../../src/autosave/manager');
+      const cleanup = setupMultiTabAutosave(
+        {
+          store,
+          getTabDrafts: () => [{ content: 'digraph {}', filePath: null }],
+        },
+        onDraftSaved
+      );
+
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(onDraftSaved).toHaveBeenCalledTimes(1);
+      cleanup();
+    });
+
+    it('handles store errors gracefully', async () => {
+      mockStore.set.mockRejectedValueOnce(new Error('Store write failed'));
+      const { setupMultiTabAutosave } = await import('../../src/autosave/manager');
+      const cleanup = setupMultiTabAutosave({
+        store,
+        getTabDrafts: () => [{ content: 'digraph {}', filePath: null }],
+      });
+
+      // Should not throw
+      await vi.advanceTimersByTimeAsync(30_000);
+      cleanup();
+    });
+
+    it('stops saving after cleanup is called', async () => {
+      const { setupMultiTabAutosave } = await import('../../src/autosave/manager');
+      let tabs = [{ content: 'v1', filePath: null }];
+      const cleanup = setupMultiTabAutosave({
+        store,
+        getTabDrafts: () => tabs,
+      });
+
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(mockStore.save).toHaveBeenCalledTimes(1);
+
+      cleanup();
+      tabs = [{ content: 'v2', filePath: null }];
+
+      await vi.advanceTimersByTimeAsync(30_000);
+      // Should not have saved again
+      expect(mockStore.save).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('saveTabDrafts()', () => {
+    it('saves tabs array with timestamp to store', async () => {
+      const { saveTabDrafts } = await import('../../src/autosave/manager');
+      const tabs = [
+        { content: 'digraph { X }', filePath: '/path/to/file.dot' },
+        { content: 'graph { Y }', filePath: null },
+      ];
+      await saveTabDrafts(store, tabs);
+
+      expect(mockStore.set).toHaveBeenCalledWith(
+        'tabDrafts',
+        expect.objectContaining({
+          tabs,
+          timestamp: expect.any(String),
+        })
+      );
+      expect(mockStore.save).toHaveBeenCalled();
+    });
+
+    it('saves empty tabs array', async () => {
+      const { saveTabDrafts } = await import('../../src/autosave/manager');
+      await saveTabDrafts(store, []);
+
+      expect(mockStore.set).toHaveBeenCalledWith(
+        'tabDrafts',
+        expect.objectContaining({
+          tabs: [],
+          timestamp: expect.any(String),
+        })
+      );
+    });
   });
 });
