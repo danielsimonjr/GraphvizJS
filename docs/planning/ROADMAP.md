@@ -74,7 +74,7 @@ Add system-aware dark mode with manual toggle for the entire application.
 
 ---
 
-### Recent Files List
+### Recent Files List (Sprint 5)
 
 **Priority:** High
 **Effort:** ~30 minutes
@@ -85,13 +85,16 @@ Show recently opened files in a dropdown menu for quick access.
 **Implementation:**
 1. Store recent file paths (max 10) in Tauri store
 2. Create `src/toolbar/recent-files.ts` with menu component
-3. Add "Recent Files" submenu to File menu or toolbar dropdown
+3. Add "Recent Files" dropdown button to toolbar
 4. Update `open-diagram.ts` to add opened files to recent list
 5. Handle missing files gracefully (remove from list if not found)
 6. Add keyboard shortcut (Ctrl+Shift+O) to open recent files menu
+7. Open recent files in new tab (consistent with multi-tab workflow)
 
-**Files to modify:** `index.html`, `src/toolbar/open-diagram.ts`, `src/window/state.ts`
+**Files to modify:** `index.html`, `src/toolbar/open-diagram.ts`, `src/toolbar/save-diagram.ts`, `src/main.ts`
 **Files to create:** `src/toolbar/recent-files.ts`
+
+**Reference:** See `docs/planning/PHASE_3_SPRINT_5_TODO.json` for detailed implementation steps.
 
 ---
 
@@ -166,42 +169,28 @@ Real-time DOT syntax validation with inline error markers.
 
 ---
 
-### Export to SVG File
-
-**Priority:** Low
-**Effort:** ~15 minutes
-**Status:** Planned
-
-Save the rendered diagram as a standalone `.svg` file via the native save dialog.
-
-**Implementation:**
-1. Add "Save as SVG" option to export menu in `index.html`
-2. Use existing `renderDotToSvg()` output
-3. Write SVG string to file via Tauri `fs` plugin and `dialog.save()`
-4. Default filename from current file path or `diagram.svg`
-
-**Files to modify:** `index.html`, `src/toolbar/export-diagram.ts`, `src/toolbar/export-menu.ts`
-
----
-
-### Export to PDF
+### Export to PDF (Sprint 6)
 
 **Priority:** Low
 **Effort:** ~30 minutes
 **Status:** Planned
 
-Add PDF export option alongside SVG and PNG.
+Add PDF export option alongside existing PNG and SVG formats.
 
 **Implementation:**
-1. Add PDF option to export menu in `index.html`
-2. Create `src/toolbar/export-pdf.ts` handler
-3. Use SVG-to-PDF conversion (jsPDF + svg2pdf.js or similar)
-4. Apply same padding/background as PNG export
-5. Support page size selection (A4, Letter, fit-to-content)
+1. Install jsPDF and svg2pdf.js packages
+2. Add 'pdf' to ExportFormat type in `export-menu.ts`
+3. Implement `exportAsPdf()` function in `export-diagram.ts`
+4. Add PDF option to export menu in `index.html`
+5. Use fit-to-content sizing (no fixed page size)
+6. Apply same padding/background as PNG export
 
-**Dependencies:** May require additional npm package (jspdf, svg2pdf.js)
-**Files to create:** `src/toolbar/export-pdf.ts`
-**Files to modify:** `index.html`, `src/toolbar/export-menu.ts`
+**Dependencies:** jspdf, svg2pdf.js npm packages
+**Files to modify:** `package.json`, `src/toolbar/export-menu.ts`, `src/toolbar/export-diagram.ts`, `index.html`
+
+**Reference:** See `docs/planning/PHASE_3_SPRINT_6_TODO.json` for detailed implementation steps.
+
+**Note:** SVG export was already implemented in Phase 1 as part of "SVG/PNG export functionality".
 
 ---
 

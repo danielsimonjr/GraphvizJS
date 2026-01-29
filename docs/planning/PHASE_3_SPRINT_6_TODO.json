@@ -1,0 +1,205 @@
+{
+  "phase": 3,
+  "sprint": 6,
+  "title": "Export to PDF",
+  "priority": "LOW",
+  "effort": "30 minutes",
+  "status": "pending",
+  "startedAt": null,
+  "completedAt": null,
+  "implementationNotes": null,
+  "impact": "Adds PDF export option for users who need print-ready or document-embeddable diagram output",
+  "targetMetrics": {
+    "exportFormats": {
+      "current": "PNG (1x and 2x) and SVG export available",
+      "target": "PDF export added alongside existing formats with fit-to-content sizing"
+    }
+  },
+  "architectureNotes": {
+    "currentState": "Export functionality is in src/toolbar/export-diagram.ts with ExportFormat = 'png' | 'pngx2' | 'svg'. The createExportHandler() returns an async handler that renders DOT to SVG, then converts to the target format. SVG is saved directly; PNG uses canvas conversion. The export menu in index.html has three options. The renderDiagram() function returns { svg, width, height } with padding applied.",
+    "targetState": "ExportFormat extended to include 'pdf'. A new exportAsPdf() function uses jsPDF and svg2pdf.js to convert SVG to PDF. The PDF is sized to fit content (no fixed page size). PDF export added to the export menu in index.html. The same padding and background handling as PNG export is applied.",
+    "keyDecisions": [
+      "Use jsPDF + svg2pdf.js libraries for SVG-to-PDF conversion",
+      "PDF sized to fit content (diagram dimensions + padding), not fixed page size",
+      "White background applied (same as PNG export)",
+      "PDF units in points (pt), convert from pixel dimensions",
+      "Add 'pdf' to ExportFormat type",
+      "PDF menu item added to existing export dropdown",
+      "Default filename uses same inferBaseName() logic with .pdf extension"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "3.6.1",
+      "category": "setup",
+      "title": "Install jsPDF and svg2pdf.js packages",
+      "description": "Add jspdf and svg2pdf.js as dependencies. These packages work together: jsPDF creates the PDF document, svg2pdf.js renders SVG content into it. Also add @types if needed for TypeScript support.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "files": ["package.json"],
+      "testCategories": ["typecheck"],
+      "acceptanceCriteria": [
+        "jspdf added to dependencies",
+        "svg2pdf.js added to dependencies",
+        "pnpm install succeeds",
+        "pnpm typecheck passes (types available or declared)"
+      ]
+    },
+    {
+      "id": "3.6.2",
+      "category": "core",
+      "title": "Add 'pdf' to ExportFormat type",
+      "description": "Update the ExportFormat type in export-menu.ts to include 'pdf'. This extends the union type: 'png' | 'pngx2' | 'svg' | 'pdf'.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.02,
+      "files": ["src/toolbar/export-menu.ts"],
+      "testCategories": ["typecheck"],
+      "acceptanceCriteria": [
+        "ExportFormat includes 'pdf'",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.6.3",
+      "category": "core",
+      "title": "Implement exportAsPdf() function",
+      "description": "Add exportAsPdf() function to export-diagram.ts. The function should: 1) Create a jsPDF instance with custom page size matching diagram dimensions (in points: pixels * 0.75), 2) Parse SVG string into DOM element, 3) Use svg2pdf.js to render SVG to PDF, 4) Show save dialog with .pdf filter, 5) Save PDF bytes to file. Apply same padding as PNG export. Use white background.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.15,
+      "files": ["src/toolbar/export-diagram.ts"],
+      "testCategories": ["typecheck", "manual"],
+      "acceptanceCriteria": [
+        "exportAsPdf(diagram, baseName) function added",
+        "Creates jsPDF with custom page size (fit-to-content)",
+        "Page dimensions in points (pixels * 0.75)",
+        "SVG rendered to PDF using svg2pdf.js",
+        "White background applied",
+        "Save dialog shows with .pdf filter",
+        "PDF saved to selected path",
+        "Handles cancel gracefully (no error)",
+        "pnpm typecheck passes"
+      ]
+    },
+    {
+      "id": "3.6.4",
+      "category": "integration",
+      "title": "Wire PDF export in createExportHandler",
+      "description": "Update createExportHandler() in export-diagram.ts to handle 'pdf' format. Add case for 'pdf' that calls exportAsPdf() with the rendered diagram and base name. Keep existing png/svg logic unchanged.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "files": ["src/toolbar/export-diagram.ts"],
+      "testCategories": ["typecheck", "manual"],
+      "acceptanceCriteria": [
+        "createExportHandler handles 'pdf' format",
+        "Calls exportAsPdf with rendered diagram",
+        "Existing png/svg exports unchanged",
+        "pnpm typecheck passes",
+        "Manual: selecting PDF export produces valid PDF file"
+      ]
+    },
+    {
+      "id": "3.6.5",
+      "category": "ui",
+      "title": "Add PDF option to export menu in HTML",
+      "description": "Add a new menu item button for PDF export in the export dropdown in index.html. Place it after the SVG option. Use data-export='pdf' attribute and label 'Export as PDF'.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.02,
+      "files": ["src/index.html"],
+      "testCategories": ["manual"],
+      "acceptanceCriteria": [
+        "PDF menu item added to export dropdown",
+        "Button has data-export='pdf' attribute",
+        "Button has role='menuitem'",
+        "Label is 'Export as PDF'",
+        "Positioned after SVG option in menu",
+        "Manual: PDF option visible in export menu"
+      ]
+    },
+    {
+      "id": "3.6.6",
+      "category": "testing",
+      "title": "Add unit tests for PDF export",
+      "description": "Add tests for PDF export in test/toolbar/export-diagram.test.ts. Mock jsPDF and svg2pdf. Test: exportAsPdf creates jsPDF with correct dimensions, SVG is rendered to PDF, save dialog is shown with correct filters, file is written on save, cancel is handled gracefully.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.1,
+      "files": ["test/toolbar/export-diagram.test.ts"],
+      "testCategories": ["unit"],
+      "acceptanceCriteria": [
+        "Tests for jsPDF instantiation with correct page size",
+        "Tests for svg2pdf rendering call",
+        "Tests for save dialog with PDF filter",
+        "Tests for file write on successful save",
+        "Tests for graceful cancel handling",
+        "Mock jsPDF and svg2pdf appropriately",
+        "Existing export tests unchanged"
+      ]
+    },
+    {
+      "id": "3.6.7",
+      "category": "documentation",
+      "title": "Update documentation and commit",
+      "description": "Update ROADMAP to mark Export to PDF as completed and remove the obsolete 'Export to SVG File' entry (already implemented). Update any user-facing documentation. Commit all changes.",
+      "status": "pending",
+      "implementationNotes": null,
+      "estimatedHours": 0.05,
+      "files": [
+        "docs/planning/ROADMAP.md",
+        "docs/planning/PHASE_3_SPRINT_6_TODO.json"
+      ],
+      "testCategories": ["manual"],
+      "acceptanceCriteria": [
+        "ROADMAP shows Export to PDF as completed with date",
+        "ROADMAP removes obsolete 'Export to SVG File' entry (already done)",
+        "Sprint JSON updated with implementation notes",
+        "All tests pass",
+        "Changes committed"
+      ]
+    }
+  ],
+  "successCriteria": [
+    "PDF option appears in export dropdown menu",
+    "Clicking PDF export opens save dialog with .pdf filter",
+    "Exported PDF contains the diagram with correct dimensions",
+    "PDF is fit-to-content (not fixed page size)",
+    "PDF has white background",
+    "Diagram renders correctly in PDF viewers",
+    "Cancel in save dialog is handled gracefully",
+    "All unit tests pass",
+    "No regression in existing export functionality"
+  ],
+  "filesCreated": [],
+  "filesModified": [
+    "package.json",
+    "src/toolbar/export-menu.ts",
+    "src/toolbar/export-diagram.ts",
+    "src/index.html",
+    "test/toolbar/export-diagram.test.ts",
+    "docs/planning/ROADMAP.md"
+  ],
+  "totalEstimatedHours": 0.44,
+  "dependencies": [
+    "jspdf npm package",
+    "svg2pdf.js npm package",
+    "Existing export infrastructure in export-diagram.ts"
+  ],
+  "technicalNotes": {
+    "pixelToPoint": "1 pixel = 0.75 points (72 points per inch, 96 pixels per inch)",
+    "jsPDFUsage": "new jsPDF({ orientation, unit: 'pt', format: [width, height] })",
+    "svg2pdfUsage": "await svg2pdf(svgElement, pdf, { x, y, width, height })",
+    "orientation": "Determined by aspect ratio: 'landscape' if width > height, else 'portrait'"
+  },
+  "notes": [
+    "jsPDF and svg2pdf.js are mature libraries with good SVG support",
+    "Fit-to-content means no wasted whitespace in the PDF",
+    "Point conversion ensures PDF prints at correct size",
+    "svg2pdf.js handles most SVG features Graphviz uses (paths, text, groups)",
+    "Some advanced SVG features may not render perfectly (gradients, filters) but Graphviz output is typically compatible",
+    "Consider adding page size options in future enhancement"
+  ]
+}
