@@ -144,7 +144,7 @@ Support multiple open documents in a tabbed interface.
 
 **Priority:** Medium
 **Effort:** ~1 hour
-**Status:** Planned
+**Status:** Completed (2026-01-29)
 
 Real-time DOT syntax validation with inline error markers.
 
@@ -158,12 +158,11 @@ Real-time DOT syntax validation with inline error markers.
 7. Style lint gutter markers, squiggles, and tooltips
 8. Debounce validation (500ms) independently from preview rendering
 
-**Files to create:** `src/editor/linting.ts`
-**Files to modify:** `src/preview/graphviz.ts`, `src/main.ts`, `src/styles.css`
+**Files created:** `src/editor/linting.ts`
+**Files modified:** `src/preview/graphviz.ts`, `src/main.ts`, `src/styles.css`
+**Tests added:** 48 unit tests (30 for validateDot, 18 for createDotLinter)
 
 **Reference:** See `docs/planning/PHASE_3_SPRINT_4_TODO.json` for detailed implementation steps.
-
-**Note:** Graphviz error messages vary in format; parsing may need heuristics.
 
 ---
 

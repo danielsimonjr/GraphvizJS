@@ -8,6 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added - Phase 3: Feature Enhancements
 
+#### DOT Syntax Validation/Linting (Sprint 4) - 48 tests
+- Real-time DOT syntax validation with inline error markers in the editor
+- validateDot() function in graphviz.ts for error-only validation without rendering
+- Error message parsing with regex patterns to extract line/column numbers from Graphviz errors
+- CodeMirror lint integration via createDotLinter() in src/editor/linting.ts
+- Red squiggly underlines under syntax errors with precise position mapping
+- Lint gutter with error markers (red dots) for quick error identification
+- Hover tooltips showing detailed error messages
+- Validation uses the currently selected layout engine (same as preview)
+- Independent 500ms debounce for validation (separate from 300ms render debounce)
+- Each tab validates independently with its own linter instance
+- CSS styling for lint UI: gutter icons, squiggles, and tooltip panels
+- Unit tests for validateDot (30 tests) covering error parsing and edge cases
+- Unit tests for createDotLinter (18 tests) covering CodeMirror integration
+
 #### Multiple Tabs / Documents (Sprint 3) - 48 tests
 - Tabbed interface supporting up to 10 simultaneous open documents
 - TabManager class: pure state container managing tab lifecycle (create, close, switch, navigate)
@@ -74,7 +89,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - theme.test.ts: Extension structure, syntax highlighting (100% coverage)
 
 #### Coverage Summary
-- Total: 262 unit tests (196 from Phase 2 + 66 from Phase 3)
+- Total: 310 unit tests (196 from Phase 2 + 114 from Phase 3)
 - Overall coverage: 85%
 - Coverage thresholds enforced: 80% lines/functions/statements, 70% branches
 
