@@ -210,11 +210,7 @@
       "status": "pending",
       "implementationNotes": null,
       "estimatedHours": 0.05,
-      "files": [
-        "docs/planning/ROADMAP.md",
-        ".claude/CLAUDE.md",
-        "src/help/dialog.ts"
-      ],
+      "files": ["docs/planning/ROADMAP.md", ".claude/CLAUDE.md", "src/help/dialog.ts"],
       "testCategories": ["manual"],
       "acceptanceCriteria": [
         "ROADMAP shows Recent Files List as completed with date",
@@ -239,10 +235,7 @@
     "Recent files persist across app restarts",
     "All unit tests pass with 80%+ coverage on new code"
   ],
-  "filesCreated": [
-    "src/toolbar/recent-files.ts",
-    "test/toolbar/recent-files.test.ts"
-  ],
+  "filesCreated": ["src/toolbar/recent-files.ts", "test/toolbar/recent-files.test.ts"],
   "filesModified": [
     "src/index.html",
     "src/main.ts",

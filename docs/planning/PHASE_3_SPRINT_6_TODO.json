@@ -56,10 +56,7 @@
       "estimatedHours": 0.02,
       "files": ["src/toolbar/export-menu.ts"],
       "testCategories": ["typecheck"],
-      "acceptanceCriteria": [
-        "ExportFormat includes 'pdf'",
-        "pnpm typecheck passes"
-      ]
+      "acceptanceCriteria": ["ExportFormat includes 'pdf'", "pnpm typecheck passes"]
     },
     {
       "id": "3.6.3",
@@ -148,10 +145,7 @@
       "status": "pending",
       "implementationNotes": null,
       "estimatedHours": 0.05,
-      "files": [
-        "docs/planning/ROADMAP.md",
-        "docs/planning/PHASE_3_SPRINT_6_TODO.json"
-      ],
+      "files": ["docs/planning/ROADMAP.md", "docs/planning/PHASE_3_SPRINT_6_TODO.json"],
       "testCategories": ["manual"],
       "acceptanceCriteria": [
         "ROADMAP shows Export to PDF as completed with date",
