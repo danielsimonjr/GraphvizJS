@@ -1,4 +1,4 @@
-import { mkdtempSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { type ElectronApplication, expect, type Page, test } from '@playwright/test';
@@ -89,6 +89,48 @@ test.describe('Export Functionality', () => {
     // SVG export option should be enabled
     const svgOption = page.locator(`${selectors.exportMenu} [data-export="svg"]`);
     await expect(svgOption).toBeEnabled();
+  });
+});
+
+test.describe('PDF Export', () => {
+  const pdfDialog = 'dialog.pdf-options-dialog';
+
+  test('export menu contains PDF option', async () => {
+    await page.locator(selectors.exportBtn).click();
+    const pdfOption = page.locator(`${selectors.exportMenu} [data-export="pdf"]`);
+    await expect(pdfOption).toBeVisible();
+  });
+
+  test('PDF export (fit) writes a valid PDF via the options dialog', async () => {
+    await setEditorContent(page, 'digraph G { A -> B }');
+    await waitForPreviewUpdate(page);
+
+    await page.locator(selectors.exportBtn).click();
+    await page.locator(`${selectors.exportMenu} [data-export="pdf"]`).click();
+
+    // Options dialog opens; default page mode is "fit" — just click Export.
+    await expect(page.locator(pdfDialog)).toBeVisible();
+    await page.locator(`${pdfDialog} [data-pdf-action="export"]`).click();
+
+    // Main process writes bytes to the stubbed save path; poll then verify header.
+    await expect.poll(() => existsSync(savePath), { timeout: 10000 }).toBe(true);
+    const bytes = readFileSync(savePath);
+    expect(bytes.subarray(0, 5).toString('latin1')).toBe('%PDF-');
+  });
+
+  test('PDF export Cancel writes nothing', async () => {
+    await setEditorContent(page, 'digraph G { A -> B }');
+    await waitForPreviewUpdate(page);
+
+    await page.locator(selectors.exportBtn).click();
+    await page.locator(`${selectors.exportMenu} [data-export="pdf"]`).click();
+
+    await expect(page.locator(pdfDialog)).toBeVisible();
+    await page.locator(`${pdfDialog} [data-pdf-action="cancel"]`).click();
+
+    // Give any (erroneous) write a chance to land, then assert none did.
+    await page.waitForTimeout(500);
+    expect(existsSync(savePath)).toBe(false);
   });
 });
 
