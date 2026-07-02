@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed - Desktop Shell: Tauri → Electron Migration
+
+- **Electron replaces Tauri** as the desktop shell. The app now runs as a standard Node/Chromium Electron application with no Rust toolchain dependency.
+- **`src-tauri/` removed** — all Rust source, Cargo files, Tauri configuration, and `@tauri-apps/*` npm packages are gone.
+- **New `electron/` directory** — `main.ts` (BrowserWindow, IPC handlers, native dialog + fs calls), `preload.ts` (context-bridge exposing `window.graphvizApi`).
+- **New `src/platform/` abstraction** — `PlatformStore` interface + `ElectronStore` implementation using `electron-store`; renderer code calls `window.graphvizApi` and never imports Node APIs directly.
+- **Persistence** uses `electron-store` (JSON file in the OS user-data directory). **Prior Tauri-store user data (window bounds, autosave drafts, settings) does not carry over automatically** — the app starts with default settings on first launch after migration.
+- **`electron-builder.yml`** added for cross-platform packaging: NSIS on Windows (primary), DMG on macOS, AppImage on Linux. Output goes to `release/`.
+- **`electron` moved to `devDependencies`** — electron-builder bundles the runtime into the installer; keeping it in `dependencies` would double the installed size.
+- **CI workflow updated** — Rust/Cargo steps removed; workflow now runs `pnpm install → pnpm lint → pnpm typecheck → pnpm test:coverage → pnpm build → E2E (xvfb-run)`.
+- E2E tests (51 passing) run against the `file://` production build inside a real Electron window, validating WASM loading under `file://` protocol.
+- Dependabot `glib`/`rand` alerts (sourced from Tauri's Rust dependencies) are expected to close automatically after this branch merges and Dependabot rescans.
+
 ### Added - Phase 3: Feature Enhancements
 
 #### DOT Syntax Validation/Linting (Sprint 4) - 48 tests

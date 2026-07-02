@@ -29,9 +29,6 @@ importers:
       codemirror:
         specifier: ^6.0.2
         version: 6.0.2
-      electron:
-        specifier: ^43.0.0
-        version: 43.0.0
       electron-store:
         specifier: ^11.0.2
         version: 11.0.2
@@ -51,6 +48,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.0.17
         version: 4.0.17(vitest@4.1.8)
+      electron:
+        specifier: ^43.0.0
+        version: 43.0.0
       electron-builder:
         specifier: ^26.15.3
         version: 26.15.3(electron-builder-squirrel-windows@26.15.3)

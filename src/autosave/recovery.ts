@@ -1,5 +1,5 @@
-import { confirm } from '../platform';
 import type { PlatformStore } from '../platform';
+import { confirm } from '../platform';
 import {
   DRAFT_CONTENT_KEY,
   DRAFT_FILE_PATH_KEY,
@@ -24,7 +24,9 @@ export interface MultiTabRecoveryData {
  * Check the store for recoverable multi-tab drafts.
  * Falls back to legacy single-tab format if no multi-tab data found.
  */
-export async function checkForMultiTabRecovery(store: PlatformStore): Promise<MultiTabRecoveryData | null> {
+export async function checkForMultiTabRecovery(
+  store: PlatformStore
+): Promise<MultiTabRecoveryData | null> {
   try {
     const tabDrafts = await store.get<TabDraftsData>(TAB_DRAFTS_KEY);
     if (tabDrafts?.tabs?.length && tabDrafts.timestamp) {

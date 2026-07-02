@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 vi.mock('../../src/platform', () => ({ store: { get: vi.fn(), set: vi.fn(), delete: vi.fn() } }));
+
 import { store } from '../../src/platform';
 import { loadEditorZoom, saveEditorZoom } from '../../src/window/state';
 

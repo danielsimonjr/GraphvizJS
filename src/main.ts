@@ -6,7 +6,6 @@ import 'remixicon/fonts/remixicon.css';
 
 import { clearDraft, setupMultiTabAutosave } from './autosave/manager';
 import { checkForMultiTabRecovery, promptMultiTabRecovery } from './autosave/recovery';
-import { confirm, store as platformStore } from './platform';
 import { createDotLanguage } from './editor/language';
 import { createDotLinter, lintGutter } from './editor/linting';
 import { createEditorTheme } from './editor/theme';
@@ -16,6 +15,7 @@ import {
   createEditorZoomKeymap,
 } from './editor/zoom';
 import { setupHelpDialog } from './help/dialog';
+import { confirm, store as platformStore } from './platform';
 import { initGraphviz } from './preview/graphviz';
 import { createPreview } from './preview/render';
 import {

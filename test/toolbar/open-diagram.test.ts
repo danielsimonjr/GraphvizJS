@@ -2,13 +2,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { setupOpenDiagramAction } from '../../src/toolbar/open-diagram';
 
 vi.mock('../../src/platform', () => ({ openTextFile: vi.fn() }));
+
 import { openTextFile } from '../../src/platform';
 
 beforeEach(() => vi.clearAllMocks());
 
 describe('setupOpenDiagramAction', () => {
   it('reads the picked file and calls onOpen with content + path', async () => {
-    (openTextFile as ReturnType<typeof vi.fn>).mockResolvedValue({ path: '/g.dot', content: 'digraph{}' });
+    (openTextFile as ReturnType<typeof vi.fn>).mockResolvedValue({
+      path: '/g.dot',
+      content: 'digraph{}',
+    });
     const button = document.createElement('button');
     const onOpen = vi.fn();
     setupOpenDiagramAction({ button, onOpen });

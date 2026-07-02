@@ -44,7 +44,10 @@ describe('platform', () => {
 
   it('pickSavePath delegates with opts and returns path string', async () => {
     api.pickSavePath.mockResolvedValue('/out/diagram.svg');
-    const opts = { defaultPath: '/out/diagram.svg', filters: [{ name: 'SVG', extensions: ['svg'] }] };
+    const opts = {
+      defaultPath: '/out/diagram.svg',
+      filters: [{ name: 'SVG', extensions: ['svg'] }],
+    };
     const result = await platform.pickSavePath(opts);
     expect(api.pickSavePath).toHaveBeenCalledWith(opts);
     expect(result).toBe('/out/diagram.svg');

@@ -19,13 +19,7 @@
     "lineWidth": 100,
     "attributePosition": "auto",
     "bracketSpacing": true,
-    "includes": [
-      "**",
-      "!**/pnpm-lock.yaml",
-      "!**/LICENSE",
-      "!dist/**",
-      "!coverage/**"
-    ]
+    "includes": ["**", "!**/pnpm-lock.yaml", "!**/LICENSE", "!dist/**", "!coverage/**"]
   },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {

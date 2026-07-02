@@ -9,8 +9,8 @@ export function makeMockStore(initial?: Map<string, unknown>) {
   const data = new Map<string, unknown>(initial);
 
   return {
-    get: vi.fn(<T>(key: string): Promise<T | undefined> =>
-      Promise.resolve(data.get(key) as T | undefined)
+    get: vi.fn(
+      <T>(key: string): Promise<T | undefined> => Promise.resolve(data.get(key) as T | undefined)
     ),
     set: vi.fn((key: string, value: unknown): Promise<void> => {
       data.set(key, value);

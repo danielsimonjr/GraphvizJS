@@ -1,5 +1,5 @@
-import { pickSavePath, writeBinaryFile, writeTextFile } from '../platform';
 import type { EditorView } from 'codemirror';
+import { pickSavePath, writeBinaryFile, writeTextFile } from '../platform';
 
 import { renderDotToSvg } from '../preview/graphviz';
 import type { ExportFormat } from './export-menu';

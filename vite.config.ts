@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite';
-import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vite';
 import electron from 'vite-plugin-electron/simple';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

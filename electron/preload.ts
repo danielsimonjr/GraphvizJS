@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { GraphvizApi, DiagramFilter, ConfirmOptions } from '../src/platform/contract';
+import type { ConfirmOptions, DiagramFilter, GraphvizApi } from '../src/platform/contract';
 
 const api: GraphvizApi = {
   openTextFile: (filters: DiagramFilter[]) => ipcRenderer.invoke('dialog:openText', filters),
