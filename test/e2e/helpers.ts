@@ -18,8 +18,14 @@ export async function launchApp(
   env: Record<string, string> = {}
 ): Promise<{ app: ElectronApplication; page: Page }> {
   const userDataDir = mkdtempSync(path.join(tmpdir(), 'gvjs-e2e-'));
+  const args = ['.', `--user-data-dir=${userDataDir}`];
+  // On Linux (incl. GitHub Actions runners) Electron's chrome-sandbox SUID
+  // helper isn't owned root:4755, so the browser process aborts before launch.
+  // Disable the OS sandbox for the TEST launcher only — the packaged production
+  // app is unaffected and keeps contextIsolation + sandbox:true webPreferences.
+  if (process.platform === 'linux') args.push('--no-sandbox');
   const app = await electron.launch({
-    args: ['.', `--user-data-dir=${userDataDir}`],
+    args,
     env: { ...process.env, ...env } as Record<string, string>,
     // First cold spawn (Electron + WASM init) can be slow; be generous.
     timeout: 60000,
