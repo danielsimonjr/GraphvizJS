@@ -1,9 +1,9 @@
+import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readFile, writeFile } from 'node:fs/promises';
 import { app, BrowserWindow, dialog, ipcMain, screen, shell } from 'electron';
 import Store from 'electron-store';
-import type { DiagramFilter, ConfirmOptions } from '../src/platform/contract';
+import type { ConfirmOptions, DiagramFilter } from '../src/platform/contract';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const store = new Store<Record<string, unknown>>();
@@ -24,7 +24,8 @@ function restoreBounds(): Partial<Electron.BrowserWindowConstructorOptions> {
   const height = s.height ?? 800;
   // Clamp to a visible display so off-screen bounds don't hide the window.
   const x = s.x != null ? Math.min(Math.max(s.x, area.x), area.x + area.width - width) : undefined;
-  const y = s.y != null ? Math.min(Math.max(s.y, area.y), area.y + area.height - height) : undefined;
+  const y =
+    s.y != null ? Math.min(Math.max(s.y, area.y), area.y + area.height - height) : undefined;
   return { width, height, x, y };
 }
 
@@ -70,7 +71,17 @@ const kindToType: Record<NonNullable<ConfirmOptions['kind']>, 'info' | 'warning'
 };
 
 function registerIpc(): void {
+  // Test seam: when driving the app under Playwright, native open/save dialogs
+  // cannot be automated. Setting these env vars makes the dialog IPC handlers
+  // return deterministic paths without opening a native dialog. Unset in normal
+  // use, so native behavior is fully preserved.
+  const stubOpen = process.env.GVJS_E2E_OPEN; // path to return from dialog:openText
+  const stubSave = process.env.GVJS_E2E_SAVE; // path to return from dialog:save
+
   ipcMain.handle('dialog:openText', async (_e, filters: DiagramFilter[]) => {
+    if (stubOpen) {
+      return { path: stubOpen, content: await readFile(stubOpen, 'utf-8') };
+    }
     const win = BrowserWindow.getFocusedWindow();
     const res = await dialog.showOpenDialog(win!, { properties: ['openFile'], filters });
     if (res.canceled || !res.filePaths[0]) return null;
@@ -78,18 +89,35 @@ function registerIpc(): void {
     return { path: p, content: await readFile(p, 'utf-8') };
   });
 
-  ipcMain.handle('dialog:save', async (_e, opts: { defaultPath: string; filters: DiagramFilter[] }) => {
-    const win = BrowserWindow.getFocusedWindow();
-    const res = await dialog.showSaveDialog(win!, { defaultPath: opts.defaultPath, filters: opts.filters });
-    return res.canceled ? null : (res.filePath ?? null);
-  });
+  ipcMain.handle(
+    'dialog:save',
+    async (_e, opts: { defaultPath: string; filters: DiagramFilter[] }) => {
+      if (stubSave) {
+        return stubSave;
+      }
+      const win = BrowserWindow.getFocusedWindow();
+      const res = await dialog.showSaveDialog(win!, {
+        defaultPath: opts.defaultPath,
+        filters: opts.filters,
+      });
+      return res.canceled ? null : (res.filePath ?? null);
+    }
+  );
 
-  ipcMain.handle('fs:writeText', (_e, p: string, content: string) => writeFile(p, content, 'utf-8'));
-  ipcMain.handle('fs:writeBinary', (_e, p: string, bytes: Uint8Array) => writeFile(p, Buffer.from(bytes)));
+  ipcMain.handle('fs:writeText', (_e, p: string, content: string) =>
+    writeFile(p, content, 'utf-8')
+  );
+  ipcMain.handle('fs:writeBinary', (_e, p: string, bytes: Uint8Array) =>
+    writeFile(p, Buffer.from(bytes))
+  );
 
   ipcMain.handle('store:get', (_e, key: string) => store.get(key));
-  ipcMain.handle('store:set', (_e, key: string, value: unknown) => { store.set(key, value); });
-  ipcMain.handle('store:delete', (_e, key: string) => { store.delete(key); });
+  ipcMain.handle('store:set', (_e, key: string, value: unknown) => {
+    store.set(key, value);
+  });
+  ipcMain.handle('store:delete', (_e, key: string) => {
+    store.delete(key);
+  });
 
   ipcMain.handle('dialog:confirm', async (_e, message: string, opts?: ConfirmOptions) => {
     const win = BrowserWindow.getFocusedWindow();
