@@ -1,15 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock Tauri app API
-vi.mock('@tauri-apps/api/app', () => ({
-  getName: vi.fn().mockResolvedValue('GraphvizJS'),
-  getVersion: vi.fn().mockResolvedValue('1.0.0'),
+// Mock platform module
+vi.mock('../../src/platform', () => ({
+  appInfo: vi.fn().mockResolvedValue({ name: 'GraphvizJS', version: '1.2.3' }),
+  openExternal: vi.fn(),
 }));
 
-// Mock Tauri shell plugin
-vi.mock('@tauri-apps/plugin-shell', () => ({
-  open: vi.fn().mockResolvedValue(undefined),
-}));
+import { appInfo, openExternal } from '../../src/platform';
 
 describe('help/dialog', () => {
   let button: HTMLButtonElement;
@@ -67,7 +64,7 @@ describe('help/dialog', () => {
       const dialog = document.querySelector('dialog.help-dialog');
       const h2 = dialog?.querySelector('h2');
       expect(h2?.textContent).toContain('GraphvizJS');
-      expect(h2?.textContent).toContain('v1.0.0');
+      expect(h2?.textContent).toContain('v1.2.3');
     });
 
     it('dialog has close button', async () => {
