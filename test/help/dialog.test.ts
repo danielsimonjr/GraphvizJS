@@ -65,6 +65,7 @@ describe('help/dialog', () => {
       const h2 = dialog?.querySelector('h2');
       expect(h2?.textContent).toContain('GraphvizJS');
       expect(h2?.textContent).toContain('v1.2.3');
+      expect(appInfo).toHaveBeenCalled();
     });
 
     it('dialog has close button', async () => {
@@ -162,6 +163,23 @@ describe('help/dialog', () => {
 
       const dialogs = document.querySelectorAll('dialog.help-dialog');
       expect(dialogs.length).toBe(1);
+    });
+
+    it('View Source button calls openExternal with repo URL', async () => {
+      const { setupHelpDialog } = await import('../../src/help/dialog');
+      setupHelpDialog(button);
+      button.click();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const dialog = document.querySelector('dialog.help-dialog');
+      const aboutBtn = dialog?.querySelector('.about-button') as HTMLButtonElement;
+      aboutBtn.click();
+
+      await vi.waitFor(() => {
+        expect(openExternal).toHaveBeenCalledWith(
+          'https://github.com/danielsimonjr/graphvizjs-desktop'
+        );
+      });
     });
   });
 });
