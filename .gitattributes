@@ -1,0 +1,5 @@
+# Normalize line endings to LF on checkout across all platforms so Biome's
+# LF-only formatting rule is deterministic on Windows CI (autocrlf would
+# otherwise check files out as CRLF and fail `biome check`). Binary files are
+# auto-detected by `text=auto` and left untouched.
+* text=auto eol=lf
