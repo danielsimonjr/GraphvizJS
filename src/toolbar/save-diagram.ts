@@ -1,6 +1,5 @@
-import { save as showSaveDialog } from '@tauri-apps/plugin-dialog';
-import { writeTextFile } from '@tauri-apps/plugin-fs';
 import type { EditorView } from 'codemirror';
+import { pickSavePath, writeTextFile } from '../platform';
 
 interface SaveDiagramOptions {
   getEditor: () => EditorView;
@@ -17,27 +16,17 @@ export function setupSaveDiagramAction(options: SaveDiagramOptions): void {
   button.addEventListener('click', async () => {
     const documentContent = getEditor().state.doc.toString();
     let targetPath = getPath();
-
     try {
       if (!targetPath) {
-        const picked = await showSaveDialog({
+        targetPath = await pickSavePath({
           defaultPath: 'diagram.dot',
           filters: [
-            {
-              name: 'DOT Diagram',
-              extensions: ['dot', 'gv'],
-            },
+            { name: 'DOT Diagram', extensions: ['dot', 'gv'] },
             { name: 'All Files', extensions: ['*'] },
           ],
         });
-
-        if (typeof picked === 'string') {
-          targetPath = picked;
-        } else {
-          return;
-        }
+        if (!targetPath) return;
       }
-
       await writeTextFile(targetPath, documentContent);
       onPathChange(targetPath);
       onSave?.(documentContent, targetPath);
