@@ -1,13 +1,12 @@
 import { indentWithTab } from '@codemirror/commands';
 import { Compartment, EditorState, StateEffect } from '@codemirror/state';
 import { keymap } from '@codemirror/view';
-import { getCurrentWindow } from '@tauri-apps/api/window';
 import { basicSetup, EditorView } from 'codemirror';
 import 'remixicon/fonts/remixicon.css';
 
 import { clearDraft, setupMultiTabAutosave } from './autosave/manager';
 import { checkForMultiTabRecovery, promptMultiTabRecovery } from './autosave/recovery';
-import { store as platformStore } from './platform';
+import { confirm, store as platformStore } from './platform';
 import { createDotLanguage } from './editor/language';
 import { createDotLinter, lintGutter } from './editor/linting';
 import { createEditorTheme } from './editor/theme';
@@ -31,12 +30,7 @@ import { renderTabBar, setupTabBar } from './tabs/tab-bar';
 import { setupToolbarActions } from './toolbar/actions';
 import { getCurrentEngine, setupLayoutEngine } from './toolbar/layout-engine';
 import { setupToolbarShortcuts } from './toolbar/shortcuts';
-import {
-  loadEditorZoom,
-  loadSettingsStore,
-  saveEditorZoom,
-  setupWindowPersistence,
-} from './window/state';
+import { loadEditorZoom, saveEditorZoom } from './window/state';
 import { initHorizontalResize } from './workspace/resize';
 
 const DEFAULT_SNIPPET = `digraph G {
@@ -51,7 +45,6 @@ const DEFAULT_SNIPPET = `digraph G {
 }`;
 
 const RENDER_DELAY = 300;
-const WINDOW_PERSIST_DELAY = 400;
 
 const DOT_LANGUAGE = createDotLanguage();
 const EDITOR_THEME = createEditorTheme();
@@ -91,9 +84,6 @@ async function bootstrap(): Promise<void> {
 
   await initGraphviz();
 
-  const appWindow = getCurrentWindow();
-  const store = await loadSettingsStore();
-
   const zoomController = createZoomController(previewElement, (level) => {
     if (zoomLevelDisplay) {
       updateLevelDisplay(zoomLevelDisplay, level);
@@ -103,10 +93,6 @@ async function bootstrap(): Promise<void> {
   setupZoomControls(zoomController, zoomInBtn, zoomOutBtn, zoomResetBtn, zoomLevelDisplay);
   if (previewPane) {
     setupWheelZoom(previewPane, zoomController);
-  }
-
-  if (store) {
-    await setupWindowPersistence(store, appWindow, WINDOW_PERSIST_DELAY);
   }
 
   const status = createStatusController(statusMessage);
@@ -135,7 +121,7 @@ async function bootstrap(): Promise<void> {
   const tabManager = new TabManager();
 
   const { extension: zoomExtension, compartment: zoomCompartment } = createEditorZoomExtension();
-  const savedEditorZoom = store ? await loadEditorZoom(store) : null;
+  const savedEditorZoom = await loadEditorZoom();
 
   /** Create a CodeMirror editor for a tab and attach it to the editor host. */
   function createTabEditor(initialDoc: string, visible: boolean): EditorView {
@@ -236,7 +222,7 @@ async function bootstrap(): Promise<void> {
       editorView,
       zoomCompartment,
       (level) => {
-        if (store) saveEditorZoom(store, level);
+        saveEditorZoom(level);
       },
       savedEditorZoom ?? undefined
     );
@@ -286,7 +272,6 @@ async function bootstrap(): Promise<void> {
 
     // Confirm before closing a dirty tab
     if (tab.isDirty) {
-      const { confirm } = await import('@tauri-apps/plugin-dialog');
       const proceed = await confirm('This tab has unsaved changes. Close anyway?', {
         title: 'Unsaved Changes',
         kind: 'warning',
