@@ -36,6 +36,12 @@ export default defineConfig({
           build: {
             outDir: path.resolve(__dirname, 'dist-electron'),
             emptyOutDir: false,
+            rollupOptions: {
+              output: {
+                // Force .js extension so main.ts can reference 'preload.js'
+                entryFileNames: '[name].js',
+              },
+            },
           },
         },
       },
