@@ -8,7 +8,9 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # Windows-only app (Windows is the sole packaging target), so CI runs on
+    # Windows — Electron e2e runs natively here (no xvfb / no --no-sandbox).
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repository
@@ -48,11 +50,8 @@ jobs:
       - name: Build renderer + main + preload
         run: pnpm build
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-
-      - name: Run E2E tests (Electron, via xvfb)
-        run: xvfb-run --auto-servernum pnpm test:e2e
+      - name: Run E2E tests (Electron)
+        run: pnpm test:e2e
 
       - name: Upload E2E test results
         uses: actions/upload-artifact@v4

@@ -55,13 +55,11 @@ pnpm dev
 # Type-check TypeScript and bundle renderer + main + preload
 pnpm build
 
-# Produce a platform-specific installer via electron-builder
-# Primary target: Windows NSIS installer (.exe) in release/
-# macOS:  DMG (.dmg)   Linux: AppImage (.AppImage)
+# Produce the Windows NSIS installer (.exe) in release/ via electron-builder
 pnpm package
 ```
 
-The `release/` directory contains the generated installer(s). On Windows this is an NSIS `.exe`; on macOS a `.dmg`; on Linux an `.AppImage`.
+GraphvizJS targets **Windows only**. The `release/` directory contains the generated NSIS `.exe` installer.
 
 ## Tooling
 
