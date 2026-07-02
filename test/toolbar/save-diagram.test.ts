@@ -39,5 +39,12 @@ describe('setupSaveDiagramAction', () => {
     button.click();
     await vi.waitFor(() => expect(writeTextFile).toHaveBeenCalledWith('/new.dot', 'digraph{}'));
     expect(onPathChange).toHaveBeenCalledWith('/new.dot');
+    expect(pickSavePath).toHaveBeenCalledWith({
+      defaultPath: 'diagram.dot',
+      filters: [
+        { name: 'DOT Diagram', extensions: ['dot', 'gv'] },
+        { name: 'All Files', extensions: ['*'] },
+      ],
+    });
   });
 });

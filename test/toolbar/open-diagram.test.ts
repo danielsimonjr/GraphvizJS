@@ -18,6 +18,10 @@ describe('setupOpenDiagramAction', () => {
     setupOpenDiagramAction({ button, onOpen });
     button.click();
     await vi.waitFor(() => expect(onOpen).toHaveBeenCalledWith('digraph{}', '/g.dot'));
+    expect(openTextFile).toHaveBeenCalledWith([
+      { name: 'DOT Diagram', extensions: ['dot', 'gv'] },
+      { name: 'All Files', extensions: ['*'] },
+    ]);
   });
 
   it('does nothing when the dialog is cancelled', async () => {

@@ -57,6 +57,14 @@ function createWindow(): void {
   });
   if ((store.get('windowState') as WindowState | undefined)?.maximized) win.maximize();
 
+  // Defense-in-depth: deny new-window creation (external links go through
+  // shell.openExternal via the IPC bridge) and block any in-page navigation
+  // (the SPA never navigates to another URL).
+  win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  win.webContents.on('will-navigate', (event) => {
+    event.preventDefault();
+  });
+
   win.on('resize', () => persistBounds(win));
   win.on('move', () => persistBounds(win));
 
