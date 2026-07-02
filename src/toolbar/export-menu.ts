@@ -1,4 +1,4 @@
-export type ExportFormat = 'png' | 'pngx2' | 'svg';
+export type ExportFormat = 'png' | 'pngx2' | 'svg' | 'pdf';
 
 export interface ExportMenuOptions {
   button: HTMLButtonElement | null;

@@ -1,8 +1,10 @@
 import type { EditorView } from 'codemirror';
 import { pickSavePath, writeBinaryFile, writeTextFile } from '../platform';
 
+import { svgToPdfBytes } from '../preview/export-pdf';
 import { renderDotToSvg } from '../preview/graphviz';
 import type { ExportFormat } from './export-menu';
+import { openPdfOptionsDialog } from './pdf-options-dialog';
 
 interface ExportDiagramOptions {
   getEditor: () => EditorView;
@@ -36,6 +38,11 @@ export function createExportHandler({ getEditor, getPath }: ExportDiagramOptions
         return;
       }
 
+      if (format === 'pdf') {
+        await exportAsPdf(rendered, baseName);
+        return;
+      }
+
       const scale = format === 'pngx2' ? 2 : 1;
       await exportAsPng(rendered, baseName, scale);
     } catch (error) {
@@ -54,6 +61,21 @@ async function exportAsSvg(svg: string, baseName: string): Promise<void> {
   });
   if (!targetPath) return;
   await writeTextFile(targetPath, svg);
+}
+
+async function exportAsPdf(diagram: RenderedDiagram, baseName: string): Promise<void> {
+  const options = await openPdfOptionsDialog();
+  if (!options) return; // cancelled
+  const targetPath = await pickSavePath({
+    defaultPath: `${baseName}.pdf`,
+    filters: [
+      { name: 'PDF Document', extensions: ['pdf'] },
+      { name: 'All Files', extensions: ['*'] },
+    ],
+  });
+  if (!targetPath) return;
+  const pdfBytes = await svgToPdfBytes(diagram.svg, diagram.width, diagram.height, options);
+  await writeBinaryFile(targetPath, pdfBytes);
 }
 
 async function exportAsPng(
