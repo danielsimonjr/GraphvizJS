@@ -35,3 +35,6 @@ playwright/.cache/
 
 # SDD subagent-driven scratch workspace (never commit)
 .superpowers/
+
+# electron-builder installer output
+release/
