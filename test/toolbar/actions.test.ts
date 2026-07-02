@@ -2,9 +2,24 @@ import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import '../mocks/graphviz';
-import '../mocks/tauri';
 import { resetMockGraphviz } from '../mocks/graphviz';
-import { mockDialog, resetAllMocks } from '../mocks/tauri';
+
+// Stable mock instances declared outside the factory so they survive vi.resetModules()
+// calls between tests while still being the same objects the factory returns.
+const mockOpenTextFile = vi.fn();
+const mockPickSavePath = vi.fn();
+const mockWriteTextFile = vi.fn();
+
+vi.mock('../../src/platform', () => ({
+  openTextFile: mockOpenTextFile,
+  pickSavePath: mockPickSavePath,
+  writeTextFile: mockWriteTextFile,
+  writeBinaryFile: vi.fn(),
+  store: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
+  confirm: vi.fn(),
+  openExternal: vi.fn(),
+  appInfo: vi.fn().mockResolvedValue({ name: 'GraphvizJS', version: '1.0.0' }),
+}));
 
 describe('toolbar/actions', () => {
   let container: HTMLElement;
@@ -19,7 +34,7 @@ describe('toolbar/actions', () => {
 
   beforeEach(() => {
     vi.resetModules();
-    resetAllMocks();
+    vi.resetAllMocks();
     resetMockGraphviz();
 
     document.body.innerHTML = '';
@@ -133,8 +148,7 @@ describe('toolbar/actions', () => {
   describe('Open action', () => {
     it('opens dialog when button is clicked', async () => {
       vi.resetModules();
-      resetAllMocks();
-      mockDialog.open.mockResolvedValue(null);
+      mockOpenTextFile.mockResolvedValue(null);
 
       const { setupToolbarActions } = await import('../../src/toolbar/actions');
 
@@ -156,15 +170,13 @@ describe('toolbar/actions', () => {
       });
 
       openButton.click();
-      await new Promise((r) => setTimeout(r, 50));
-
-      expect(mockDialog.open).toHaveBeenCalled();
+      await vi.waitFor(() => expect(mockOpenTextFile).toHaveBeenCalled());
     });
   });
 
   describe('Save action', () => {
     it('saves document when save button is clicked', async () => {
-      mockDialog.save.mockResolvedValue('/path/to/file.dot');
+      mockPickSavePath.mockResolvedValue('/path/to/file.dot');
 
       const { setupToolbarActions } = await import('../../src/toolbar/actions');
       const commitDocument = vi.fn();
@@ -189,9 +201,7 @@ describe('toolbar/actions', () => {
       });
 
       saveButton.click();
-      await new Promise((r) => setTimeout(r, 50));
-
-      expect(mockDialog.save).toHaveBeenCalled();
+      await vi.waitFor(() => expect(mockPickSavePath).toHaveBeenCalled());
     });
   });
 
