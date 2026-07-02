@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-02
+
 ### Added - PDF Export
 
 - **Export as PDF** joins SVG / PNG / PNG@2x in the export menu. Output is a **vector** PDF converted from the rendered diagram SVG via `svg2pdf.js` + `jsPDF` (the `@hpcc-js/wasm` Graphviz build cannot emit PDF directly).
