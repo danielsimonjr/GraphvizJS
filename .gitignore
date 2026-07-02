@@ -32,3 +32,6 @@ coverage/
 test-results/
 playwright-report/
 playwright/.cache/
+
+# SDD subagent-driven scratch workspace (never commit)
+.superpowers/
