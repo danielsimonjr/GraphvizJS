@@ -2,7 +2,7 @@
 export interface InternalDep {
   /** Raw specifier as written, e.g. './render' or '../utils/debounce'. */
   file: string;
-  /** Imported identifiers; '*' for namespace or re-export-all. */
+  /** Imported identifiers; '* as NS' for a namespace import, '*' for a re-export-all. */
   imports: string[];
   /** True if every binding is type-only (`import type` or all `{ type X }`). */
   typeOnly: boolean;

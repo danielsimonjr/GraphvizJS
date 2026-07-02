@@ -43,6 +43,24 @@ describe('parseFile', () => {
   it('counts lines of code', () => {
     expect(parseFile('src/a.ts', 'a\nb\nc').loc).toBe(3);
   });
+
+  it('counts lines without over-counting a trailing newline', () => {
+    expect(parseFile('src/a.ts', 'a\nb\nc\n').loc).toBe(3);
+    expect(parseFile('src/a.ts', 'a\nb\nc').loc).toBe(3);
+    expect(parseFile('src/a.ts', '').loc).toBe(0);
+  });
+
+  it('records both bindings of a combined default + named import', () => {
+    const f = parseFile('src/a.ts', "import Store, { type Options } from './store';\n");
+    expect(f.internalDeps[0].imports).toEqual(['Options', 'Store']);
+    // one binding is a runtime default → the whole import is a runtime import
+    expect(f.internalDeps[0].typeOnly).toBe(false);
+  });
+
+  it('treats a mixed `{ type A, B }` import as runtime (not type-only)', () => {
+    const f = parseFile('src/a.ts', "import { type A, B } from './c';\n");
+    expect(f.internalDeps[0].typeOnly).toBe(false);
+  });
 });
 
 describe('resolveImport', () => {

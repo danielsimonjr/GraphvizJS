@@ -24,8 +24,9 @@ export function scanDir(root: string, subdir: string): ParsedFile[] {
 }
 
 // import type { ... } | import { type X, Y } | import D from | import * as NS from
+// | import D, { Named } from  (combined default + named)
 const IMPORT_RE =
-  /import\s+(type\s+)?(?:(?:{([^}]+)}|(\w+)|\*\s+as\s+(\w+)))\s+from\s+['"]([^'"]+)['"]/g;
+  /import\s+(type\s+)?(?:(?:{([^}]+)}|(\w+)|\*\s+as\s+(\w+))(?:\s*,\s*(?:{([^}]+)}|(\w+)))?)\s+from\s+['"]([^'"]+)['"]/g;
 
 function parseImports(content: string): InternalDep[] {
   const deps: InternalDep[] = [];
@@ -33,10 +34,10 @@ function parseImports(content: string): InternalDep[] {
   IMPORT_RE.lastIndex = 0;
   while ((m = IMPORT_RE.exec(content)) !== null) {
     const isTypeOnly = !!m[1];
-    const named = m[2] ?? '';
-    const def = m[3] ?? '';
+    const named = m[2] ?? m[5] ?? '';
+    const def = m[3] ?? m[6] ?? '';
     const ns = m[4] ?? '';
-    const source = m[5];
+    const source = m[7];
     if (!source.startsWith('.')) continue; // internal (relative) only
 
     const imports: string[] = [];
@@ -93,12 +94,18 @@ function parseExports(content: string): string[] {
   return [...names];
 }
 
+function countLoc(content: string): number {
+  if (content === '') return 0;
+  const lines = content.split('\n');
+  return lines[lines.length - 1] === '' ? lines.length - 1 : lines.length;
+}
+
 export function parseFile(relPath: string, content: string): ParsedFile {
   return {
     path: relPath,
     internalDeps: parseImports(content),
     exports: parseExports(content),
-    loc: content.split('\n').length,
+    loc: countLoc(content),
   };
 }
 
