@@ -26,16 +26,25 @@ export function makeMockStore(initial?: Map<string, unknown>) {
 /** Stable confirm mock — reset between tests via resetPlatformMocks(). */
 export const mockConfirm = vi.fn().mockResolvedValue(true);
 
+// Factory-level store spies lifted out so resetPlatformMocks() can clear them.
+// Variables must start with "mock" for vitest's hoisting to allow factory references.
+const mockStoreGet = vi.fn().mockResolvedValue(undefined);
+const mockStoreSet = vi.fn().mockResolvedValue(undefined);
+const mockStoreDel = vi.fn().mockResolvedValue(undefined);
+
 export function resetPlatformMocks(): void {
   mockConfirm.mockClear().mockResolvedValue(true);
+  mockStoreGet.mockClear().mockResolvedValue(undefined);
+  mockStoreSet.mockClear().mockResolvedValue(undefined);
+  mockStoreDel.mockClear().mockResolvedValue(undefined);
 }
 
 // Intercept all imports of src/platform so that `confirm` is mockable.
 vi.mock('../../src/platform', () => ({
   confirm: mockConfirm,
   store: {
-    get: vi.fn().mockResolvedValue(undefined),
-    set: vi.fn().mockResolvedValue(undefined),
-    delete: vi.fn().mockResolvedValue(undefined),
+    get: mockStoreGet,
+    set: mockStoreSet,
+    delete: mockStoreDel,
   },
 }));

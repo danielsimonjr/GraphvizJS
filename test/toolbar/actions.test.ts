@@ -16,7 +16,7 @@ vi.mock('../../src/platform', () => ({
   writeTextFile: mockWriteTextFile,
   writeBinaryFile: vi.fn(),
   store: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
-  confirm: vi.fn(),
+  confirm: vi.fn().mockResolvedValue(false),
   openExternal: vi.fn(),
   appInfo: vi.fn().mockResolvedValue({ name: 'GraphvizJS', version: '1.0.0' }),
 }));
@@ -147,7 +147,6 @@ describe('toolbar/actions', () => {
 
   describe('Open action', () => {
     it('opens dialog when button is clicked', async () => {
-      vi.resetModules();
       mockOpenTextFile.mockResolvedValue(null);
 
       const { setupToolbarActions } = await import('../../src/toolbar/actions');
