@@ -1,14 +1,13 @@
-import type { Store } from '@tauri-apps/plugin-store';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import '../mocks/tauri';
-import { mockStore, resetAllMocks } from '../mocks/tauri';
+import { makeMockStore, resetPlatformMocks } from '../mocks/platform';
 
-const store = mockStore as unknown as Store;
+let store: ReturnType<typeof makeMockStore>;
 
 describe('autosave/manager', () => {
   beforeEach(() => {
     vi.resetModules();
-    resetAllMocks();
+    store = makeMockStore();
+    resetPlatformMocks();
     vi.useFakeTimers();
   });
 
@@ -38,10 +37,9 @@ describe('autosave/manager', () => {
 
       await vi.advanceTimersByTimeAsync(30_000);
 
-      expect(mockStore.set).toHaveBeenCalledWith('draftContent', 'digraph { A -> B }');
-      expect(mockStore.set).toHaveBeenCalledWith('draftFilePath', '/tmp/test.dot');
-      expect(mockStore.set).toHaveBeenCalledWith('draftTimestamp', expect.any(String));
-      expect(mockStore.save).toHaveBeenCalled();
+      expect(store.set).toHaveBeenCalledWith('draftContent', 'digraph { A -> B }');
+      expect(store.set).toHaveBeenCalledWith('draftFilePath', '/tmp/test.dot');
+      expect(store.set).toHaveBeenCalledWith('draftTimestamp', expect.any(String));
       cleanup();
     });
 
@@ -53,13 +51,13 @@ describe('autosave/manager', () => {
         getFilePath: () => null,
       });
 
-      // First interval: saves
+      // First interval: saves (3 set calls: content, timestamp, filePath)
       await vi.advanceTimersByTimeAsync(30_000);
-      expect(mockStore.save).toHaveBeenCalledTimes(1);
+      expect(store.set).toHaveBeenCalledTimes(3);
 
       // Second interval: same content, should not save again
       await vi.advanceTimersByTimeAsync(30_000);
-      expect(mockStore.save).toHaveBeenCalledTimes(1);
+      expect(store.set).toHaveBeenCalledTimes(3);
 
       cleanup();
     });
@@ -82,7 +80,7 @@ describe('autosave/manager', () => {
     });
 
     it('handles store errors gracefully', async () => {
-      mockStore.set.mockRejectedValueOnce(new Error('Store write failed'));
+      store.set.mockRejectedValueOnce(new Error('Store write failed'));
       const { setupAutosave } = await import('../../src/autosave/manager');
       const cleanup = setupAutosave({
         store,
@@ -105,14 +103,14 @@ describe('autosave/manager', () => {
       });
 
       await vi.advanceTimersByTimeAsync(30_000);
-      expect(mockStore.save).toHaveBeenCalledTimes(1);
+      expect(store.set).toHaveBeenCalledTimes(3);
 
       cleanup();
       content = 'v2';
 
       await vi.advanceTimersByTimeAsync(30_000);
       // Should not have saved again
-      expect(mockStore.save).toHaveBeenCalledTimes(1);
+      expect(store.set).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -121,17 +119,16 @@ describe('autosave/manager', () => {
       const { saveDraft } = await import('../../src/autosave/manager');
       await saveDraft(store, 'digraph { X }', '/path/to/file.dot');
 
-      expect(mockStore.set).toHaveBeenCalledWith('draftContent', 'digraph { X }');
-      expect(mockStore.set).toHaveBeenCalledWith('draftTimestamp', expect.any(String));
-      expect(mockStore.set).toHaveBeenCalledWith('draftFilePath', '/path/to/file.dot');
-      expect(mockStore.save).toHaveBeenCalled();
+      expect(store.set).toHaveBeenCalledWith('draftContent', 'digraph { X }');
+      expect(store.set).toHaveBeenCalledWith('draftTimestamp', expect.any(String));
+      expect(store.set).toHaveBeenCalledWith('draftFilePath', '/path/to/file.dot');
     });
 
     it('saves null filePath for unsaved diagrams', async () => {
       const { saveDraft } = await import('../../src/autosave/manager');
       await saveDraft(store, 'digraph {}', null);
 
-      expect(mockStore.set).toHaveBeenCalledWith('draftFilePath', null);
+      expect(store.set).toHaveBeenCalledWith('draftFilePath', null);
     });
   });
 
@@ -140,14 +137,13 @@ describe('autosave/manager', () => {
       const { clearDraft } = await import('../../src/autosave/manager');
       await clearDraft(store);
 
-      expect(mockStore.delete).toHaveBeenCalledWith('draftContent');
-      expect(mockStore.delete).toHaveBeenCalledWith('draftTimestamp');
-      expect(mockStore.delete).toHaveBeenCalledWith('draftFilePath');
-      expect(mockStore.save).toHaveBeenCalled();
+      expect(store.delete).toHaveBeenCalledWith('draftContent');
+      expect(store.delete).toHaveBeenCalledWith('draftTimestamp');
+      expect(store.delete).toHaveBeenCalledWith('draftFilePath');
     });
 
     it('handles errors gracefully', async () => {
-      mockStore.delete.mockRejectedValueOnce(new Error('Delete failed'));
+      store.delete.mockRejectedValueOnce(new Error('Delete failed'));
       const { clearDraft } = await import('../../src/autosave/manager');
       await expect(clearDraft(store)).resolves.not.toThrow();
     });
@@ -156,7 +152,7 @@ describe('autosave/manager', () => {
       const { clearDraft } = await import('../../src/autosave/manager');
       await clearDraft(store);
 
-      expect(mockStore.delete).toHaveBeenCalledWith('tabDrafts');
+      expect(store.delete).toHaveBeenCalledWith('tabDrafts');
     });
   });
 
@@ -183,7 +179,7 @@ describe('autosave/manager', () => {
 
       await vi.advanceTimersByTimeAsync(30_000);
 
-      expect(mockStore.set).toHaveBeenCalledWith(
+      expect(store.set).toHaveBeenCalledWith(
         'tabDrafts',
         expect.objectContaining({
           tabs: [
@@ -193,7 +189,6 @@ describe('autosave/manager', () => {
           timestamp: expect.any(String),
         })
       );
-      expect(mockStore.save).toHaveBeenCalled();
       cleanup();
     });
 
@@ -205,13 +200,13 @@ describe('autosave/manager', () => {
         getTabDrafts: () => tabs,
       });
 
-      // First interval: saves
+      // First interval: saves (1 set call for tabDrafts)
       await vi.advanceTimersByTimeAsync(30_000);
-      expect(mockStore.save).toHaveBeenCalledTimes(1);
+      expect(store.set).toHaveBeenCalledTimes(1);
 
       // Second interval: same content, should not save again
       await vi.advanceTimersByTimeAsync(30_000);
-      expect(mockStore.save).toHaveBeenCalledTimes(1);
+      expect(store.set).toHaveBeenCalledTimes(1);
 
       cleanup();
     });
@@ -225,12 +220,12 @@ describe('autosave/manager', () => {
       });
 
       await vi.advanceTimersByTimeAsync(30_000);
-      expect(mockStore.save).toHaveBeenCalledTimes(1);
+      expect(store.set).toHaveBeenCalledTimes(1);
 
       // Change content
       tabs = [{ content: 'v2', filePath: null }];
       await vi.advanceTimersByTimeAsync(30_000);
-      expect(mockStore.save).toHaveBeenCalledTimes(2);
+      expect(store.set).toHaveBeenCalledTimes(2);
 
       cleanup();
     });
@@ -252,7 +247,7 @@ describe('autosave/manager', () => {
     });
 
     it('handles store errors gracefully', async () => {
-      mockStore.set.mockRejectedValueOnce(new Error('Store write failed'));
+      store.set.mockRejectedValueOnce(new Error('Store write failed'));
       const { setupMultiTabAutosave } = await import('../../src/autosave/manager');
       const cleanup = setupMultiTabAutosave({
         store,
@@ -273,14 +268,14 @@ describe('autosave/manager', () => {
       });
 
       await vi.advanceTimersByTimeAsync(30_000);
-      expect(mockStore.save).toHaveBeenCalledTimes(1);
+      expect(store.set).toHaveBeenCalledTimes(1);
 
       cleanup();
       tabs = [{ content: 'v2', filePath: null }];
 
       await vi.advanceTimersByTimeAsync(30_000);
       // Should not have saved again
-      expect(mockStore.save).toHaveBeenCalledTimes(1);
+      expect(store.set).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -293,21 +288,20 @@ describe('autosave/manager', () => {
       ];
       await saveTabDrafts(store, tabs);
 
-      expect(mockStore.set).toHaveBeenCalledWith(
+      expect(store.set).toHaveBeenCalledWith(
         'tabDrafts',
         expect.objectContaining({
           tabs,
           timestamp: expect.any(String),
         })
       );
-      expect(mockStore.save).toHaveBeenCalled();
     });
 
     it('saves empty tabs array', async () => {
       const { saveTabDrafts } = await import('../../src/autosave/manager');
       await saveTabDrafts(store, []);
 
-      expect(mockStore.set).toHaveBeenCalledWith(
+      expect(store.set).toHaveBeenCalledWith(
         'tabDrafts',
         expect.objectContaining({
           tabs: [],

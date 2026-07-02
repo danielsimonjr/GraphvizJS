@@ -7,6 +7,7 @@ import 'remixicon/fonts/remixicon.css';
 
 import { clearDraft, setupMultiTabAutosave } from './autosave/manager';
 import { checkForMultiTabRecovery, promptMultiTabRecovery } from './autosave/recovery';
+import { store as platformStore } from './platform';
 import { createDotLanguage } from './editor/language';
 import { createDotLinter, lintGutter } from './editor/linting';
 import { createEditorTheme } from './editor/theme';
@@ -186,9 +187,7 @@ async function bootstrap(): Promise<void> {
     tab.isDirty = false;
     if (options?.saved) {
       tab.lastSavedAt = new Date();
-      if (store) {
-        clearDraft(store);
-      }
+      clearDraft(platformStore);
     } else if (!tab.filePath) {
       tab.lastSavedAt = null;
     }
@@ -330,8 +329,8 @@ async function bootstrap(): Promise<void> {
   commitDocument(initialTab.editorView!.state.doc.toString());
 
   // Check for unsaved draft recovery before focusing editor
-  if (store) {
-    const recoveryData = await checkForMultiTabRecovery(store);
+  {
+    const recoveryData = await checkForMultiTabRecovery(platformStore);
     if (recoveryData) {
       const shouldRecover = await promptMultiTabRecovery(recoveryData);
       if (shouldRecover) {
@@ -362,7 +361,7 @@ async function bootstrap(): Promise<void> {
       // Clear draft regardless of user choice: accepting restores the content,
       // declining means the user intentionally discarded it. Either way, we don't
       // want the same recovery prompt on next startup.
-      await clearDraft(store);
+      await clearDraft(platformStore);
     }
   }
 
@@ -435,10 +434,10 @@ async function bootstrap(): Promise<void> {
   });
 
   // Start autosave (all tabs saved every 30s when content changes)
-  if (store) {
+  {
     setupMultiTabAutosave(
       {
-        store,
+        store: platformStore,
         getTabDrafts: () =>
           tabManager.getAllTabs().map((tab) => ({
             content: tab.editorView?.state.doc.toString() ?? '',

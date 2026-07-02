@@ -1,4 +1,4 @@
-import type { Store } from '@tauri-apps/plugin-store';
+import type { PlatformStore } from '../platform';
 import {
   AUTOSAVE_INTERVAL,
   DRAFT_CONTENT_KEY,
@@ -18,13 +18,13 @@ export interface TabDraftsData {
 }
 
 export interface AutosaveOptions {
-  store: Store;
+  store: PlatformStore;
   getContent: () => string;
   getFilePath: () => string | null;
 }
 
 export interface MultiTabAutosaveOptions {
-  store: Store;
+  store: PlatformStore;
   getTabDrafts: () => TabDraft[];
 }
 
@@ -90,39 +90,36 @@ export function setupMultiTabAutosave(
  * Save a single draft to the store (legacy format).
  */
 export async function saveDraft(
-  store: Store,
+  store: PlatformStore,
   content: string,
   filePath: string | null
 ): Promise<void> {
   await store.set(DRAFT_CONTENT_KEY, content);
   await store.set(DRAFT_TIMESTAMP_KEY, new Date().toISOString());
   await store.set(DRAFT_FILE_PATH_KEY, filePath);
-  await store.save();
 }
 
 /**
  * Save multi-tab drafts to the store.
  */
-export async function saveTabDrafts(store: Store, tabs: TabDraft[]): Promise<void> {
+export async function saveTabDrafts(store: PlatformStore, tabs: TabDraft[]): Promise<void> {
   const data: TabDraftsData = {
     tabs,
     timestamp: new Date().toISOString(),
   };
   await store.set(TAB_DRAFTS_KEY, data);
-  await store.save();
 }
 
 /**
  * Clear draft data from the store.
  * Clears both legacy single-tab and multi-tab draft data.
  */
-export async function clearDraft(store: Store): Promise<void> {
+export async function clearDraft(store: PlatformStore): Promise<void> {
   try {
     await store.delete(DRAFT_CONTENT_KEY);
     await store.delete(DRAFT_TIMESTAMP_KEY);
     await store.delete(DRAFT_FILE_PATH_KEY);
     await store.delete(TAB_DRAFTS_KEY);
-    await store.save();
   } catch (error) {
     console.warn('Failed to clear draft', error);
   }

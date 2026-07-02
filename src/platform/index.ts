@@ -27,6 +27,8 @@ export const store = {
   delete: (key: string): Promise<void> => window.graphviz.storeDelete(key),
 };
 
+export type PlatformStore = typeof store;
+
 export function confirm(message: string, opts?: ConfirmOptions): Promise<boolean> {
   return window.graphviz.confirm(message, opts);
 }
