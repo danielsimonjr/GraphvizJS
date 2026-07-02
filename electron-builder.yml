@@ -1,0 +1,9 @@
+appId: com.danielsimonjr.graphvizjs
+productName: GraphvizJS
+directories:
+  output: release
+files:
+  - dist/**
+  - dist-electron/**
+win:
+  target: nsis

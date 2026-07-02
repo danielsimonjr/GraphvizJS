@@ -1,5 +1,5 @@
-import { confirm } from '@tauri-apps/plugin-dialog';
-import type { Store } from '@tauri-apps/plugin-store';
+import type { PlatformStore } from '../platform';
+import { confirm } from '../platform';
 import {
   DRAFT_CONTENT_KEY,
   DRAFT_FILE_PATH_KEY,
@@ -24,7 +24,9 @@ export interface MultiTabRecoveryData {
  * Check the store for recoverable multi-tab drafts.
  * Falls back to legacy single-tab format if no multi-tab data found.
  */
-export async function checkForMultiTabRecovery(store: Store): Promise<MultiTabRecoveryData | null> {
+export async function checkForMultiTabRecovery(
+  store: PlatformStore
+): Promise<MultiTabRecoveryData | null> {
   try {
     const tabDrafts = await store.get<TabDraftsData>(TAB_DRAFTS_KEY);
     if (tabDrafts?.tabs?.length && tabDrafts.timestamp) {
@@ -81,7 +83,7 @@ export async function promptMultiTabRecovery(data: MultiTabRecoveryData): Promis
  * Check the store for a recoverable draft (legacy single-tab format).
  * Returns the draft data if found and not stale, or null otherwise.
  */
-export async function checkForRecovery(store: Store): Promise<RecoveryData | null> {
+export async function checkForRecovery(store: PlatformStore): Promise<RecoveryData | null> {
   try {
     const content = await store.get<string>(DRAFT_CONTENT_KEY);
     const timestamp = await store.get<string>(DRAFT_TIMESTAMP_KEY);
@@ -124,13 +126,12 @@ export async function promptRecovery(data: RecoveryData): Promise<boolean> {
 /**
  * Remove stale draft data from the store.
  */
-export async function cleanupStaleDrafts(store: Store): Promise<void> {
+export async function cleanupStaleDrafts(store: PlatformStore): Promise<void> {
   try {
     await store.delete(DRAFT_CONTENT_KEY);
     await store.delete(DRAFT_TIMESTAMP_KEY);
     await store.delete(DRAFT_FILE_PATH_KEY);
     await store.delete(TAB_DRAFTS_KEY);
-    await store.save();
   } catch (error) {
     console.warn('Failed to cleanup stale drafts', error);
   }

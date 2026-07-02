@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+dist-electron
 dist-ssr
 *.local
 
@@ -31,3 +32,9 @@ coverage/
 test-results/
 playwright-report/
 playwright/.cache/
+
+# SDD subagent-driven scratch workspace (never commit)
+.superpowers/
+
+# electron-builder installer output
+release/

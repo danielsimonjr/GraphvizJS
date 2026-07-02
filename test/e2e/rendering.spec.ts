@@ -1,19 +1,27 @@
-import { expect, test } from '@playwright/test';
+import { type ElectronApplication, expect, type Page, test } from '@playwright/test';
 import {
   hasPreviewError,
+  launchApp,
   selectors,
   setEditorContent,
   waitForAppReady,
   waitForPreviewUpdate,
 } from './helpers';
 
-test.describe('Diagram Rendering', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await waitForAppReady(page);
-  });
+let app: ElectronApplication;
+let page: Page;
 
-  test('typing DOT code updates preview', async ({ page }) => {
+test.beforeEach(async () => {
+  ({ app, page } = await launchApp());
+  await waitForAppReady(page);
+});
+
+test.afterEach(async () => {
+  await app.close();
+});
+
+test.describe('Diagram Rendering', () => {
+  test('typing DOT code updates preview', async () => {
     const validDot = 'digraph G { A -> B -> C }';
     await setEditorContent(page, validDot);
     await waitForPreviewUpdate(page);
@@ -22,20 +30,19 @@ test.describe('Diagram Rendering', () => {
     await expect(svg).toBeVisible();
 
     // Check that nodes are rendered
-    const nodes = page.locator('#preview svg .node');
+    const nodes = page.locator(`${selectors.preview} svg .node`);
     await expect(nodes).toHaveCount(3);
   });
 
-  test('invalid DOT shows error message', async ({ page }) => {
+  test('invalid DOT shows error message', async () => {
     const invalidDot = 'this is not valid DOT syntax {{{';
     await setEditorContent(page, invalidDot);
     await waitForPreviewUpdate(page);
 
-    const hasError = await hasPreviewError(page);
-    expect(hasError).toBe(true);
+    await expect.poll(async () => hasPreviewError(page), { timeout: 5000 }).toBe(true);
   });
 
-  test('empty editor shows empty state or clears preview', async ({ page }) => {
+  test('empty editor shows empty state or clears preview', async () => {
     await setEditorContent(page, '');
     await waitForPreviewUpdate(page);
 
@@ -48,7 +55,7 @@ test.describe('Diagram Rendering', () => {
     expect(svgVisible || hasError || true).toBe(true);
   });
 
-  test('complex diagram renders correctly', async ({ page }) => {
+  test('complex diagram renders correctly', async () => {
     const complexDot = `
       digraph G {
         rankdir=LR;
@@ -74,31 +81,26 @@ test.describe('Diagram Rendering', () => {
     await expect(svg).toBeVisible();
 
     // Should have clusters
-    const clusters = page.locator('#preview svg .cluster');
+    const clusters = page.locator(`${selectors.preview} svg .cluster`);
     await expect(clusters).toHaveCount(2);
   });
 
-  test('preview zoom controls work', async ({ page }) => {
-    // Get initial transform or scale
+  test('preview zoom controls work', async () => {
     const preview = page.locator(selectors.preview);
     await expect(preview).toBeVisible();
 
-    // Click zoom in if available
     const zoomIn = page.locator(selectors.zoomIn);
     if (await zoomIn.isVisible()) {
       await zoomIn.click();
-      // Zoom should change (hard to verify exact value)
       await page.waitForTimeout(200);
     }
 
-    // Click zoom out
     const zoomOut = page.locator(selectors.zoomOut);
     if (await zoomOut.isVisible()) {
       await zoomOut.click();
       await page.waitForTimeout(200);
     }
 
-    // Click reset
     const zoomReset = page.locator(selectors.zoomReset);
     if (await zoomReset.isVisible()) {
       await zoomReset.click();
@@ -106,7 +108,7 @@ test.describe('Diagram Rendering', () => {
     }
   });
 
-  test('different layout engines render', async ({ page }) => {
+  test('different layout engines render', async () => {
     // Test with explicit layout in DOT
     const neatoDot = `
       graph G {

@@ -1,112 +1,101 @@
-import { expect, test } from '@playwright/test';
-import { getEditorContent, selectors, waitForAppReady } from './helpers';
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { type ElectronApplication, expect, type Page, test } from '@playwright/test';
+import { getEditorContent, launchApp, selectors, waitForAppReady } from './helpers';
+
+const FIXTURE_CONTENT = 'digraph Fixture { A -> B }';
+
+let app: ElectronApplication;
+let page: Page;
+
+test.beforeEach(async () => {
+  // Ctrl+O / Ctrl+S trigger open/save; stub the native dialogs so they don't hang.
+  const dir = mkdtempSync(path.join(tmpdir(), 'gvjs-kbd-'));
+  const openPath = path.join(dir, 'fixture.dot');
+  const savePath = path.join(dir, 'saved.dot');
+  writeFileSync(openPath, FIXTURE_CONTENT, 'utf-8');
+
+  ({ app, page } = await launchApp({ GVJS_E2E_OPEN: openPath, GVJS_E2E_SAVE: savePath }));
+  await waitForAppReady(page);
+});
+
+test.afterEach(async () => {
+  await app.close();
+});
 
 test.describe('Keyboard Shortcuts', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await waitForAppReady(page);
-  });
-
-  test('Ctrl+N creates new diagram', async ({ page }) => {
-    // Set up dialog handler for confirmation
-    page.on('dialog', async (dialog) => {
-      await dialog.accept();
-    });
-
-    // Modify content first
-    const editor = page.locator(selectors.editorContent);
-    await editor.click();
-    await page.keyboard.type('// test modification');
-
-    // Press Ctrl+N
+  test('Ctrl+N creates new diagram', async () => {
+    // Press Ctrl+N — opens a new tab (a second editor instance in the DOM)
     await page.keyboard.press('Control+n');
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(300);
 
-    // Content should be reset (or dialog shown)
-    // This verifies the shortcut is registered
-    expect(true).toBe(true);
+    await expect(page.locator('.cm-editor')).toHaveCount(2);
   });
 
-  test('Ctrl+O triggers open action', async ({ page }) => {
-    // Press Ctrl+O
+  test('Ctrl+O triggers open action', async () => {
+    // Press Ctrl+O — with the open stub this loads the fixture file
     await page.keyboard.press('Control+o');
     await page.waitForTimeout(300);
 
-    // In browser mode, this might not open a dialog
-    // But the shortcut should be registered
-    expect(true).toBe(true);
+    const content = await getEditorContent(page);
+    expect(content).toContain('Fixture');
   });
 
-  test('Ctrl+S triggers save action', async ({ page }) => {
-    // Press Ctrl+S
+  test('Ctrl+S triggers save action', async () => {
+    // Press Ctrl+S — with the save stub this assigns the save path
     await page.keyboard.press('Control+s');
     await page.waitForTimeout(300);
 
-    // Shortcut should be registered
-    expect(true).toBe(true);
+    const fileStatus = page.locator('[data-status="file"]');
+    await expect(fileStatus).toContainText('saved.dot');
   });
 
-  test('F1 opens help dialog', async ({ page }) => {
-    // Press F1
+  test('F1 opens help dialog', async () => {
     await page.keyboard.press('F1');
     await page.waitForTimeout(300);
 
-    // Help dialog should be visible
     const helpDialog = page.locator(selectors.helpDialog);
     await expect(helpDialog).toBeVisible();
   });
 
-  test('Escape closes help dialog', async ({ page }) => {
-    // Open help dialog first
+  test('Escape closes help dialog', async () => {
     await page.keyboard.press('F1');
     await page.waitForTimeout(300);
 
     const helpDialog = page.locator(selectors.helpDialog);
     await expect(helpDialog).toBeVisible();
 
-    // Press Escape
     await page.keyboard.press('Escape');
     await page.waitForTimeout(200);
 
     await expect(helpDialog).not.toBeVisible();
   });
 
-  test('Ctrl+? opens help dialog', async ({ page }) => {
+  test('Ctrl+? opens help dialog', async () => {
     // Press Ctrl+? (Ctrl+Shift+/)
     await page.keyboard.press('Control+Shift+/');
     await page.waitForTimeout(300);
 
-    // Help dialog should be visible (if this shortcut is implemented)
-    // Some implementations use Cmd+? on Mac
+    // Help dialog may vary by platform; tolerate either outcome.
     const helpDialog = page.locator(selectors.helpDialog);
     const isVisible = await helpDialog.isVisible().catch(() => false);
-    expect(isVisible || true).toBe(true); // Shortcut may vary by platform
+    expect(isVisible || true).toBe(true);
   });
 });
 
 test.describe('Editor Zoom Shortcuts', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await waitForAppReady(page);
-  });
-
-  test('Ctrl+= zooms in editor', async ({ page }) => {
-    // Get initial font size (if possible)
+  test('Ctrl+= zooms in editor', async () => {
     const editor = page.locator(selectors.editor);
-
-    // Press Ctrl+=
     await editor.click();
     await page.keyboard.press('Control+=');
     await page.waitForTimeout(200);
 
-    // Editor should still be functional
     await expect(editor).toBeVisible();
   });
 
-  test('Ctrl+- zooms out editor', async ({ page }) => {
+  test('Ctrl+- zooms out editor', async () => {
     const editor = page.locator(selectors.editor);
-
-    // Press Ctrl+-
     await editor.click();
     await page.keyboard.press('Control+-');
     await page.waitForTimeout(200);
@@ -114,15 +103,12 @@ test.describe('Editor Zoom Shortcuts', () => {
     await expect(editor).toBeVisible();
   });
 
-  test('Ctrl+0 resets editor zoom', async ({ page }) => {
+  test('Ctrl+0 resets editor zoom', async () => {
     const editor = page.locator(selectors.editor);
-
-    // Zoom in first
     await editor.click();
     await page.keyboard.press('Control+=');
     await page.waitForTimeout(100);
 
-    // Reset zoom
     await page.keyboard.press('Control+0');
     await page.waitForTimeout(200);
 
@@ -131,22 +117,14 @@ test.describe('Editor Zoom Shortcuts', () => {
 });
 
 test.describe('Menu Keyboard Navigation', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await waitForAppReady(page);
-  });
-
-  test('Tab navigates through toolbar buttons', async ({ page }) => {
-    // Focus on first toolbar button
-    const firstBtn = page.locator('#toolbar button').first();
+  test('Tab navigates through toolbar buttons', async () => {
+    const firstBtn = page.locator('.toolbar button').first();
     await firstBtn.focus();
 
-    // Tab through buttons
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
 
-    // Some button should have focus
-    const focusedBtn = page.locator('#toolbar button:focus');
+    const focusedBtn = page.locator('.toolbar button:focus');
     const hasFocus = await focusedBtn.count();
     expect(hasFocus >= 0).toBe(true);
   });

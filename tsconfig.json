@@ -12,6 +12,5 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts"],
-  "exclude": ["src-tauri"]
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "electron/**/*.ts"]
 }

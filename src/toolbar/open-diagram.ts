@@ -1,5 +1,4 @@
-import { open as showOpenDialog } from '@tauri-apps/plugin-dialog';
-import { readTextFile } from '@tauri-apps/plugin-fs';
+import { openTextFile } from '../platform';
 
 interface OpenDiagramOptions {
   button: HTMLButtonElement | null;
@@ -12,23 +11,12 @@ export function setupOpenDiagramAction(options: OpenDiagramOptions): void {
 
   button.addEventListener('click', async () => {
     try {
-      const selected = await showOpenDialog({
-        filters: [
-          {
-            name: 'DOT Diagram',
-            extensions: ['dot', 'gv'],
-          },
-          { name: 'All Files', extensions: ['*'] },
-        ],
-      });
-
-      if (!selected) return;
-
-      const path = Array.isArray(selected) ? selected[0] : selected;
-      if (!path) return;
-
-      const fileContents = await readTextFile(path);
-      onOpen(fileContents, path);
+      const opened = await openTextFile([
+        { name: 'DOT Diagram', extensions: ['dot', 'gv'] },
+        { name: 'All Files', extensions: ['*'] },
+      ]);
+      if (!opened) return;
+      onOpen(opened.content, opened.path);
     } catch (error) {
       console.error('Failed to open diagram', error);
     }

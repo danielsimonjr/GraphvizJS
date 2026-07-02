@@ -1,97 +1,100 @@
-import { expect, test } from '@playwright/test';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { type ElectronApplication, expect, type Page, test } from '@playwright/test';
 import {
-  openExportMenu,
+  launchApp,
   selectors,
   setEditorContent,
   waitForAppReady,
   waitForPreviewUpdate,
 } from './helpers';
 
-test.describe('Export Functionality', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await waitForAppReady(page);
-  });
+let app: ElectronApplication;
+let page: Page;
+let savePath: string;
 
-  test('export menu opens on click', async ({ page }) => {
-    const exportBtn = page.locator(selectors.exportBtn);
-    await exportBtn.click();
+test.beforeEach(async () => {
+  // Give the app a stubbed save target so clicking an export item does not open
+  // a native save dialog (which Playwright cannot drive).
+  savePath = path.join(mkdtempSync(path.join(tmpdir(), 'gvjs-export-')), 'export-out');
+  ({ app, page } = await launchApp({ GVJS_E2E_SAVE: savePath }));
+  await waitForAppReady(page);
+});
+
+test.afterEach(async () => {
+  await app.close();
+});
+
+test.describe('Export Functionality', () => {
+  test('export menu opens on click', async () => {
+    await page.locator(selectors.exportBtn).click();
 
     const exportMenu = page.locator(selectors.exportMenu);
     await expect(exportMenu).toBeVisible();
   });
 
-  test('export menu contains PNG option', async ({ page }) => {
-    await openExportMenu(page);
+  test('export menu contains PNG option', async () => {
+    await page.locator(selectors.exportBtn).click();
 
-    const pngOption = page.locator('.export-menu button:has-text("PNG")');
+    const pngOption = page.locator(`${selectors.exportMenu} [data-export="png"]`);
     await expect(pngOption).toBeVisible();
   });
 
-  test('export menu contains PNG @2x option', async ({ page }) => {
-    await openExportMenu(page);
+  test('export menu contains PNG @2x option', async () => {
+    await page.locator(selectors.exportBtn).click();
 
-    const png2xOption = page.locator(
-      '.export-menu button:has-text("2x"), .export-menu button:has-text("@2x")'
-    );
+    const png2xOption = page.locator(`${selectors.exportMenu} [data-export="pngx2"]`);
     await expect(png2xOption).toBeVisible();
   });
 
-  test('export menu contains SVG option', async ({ page }) => {
-    await openExportMenu(page);
+  test('export menu contains SVG option', async () => {
+    await page.locator(selectors.exportBtn).click();
 
-    const svgOption = page.locator('.export-menu button:has-text("SVG")');
+    const svgOption = page.locator(`${selectors.exportMenu} [data-export="svg"]`);
     await expect(svgOption).toBeVisible();
   });
 
-  test('export menu closes on outside click', async ({ page }) => {
-    await openExportMenu(page);
+  test('export menu closes on outside click', async () => {
+    await page.locator(selectors.exportBtn).click();
 
     const exportMenu = page.locator(selectors.exportMenu);
     await expect(exportMenu).toBeVisible();
 
-    // Click outside the menu
-    await page.click(selectors.editor);
+    // Click outside the menu (into the editor)
+    await page.locator(selectors.editor).first().click();
 
     await expect(exportMenu).not.toBeVisible();
   });
 
-  test('export menu closes after selection', async ({ page }) => {
-    await openExportMenu(page);
+  test('export menu closes after selection', async () => {
+    await page.locator(selectors.exportBtn).click();
+    await expect(page.locator(selectors.exportMenu)).toBeVisible();
 
-    // Set up download handler (export triggers download in browser)
-    const _downloadPromise = page.waitForEvent('download', { timeout: 5000 }).catch(() => null);
-
-    // Click SVG export (least complex)
-    const svgOption = page.locator('.export-menu button:has-text("SVG")');
-    await svgOption.click();
+    // Click SVG export (writes to the stubbed save path).
+    await page.locator(`${selectors.exportMenu} [data-export="svg"]`).click();
 
     // Menu should close
     const exportMenu = page.locator(selectors.exportMenu);
     await expect(exportMenu).not.toBeVisible();
   });
 
-  test('export works with valid diagram', async ({ page }) => {
+  test('export works with valid diagram', async () => {
     // Ensure we have a valid diagram
     await setEditorContent(page, 'digraph G { A -> B }');
     await waitForPreviewUpdate(page);
 
-    await openExportMenu(page);
+    await page.locator(selectors.exportBtn).click();
 
-    // Click SVG export
-    const svgOption = page.locator('.export-menu button:has-text("SVG")');
+    // SVG export option should be enabled
+    const svgOption = page.locator(`${selectors.exportMenu} [data-export="svg"]`);
     await expect(svgOption).toBeEnabled();
   });
 });
 
 test.describe('Export Menu Keyboard Navigation', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await waitForAppReady(page);
-  });
-
-  test('Escape closes export menu', async ({ page }) => {
-    await openExportMenu(page);
+  test('Escape closes export menu', async () => {
+    await page.locator(selectors.exportBtn).click();
 
     const exportMenu = page.locator(selectors.exportMenu);
     await expect(exportMenu).toBeVisible();
@@ -101,16 +104,17 @@ test.describe('Export Menu Keyboard Navigation', () => {
     await expect(exportMenu).not.toBeVisible();
   });
 
-  test('arrow keys navigate menu options', async ({ page }) => {
-    await openExportMenu(page);
+  test('arrow keys navigate menu options', async () => {
+    await page.locator(selectors.exportBtn).click();
+    await expect(page.locator(selectors.exportMenu)).toBeVisible();
 
     // Press down arrow to move through options
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('ArrowDown');
 
-    // Focus should be on a menu item
-    const focusedElement = page.locator('.export-menu button:focus');
+    // Focus may or may not move; just assert the menu is still usable.
+    const focusedElement = page.locator(`${selectors.exportMenu} .toolbar-menu-item:focus`);
     const hasFocus = await focusedElement.count();
-    expect(hasFocus >= 0).toBe(true); // Navigation may or may not move focus
+    expect(hasFocus >= 0).toBe(true);
   });
 });

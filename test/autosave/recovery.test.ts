@@ -1,14 +1,13 @@
-import type { Store } from '@tauri-apps/plugin-store';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import '../mocks/tauri';
-import { mockDialog, mockStore, resetAllMocks } from '../mocks/tauri';
+import { makeMockStore, mockConfirm, resetPlatformMocks } from '../mocks/platform';
 
-const store = mockStore as unknown as Store;
+let store: ReturnType<typeof makeMockStore>;
 
 describe('autosave/recovery', () => {
   beforeEach(() => {
     vi.resetModules();
-    resetAllMocks();
+    store = makeMockStore();
+    resetPlatformMocks();
   });
 
   describe('checkForRecovery()', () => {
@@ -20,7 +19,7 @@ describe('autosave/recovery', () => {
 
     it('returns draft data when valid draft exists', async () => {
       const timestamp = new Date().toISOString();
-      mockStore.get
+      store.get
         .mockResolvedValueOnce('digraph { A -> B }') // draftContent
         .mockResolvedValueOnce(timestamp) // draftTimestamp
         .mockResolvedValueOnce('/tmp/test.dot'); // draftFilePath
@@ -37,7 +36,7 @@ describe('autosave/recovery', () => {
 
     it('returns null filePath when draft has no file path', async () => {
       const timestamp = new Date().toISOString();
-      mockStore.get
+      store.get
         .mockResolvedValueOnce('digraph {}') // draftContent
         .mockResolvedValueOnce(timestamp) // draftTimestamp
         .mockResolvedValueOnce(null); // draftFilePath
@@ -51,7 +50,7 @@ describe('autosave/recovery', () => {
 
     it('returns null and cleans up stale drafts (>7 days)', async () => {
       const staleDate = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString();
-      mockStore.get
+      store.get
         .mockResolvedValueOnce('old content') // draftContent
         .mockResolvedValueOnce(staleDate); // draftTimestamp
 
@@ -60,13 +59,13 @@ describe('autosave/recovery', () => {
 
       expect(result).toBeNull();
       // Should have cleaned up
-      expect(mockStore.delete).toHaveBeenCalledWith('draftContent');
-      expect(mockStore.delete).toHaveBeenCalledWith('draftTimestamp');
-      expect(mockStore.delete).toHaveBeenCalledWith('draftFilePath');
+      expect(store.delete).toHaveBeenCalledWith('draftContent');
+      expect(store.delete).toHaveBeenCalledWith('draftTimestamp');
+      expect(store.delete).toHaveBeenCalledWith('draftFilePath');
     });
 
     it('returns null when only content exists (no timestamp)', async () => {
-      mockStore.get
+      store.get
         .mockResolvedValueOnce('some content') // draftContent
         .mockResolvedValueOnce(null); // draftTimestamp - missing
 
@@ -76,7 +75,7 @@ describe('autosave/recovery', () => {
     });
 
     it('handles store errors gracefully', async () => {
-      mockStore.get.mockRejectedValueOnce(new Error('Store read failed'));
+      store.get.mockRejectedValueOnce(new Error('Store read failed'));
       const { checkForRecovery } = await import('../../src/autosave/recovery');
       const result = await checkForRecovery(store);
       expect(result).toBeNull();
@@ -85,7 +84,7 @@ describe('autosave/recovery', () => {
 
   describe('promptRecovery()', () => {
     it('returns true when user accepts recovery', async () => {
-      mockDialog.confirm.mockResolvedValueOnce(true);
+      mockConfirm.mockResolvedValueOnce(true);
       const { promptRecovery } = await import('../../src/autosave/recovery');
       const result = await promptRecovery({
         content: 'digraph {}',
@@ -96,7 +95,7 @@ describe('autosave/recovery', () => {
     });
 
     it('returns false when user declines recovery', async () => {
-      mockDialog.confirm.mockResolvedValueOnce(false);
+      mockConfirm.mockResolvedValueOnce(false);
       const { promptRecovery } = await import('../../src/autosave/recovery');
       const result = await promptRecovery({
         content: 'digraph {}',
@@ -114,7 +113,7 @@ describe('autosave/recovery', () => {
         filePath: '/tmp/test.dot',
       });
 
-      expect(mockDialog.confirm).toHaveBeenCalledWith(expect.stringContaining('unsaved draft'), {
+      expect(mockConfirm).toHaveBeenCalledWith(expect.stringContaining('unsaved draft'), {
         title: 'Recover Unsaved Work',
         kind: 'warning',
       });
@@ -126,15 +125,14 @@ describe('autosave/recovery', () => {
       const { cleanupStaleDrafts } = await import('../../src/autosave/recovery');
       await cleanupStaleDrafts(store);
 
-      expect(mockStore.delete).toHaveBeenCalledWith('draftContent');
-      expect(mockStore.delete).toHaveBeenCalledWith('draftTimestamp');
-      expect(mockStore.delete).toHaveBeenCalledWith('draftFilePath');
-      expect(mockStore.delete).toHaveBeenCalledWith('tabDrafts');
-      expect(mockStore.save).toHaveBeenCalled();
+      expect(store.delete).toHaveBeenCalledWith('draftContent');
+      expect(store.delete).toHaveBeenCalledWith('draftTimestamp');
+      expect(store.delete).toHaveBeenCalledWith('draftFilePath');
+      expect(store.delete).toHaveBeenCalledWith('tabDrafts');
     });
 
     it('handles errors gracefully', async () => {
-      mockStore.delete.mockRejectedValueOnce(new Error('Delete failed'));
+      store.delete.mockRejectedValueOnce(new Error('Delete failed'));
       const { cleanupStaleDrafts } = await import('../../src/autosave/recovery');
       await expect(cleanupStaleDrafts(store)).resolves.not.toThrow();
     });
@@ -142,7 +140,7 @@ describe('autosave/recovery', () => {
 
   describe('checkForMultiTabRecovery()', () => {
     it('returns null when no drafts exist', async () => {
-      mockStore.get.mockResolvedValue(null);
+      store.get.mockResolvedValue(null);
       const { checkForMultiTabRecovery } = await import('../../src/autosave/recovery');
       const result = await checkForMultiTabRecovery(store);
       expect(result).toBeNull();
@@ -150,7 +148,7 @@ describe('autosave/recovery', () => {
 
     it('returns multi-tab data when valid drafts exist', async () => {
       const timestamp = new Date().toISOString();
-      mockStore.get.mockResolvedValueOnce({
+      store.get.mockResolvedValueOnce({
         tabs: [
           { content: 'digraph { A }', filePath: '/tmp/a.dot' },
           { content: 'graph { B }', filePath: null },
@@ -172,7 +170,7 @@ describe('autosave/recovery', () => {
 
     it('returns null and cleans up stale multi-tab drafts (>7 days)', async () => {
       const staleDate = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString();
-      mockStore.get.mockResolvedValueOnce({
+      store.get.mockResolvedValueOnce({
         tabs: [{ content: 'old content', filePath: null }],
         timestamp: staleDate,
       });
@@ -181,13 +179,13 @@ describe('autosave/recovery', () => {
       const result = await checkForMultiTabRecovery(store);
 
       expect(result).toBeNull();
-      expect(mockStore.delete).toHaveBeenCalledWith('tabDrafts');
+      expect(store.delete).toHaveBeenCalledWith('tabDrafts');
     });
 
     it('falls back to legacy single-tab format when no multi-tab data', async () => {
       const timestamp = new Date().toISOString();
       // First call returns null for tabDrafts
-      mockStore.get
+      store.get
         .mockResolvedValueOnce(null) // tabDrafts
         .mockResolvedValueOnce('legacy content') // draftContent
         .mockResolvedValueOnce(timestamp) // draftTimestamp
@@ -203,7 +201,7 @@ describe('autosave/recovery', () => {
     });
 
     it('returns null when multi-tab data has empty tabs array', async () => {
-      mockStore.get
+      store.get
         .mockResolvedValueOnce({ tabs: [], timestamp: new Date().toISOString() }) // tabDrafts with empty tabs
         .mockResolvedValueOnce(null); // fallback: no draftContent
 
@@ -214,7 +212,7 @@ describe('autosave/recovery', () => {
     });
 
     it('handles store errors gracefully', async () => {
-      mockStore.get.mockRejectedValueOnce(new Error('Store read failed'));
+      store.get.mockRejectedValueOnce(new Error('Store read failed'));
       const { checkForMultiTabRecovery } = await import('../../src/autosave/recovery');
       const result = await checkForMultiTabRecovery(store);
       expect(result).toBeNull();
@@ -223,7 +221,7 @@ describe('autosave/recovery', () => {
 
   describe('promptMultiTabRecovery()', () => {
     it('returns true when user accepts recovery', async () => {
-      mockDialog.confirm.mockResolvedValueOnce(true);
+      mockConfirm.mockResolvedValueOnce(true);
       const { promptMultiTabRecovery } = await import('../../src/autosave/recovery');
       const result = await promptMultiTabRecovery({
         tabs: [
@@ -236,7 +234,7 @@ describe('autosave/recovery', () => {
     });
 
     it('returns false when user declines recovery', async () => {
-      mockDialog.confirm.mockResolvedValueOnce(false);
+      mockConfirm.mockResolvedValueOnce(false);
       const { promptMultiTabRecovery } = await import('../../src/autosave/recovery');
       const result = await promptMultiTabRecovery({
         tabs: [{ content: 'digraph {}', filePath: null }],
@@ -252,7 +250,7 @@ describe('autosave/recovery', () => {
         timestamp: new Date().toISOString(),
       });
 
-      expect(mockDialog.confirm).toHaveBeenCalledWith(
+      expect(mockConfirm).toHaveBeenCalledWith(
         expect.stringContaining('1 tab'),
         expect.any(Object)
       );
@@ -269,7 +267,7 @@ describe('autosave/recovery', () => {
         timestamp: new Date().toISOString(),
       });
 
-      expect(mockDialog.confirm).toHaveBeenCalledWith(
+      expect(mockConfirm).toHaveBeenCalledWith(
         expect.stringContaining('3 tabs'),
         expect.any(Object)
       );
@@ -282,7 +280,7 @@ describe('autosave/recovery', () => {
         timestamp: new Date().toISOString(),
       });
 
-      expect(mockDialog.confirm).toHaveBeenCalledWith(expect.any(String), {
+      expect(mockConfirm).toHaveBeenCalledWith(expect.any(String), {
         title: 'Recover Unsaved Work',
         kind: 'warning',
       });

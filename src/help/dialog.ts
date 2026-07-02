@@ -1,5 +1,4 @@
-import { getName, getVersion } from '@tauri-apps/api/app';
-import { open } from '@tauri-apps/plugin-shell';
+import { appInfo, openExternal } from '../platform';
 
 export function setupHelpDialog(button: HTMLButtonElement | null): void {
   if (!button) return;
@@ -7,7 +6,7 @@ export function setupHelpDialog(button: HTMLButtonElement | null): void {
   let dialog: HTMLDialogElement | null = null;
 
   async function createDialog(): Promise<HTMLDialogElement> {
-    const [appName, appVersion] = await Promise.all([getName(), getVersion()]);
+    const { name: appName, version: appVersion } = await appInfo();
 
     const userAgentData = (navigator as Navigator & { userAgentData?: { platform: string } })
       .userAgentData;
@@ -98,7 +97,7 @@ export function setupHelpDialog(button: HTMLButtonElement | null): void {
       const button = event.currentTarget as HTMLButtonElement;
       const url = button.dataset.url;
       if (url) {
-        await open(url);
+        await openExternal(url);
       }
     });
 
