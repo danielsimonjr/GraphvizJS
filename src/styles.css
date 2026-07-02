@@ -1203,11 +1203,17 @@ body.dark .cm-tooltip-lint .cm-tooltip-arrow::after {
 .pdf-options-dialog {
   border: none;
   border-radius: 12px;
-  padding: 1.25rem 1.5rem;
+  /* No padding on the dialog element itself: padding lives on the inner form so
+     that a click on the padding is NOT treated as a backdrop (cancel) click. */
+  padding: 0;
   min-width: 320px;
   background: #ffffff;
   color: #0f172a;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.pdf-options-form {
+  padding: 1.25rem 1.5rem;
 }
 
 body.dark .pdf-options-dialog {

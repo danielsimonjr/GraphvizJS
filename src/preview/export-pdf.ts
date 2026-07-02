@@ -44,6 +44,10 @@ export function computePageGeometry(
   const dh = heightPx * PX_TO_PT;
 
   if (options.mode === 'fit') {
+    // The page is the diagram bounds exactly (no whitespace). Note: a very large
+    // diagram (> ~19200px) yields a page over the PDF spec's default 14400pt max,
+    // which some viewers clamp; this is inherent to "fit exactly" and matches the
+    // uncapped PNG export. Use "standard page" for guaranteed-portable output.
     return {
       pageWidth: dw,
       pageHeight: dh,
