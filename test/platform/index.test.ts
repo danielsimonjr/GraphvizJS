@@ -41,4 +41,38 @@ describe('platform', () => {
     expect(await platform.confirm('sure?', { title: 'T', kind: 'warning' })).toBe(true);
     expect(api.confirm).toHaveBeenCalledWith('sure?', { title: 'T', kind: 'warning' });
   });
+
+  it('pickSavePath delegates with opts and returns path string', async () => {
+    api.pickSavePath.mockResolvedValue('/out/diagram.svg');
+    const opts = { defaultPath: '/out/diagram.svg', filters: [{ name: 'SVG', extensions: ['svg'] }] };
+    const result = await platform.pickSavePath(opts);
+    expect(api.pickSavePath).toHaveBeenCalledWith(opts);
+    expect(result).toBe('/out/diagram.svg');
+  });
+
+  it('writeTextFile delegates path and content in order', async () => {
+    api.writeTextFile.mockResolvedValue(undefined);
+    await platform.writeTextFile('/a.dot', 'digraph{}');
+    expect(api.writeTextFile).toHaveBeenCalledWith('/a.dot', 'digraph{}');
+  });
+
+  it('writeBinaryFile delegates path and Uint8Array bytes in order', async () => {
+    api.writeBinaryFile.mockResolvedValue(undefined);
+    const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47]);
+    await platform.writeBinaryFile('/img.png', bytes);
+    expect(api.writeBinaryFile).toHaveBeenCalledWith('/img.png', bytes);
+  });
+
+  it('openExternal delegates the url', async () => {
+    api.openExternal.mockResolvedValue(undefined);
+    await platform.openExternal('https://graphviz.org');
+    expect(api.openExternal).toHaveBeenCalledWith('https://graphviz.org');
+  });
+
+  it('appInfo delegates and returns name/version passthrough', async () => {
+    api.appInfo.mockResolvedValue({ name: 'GraphvizJS', version: '1.2.3' });
+    const result = await platform.appInfo();
+    expect(api.appInfo).toHaveBeenCalled();
+    expect(result).toEqual({ name: 'GraphvizJS', version: '1.2.3' });
+  });
 });
