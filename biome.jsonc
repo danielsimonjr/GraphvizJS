@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!src-tauri/**", "!dist/**", "!coverage/**"]
+    "includes": ["**", "!dist/**", "!coverage/**"]
   },
   "formatter": {
     "enabled": true,
@@ -23,7 +23,6 @@
       "**",
       "!**/pnpm-lock.yaml",
       "!**/LICENSE",
-      "!src-tauri/**",
       "!dist/**",
       "!coverage/**"
     ]
@@ -117,7 +116,6 @@
       "!**/*.tsbuildinfo",
       "!**/.pnpm-debug.log*",
       "!**/.DS_Store",
-      "!src-tauri/**",
       "!dist/**",
       "!**/Thumbs.db"
     ]

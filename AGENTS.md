@@ -7,9 +7,8 @@ This file provides guidance to AI coding agents working in this repository. For 
 ```bash
 pnpm install                # Install dependencies
 pnpm dev                    # Frontend dev server (localhost:5173)
-pnpm tauri dev              # Full desktop app with hot reload
 pnpm build                  # TypeScript compile + Vite bundle
-pnpm tauri build            # Production installer
+pnpm package                # Build distributable (electron-builder)
 
 pnpm test                   # Unit tests (Vitest + happy-dom)
 pnpm test:watch             # Watch mode
@@ -26,7 +25,7 @@ Single E2E test: `npx playwright test test/e2e/rendering.spec.ts`
 
 ## Project Overview
 
-Tauri 2 desktop app for editing Graphviz DOT diagrams with live preview. TypeScript/Vite frontend with CodeMirror 6 editor and `@hpcc-js/wasm` for client-side Graphviz WebAssembly rendering. Rust backend is thin — only plugin setup and window restore.
+Electron desktop app for editing Graphviz DOT diagrams with live preview. TypeScript/Vite frontend with CodeMirror 6 editor and `@hpcc-js/wasm` for client-side Graphviz WebAssembly rendering.
 
 ## Architecture
 
@@ -41,18 +40,18 @@ Each `src/` subdirectory exports setup functions that receive DOM elements and c
 - **editor/** — CodeMirror extensions (DOT language, theme, font zoom)
 - **preview/** — Graphviz WASM init, debounced SVG rendering (300ms), preview zoom
 - **toolbar/** — One module per action (`new-diagram.ts`, `open-diagram.ts`, `save-diagram.ts`, `export-diagram.ts`, `export-menu.ts`, `examples-menu.ts`, `layout-engine.ts`, `shortcuts.ts`), orchestrated by `actions.ts`
-- **autosave/** — Periodic draft saving (`manager.ts`) and crash recovery (`recovery.ts`) via Tauri Store
+- **autosave/** — Periodic draft saving (`manager.ts`) and crash recovery (`recovery.ts`) via electron-store
 - **workspace/** — Resizable pane divider
-- **window/** — Window state persistence via Tauri Store
+- **window/** — Window state persistence via electron-store
 - **examples/** — `.dot` template files, loaded via Vite `import.meta.glob` with `?raw` query
 
 ### Rendering Pipeline
 
 Editor doc changes → 300ms debounce → `schedulePreviewRender(doc)` → Graphviz WASM renders with selected layout engine (`getCurrentEngine()`) → SVG injected into preview host → zoom reapplied.
 
-### Tauri Plugins
+### Electron Integration
 
-`@tauri-apps/plugin-dialog` (file dialogs), `@tauri-apps/plugin-fs` (read/write), `@tauri-apps/plugin-store` (key-value persistence), `@tauri-apps/plugin-shell` (shell commands).
+Native capabilities use Electron APIs and `electron-store` for key-value persistence. File dialogs and filesystem access are handled via Electron's `dialog` and `fs` modules exposed through the preload script.
 
 ### Vite
 
@@ -79,7 +78,7 @@ Root is `src/` (not project root). Entry point is `src/index.html`. `@hpcc-js/wa
 
 ## Version Sync
 
-Update version in **both** `package.json` and `src-tauri/tauri.conf.json`.
+Update version in `package.json`.
 
 ## Adding Features
 

@@ -76,7 +76,7 @@ test.describe('File Operations', () => {
     await page.keyboard.press('Control+s');
     await page.waitForTimeout(500);
 
-    // In browser mode without Tauri, save might not trigger a dialog
+    // In browser mode, save might not trigger a native dialog
     // This test verifies the shortcut is registered
     expect(true).toBe(true);
   });
