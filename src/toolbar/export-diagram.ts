@@ -1,5 +1,4 @@
-import { save as showSaveDialog } from '@tauri-apps/plugin-dialog';
-import { writeFile, writeTextFile } from '@tauri-apps/plugin-fs';
+import { pickSavePath, writeBinaryFile, writeTextFile } from '../platform';
 import type { EditorView } from 'codemirror';
 
 import { renderDotToSvg } from '../preview/graphviz';
@@ -46,21 +45,14 @@ export function createExportHandler({ getEditor, getPath }: ExportDiagramOptions
 }
 
 async function exportAsSvg(svg: string, baseName: string): Promise<void> {
-  const targetPath = await showSaveDialog({
+  const targetPath = await pickSavePath({
     defaultPath: `${baseName}.svg`,
     filters: [
-      {
-        name: 'SVG Image',
-        extensions: ['svg'],
-      },
+      { name: 'SVG Image', extensions: ['svg'] },
       { name: 'All Files', extensions: ['*'] },
     ],
   });
-
-  if (!targetPath) {
-    return;
-  }
-
+  if (!targetPath) return;
   await writeTextFile(targetPath, svg);
 }
 
@@ -70,23 +62,16 @@ async function exportAsPng(
   scale: number
 ): Promise<void> {
   const suffix = scale > 1 ? '@2x' : '';
-  const targetPath = await showSaveDialog({
+  const targetPath = await pickSavePath({
     defaultPath: `${baseName}${suffix}.png`,
     filters: [
-      {
-        name: 'PNG Image',
-        extensions: ['png'],
-      },
+      { name: 'PNG Image', extensions: ['png'] },
       { name: 'All Files', extensions: ['*'] },
     ],
   });
-
-  if (!targetPath) {
-    return;
-  }
-
+  if (!targetPath) return;
   const pngBytes = await convertSvgToPng(diagram, scale);
-  await writeFile(targetPath, pngBytes);
+  await writeBinaryFile(targetPath, pngBytes);
 }
 
 async function renderDiagram(source: string): Promise<RenderedDiagram> {
