@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-02
+
+### Added - PDF Export
+
+- **Export as PDF** joins SVG / PNG / PNG@2x in the export menu. Output is a **vector** PDF converted from the rendered diagram SVG via `svg2pdf.js` + `jsPDF` (the `@hpcc-js/wasm` Graphviz build cannot emit PDF directly).
+- **Export-time options dialog**: choose **Fit page to diagram** (default — the page equals the diagram bounds) or **Standard page** (Letter/A4 with Auto/Portrait/Landscape orientation, diagram scaled-to-fit and centered on a white background).
+
+## [1.0.0] - 2026-07-02
+
 ### Changed - Desktop Shell: Tauri → Electron Migration
 
 - **Electron replaces Tauri** as the desktop shell. The app now runs as a standard Node/Chromium Electron application with no Rust toolchain dependency.

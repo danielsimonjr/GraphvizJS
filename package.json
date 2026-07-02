@@ -1,6 +1,6 @@
 {
   "name": "graphvizjs-desktop-client",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Desktop editor for Graphviz DOT diagrams with real-time preview, syntax highlighting, and SVG/PNG export.",
   "license": "MIT",
   "author": {
@@ -34,7 +34,9 @@
     "@hpcc-js/wasm": "^2.22.4",
     "codemirror": "^6.0.2",
     "electron-store": "^11.0.2",
-    "remixicon": "^4.7.0"
+    "jspdf": "^4.2.1",
+    "remixicon": "^4.7.0",
+    "svg2pdf.js": "^2.7.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",
