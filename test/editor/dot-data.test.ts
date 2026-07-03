@@ -38,4 +38,10 @@ describe('dot-data', () => {
     expect(isColorAttribute('shape')).toBe(false);
     expect(DOT_COLORS).toEqual(expect.arrayContaining(['black', 'white', 'red', 'blue']));
   });
+
+  it('includes compound-graph and common attributes (no false-unknown)', () => {
+    expect(DOT_ATTRIBUTES).toEqual(
+      expect.arrayContaining(['ltail', 'lhead', 'weight', 'constraint', 'penwidth', 'nodesep'])
+    );
+  });
 });

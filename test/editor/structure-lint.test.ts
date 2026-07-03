@@ -27,4 +27,11 @@ describe('structuralDiagnostics', () => {
   it('ignores attribute-looking text inside strings', () => {
     expect(structuralDiagnostics('a [label="shp=1"];')).toEqual([]);
   });
+
+  it('does not flag valid compound-graph attributes as unknown', () => {
+    const src = 'digraph { a -> b [ltail=cluster0, lhead=cluster1]; }';
+    expect(structuralDiagnostics(src).filter((d) => /Unknown attribute/.test(d.message))).toEqual(
+      []
+    );
+  });
 });
