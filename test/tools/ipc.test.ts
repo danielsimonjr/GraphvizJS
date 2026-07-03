@@ -70,6 +70,17 @@ describe('analyzeIpc', () => {
     expect(chans(r.orphanHandlers)).toContain('shell:openExternal'); // handler, no preload
     expect(chans(r.fullyWired)).toEqual(['app:info', 'dialog:openText', 'store:get']);
   });
+
+  it('classifies a wired channel with no contract method as missingContract', () => {
+    const contract = 'export interface GraphvizApi {\n  appInfo(): Promise<{ name: string }>;\n}\n';
+    const preload =
+      "const api: GraphvizApi = {\n  appInfo: () => ipcRenderer.invoke('app:info'),\n  ghost: (x) => ipcRenderer.invoke('ghost:chan', x),\n};\n";
+    const main =
+      "ipcMain.handle('app:info', () => ({}));\nipcMain.handle('ghost:chan', () => ({}));\n";
+    const r = analyzeIpc(contract, preload, main);
+    expect(r.fullyWired.map((c) => c.channel)).toEqual(['app:info']);
+    expect(r.missingContract.map((c) => c.channel)).toEqual(['ghost:chan']);
+  });
 });
 
 describe('analyzeIpcFromRoot (real repo)', () => {
@@ -89,6 +100,7 @@ describe('analyzeIpcFromRoot (real repo)', () => {
         'store:set',
       ].sort()
     );
+    expect(r.missingContract).toEqual([]);
     expect(r.missingHandlers).toEqual([]);
     expect(r.orphanHandlers).toEqual([]);
   });

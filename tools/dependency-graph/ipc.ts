@@ -70,16 +70,19 @@ export function analyzeIpc(contractSrc: string, preloadSrc: string, mainSrc: str
   }
 
   const fullyWired: IpcChannel[] = [];
+  const missingContract: IpcChannel[] = [];
   const missingHandlers: IpcChannel[] = [];
   const orphanHandlers: IpcChannel[] = [];
   for (const c of byChannel.values()) {
-    if (c.hasPreload && c.hasHandler) fullyWired.push(c);
+    if (c.hasContract && c.hasPreload && c.hasHandler) fullyWired.push(c);
+    else if (c.hasPreload && c.hasHandler && !c.hasContract) missingContract.push(c);
     else if (c.hasPreload && !c.hasHandler) missingHandlers.push(c);
     else if (!c.hasPreload && c.hasHandler) orphanHandlers.push(c);
   }
   const byName = (a: IpcChannel, b: IpcChannel) => a.channel.localeCompare(b.channel);
   return {
     fullyWired: fullyWired.sort(byName),
+    missingContract: missingContract.sort(byName),
     missingHandlers: missingHandlers.sort(byName),
     orphanHandlers: orphanHandlers.sort(byName),
   };

@@ -58,6 +58,8 @@ export interface IpcChannel {
 export interface IpcReport {
   /** contract method -> preload invoke -> main handle. */
   fullyWired: IpcChannel[];
+  /** preload invoke + main handle but NO matching contract method (contract drift or a contract-parser miss). */
+  missingContract: IpcChannel[];
   /** preload invoke with no ipcMain.handle (latent bug: invoke would reject). */
   missingHandlers: IpcChannel[];
   /** ipcMain.handle with no preload invoke (orphan/dead handler). */
