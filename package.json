@@ -1,6 +1,6 @@
 {
   "name": "graphvizjs-desktop-client",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Desktop editor for Graphviz DOT diagrams with real-time preview, syntax highlighting, and SVG/PNG export.",
   "license": "MIT",
   "author": {
@@ -27,9 +27,11 @@
     "test:e2e:debug": "playwright test --debug"
   },
   "dependencies": {
+    "@codemirror/autocomplete": "^6.20.3",
     "@codemirror/commands": "^6.10.1",
     "@codemirror/language": "^6.12.1",
     "@codemirror/lint": "^6.8.5",
+    "@codemirror/search": "^6.7.1",
     "@codemirror/state": "^6.5.3",
     "@codemirror/view": "^6.39.7",
     "@hpcc-js/wasm": "^2.22.4",

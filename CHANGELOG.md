@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-03
+
+### Added
+
+- DOT-aware autocomplete with snippets: keyword, attribute-name, and
+  attribute-value (enum/color) completions, plus subgraph/node/edge snippet
+  templates (Ctrl+Space or type to trigger).
+- Find & replace: a themed search panel (Ctrl+F / Ctrl+H, F3 to cycle) plus a
+  toolbar Find button.
+- Format document: reindents by brace depth and normalizes spacing without
+  touching string/HTML-label/comment content (toolbar Format button or
+  Shift+Alt+F). Idempotent and fail-safe on unbalanced input.
+- Richer linting: fast local diagnostics for unbalanced delimiters, unknown
+  attribute names, and attribute entries missing a value — alongside the
+  existing Graphviz engine validation.
+
 ## [1.1.0] - 2026-07-02
 
 ### Added - PDF Export

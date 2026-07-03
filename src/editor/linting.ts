@@ -11,6 +11,7 @@ import type { Extension } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
 import type { LayoutEngine } from '../preview/graphviz';
 import { validateDot } from '../preview/graphviz';
+import { createStructureLintSource } from './structure-lint';
 
 /** Default debounce delay for linting (ms) */
 const DEFAULT_LINT_DELAY = 500;
@@ -160,10 +161,10 @@ function createDotLintSource(options: DotLinterOptions): LintSource {
  */
 export function createDotLinter(options: DotLinterOptions): Extension {
   const delay = options.delay ?? DEFAULT_LINT_DELAY;
-
-  return linter(createDotLintSource(options), {
-    delay,
-  });
+  return [
+    linter(createDotLintSource(options), { delay }),
+    linter(createStructureLintSource(), { delay: 200 }),
+  ];
 }
 
 /**
