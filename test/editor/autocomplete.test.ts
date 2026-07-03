@@ -37,4 +37,24 @@ describe('dotCompletionSource', () => {
   it('returns null in the middle of a plain identifier', () => {
     expect(dotCompletionSource(contextAt('mynode'))).toBeNull();
   });
+
+  it('does not offer attribute names while typing a numeric value', () => {
+    expect(labels('a [penwidth=1.5')).not.toContain('shape');
+  });
+
+  it('does not offer attribute names while typing a quoted label value', () => {
+    expect(labels('a [label="hello wor')).not.toContain('shape');
+  });
+
+  it('does not offer attribute names while typing a hex color value', () => {
+    expect(labels('a [color=#ff')).not.toContain('shape');
+  });
+
+  it('offers matching shape enums for a partial value', () => {
+    expect(labels('a [shape=b')).toContain('box');
+  });
+
+  it('offers attribute names for a later name-position entry', () => {
+    expect(labels('a [shape=box, ')).toContain('label');
+  });
 });
