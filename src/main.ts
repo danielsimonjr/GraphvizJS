@@ -6,8 +6,10 @@ import 'remixicon/fonts/remixicon.css';
 
 import { clearDraft, setupMultiTabAutosave } from './autosave/manager';
 import { checkForMultiTabRecovery, promptMultiTabRecovery } from './autosave/recovery';
+import { createDotAutocomplete } from './editor/autocomplete';
 import { createDotLanguage } from './editor/language';
 import { createDotLinter, lintGutter } from './editor/linting';
+import { createSearch } from './editor/search';
 import { createEditorTheme } from './editor/theme';
 import {
   createEditorZoomController,
@@ -28,6 +30,7 @@ import type { TabState } from './tabs/manager';
 import { MAX_TABS, TabManager } from './tabs/manager';
 import { renderTabBar, setupTabBar } from './tabs/tab-bar';
 import { setupToolbarActions } from './toolbar/actions';
+import { makeFormatKeymap } from './toolbar/format';
 import { getCurrentEngine, setupLayoutEngine } from './toolbar/layout-engine';
 import { setupToolbarShortcuts } from './toolbar/shortcuts';
 import { loadEditorZoom, saveEditorZoom } from './window/state';
@@ -65,6 +68,8 @@ async function bootstrap(): Promise<void> {
   const exportMenu = document.querySelector<HTMLDivElement>(
     '[data-dropdown="export"] .toolbar-menu'
   );
+  const findButton = document.querySelector<HTMLButtonElement>('[data-action="find"]');
+  const formatButton = document.querySelector<HTMLButtonElement>('[data-action="format"]');
   const statusMessage = document.querySelector<HTMLSpanElement>('[data-status="message"]');
   const statusFile = document.querySelector<HTMLSpanElement>('[data-status="file"]');
   const workspace = document.querySelector<HTMLDivElement>('.workspace');
@@ -128,6 +133,9 @@ async function bootstrap(): Promise<void> {
     const extensions = [
       basicSetup,
       DOT_LANGUAGE,
+      createDotAutocomplete(),
+      createSearch(),
+      keymap.of([makeFormatKeymap((doc) => schedulePreviewRender(doc))]),
       createDotLinter({ getEngine: getCurrentEngine }),
       lintGutter(),
       EditorView.lineWrapping,
@@ -366,6 +374,8 @@ async function bootstrap(): Promise<void> {
     exportMenu,
     examplesButton,
     examplesMenu,
+    findButton,
+    formatButton,
     commitDocument,
     onNew() {
       createNewTab(DEFAULT_SNIPPET);
@@ -375,6 +385,11 @@ async function bootstrap(): Promise<void> {
     },
     onLoadExample(content) {
       createNewTab(content);
+    },
+    onFormat(doc) {
+      const tab = tabManager.getActiveTab();
+      if (tab) handleDocChange(tab, doc);
+      schedulePreviewRender(doc);
     },
     onPathChange(path) {
       const tab = tabManager.getActiveTab();

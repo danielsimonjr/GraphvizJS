@@ -1286,3 +1286,56 @@ body.dark .pdf-options-dialog {
 body.dark .pdf-options-actions button {
   border-color: rgba(148, 163, 184, 0.25);
 }
+
+/* CodeMirror find/replace panel — themed to match the app toolbar. */
+.cm-panels.cm-panels-top {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.cm-search {
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.9);
+  font: inherit;
+}
+
+body.dark .cm-panels.cm-panels-top {
+  border-bottom-color: rgba(148, 163, 184, 0.2);
+}
+
+body.dark .cm-search {
+  background: rgba(17, 24, 39, 0.6);
+}
+
+.cm-search .cm-textfield {
+  padding: 2px 6px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 6px;
+  background: #ffffff;
+  color: inherit;
+}
+
+body.dark .cm-search .cm-textfield {
+  border-color: rgba(148, 163, 184, 0.2);
+  background: rgba(17, 24, 39, 0.75);
+  color: #f8fafc;
+}
+
+.cm-search .cm-button {
+  padding: 2px 8px;
+  margin-left: 4px;
+  border-radius: 6px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.9);
+  color: inherit;
+  cursor: pointer;
+}
+
+.cm-search .cm-button:hover {
+  border-color: rgba(59, 130, 246, 0.45);
+}
+
+body.dark .cm-search .cm-button {
+  border-color: rgba(148, 163, 184, 0.2);
+  background: rgba(17, 24, 39, 0.6);
+  color: #f8fafc;
+}

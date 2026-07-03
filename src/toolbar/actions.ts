@@ -2,6 +2,8 @@ import type { EditorView } from 'codemirror';
 import { type ExampleItem, setupExamplesMenu } from './examples-menu';
 import { createExportHandler } from './export-diagram';
 import { setupExportMenu } from './export-menu';
+import { setupFind } from './find';
+import { setupFormat } from './format';
 import { setupNewDiagramAction } from './new-diagram';
 import { setupOpenDiagramAction } from './open-diagram';
 import { setupSaveDiagramAction } from './save-diagram';
@@ -17,11 +19,14 @@ export interface ToolbarActionsOptions {
   exportMenu: HTMLDivElement | null;
   examplesButton: HTMLButtonElement | null;
   examplesMenu: HTMLDivElement | null;
+  findButton: HTMLButtonElement | null;
+  formatButton: HTMLButtonElement | null;
   commitDocument: (doc: string, options?: { saved?: boolean }) => void;
   onNew: () => void;
   onOpen: (content: string, path: string) => void;
   onLoadExample: (content: string) => void;
   onPathChange: (path: string | null) => void;
+  onFormat: (doc: string) => void;
   getPath: () => string | null;
 }
 
@@ -59,6 +64,9 @@ export function setupToolbarActions(options: ToolbarActionsOptions): void {
       commitDocument(doc, { saved: true });
     },
   });
+
+  setupFind({ button: options.findButton, getEditor });
+  setupFormat({ button: options.formatButton, getEditor, onFormat: options.onFormat });
 
   const handleExport = createExportHandler({
     getEditor,
