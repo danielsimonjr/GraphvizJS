@@ -27,5 +27,18 @@ Regenerate before architecture reviews; the committed copy can drift from code.
 
 ## Known limits
 
-Regex (not AST) parsing. `import.meta.glob` loads (Vite, used in `examples/` and
-`editor/`) are not static imports and are excluded from edge resolution.
+Regex (not AST) parsing, so several constructs are approximated:
+
+- `import.meta.glob` loads (Vite, used in `examples/` and `editor/`) are not
+  static imports and are excluded from edge resolution.
+- `export default` is not recorded as an export.
+- Re-exports (`export { X } from './y'`) are not counted as a *use* of `y`'s
+  `X`, so a symbol only consumed via a re-export barrel can show as an unused
+  export (false positive).
+- Combined default-plus-namespace imports (`import D, * as NS from './x'`) are
+  not parsed (combined default-plus-named `import D, { N }` IS supported).
+- Circular-dependency detection reports whether a cycle exists and gives one
+  representative cycle per back-edge; it can under-enumerate distinct
+  overlapping simple cycles.
+- Scan exclusions match by directory *basename* (`dist`, `coverage`, `e2e`,
+  …), so a same-named directory anywhere in the tree is skipped.

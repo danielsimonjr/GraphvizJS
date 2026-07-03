@@ -86,10 +86,12 @@ export function renderMarkdown(a: Analysis): string {
 
   out.push('## Unused');
   out.push('');
-  out.push(`**Unused files:** ${a.unused.unusedFiles.length === 0 ? 'none ✅' : ''}`);
+  out.push(a.unused.unusedFiles.length === 0 ? '**Unused files:** none ✅' : '**Unused files:**');
   for (const f of a.unused.unusedFiles) out.push(`- \`${f}\``);
   out.push('');
-  out.push(`**Unused exports:** ${a.unused.unusedExports.length === 0 ? 'none ✅' : ''}`);
+  out.push(
+    a.unused.unusedExports.length === 0 ? '**Unused exports:** none ✅' : '**Unused exports:**'
+  );
   for (const e of a.unused.unusedExports) out.push(`- \`${e.name}\` in \`${e.file}\``);
   out.push('');
 

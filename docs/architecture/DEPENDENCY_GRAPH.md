@@ -97,7 +97,7 @@ None. ✅
 
 **Unused files:** none ✅
 
-**Unused exports:** 
+**Unused exports:**
 - `setupAutosave` in `src/autosave/manager.ts`
 - `saveDraft` in `src/autosave/manager.ts`
 - `saveTabDrafts` in `src/autosave/manager.ts`
