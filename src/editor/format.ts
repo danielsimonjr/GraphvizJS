@@ -86,10 +86,21 @@ function braceDelta(line: string, lineStart: number, spans: Span[]): BraceDelta 
 }
 
 /**
- * Reindent DOT source by `{}` depth and normalize spacing around `->`/`--`
- * in code regions. Content inside string/HTML literals and comments is
- * preserved verbatim. Idempotent. Fails safe: returns `source` unchanged
- * when its delimiters are unbalanced.
+ * Reformat DOT source: reindent by `{}` brace depth and normalize spacing
+ * around `->` / `--` edge operators in code regions. Content inside string
+ * literals, `<...>` HTML labels, and comments is preserved verbatim.
+ * Idempotent; fails safe (returns `source` unchanged when delimiters are
+ * unbalanced).
+ *
+ * Scope (deliberate, narrower than the design spec):
+ *  - Does NOT split or merge statements ("one statement per line" was dropped
+ *    — without a real parser, guessing statement boundaries risks rewriting the
+ *    user's code and breaks idempotency).
+ *  - Does NOT normalize spacing around `=` (attribute assignments) — the spec
+ *    mentioned it, but `=` spacing is lower value and riskier to touch safely,
+ *    so only `->`/`--` spacing is normalized.
+ * Both are safe reductions: this formatter only re-indents and adjusts `->`/`--`
+ * spacing; it never rewrites structure or literal content.
  */
 export function formatDot(source: string, opts: FormatOptions = {}): string {
   if (!checkBalance(source).balanced) return source; // fail-safe

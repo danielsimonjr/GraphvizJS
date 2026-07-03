@@ -31,6 +31,12 @@ export function structuralDiagnostics(source: string): StructuralDiagnostic[] {
   for (const span of scanDot(source)) {
     if (span.kind !== 'code') continue;
     const text = source.slice(span.from, span.to);
+    // Known limitation: an attribute list whose value is a quoted string or
+    // HTML label is split across multiple code spans (e.g. `[label="x", shp=1]`
+    // → code `[label=` | string `"x"` | code `, shp=1]`), so neither code span
+    // contains a full `[...]` pair and the list is not linted. This is a safe
+    // false-negative (never a false-positive on valid DOT); the authoritative
+    // Graphviz engine linter still validates the whole document.
     const listRe = /\[([^\]]*)\]/g;
     let m: RegExpExecArray | null;
     while ((m = listRe.exec(text)) !== null) {
