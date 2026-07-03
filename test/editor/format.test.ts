@@ -68,4 +68,9 @@ describe('formatDot', () => {
     const src = 'n [label="a    b"];';
     expect(formatDot(src)).toBe(src);
   });
+
+  it('preserves an HTML table label whose attribute value contains > and internal spacing', () => {
+    const src = 'digraph { n [label=<<TABLE TITLE="a>b"><TR><TD>x  y</TD></TR></TABLE>>]; }';
+    expect(formatDot(src)).toContain('<<TABLE TITLE="a>b"><TR><TD>x  y</TD></TR></TABLE>>');
+  });
 });

@@ -54,6 +54,22 @@ export function scanDot(source: string): Span[] {
       let depth = 1;
       while (i < n && depth > 0) {
         const ch = source[i];
+        if (ch === '"') {
+          // Skip a quoted attribute value so its `<`/`>` don't affect depth
+          // counting (e.g. `TITLE="a>b"` must not close the label early).
+          // Escape handling mirrors the string-scanner branch above.
+          i++;
+          while (i < n) {
+            const qch = source[i];
+            if (qch === '\\') {
+              i = Math.min(i + 2, n);
+              continue;
+            }
+            i++;
+            if (qch === '"') break;
+          }
+          continue;
+        }
         if (ch === '<') depth++;
         else if (ch === '>') depth--;
         i++;

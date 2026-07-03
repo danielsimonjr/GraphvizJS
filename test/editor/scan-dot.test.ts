@@ -27,6 +27,10 @@ describe('scanDot', () => {
   it('honors escaped quotes inside strings', () => {
     expect(kinds('"a\\"b"')).toEqual(['string:"a\\"b"']);
   });
+
+  it('does not end an HTML label on a > inside a quoted attribute', () => {
+    expect(kinds('l=<a "x>y" b>')).toEqual(['code:l=', 'html:<a "x>y" b>']);
+  });
 });
 
 describe('checkBalance', () => {
