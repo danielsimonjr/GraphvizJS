@@ -34,4 +34,20 @@ describe('structuralDiagnostics', () => {
       []
     );
   });
+
+  it('catches an unknown attribute after the first entry in a whitespace-separated list', () => {
+    expect(messages('a [shape=box shp=red];').some((m) => /Unknown attribute 'shp'/.test(m))).toBe(
+      true
+    );
+  });
+
+  it('does not false-flag an attribute with spaces around = (name = value)', () => {
+    expect(structuralDiagnostics('a [shape = box];')).toEqual([]);
+  });
+
+  it('still flags a comma-separated unknown attribute', () => {
+    expect(messages('a [shape=box, shp=red];').some((m) => /Unknown attribute 'shp'/.test(m))).toBe(
+      true
+    );
+  });
 });

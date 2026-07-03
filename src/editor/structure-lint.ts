@@ -35,27 +35,21 @@ export function structuralDiagnostics(source: string): StructuralDiagnostic[] {
     let m: RegExpExecArray | null;
     while ((m = listRe.exec(text)) !== null) {
       const listStart = span.from + m.index + 1;
-      for (const entry of splitTopLevel(m[1])) {
-        const trimmed = entry.text.trim();
-        if (trimmed === '') continue;
-        const at = listStart + entry.offset + (entry.text.length - entry.text.trimStart().length);
-        const eq = trimmed.indexOf('=');
-        if (eq === -1) {
+      for (const entry of parseAttrEntries(m[1])) {
+        const at = listStart + entry.offset;
+        if (!entry.hasValue) {
           out.push({
             from: at,
-            to: at + trimmed.length,
+            to: at + entry.name.length,
             severity: 'warning',
-            message: `Attribute '${trimmed}' is missing '=' value`,
+            message: `Attribute '${entry.name}' is missing '=' value`,
           });
-          continue;
-        }
-        const name = trimmed.slice(0, eq).trim();
-        if (name && /^[A-Za-z_]\w*$/.test(name) && !ATTR_SET.has(name.toLowerCase())) {
+        } else if (/^[A-Za-z_]\w*$/.test(entry.name) && !ATTR_SET.has(entry.name.toLowerCase())) {
           out.push({
             from: at,
-            to: at + name.length,
+            to: at + entry.name.length,
             severity: 'warning',
-            message: `Unknown attribute '${name}'`,
+            message: `Unknown attribute '${entry.name}'`,
           });
         }
       }
@@ -64,18 +58,44 @@ export function structuralDiagnostics(source: string): StructuralDiagnostic[] {
   return out;
 }
 
-/** Split an attribute-list body on commas and semicolons, tracking each entry's offset. */
-function splitTopLevel(body: string): { text: string; offset: number }[] {
-  const parts: { text: string; offset: number }[] = [];
-  let start = 0;
-  for (let i = 0; i <= body.length; i++) {
-    const ch = body[i];
-    if (i === body.length || ch === ',' || ch === ';') {
-      parts.push({ text: body.slice(start, i), offset: start });
-      start = i + 1;
+interface AttrEntry {
+  name: string;
+  hasValue: boolean;
+  offset: number;
+}
+
+/**
+ * Tokenize an attribute-list body into entries. Each entry is a `name`
+ * optionally followed by `= value`; entries are separated by `,`, `;`, or
+ * whitespace. Spaces around `=` bind the name and value into ONE entry, so
+ * `shape = box` is a single valid attribute (not a missing-`=` entry).
+ */
+function parseAttrEntries(body: string): AttrEntry[] {
+  const entries: AttrEntry[] = [];
+  const isSep = (c: string): boolean => c === ',' || c === ';' || /\s/.test(c);
+  let i = 0;
+  const n = body.length;
+  while (i < n) {
+    while (i < n && isSep(body[i])) i++; // skip separators
+    if (i >= n) break;
+    const nameStart = i;
+    while (i < n && !isSep(body[i]) && body[i] !== '=') i++;
+    const name = body.slice(nameStart, i);
+    let j = i;
+    while (j < n && /\s/.test(body[j])) j++; // optional ws before =
+    let hasValue = false;
+    if (j < n && body[j] === '=') {
+      hasValue = true;
+      j++;
+      while (j < n && /\s/.test(body[j])) j++; // optional ws after =
+      while (j < n && !isSep(body[j])) j++; // consume value token
+      i = j;
+    } else {
+      i = j;
     }
+    if (name) entries.push({ name, hasValue, offset: nameStart });
   }
-  return parts;
+  return entries;
 }
 
 /** CodeMirror LintSource wrapping the pure structural analysis. */
