@@ -1,45 +1,9 @@
 import type { StringStream } from '@codemirror/language';
 import { StreamLanguage } from '@codemirror/language';
 import type { Extension } from '@codemirror/state';
-
-const DOT_KEYWORDS = ['graph', 'digraph', 'subgraph', 'node', 'edge', 'strict'] as const;
+import { DOT_ATTRIBUTES, DOT_KEYWORDS } from './dot-data';
 
 export type DotKeyword = (typeof DOT_KEYWORDS)[number];
-
-const DOT_ATTRIBUTES = [
-  'label',
-  'color',
-  'bgcolor',
-  'fillcolor',
-  'fontcolor',
-  'fontname',
-  'fontsize',
-  'shape',
-  'style',
-  'width',
-  'height',
-  'rank',
-  'rankdir',
-  'size',
-  'ratio',
-  'margin',
-  'pad',
-  'splines',
-  'overlap',
-  'concentrate',
-  'compound',
-  'arrowhead',
-  'arrowtail',
-  'dir',
-  'headlabel',
-  'taillabel',
-  'penwidth',
-  'pos',
-  'xlabel',
-  'tooltip',
-  'URL',
-  'href',
-] as const;
 
 const ARROW_TOKENS = ['->', '--'];
 
