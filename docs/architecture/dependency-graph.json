@@ -1,0 +1,757 @@
+{
+  "stats": {
+    "fileCount": 30,
+    "moduleCount": 11,
+    "totalLoc": 3260,
+    "edgeCount": 49,
+    "exportCount": 98
+  },
+  "modules": {
+    "autosave": [
+      "src/autosave/constants.ts",
+      "src/autosave/manager.ts",
+      "src/autosave/recovery.ts"
+    ],
+    "editor": [
+      "src/editor/language.ts",
+      "src/editor/linting.ts",
+      "src/editor/theme.ts",
+      "src/editor/zoom.ts"
+    ],
+    "help": [
+      "src/help/dialog.ts"
+    ],
+    "root": [
+      "src/main.ts"
+    ],
+    "platform": [
+      "src/platform/contract.ts",
+      "src/platform/index.ts"
+    ],
+    "preview": [
+      "src/preview/export-pdf.ts",
+      "src/preview/graphviz.ts",
+      "src/preview/render.ts",
+      "src/preview/zoom.ts"
+    ],
+    "tabs": [
+      "src/tabs/manager.ts",
+      "src/tabs/tab-bar.ts"
+    ],
+    "toolbar": [
+      "src/toolbar/actions.ts",
+      "src/toolbar/examples-menu.ts",
+      "src/toolbar/export-diagram.ts",
+      "src/toolbar/export-menu.ts",
+      "src/toolbar/layout-engine.ts",
+      "src/toolbar/new-diagram.ts",
+      "src/toolbar/open-diagram.ts",
+      "src/toolbar/pdf-options-dialog.ts",
+      "src/toolbar/save-diagram.ts",
+      "src/toolbar/shortcuts.ts"
+    ],
+    "utils": [
+      "src/utils/debounce.ts"
+    ],
+    "window": [
+      "src/window/state.ts"
+    ],
+    "workspace": [
+      "src/workspace/resize.ts"
+    ]
+  },
+  "moduleEdges": {
+    "autosave": [
+      "platform"
+    ],
+    "editor": [
+      "preview"
+    ],
+    "help": [
+      "platform"
+    ],
+    "root": [
+      "autosave",
+      "editor",
+      "help",
+      "platform",
+      "preview",
+      "tabs",
+      "toolbar",
+      "window",
+      "workspace"
+    ],
+    "preview": [
+      "utils"
+    ],
+    "toolbar": [
+      "platform",
+      "preview"
+    ],
+    "window": [
+      "platform"
+    ]
+  },
+  "cycles": {
+    "runtime": [],
+    "typeOnly": []
+  },
+  "unused": {
+    "unusedFiles": [],
+    "unusedExports": [
+      {
+        "file": "src/autosave/manager.ts",
+        "name": "setupAutosave"
+      },
+      {
+        "file": "src/autosave/manager.ts",
+        "name": "saveDraft"
+      },
+      {
+        "file": "src/autosave/manager.ts",
+        "name": "saveTabDrafts"
+      },
+      {
+        "file": "src/autosave/manager.ts",
+        "name": "TabDraft"
+      },
+      {
+        "file": "src/autosave/manager.ts",
+        "name": "AutosaveOptions"
+      },
+      {
+        "file": "src/autosave/manager.ts",
+        "name": "MultiTabAutosaveOptions"
+      },
+      {
+        "file": "src/autosave/recovery.ts",
+        "name": "checkForRecovery"
+      },
+      {
+        "file": "src/autosave/recovery.ts",
+        "name": "promptRecovery"
+      },
+      {
+        "file": "src/autosave/recovery.ts",
+        "name": "cleanupStaleDrafts"
+      },
+      {
+        "file": "src/autosave/recovery.ts",
+        "name": "RecoveryData"
+      },
+      {
+        "file": "src/autosave/recovery.ts",
+        "name": "MultiTabRecoveryData"
+      },
+      {
+        "file": "src/editor/language.ts",
+        "name": "DotKeyword"
+      },
+      {
+        "file": "src/editor/linting.ts",
+        "name": "DotLinterOptions"
+      },
+      {
+        "file": "src/editor/zoom.ts",
+        "name": "EditorZoomController"
+      },
+      {
+        "file": "src/platform/contract.ts",
+        "name": "GraphvizApi"
+      },
+      {
+        "file": "src/preview/export-pdf.ts",
+        "name": "PageGeometry"
+      },
+      {
+        "file": "src/preview/export-pdf.ts",
+        "name": "PdfPageMode"
+      },
+      {
+        "file": "src/preview/export-pdf.ts",
+        "name": "PdfPageSize"
+      },
+      {
+        "file": "src/preview/export-pdf.ts",
+        "name": "PdfOrientation"
+      },
+      {
+        "file": "src/preview/graphviz.ts",
+        "name": "isGraphvizReady"
+      },
+      {
+        "file": "src/preview/render.ts",
+        "name": "PreviewStatusCallbacks"
+      },
+      {
+        "file": "src/preview/render.ts",
+        "name": "PreviewOptions"
+      },
+      {
+        "file": "src/preview/render.ts",
+        "name": "PreviewScheduler"
+      },
+      {
+        "file": "src/preview/zoom.ts",
+        "name": "ZoomController"
+      },
+      {
+        "file": "src/tabs/manager.ts",
+        "name": "CreateTabOptions"
+      },
+      {
+        "file": "src/tabs/tab-bar.ts",
+        "name": "TabBarCallbacks"
+      },
+      {
+        "file": "src/tabs/tab-bar.ts",
+        "name": "TabBarOptions"
+      },
+      {
+        "file": "src/toolbar/actions.ts",
+        "name": "ToolbarActionsOptions"
+      },
+      {
+        "file": "src/toolbar/examples-menu.ts",
+        "name": "ExamplesMenuOptions"
+      },
+      {
+        "file": "src/toolbar/export-menu.ts",
+        "name": "ExportMenuOptions"
+      },
+      {
+        "file": "src/toolbar/shortcuts.ts",
+        "name": "ToolbarShortcutsOptions"
+      }
+    ]
+  },
+  "coverage": [
+    {
+      "file": "src/autosave/constants.ts",
+      "testFiles": []
+    },
+    {
+      "file": "src/autosave/manager.ts",
+      "testFiles": []
+    },
+    {
+      "file": "src/autosave/recovery.ts",
+      "testFiles": []
+    },
+    {
+      "file": "src/editor/language.ts",
+      "testFiles": [
+        "test/editor/language.test.ts"
+      ]
+    },
+    {
+      "file": "src/editor/linting.ts",
+      "testFiles": [
+        "test/editor/linting.test.ts"
+      ]
+    },
+    {
+      "file": "src/editor/theme.ts",
+      "testFiles": [
+        "test/editor/theme.test.ts"
+      ]
+    },
+    {
+      "file": "src/editor/zoom.ts",
+      "testFiles": [
+        "test/editor/zoom.test.ts"
+      ]
+    },
+    {
+      "file": "src/help/dialog.ts",
+      "testFiles": []
+    },
+    {
+      "file": "src/main.ts",
+      "testFiles": []
+    },
+    {
+      "file": "src/platform/contract.ts",
+      "testFiles": []
+    },
+    {
+      "file": "src/platform/index.ts",
+      "testFiles": [
+        "test/help/dialog.test.ts",
+        "test/platform/index.test.ts",
+        "test/toolbar/export-diagram.test.ts",
+        "test/toolbar/open-diagram.test.ts",
+        "test/toolbar/save-diagram.test.ts",
+        "test/window/state.test.ts"
+      ]
+    },
+    {
+      "file": "src/preview/export-pdf.ts",
+      "testFiles": [
+        "test/preview/export-pdf.test.ts"
+      ]
+    },
+    {
+      "file": "src/preview/graphviz.ts",
+      "testFiles": [
+        "test/editor/linting.test.ts",
+        "test/toolbar/export-diagram.test.ts"
+      ]
+    },
+    {
+      "file": "src/preview/render.ts",
+      "testFiles": []
+    },
+    {
+      "file": "src/preview/zoom.ts",
+      "testFiles": [
+        "test/preview/zoom.test.ts"
+      ]
+    },
+    {
+      "file": "src/tabs/manager.ts",
+      "testFiles": [
+        "test/tabs/manager.test.ts",
+        "test/tabs/tab-bar.test.ts"
+      ]
+    },
+    {
+      "file": "src/tabs/tab-bar.ts",
+      "testFiles": [
+        "test/tabs/tab-bar.test.ts"
+      ]
+    },
+    {
+      "file": "src/toolbar/actions.ts",
+      "testFiles": []
+    },
+    {
+      "file": "src/toolbar/examples-menu.ts",
+      "testFiles": [
+        "test/toolbar/examples-menu.test.ts"
+      ]
+    },
+    {
+      "file": "src/toolbar/export-diagram.ts",
+      "testFiles": [
+        "test/toolbar/export-diagram.test.ts"
+      ]
+    },
+    {
+      "file": "src/toolbar/export-menu.ts",
+      "testFiles": [
+        "test/toolbar/export-menu.test.ts"
+      ]
+    },
+    {
+      "file": "src/toolbar/layout-engine.ts",
+      "testFiles": [
+        "test/toolbar/layout-engine.test.ts"
+      ]
+    },
+    {
+      "file": "src/toolbar/new-diagram.ts",
+      "testFiles": [
+        "test/toolbar/new-diagram.test.ts"
+      ]
+    },
+    {
+      "file": "src/toolbar/open-diagram.ts",
+      "testFiles": [
+        "test/toolbar/open-diagram.test.ts"
+      ]
+    },
+    {
+      "file": "src/toolbar/pdf-options-dialog.ts",
+      "testFiles": [
+        "test/toolbar/pdf-options-dialog.test.ts"
+      ]
+    },
+    {
+      "file": "src/toolbar/save-diagram.ts",
+      "testFiles": [
+        "test/toolbar/save-diagram.test.ts"
+      ]
+    },
+    {
+      "file": "src/toolbar/shortcuts.ts",
+      "testFiles": [
+        "test/toolbar/shortcuts.test.ts"
+      ]
+    },
+    {
+      "file": "src/utils/debounce.ts",
+      "testFiles": [
+        "test/utils/debounce.test.ts"
+      ]
+    },
+    {
+      "file": "src/window/state.ts",
+      "testFiles": [
+        "test/window/state.test.ts"
+      ]
+    },
+    {
+      "file": "src/workspace/resize.ts",
+      "testFiles": [
+        "test/workspace/resize.test.ts"
+      ]
+    }
+  ],
+  "ipc": {
+    "fullyWired": [
+      {
+        "channel": "app:info",
+        "method": "appInfo",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
+        "channel": "dialog:confirm",
+        "method": "confirm",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
+        "channel": "dialog:openText",
+        "method": "openTextFile",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
+        "channel": "dialog:save",
+        "method": "pickSavePath",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
+        "channel": "fs:writeBinary",
+        "method": "writeBinaryFile",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
+        "channel": "fs:writeText",
+        "method": "writeTextFile",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
+        "channel": "shell:openExternal",
+        "method": "openExternal",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
+        "channel": "store:delete",
+        "method": "storeDelete",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
+        "channel": "store:get",
+        "method": "storeGet",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
+        "channel": "store:set",
+        "method": "storeSet",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      }
+    ],
+    "missingContract": [],
+    "missingHandlers": [],
+    "orphanHandlers": []
+  },
+  "files": [
+    {
+      "path": "src/autosave/constants.ts",
+      "loc": 13,
+      "exports": [
+        "DRAFT_CONTENT_KEY",
+        "DRAFT_TIMESTAMP_KEY",
+        "DRAFT_FILE_PATH_KEY",
+        "TAB_DRAFTS_KEY",
+        "MAX_DRAFT_AGE_DAYS",
+        "AUTOSAVE_INTERVAL"
+      ]
+    },
+    {
+      "path": "src/autosave/manager.ts",
+      "loc": 126,
+      "exports": [
+        "setupAutosave",
+        "setupMultiTabAutosave",
+        "saveDraft",
+        "saveTabDrafts",
+        "clearDraft",
+        "TabDraft",
+        "TabDraftsData",
+        "AutosaveOptions",
+        "MultiTabAutosaveOptions"
+      ]
+    },
+    {
+      "path": "src/autosave/recovery.ts",
+      "loc": 138,
+      "exports": [
+        "checkForMultiTabRecovery",
+        "promptMultiTabRecovery",
+        "checkForRecovery",
+        "promptRecovery",
+        "cleanupStaleDrafts",
+        "RecoveryData",
+        "MultiTabRecoveryData"
+      ]
+    },
+    {
+      "path": "src/editor/language.ts",
+      "loc": 149,
+      "exports": [
+        "createDotLanguage",
+        "DotKeyword"
+      ]
+    },
+    {
+      "path": "src/editor/linting.ts",
+      "loc": 175,
+      "exports": [
+        "lintGutter",
+        "createDotLinter",
+        "DotLinterOptions"
+      ]
+    },
+    {
+      "path": "src/editor/theme.ts",
+      "loc": 27,
+      "exports": [
+        "createEditorTheme"
+      ]
+    },
+    {
+      "path": "src/editor/zoom.ts",
+      "loc": 110,
+      "exports": [
+        "createEditorZoomExtension",
+        "createEditorZoomController",
+        "createEditorZoomKeymap",
+        "EditorZoomController"
+      ]
+    },
+    {
+      "path": "src/help/dialog.ts",
+      "loc": 130,
+      "exports": [
+        "setupHelpDialog"
+      ]
+    },
+    {
+      "path": "src/main.ts",
+      "loc": 571,
+      "exports": []
+    },
+    {
+      "path": "src/platform/contract.ts",
+      "loc": 27,
+      "exports": [
+        "DiagramFilter",
+        "OpenedFile",
+        "ConfirmOptions",
+        "GraphvizApi"
+      ]
+    },
+    {
+      "path": "src/platform/index.ts",
+      "loc": 42,
+      "exports": [
+        "store",
+        "openTextFile",
+        "pickSavePath",
+        "writeTextFile",
+        "writeBinaryFile",
+        "confirm",
+        "openExternal",
+        "appInfo",
+        "PlatformStore"
+      ]
+    },
+    {
+      "path": "src/preview/export-pdf.ts",
+      "loc": 124,
+      "exports": [
+        "computePageGeometry",
+        "svgToPdfBytes",
+        "PdfExportOptions",
+        "PageGeometry",
+        "PdfPageMode",
+        "PdfPageSize",
+        "PdfOrientation"
+      ]
+    },
+    {
+      "path": "src/preview/graphviz.ts",
+      "loc": 161,
+      "exports": [
+        "initGraphviz",
+        "renderDotToSvg",
+        "isGraphvizReady",
+        "validateDot",
+        "DotValidationError",
+        "LayoutEngine"
+      ]
+    },
+    {
+      "path": "src/preview/render.ts",
+      "loc": 90,
+      "exports": [
+        "createPreview",
+        "PreviewStatusCallbacks",
+        "PreviewOptions",
+        "PreviewScheduler"
+      ]
+    },
+    {
+      "path": "src/preview/zoom.ts",
+      "loc": 109,
+      "exports": [
+        "createZoomController",
+        "setupZoomControls",
+        "setupWheelZoom",
+        "updateLevelDisplay",
+        "ZoomController"
+      ]
+    },
+    {
+      "path": "src/tabs/manager.ts",
+      "loc": 160,
+      "exports": [
+        "MAX_TABS",
+        "TabManager",
+        "TabState",
+        "CreateTabOptions"
+      ]
+    },
+    {
+      "path": "src/tabs/tab-bar.ts",
+      "loc": 115,
+      "exports": [
+        "renderTabBar",
+        "setupTabBar",
+        "TabBarCallbacks",
+        "TabBarOptions"
+      ]
+    },
+    {
+      "path": "src/toolbar/actions.ts",
+      "loc": 132,
+      "exports": [
+        "setupToolbarActions",
+        "ToolbarActionsOptions"
+      ]
+    },
+    {
+      "path": "src/toolbar/examples-menu.ts",
+      "loc": 116,
+      "exports": [
+        "setupExamplesMenu",
+        "ExampleItem",
+        "ExamplesMenuOptions"
+      ]
+    },
+    {
+      "path": "src/toolbar/export-diagram.ts",
+      "loc": 250,
+      "exports": [
+        "createExportHandler"
+      ]
+    },
+    {
+      "path": "src/toolbar/export-menu.ts",
+      "loc": 93,
+      "exports": [
+        "setupExportMenu",
+        "ExportMenuOptions",
+        "ExportFormat"
+      ]
+    },
+    {
+      "path": "src/toolbar/layout-engine.ts",
+      "loc": 71,
+      "exports": [
+        "setupLayoutEngine",
+        "getCurrentEngine",
+        "resetLayoutEngineCache"
+      ]
+    },
+    {
+      "path": "src/toolbar/new-diagram.ts",
+      "loc": 13,
+      "exports": [
+        "setupNewDiagramAction"
+      ]
+    },
+    {
+      "path": "src/toolbar/open-diagram.ts",
+      "loc": 24,
+      "exports": [
+        "setupOpenDiagramAction"
+      ]
+    },
+    {
+      "path": "src/toolbar/pdf-options-dialog.ts",
+      "loc": 84,
+      "exports": [
+        "openPdfOptionsDialog"
+      ]
+    },
+    {
+      "path": "src/toolbar/save-diagram.ts",
+      "loc": 37,
+      "exports": [
+        "setupSaveDiagramAction"
+      ]
+    },
+    {
+      "path": "src/toolbar/shortcuts.ts",
+      "loc": 83,
+      "exports": [
+        "setupToolbarShortcuts",
+        "ToolbarShortcutsOptions"
+      ]
+    },
+    {
+      "path": "src/utils/debounce.ts",
+      "loc": 12,
+      "exports": [
+        "debounce"
+      ]
+    },
+    {
+      "path": "src/window/state.ts",
+      "loc": 21,
+      "exports": [
+        "loadEditorZoom",
+        "saveEditorZoom"
+      ]
+    },
+    {
+      "path": "src/workspace/resize.ts",
+      "loc": 57,
+      "exports": [
+        "initHorizontalResize"
+      ]
+    }
+  ]
+}

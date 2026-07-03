@@ -1,0 +1,28 @@
+graph LR
+  autosave["autosave"]
+  editor["editor"]
+  help["help"]
+  platform["platform"]
+  preview["preview"]
+  root["root"]
+  tabs["tabs"]
+  toolbar["toolbar"]
+  utils["utils"]
+  window["window"]
+  workspace["workspace"]
+  autosave --> platform
+  editor --> preview
+  help --> platform
+  preview --> utils
+  root --> autosave
+  root --> editor
+  root --> help
+  root --> platform
+  root --> preview
+  root --> tabs
+  root --> toolbar
+  root --> window
+  root --> workspace
+  toolbar --> platform
+  toolbar --> preview
+  window --> platform
