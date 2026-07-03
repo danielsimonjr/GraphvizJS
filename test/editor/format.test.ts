@@ -73,4 +73,11 @@ describe('formatDot', () => {
     const src = 'digraph { n [label=<<TABLE TITLE="a>b"><TR><TD>x  y</TD></TR></TABLE>>]; }';
     expect(formatDot(src)).toContain('<<TABLE TITLE="a>b"><TR><TD>x  y</TD></TR></TABLE>>');
   });
+
+  it('keeps brace depth correct after a multi-line literal closing line with trailing code', () => {
+    const src = 'digraph { n [label=<\n<b>x</b>\n>]; }\nm;';
+    const out = formatDot(src);
+    expect(out.split('\n').at(-1)).toBe('m;'); // digraph brace closed on the label-closing line
+    expect(formatDot(out)).toBe(out); // still idempotent
+  });
 });

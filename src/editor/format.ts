@@ -115,8 +115,12 @@ export function formatDot(source: string, opts: FormatOptions = {}): string {
     const start = lineStarts[li];
 
     if (insideLiteral(spans, start)) {
-      out.push(raw); // continuation line of a multi-line literal — verbatim
+      out.push(raw); // continuation line of a multi-line literal — kept verbatim
       pendingBlank = false;
+      // The literal may close mid-line, leaving trailing code with braces:
+      // count those so brace depth (and thus later lines' indent) stays correct.
+      const { open } = braceDelta(raw, start, spans);
+      depth = Math.max(0, depth + open);
       continue;
     }
 
