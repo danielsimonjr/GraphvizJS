@@ -27,6 +27,7 @@
     "test:e2e:debug": "playwright test --debug"
   },
   "dependencies": {
+    "@codemirror/autocomplete": "^6.20.3",
     "@codemirror/commands": "^6.10.1",
     "@codemirror/language": "^6.12.1",
     "@codemirror/lint": "^6.8.5",
