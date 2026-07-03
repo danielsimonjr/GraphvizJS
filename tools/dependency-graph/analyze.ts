@@ -9,6 +9,8 @@ import type {
   UnusedReport,
 } from './types';
 
+const cycleKey = (c: string[]): string => [...c].sort().join('->');
+
 /** Resolve a file's internal deps to known targets, optionally runtime-only. */
 function edgesOf(file: ParsedFile, known: Set<string>, runtimeOnly: boolean): string[] {
   const out: string[] = [];
@@ -30,8 +32,8 @@ function findCycles(graph: Map<string, string[]>): string[][] {
       const start = pathAcc.indexOf(node);
       if (start !== -1) {
         const cycle = [...pathAcc.slice(start), node];
-        const key = [...cycle].sort().join('->');
-        if (!cycles.some((c) => [...c].sort().join('->') === key)) cycles.push(cycle);
+        const key = cycleKey(cycle);
+        if (!cycles.some((c) => cycleKey(c) === key)) cycles.push(cycle);
       }
       return;
     }
@@ -58,8 +60,8 @@ export function detectCycles(files: ParsedFile[]): CycleReport {
   }
   const runtime = findCycles(runtimeGraph);
   const all = findCycles(allGraph);
-  const runtimeKeys = new Set(runtime.map((c) => [...c].sort().join('->')));
-  const typeOnly = all.filter((c) => !runtimeKeys.has([...c].sort().join('->')));
+  const runtimeKeys = new Set(runtime.map((c) => cycleKey(c)));
+  const typeOnly = all.filter((c) => !runtimeKeys.has(cycleKey(c)));
   return { runtime, typeOnly };
 }
 
@@ -78,7 +80,9 @@ export function detectUnused(
       if (!target) continue;
       importedFiles.add(target);
       const set = importedNames.get(target) ?? new Set<string>();
-      for (const imp of dep.imports) set.add(imp === '*' ? '*' : imp.replace(/^\* as /, ''));
+      for (const imp of dep.imports) {
+        set.add(imp === '*' || imp.startsWith('* as ') ? '*' : imp);
+      }
       importedNames.set(target, set);
     }
   }

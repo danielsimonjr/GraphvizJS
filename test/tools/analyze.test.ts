@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { detectCycles, detectUnused, mapTestCoverage } from '../../tools/dependency-graph/analyze';
+import {
+  computeStats,
+  detectCycles,
+  detectUnused,
+  mapTestCoverage,
+} from '../../tools/dependency-graph/analyze';
 import type { ParsedFile } from '../../tools/dependency-graph/types';
 
 const f = (
@@ -67,6 +72,15 @@ describe('detectUnused', () => {
     expect(r.unusedExports).toContainEqual({ file: 'src/b.ts', name: 'unusedExport' });
     expect(r.unusedExports).not.toContainEqual({ file: 'src/b.ts', name: 'used' });
   });
+
+  it('does not flag exports of a file imported via namespace (import * as NS)', () => {
+    const files = [
+      f('src/a.ts', [{ file: './ns', imports: ['* as NS'] }]),
+      f('src/ns.ts', [], ['alpha', 'beta']),
+    ];
+    const r = detectUnused(files, [], new Set(['src/a.ts']));
+    expect(r.unusedExports).toEqual([]); // namespace import consumes all exports of ns.ts
+  });
 });
 
 describe('mapTestCoverage', () => {
@@ -81,5 +95,22 @@ describe('mapTestCoverage', () => {
   it('lists a src file with no tests as uncovered', () => {
     const src = [f('src/lonely.ts')];
     expect(mapTestCoverage(src, [])).toEqual([{ file: 'src/lonely.ts', testFiles: [] }]);
+  });
+});
+
+describe('computeStats', () => {
+  it('computes counts over files and modules', () => {
+    const files = [
+      f('src/preview/render.ts', [{ file: './graphviz' }], ['render']),
+      f('src/preview/graphviz.ts', [], ['initGraphviz']),
+    ];
+    const modules = new Map<string, string[]>([['preview', files.map((x) => x.path)]]);
+    const edges = new Map<string, Set<string>>();
+    const s = computeStats(files, modules, edges);
+    expect(s.fileCount).toBe(2);
+    expect(s.moduleCount).toBe(1);
+    expect(s.totalLoc).toBe(2); // f() sets loc:1 each
+    expect(s.edgeCount).toBe(1); // render → graphviz resolves to a known file
+    expect(s.exportCount).toBe(2);
   });
 });
