@@ -41,7 +41,10 @@ export function setupFileWatcher(): void {
         });
         watchers.set(dir, w);
       } catch {
-        // Directory may be unwatchable (removed/permission); ignore.
+        // Directory is momentarily unwatchable (removed/permission). Drop it from
+        // the tracked set so the next reconcile treats it as new and retries,
+        // rather than believing a watcher exists and never re-attempting.
+        delete next[dir];
       }
     }
     basenamesByDir = next;
