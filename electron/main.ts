@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, dialog, ipcMain, screen, shell } from 'electron';
 import Store from 'electron-store';
 import type { ConfirmOptions, DiagramFilter } from '../src/platform/contract';
+import { setMenuRecentFiles, setupAppMenu } from './app-menu';
 import { setupFileWatcher } from './file-watcher';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -164,12 +165,17 @@ function registerIpc(): void {
   });
 
   ipcMain.handle('app:info', () => ({ name: app.getName(), version: app.getVersion() }));
+
+  ipcMain.handle('menu:setRecent', (_e, paths: string[]) => {
+    setMenuRecentFiles(paths);
+  });
 }
 
 app.whenReady().then(() => {
   registerIpc();
   setupFileWatcher();
   createWindow();
+  setupAppMenu();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });

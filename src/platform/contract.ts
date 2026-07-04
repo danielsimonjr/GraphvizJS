@@ -27,4 +27,6 @@ export interface GraphvizApi {
   appInfo(): Promise<{ name: string; version: string }>;
   setWatchedPaths(paths: string[]): Promise<void>;
   onFileChanged(cb: (path: string) => void): () => void;
+  onMenuAction(cb: (action: string, payload?: string) => void): () => void;
+  setMenuRecent(paths: string[]): Promise<void>;
 }

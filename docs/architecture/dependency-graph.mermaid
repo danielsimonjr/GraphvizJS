@@ -2,6 +2,7 @@ graph LR
   autosave["autosave"]
   editor["editor"]
   help["help"]
+  menu["menu"]
   platform["platform"]
   preview["preview"]
   recent["recent"]
@@ -15,11 +16,13 @@ graph LR
   workspace["workspace"]
   editor --> preview
   help --> platform
+  menu --> platform
   preview --> utils
   recent --> platform
   root --> autosave
   root --> editor
   root --> help
+  root --> menu
   root --> platform
   root --> preview
   root --> recent
