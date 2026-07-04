@@ -44,3 +44,11 @@ export function openExternal(url: string): Promise<void> {
 export function appInfo(): Promise<{ name: string; version: string }> {
   return window.graphviz.appInfo();
 }
+
+export function setWatchedPaths(paths: string[]): Promise<void> {
+  return window.graphviz.setWatchedPaths(paths);
+}
+
+export function onFileChanged(cb: (path: string) => void): () => void {
+  return window.graphviz.onFileChanged(cb);
+}

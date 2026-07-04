@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, dialog, ipcMain, screen, shell } from 'electron';
 import Store from 'electron-store';
 import type { ConfirmOptions, DiagramFilter } from '../src/platform/contract';
+import { setupFileWatcher } from './file-watcher';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -165,6 +166,7 @@ function registerIpc(): void {
 
 app.whenReady().then(() => {
   registerIpc();
+  setupFileWatcher();
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

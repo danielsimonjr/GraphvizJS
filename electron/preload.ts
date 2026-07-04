@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, type IpcRendererEvent, ipcRenderer } from 'electron';
 import type { ConfirmOptions, DiagramFilter, GraphvizApi } from '../src/platform/contract';
 
 const api: GraphvizApi = {
@@ -13,6 +13,12 @@ const api: GraphvizApi = {
   confirm: (message, opts?: ConfirmOptions) => ipcRenderer.invoke('dialog:confirm', message, opts),
   openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),
   appInfo: () => ipcRenderer.invoke('app:info'),
+  setWatchedPaths: (paths) => ipcRenderer.invoke('watch:setPaths', paths),
+  onFileChanged: (cb) => {
+    const listener = (_e: IpcRendererEvent, p: string) => cb(p);
+    ipcRenderer.on('file:changed', listener);
+    return () => ipcRenderer.removeListener('file:changed', listener);
+  },
 };
 
 contextBridge.exposeInMainWorld('graphviz', api);

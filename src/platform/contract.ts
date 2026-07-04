@@ -25,4 +25,6 @@ export interface GraphvizApi {
   confirm(message: string, opts?: ConfirmOptions): Promise<boolean>;
   openExternal(url: string): Promise<void>;
   appInfo(): Promise<{ name: string; version: string }>;
+  setWatchedPaths(paths: string[]): Promise<void>;
+  onFileChanged(cb: (path: string) => void): () => void;
 }
