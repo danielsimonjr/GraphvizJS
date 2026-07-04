@@ -339,16 +339,18 @@ async function bootstrap(): Promise<void> {
   }
 
   // ── Session persistence ──────────────────────────────────────────
-  const captureCurrentSession = (): SessionData =>
-    captureSession(
-      tabManager.getAllTabs().map((t) => ({
+  const captureCurrentSession = (): SessionData => {
+    const tabs = tabManager.getAllTabs();
+    return captureSession(
+      tabs.map((t) => ({
         filePath: t.filePath,
         content: t.editorView?.state.doc.toString() ?? t.lastCommittedDoc,
         savedContent: t.lastCommittedDoc,
         engine: t.layoutEngine,
       })),
-      tabManager.getAllTabs().findIndex((t) => t.id === tabManager.getActiveTabId())
+      tabs.findIndex((t) => t.id === tabManager.getActiveTabId())
     );
+  };
 
   let sessionSaveTimer: number | null = null;
   const scheduleSessionSave = (): void => {
@@ -501,6 +503,7 @@ async function bootstrap(): Promise<void> {
     if (tab.editorView) {
       schedulePreviewRender(tab.editorView.state.doc.toString());
     }
+    scheduleSessionSave();
   });
 
   // Backstop: persist the session on a 30s interval, in addition to the
