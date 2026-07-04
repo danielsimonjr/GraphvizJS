@@ -35,8 +35,11 @@
     "@codemirror/state": "^6.5.3",
     "@codemirror/view": "^6.39.7",
     "@hpcc-js/wasm": "^2.22.4",
+    "@resvg/resvg-js": "^2.6.2",
+    "canvas": "^3.2.3",
     "codemirror": "^6.0.2",
     "electron-store": "^11.0.2",
+    "jsdom": "^29.1.1",
     "jspdf": "^4.2.1",
     "remixicon": "^4.7.0",
     "svg2pdf.js": "^2.7.0"
