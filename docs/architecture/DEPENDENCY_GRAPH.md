@@ -6,24 +6,28 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 30 |
-| Modules | 11 |
-| Lines of code | 3260 |
-| Internal edges | 49 |
-| Exports | 98 |
+| Files | 42 |
+| Modules | 14 |
+| Lines of code | 4350 |
+| Internal edges | 68 |
+| Exports | 129 |
 
 ## Modules
 
 ### autosave
 
 - `src/autosave/constants.ts`
-- `src/autosave/manager.ts`
-- `src/autosave/recovery.ts`
 
 ### editor
 
+- `src/editor/autocomplete.ts`
+- `src/editor/dot-data.ts`
+- `src/editor/format.ts`
 - `src/editor/language.ts`
 - `src/editor/linting.ts`
+- `src/editor/scan-dot.ts`
+- `src/editor/search.ts`
+- `src/editor/structure-lint.ts`
 - `src/editor/theme.ts`
 - `src/editor/zoom.ts`
 
@@ -43,9 +47,17 @@
 - `src/preview/render.ts`
 - `src/preview/zoom.ts`
 
+### recent
+
+- `src/recent/recent-files.ts`
+
 ### root
 
 - `src/main.ts`
+
+### session
+
+- `src/session/session.ts`
 
 ### tabs
 
@@ -58,16 +70,25 @@
 - `src/toolbar/examples-menu.ts`
 - `src/toolbar/export-diagram.ts`
 - `src/toolbar/export-menu.ts`
+- `src/toolbar/find.ts`
+- `src/toolbar/format.ts`
 - `src/toolbar/layout-engine.ts`
 - `src/toolbar/new-diagram.ts`
 - `src/toolbar/open-diagram.ts`
 - `src/toolbar/pdf-options-dialog.ts`
+- `src/toolbar/recent-menu.ts`
+- `src/toolbar/save-as.ts`
 - `src/toolbar/save-diagram.ts`
 - `src/toolbar/shortcuts.ts`
 
 ### utils
 
 - `src/utils/debounce.ts`
+
+### watch
+
+- `src/watch/file-watch.ts`
+- `src/watch/watch-plan.ts`
 
 ### window
 
@@ -81,12 +102,15 @@
 
 | Module | Depends on |
 | --- | --- |
-| autosave | platform |
 | editor | preview |
 | help | platform |
 | preview | utils |
-| root | autosave, editor, help, platform, preview, tabs, toolbar, window, workspace |
-| toolbar | platform, preview |
+| recent | platform |
+| root | autosave, editor, help, platform, preview, recent, session, tabs, toolbar, watch, window, workspace |
+| session | autosave, platform, preview |
+| tabs | preview |
+| toolbar | editor, platform, preview |
+| watch | platform |
 | window | platform |
 
 ## Circular dependencies
@@ -98,19 +122,12 @@ None. ✅
 **Unused files:** none ✅
 
 **Unused exports:**
-- `setupAutosave` in `src/autosave/manager.ts`
-- `saveDraft` in `src/autosave/manager.ts`
-- `saveTabDrafts` in `src/autosave/manager.ts`
-- `TabDraft` in `src/autosave/manager.ts`
-- `AutosaveOptions` in `src/autosave/manager.ts`
-- `MultiTabAutosaveOptions` in `src/autosave/manager.ts`
-- `checkForRecovery` in `src/autosave/recovery.ts`
-- `promptRecovery` in `src/autosave/recovery.ts`
-- `cleanupStaleDrafts` in `src/autosave/recovery.ts`
-- `RecoveryData` in `src/autosave/recovery.ts`
-- `MultiTabRecoveryData` in `src/autosave/recovery.ts`
+- `FormatOptions` in `src/editor/format.ts`
 - `DotKeyword` in `src/editor/language.ts`
 - `DotLinterOptions` in `src/editor/linting.ts`
+- `BalanceResult` in `src/editor/scan-dot.ts`
+- `SpanKind` in `src/editor/scan-dot.ts`
+- `StructuralDiagnostic` in `src/editor/structure-lint.ts`
 - `EditorZoomController` in `src/editor/zoom.ts`
 - `GraphvizApi` in `src/platform/contract.ts`
 - `PageGeometry` in `src/preview/export-pdf.ts`
@@ -122,46 +139,65 @@ None. ✅
 - `PreviewOptions` in `src/preview/render.ts`
 - `PreviewScheduler` in `src/preview/render.ts`
 - `ZoomController` in `src/preview/zoom.ts`
+- `SessionTab` in `src/session/session.ts`
+- `CapturableTab` in `src/session/session.ts`
 - `CreateTabOptions` in `src/tabs/manager.ts`
 - `TabBarCallbacks` in `src/tabs/tab-bar.ts`
 - `TabBarOptions` in `src/tabs/tab-bar.ts`
 - `ToolbarActionsOptions` in `src/toolbar/actions.ts`
 - `ExamplesMenuOptions` in `src/toolbar/examples-menu.ts`
 - `ExportMenuOptions` in `src/toolbar/export-menu.ts`
+- `FindActionOptions` in `src/toolbar/find.ts`
+- `FormatActionOptions` in `src/toolbar/format.ts`
+- `RecentMenuOptions` in `src/toolbar/recent-menu.ts`
+- `SaveAsOptions` in `src/toolbar/save-as.ts`
 - `ToolbarShortcutsOptions` in `src/toolbar/shortcuts.ts`
+- `FileWatchOptions` in `src/watch/file-watch.ts`
 
 ## Test coverage (src ↔ test)
 
 | Source file | Tests |
 | --- | --- |
-| `src/autosave/constants.ts` | — |
-| `src/autosave/manager.ts` | — |
-| `src/autosave/recovery.ts` | — |
+| `src/autosave/constants.ts` | `test/session/session.test.ts` |
+| `src/editor/autocomplete.ts` | `test/editor/autocomplete.test.ts` |
+| `src/editor/dot-data.ts` | `test/editor/dot-data.test.ts` |
+| `src/editor/format.ts` | `test/editor/format.test.ts` |
 | `src/editor/language.ts` | `test/editor/language.test.ts` |
 | `src/editor/linting.ts` | `test/editor/linting.test.ts` |
+| `src/editor/scan-dot.ts` | `test/editor/scan-dot.test.ts` |
+| `src/editor/search.ts` | `test/editor/search.test.ts` |
+| `src/editor/structure-lint.ts` | `test/editor/structure-lint.test.ts` |
 | `src/editor/theme.ts` | `test/editor/theme.test.ts` |
 | `src/editor/zoom.ts` | `test/editor/zoom.test.ts` |
 | `src/help/dialog.ts` | — |
 | `src/main.ts` | — |
 | `src/platform/contract.ts` | — |
-| `src/platform/index.ts` | `test/help/dialog.test.ts`, `test/platform/index.test.ts`, `test/toolbar/export-diagram.test.ts`, `test/toolbar/open-diagram.test.ts`, `test/toolbar/save-diagram.test.ts`, `test/window/state.test.ts` |
+| `src/platform/index.ts` | `test/help/dialog.test.ts`, `test/platform/index.test.ts`, `test/toolbar/export-diagram.test.ts`, `test/toolbar/open-diagram.test.ts`, `test/toolbar/save-as.test.ts`, `test/toolbar/save-diagram.test.ts`, `test/window/state.test.ts` |
 | `src/preview/export-pdf.ts` | `test/preview/export-pdf.test.ts` |
-| `src/preview/graphviz.ts` | `test/editor/linting.test.ts`, `test/toolbar/export-diagram.test.ts` |
+| `src/preview/graphviz.ts` | `test/editor/linting.test.ts`, `test/tabs/manager.test.ts`, `test/toolbar/export-diagram.test.ts` |
 | `src/preview/render.ts` | — |
 | `src/preview/zoom.ts` | `test/preview/zoom.test.ts` |
+| `src/recent/recent-files.ts` | `test/recent/recent-files.test.ts` |
+| `src/session/session.ts` | `test/session/session.test.ts` |
 | `src/tabs/manager.ts` | `test/tabs/manager.test.ts`, `test/tabs/tab-bar.test.ts` |
 | `src/tabs/tab-bar.ts` | `test/tabs/tab-bar.test.ts` |
 | `src/toolbar/actions.ts` | — |
 | `src/toolbar/examples-menu.ts` | `test/toolbar/examples-menu.test.ts` |
 | `src/toolbar/export-diagram.ts` | `test/toolbar/export-diagram.test.ts` |
 | `src/toolbar/export-menu.ts` | `test/toolbar/export-menu.test.ts` |
+| `src/toolbar/find.ts` | `test/toolbar/find.test.ts` |
+| `src/toolbar/format.ts` | `test/toolbar/format.test.ts` |
 | `src/toolbar/layout-engine.ts` | `test/toolbar/layout-engine.test.ts` |
 | `src/toolbar/new-diagram.ts` | `test/toolbar/new-diagram.test.ts` |
 | `src/toolbar/open-diagram.ts` | `test/toolbar/open-diagram.test.ts` |
 | `src/toolbar/pdf-options-dialog.ts` | `test/toolbar/pdf-options-dialog.test.ts` |
+| `src/toolbar/recent-menu.ts` | `test/toolbar/recent-menu.test.ts` |
+| `src/toolbar/save-as.ts` | `test/toolbar/save-as.test.ts` |
 | `src/toolbar/save-diagram.ts` | `test/toolbar/save-diagram.test.ts` |
 | `src/toolbar/shortcuts.ts` | `test/toolbar/shortcuts.test.ts` |
 | `src/utils/debounce.ts` | `test/utils/debounce.test.ts` |
+| `src/watch/file-watch.ts` | — |
+| `src/watch/watch-plan.ts` | `test/watch/watch-plan.test.ts` |
 | `src/window/state.ts` | `test/window/state.test.ts` |
 | `src/workspace/resize.ts` | `test/workspace/resize.test.ts` |
 
@@ -173,11 +209,13 @@ None. ✅
 | `dialog:confirm` | confirm | ✅ wired |
 | `dialog:openText` | openTextFile | ✅ wired |
 | `dialog:save` | pickSavePath | ✅ wired |
+| `fs:readText` | readTextFile | ✅ wired |
 | `fs:writeBinary` | writeBinaryFile | ✅ wired |
 | `fs:writeText` | writeTextFile | ✅ wired |
 | `shell:openExternal` | openExternal | ✅ wired |
 | `store:delete` | storeDelete | ✅ wired |
 | `store:get` | storeGet | ✅ wired |
 | `store:set` | storeSet | ✅ wired |
+| `watch:setPaths` | setWatchedPaths | ✅ wired |
 
 > `import.meta.glob` example/module loads (Vite) are not static imports and are excluded from edge resolution.
