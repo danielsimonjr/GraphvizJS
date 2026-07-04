@@ -53,16 +53,6 @@ export function setupLayoutEngine(onEngineChange: (engine: LayoutEngine) => void
 }
 
 /**
- * Get the currently selected layout engine
- * @returns The selected layout engine, defaults to 'dot'
- */
-export function getCurrentEngine(): LayoutEngine {
-  const select = getSelectElement();
-  const value = select?.value;
-  return value && isLayoutEngine(value) ? value : DEFAULT_ENGINE;
-}
-
-/**
  * Reset the cached select element reference.
  * Primarily used for testing to ensure clean state between tests.
  */

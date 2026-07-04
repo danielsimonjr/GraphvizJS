@@ -2,9 +2,9 @@
   "stats": {
     "fileCount": 42,
     "moduleCount": 14,
-    "totalLoc": 4350,
+    "totalLoc": 4343,
     "edgeCount": 68,
-    "exportCount": 129
+    "exportCount": 128
   },
   "modules": {
     "autosave": [
@@ -706,7 +706,7 @@
     },
     {
       "path": "src/main.ts",
-      "loc": 717,
+      "loc": 720,
       "exports": []
     },
     {
@@ -883,10 +883,9 @@
     },
     {
       "path": "src/toolbar/layout-engine.ts",
-      "loc": 71,
+      "loc": 61,
       "exports": [
         "setupLayoutEngine",
-        "getCurrentEngine",
         "resetLayoutEngineCache"
       ]
     },

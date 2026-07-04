@@ -8,9 +8,9 @@
 | --- | --- |
 | Files | 42 |
 | Modules | 14 |
-| Lines of code | 4350 |
+| Lines of code | 4343 |
 | Internal edges | 68 |
-| Exports | 129 |
+| Exports | 128 |
 
 ## Modules
 
