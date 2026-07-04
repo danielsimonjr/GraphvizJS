@@ -13,6 +13,10 @@ export function pickSavePath(opts: {
   return window.graphviz.pickSavePath(opts);
 }
 
+export function readTextFile(path: string): Promise<string | null> {
+  return window.graphviz.readTextFile(path);
+}
+
 export function writeTextFile(path: string, content: string): Promise<void> {
   return window.graphviz.writeTextFile(path, content);
 }
@@ -39,4 +43,12 @@ export function openExternal(url: string): Promise<void> {
 
 export function appInfo(): Promise<{ name: string; version: string }> {
   return window.graphviz.appInfo();
+}
+
+export function setWatchedPaths(paths: string[]): Promise<void> {
+  return window.graphviz.setWatchedPaths(paths);
+}
+
+export function onFileChanged(cb: (path: string) => void): () => void {
+  return window.graphviz.onFileChanged(cb);
 }

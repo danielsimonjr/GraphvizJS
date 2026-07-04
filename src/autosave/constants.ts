@@ -1,13 +1,9 @@
-/** Store keys for autosave draft data. */
-export const DRAFT_CONTENT_KEY = 'draftContent';
-export const DRAFT_TIMESTAMP_KEY = 'draftTimestamp';
-export const DRAFT_FILE_PATH_KEY = 'draftFilePath';
-
-/** Store key for multi-tab draft data (array of tab drafts). */
+/**
+ * Store key for the legacy multi-tab draft data. Superseded by the `session`
+ * store key; retained only so a pre-v1.3.0 draft is migrated into a session
+ * once on first launch (see `src/session/session.ts` `migrateLegacyDrafts`).
+ */
 export const TAB_DRAFTS_KEY = 'tabDrafts';
 
-/** Maximum age (in days) before a draft is considered stale and auto-cleaned. */
-export const MAX_DRAFT_AGE_DAYS = 7;
-
-/** Autosave interval in milliseconds (30 seconds). */
+/** Session-persistence backstop interval in milliseconds (30 seconds). */
 export const AUTOSAVE_INTERVAL = 30_000;

@@ -4,8 +4,16 @@ import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, dialog, ipcMain, screen, shell } from 'electron';
 import Store from 'electron-store';
 import type { ConfirmOptions, DiagramFilter } from '../src/platform/contract';
+import { setupFileWatcher } from './file-watcher';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Test seam: isolate persisted state to a temp dir under Playwright so session
+// restore can be exercised deterministically. Must run before Store construction.
+if (process.env.GVJS_E2E_USERDATA) {
+  app.setPath('userData', process.env.GVJS_E2E_USERDATA);
+}
+
 const store = new Store<Record<string, unknown>>();
 
 interface WindowState {
@@ -85,6 +93,7 @@ function registerIpc(): void {
   // use, so native behavior is fully preserved.
   const stubOpen = process.env.GVJS_E2E_OPEN; // path to return from dialog:openText
   const stubSave = process.env.GVJS_E2E_SAVE; // path to return from dialog:save
+  const stubConfirm = process.env.GVJS_E2E_CONFIRM; // 'ok' | 'cancel'
 
   ipcMain.handle('dialog:openText', async (_e, filters: DiagramFilter[]) => {
     if (stubOpen) {
@@ -112,6 +121,14 @@ function registerIpc(): void {
     }
   );
 
+  ipcMain.handle('fs:readText', async (_e, p: string) => {
+    try {
+      return await readFile(p, 'utf-8');
+    } catch {
+      return null;
+    }
+  });
+
   ipcMain.handle('fs:writeText', (_e, p: string, content: string) =>
     writeFile(p, content, 'utf-8')
   );
@@ -128,6 +145,7 @@ function registerIpc(): void {
   });
 
   ipcMain.handle('dialog:confirm', async (_e, message: string, opts?: ConfirmOptions) => {
+    if (stubConfirm) return stubConfirm === 'ok';
     const win = BrowserWindow.getFocusedWindow();
     const res = await dialog.showMessageBox(win!, {
       type: opts?.kind ? kindToType[opts.kind] : 'question',
@@ -150,6 +168,7 @@ function registerIpc(): void {
 
 app.whenReady().then(() => {
   registerIpc();
+  setupFileWatcher();
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

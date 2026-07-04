@@ -1,9 +1,10 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, type IpcRendererEvent, ipcRenderer } from 'electron';
 import type { ConfirmOptions, DiagramFilter, GraphvizApi } from '../src/platform/contract';
 
 const api: GraphvizApi = {
   openTextFile: (filters: DiagramFilter[]) => ipcRenderer.invoke('dialog:openText', filters),
   pickSavePath: (opts) => ipcRenderer.invoke('dialog:save', opts),
+  readTextFile: (path: string) => ipcRenderer.invoke('fs:readText', path),
   writeTextFile: (path, content) => ipcRenderer.invoke('fs:writeText', path, content),
   writeBinaryFile: (path, bytes) => ipcRenderer.invoke('fs:writeBinary', path, bytes),
   storeGet: (key) => ipcRenderer.invoke('store:get', key),
@@ -12,6 +13,12 @@ const api: GraphvizApi = {
   confirm: (message, opts?: ConfirmOptions) => ipcRenderer.invoke('dialog:confirm', message, opts),
   openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),
   appInfo: () => ipcRenderer.invoke('app:info'),
+  setWatchedPaths: (paths) => ipcRenderer.invoke('watch:setPaths', paths),
+  onFileChanged: (cb) => {
+    const listener = (_e: IpcRendererEvent, p: string) => cb(p);
+    ipcRenderer.on('file:changed', listener);
+    return () => ipcRenderer.removeListener('file:changed', listener);
+  },
 };
 
 contextBridge.exposeInMainWorld('graphviz', api);

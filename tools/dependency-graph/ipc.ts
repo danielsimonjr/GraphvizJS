@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import type { IpcChannel, IpcReport } from './types';
 
@@ -90,9 +90,14 @@ export function analyzeIpc(contractSrc: string, preloadSrc: string, mainSrc: str
 
 export function analyzeIpcFromRoot(root: string): IpcReport {
   const read = (rel: string) => readFileSync(path.join(root, rel), 'utf-8');
-  return analyzeIpc(
-    read('src/platform/contract.ts'),
-    read('electron/preload.ts'),
-    read('electron/main.ts')
-  );
+  // Handlers may be registered in any electron/*.ts module (e.g. the file
+  // watcher registers `watch:setPaths` in electron/file-watcher.ts), not only
+  // in main.ts — scan the whole main-process directory so the boundary check
+  // doesn't false-flag a handler that lives outside main.ts.
+  const electronDir = path.join(root, 'electron');
+  const mainSrc = readdirSync(electronDir)
+    .filter((f) => f.endsWith('.ts'))
+    .map((f) => readFileSync(path.join(electronDir, f), 'utf-8'))
+    .join('\n');
+  return analyzeIpc(read('src/platform/contract.ts'), read('electron/preload.ts'), mainSrc);
 }

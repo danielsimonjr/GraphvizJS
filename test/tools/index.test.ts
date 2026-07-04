@@ -10,8 +10,8 @@ describe('buildAnalysis (real repo)', () => {
     }
   });
 
-  it('wires all 10 IPC channels with no gaps', () => {
-    expect(a.ipc.fullyWired).toHaveLength(10);
+  it('wires all 12 IPC channels with no gaps', () => {
+    expect(a.ipc.fullyWired).toHaveLength(12);
     expect(a.ipc.missingHandlers).toHaveLength(0);
     expect(a.ipc.orphanHandlers).toHaveLength(0);
     expect(a.ipc.missingContract).toHaveLength(0);

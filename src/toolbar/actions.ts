@@ -6,6 +6,8 @@ import { setupFind } from './find';
 import { setupFormat } from './format';
 import { setupNewDiagramAction } from './new-diagram';
 import { setupOpenDiagramAction } from './open-diagram';
+import { setupRecentMenu } from './recent-menu';
+import { setupSaveAsAction } from './save-as';
 import { setupSaveDiagramAction } from './save-diagram';
 
 const EXAMPLES = loadExamples();
@@ -15,10 +17,13 @@ export interface ToolbarActionsOptions {
   newDiagramButton: HTMLButtonElement | null;
   openButton: HTMLButtonElement | null;
   saveButton: HTMLButtonElement | null;
+  saveAsButton: HTMLButtonElement | null;
   exportButton: HTMLButtonElement | null;
   exportMenu: HTMLDivElement | null;
   examplesButton: HTMLButtonElement | null;
   examplesMenu: HTMLDivElement | null;
+  recentButton: HTMLButtonElement | null;
+  recentMenu: HTMLDivElement | null;
   findButton: HTMLButtonElement | null;
   formatButton: HTMLButtonElement | null;
   commitDocument: (doc: string, options?: { saved?: boolean }) => void;
@@ -28,6 +33,8 @@ export interface ToolbarActionsOptions {
   onPathChange: (path: string | null) => void;
   onFormat: (doc: string) => void;
   getPath: () => string | null;
+  getRecent: () => string[];
+  onPickRecent: (path: string) => void;
 }
 
 export function setupToolbarActions(options: ToolbarActionsOptions): void {
@@ -65,6 +72,16 @@ export function setupToolbarActions(options: ToolbarActionsOptions): void {
     },
   });
 
+  setupSaveAsAction({
+    button: options.saveAsButton,
+    getEditor,
+    getPath,
+    onPathChange,
+    onSave(doc) {
+      commitDocument(doc, { saved: true });
+    },
+  });
+
   setupFind({ button: options.findButton, getEditor });
   setupFormat({ button: options.formatButton, getEditor, onFormat: options.onFormat });
 
@@ -89,6 +106,13 @@ export function setupToolbarActions(options: ToolbarActionsOptions): void {
       },
     });
   }
+
+  setupRecentMenu({
+    button: options.recentButton,
+    menu: options.recentMenu,
+    getRecent: options.getRecent,
+    onPick: options.onPickRecent,
+  });
 }
 
 function loadExamples(): ExampleItem[] {

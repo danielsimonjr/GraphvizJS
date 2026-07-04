@@ -1,9 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  getCurrentEngine,
-  resetLayoutEngineCache,
-  setupLayoutEngine,
-} from '../../src/toolbar/layout-engine';
+import { resetLayoutEngineCache, setupLayoutEngine } from '../../src/toolbar/layout-engine';
 
 describe('toolbar/layout-engine', () => {
   let selectElement: HTMLSelectElement;
@@ -42,31 +38,6 @@ describe('toolbar/layout-engine', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-  });
-
-  describe('getCurrentEngine()', () => {
-    it('returns default engine (dot) when select has default value', () => {
-      expect(getCurrentEngine()).toBe('dot');
-    });
-
-    it('returns selected engine value', () => {
-      selectElement.value = 'neato';
-      expect(getCurrentEngine()).toBe('neato');
-    });
-
-    it('returns dot when select element not found', () => {
-      document.body.innerHTML = '';
-      expect(getCurrentEngine()).toBe('dot');
-    });
-
-    it('returns each engine correctly', () => {
-      const engines = ['dot', 'neato', 'fdp', 'sfdp', 'circo', 'twopi', 'osage', 'patchwork'];
-
-      for (const engine of engines) {
-        selectElement.value = engine;
-        expect(getCurrentEngine()).toBe(engine);
-      }
-    });
   });
 
   describe('setupLayoutEngine()', () => {
@@ -113,29 +84,14 @@ describe('toolbar/layout-engine', () => {
       // Should not throw
       expect(() => setupLayoutEngine(callback)).not.toThrow();
     });
-  });
 
-  describe('resetLayoutEngineCache()', () => {
-    it('clears cached select element', () => {
-      // First call caches the element
-      expect(getCurrentEngine()).toBe('dot');
+    it('re-resolves the select element after resetLayoutEngineCache', () => {
+      // Prime the cache against the initial element.
+      setupLayoutEngine(vi.fn());
 
-      // Remove element from DOM and reset cache
+      // Replace the select and reset the cache; setup must bind the new element.
       document.body.innerHTML = '';
       resetLayoutEngineCache();
-
-      // Should return default since element is gone
-      expect(getCurrentEngine()).toBe('dot');
-    });
-
-    it('allows re-caching after reset', () => {
-      // Cache initial element
-      getCurrentEngine();
-
-      // Create a new select with different value
-      document.body.innerHTML = '';
-      resetLayoutEngineCache();
-
       const newSelect = document.createElement('select');
       newSelect.id = 'layout-engine';
       const option = document.createElement('option');
@@ -144,8 +100,10 @@ describe('toolbar/layout-engine', () => {
       newSelect.appendChild(option);
       document.body.appendChild(newSelect);
 
-      // Should find new element after reset
-      expect(getCurrentEngine()).toBe('neato');
+      const callback = vi.fn();
+      setupLayoutEngine(callback);
+      newSelect.dispatchEvent(new Event('change'));
+      expect(callback).toHaveBeenCalledWith('neato');
     });
   });
 });

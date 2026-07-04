@@ -4,25 +4,37 @@ graph LR
   help["help"]
   platform["platform"]
   preview["preview"]
+  recent["recent"]
   root["root"]
+  session["session"]
   tabs["tabs"]
   toolbar["toolbar"]
   utils["utils"]
+  watch["watch"]
   window["window"]
   workspace["workspace"]
-  autosave --> platform
   editor --> preview
   help --> platform
   preview --> utils
+  recent --> platform
   root --> autosave
   root --> editor
   root --> help
   root --> platform
   root --> preview
+  root --> recent
+  root --> session
   root --> tabs
   root --> toolbar
+  root --> watch
   root --> window
   root --> workspace
+  session --> autosave
+  session --> platform
+  session --> preview
+  tabs --> preview
+  toolbar --> editor
   toolbar --> platform
   toolbar --> preview
+  watch --> platform
   window --> platform

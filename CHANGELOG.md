@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-07-03
+
+### Added
+
+- Recent files: a toolbar **Recent** menu lists recently opened and saved
+  diagrams (most-recent-first, up to 10); pick one to reopen it, or focus it if
+  it's already open. Files that have since been deleted are pruned on use.
+- **Save As** (Ctrl+Shift+S): save the current diagram to a newly chosen path,
+  even when the tab already has one.
+- Silent session restore: on launch the app reopens the tabs you had open —
+  file paths, unsaved edits, per-tab layout engine, and the active tab — with no
+  prompt. This replaces the old crash-recovery dialog; a pre-1.3.0 draft is
+  migrated into the session once on first launch.
+- Per-document layout engine: each tab remembers its own dot/neato/fdp/… engine,
+  and the selector follows the active tab across switching, closing, and new tabs.
+- External-change reload: when a file open in the app is changed on disk by
+  another program, a tab with no unsaved edits reloads automatically, while a tab
+  with unsaved edits prompts before discarding your changes.
+
 ## [1.2.0] - 2026-07-03
 
 ### Added

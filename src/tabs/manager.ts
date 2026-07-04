@@ -1,4 +1,5 @@
 import type { EditorView } from 'codemirror';
+import type { LayoutEngine } from '../preview/graphviz';
 
 /** Maximum number of tabs allowed */
 export const MAX_TABS = 10;
@@ -19,6 +20,8 @@ export interface TabState {
   editorView: EditorView | null;
   /** Editor zoom level for this tab */
   editorZoomLevel: number;
+  /** Layout engine used to render this tab's diagram. */
+  layoutEngine: LayoutEngine;
 }
 
 /** Options for creating a new tab */
@@ -29,6 +32,8 @@ export interface CreateTabOptions {
   filePath?: string | null;
   /** Pre-created EditorView to attach */
   editorView?: EditorView | null;
+  /** Layout engine for this tab (defaults to 'dot'). */
+  layoutEngine?: LayoutEngine;
 }
 
 /**
@@ -62,6 +67,7 @@ export class TabManager {
       lastSavedAt: null,
       editorView: options.editorView ?? null,
       editorZoomLevel: 0,
+      layoutEngine: options.layoutEngine ?? 'dot',
     };
 
     this.tabs.set(id, tab);

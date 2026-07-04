@@ -16,6 +16,7 @@ export interface ConfirmOptions {
 export interface GraphvizApi {
   openTextFile(filters: DiagramFilter[]): Promise<OpenedFile | null>;
   pickSavePath(opts: { defaultPath: string; filters: DiagramFilter[] }): Promise<string | null>;
+  readTextFile(path: string): Promise<string | null>;
   writeTextFile(path: string, content: string): Promise<void>;
   writeBinaryFile(path: string, bytes: Uint8Array): Promise<void>;
   storeGet<T>(key: string): Promise<T | undefined>;
@@ -24,4 +25,6 @@ export interface GraphvizApi {
   confirm(message: string, opts?: ConfirmOptions): Promise<boolean>;
   openExternal(url: string): Promise<void>;
   appInfo(): Promise<{ name: string; version: string }>;
+  setWatchedPaths(paths: string[]): Promise<void>;
+  onFileChanged(cb: (path: string) => void): () => void;
 }
