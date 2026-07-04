@@ -35,6 +35,7 @@ import { setupToolbarActions } from './toolbar/actions';
 import { makeFormatKeymap } from './toolbar/format';
 import { setupLayoutEngine } from './toolbar/layout-engine';
 import { setupToolbarShortcuts } from './toolbar/shortcuts';
+import { setupFileWatch } from './watch/file-watch';
 import { loadEditorZoom, saveEditorZoom } from './window/state';
 import { initHorizontalResize } from './workspace/resize';
 
@@ -114,6 +115,12 @@ async function bootstrap(): Promise<void> {
   // Declared before createPreview() so the getEngine closure below can
   // reference it (invoked lazily at render time, after this is assigned).
   const tabManager = new TabManager();
+
+  // Declared here (before session restore, which calls createNewTab) and assigned
+  // after restore completes. createNewTab/closeTab call `fileWatch?.sync()`; using
+  // optional chaining avoids a TDZ crash if they run during restore, before the
+  // real setupFileWatch() call below is reached.
+  let fileWatch: { sync: () => void; dispose: () => void } | null = null;
 
   const schedulePreviewRender = createPreview(previewElement, RENDER_DELAY, {
     callbacks: {
@@ -275,6 +282,7 @@ async function bootstrap(): Promise<void> {
     editorView.focus();
     syncEngineSelect(tab.layoutEngine);
     scheduleSessionSave();
+    fileWatch?.sync();
 
     return tab;
   }
@@ -336,6 +344,7 @@ async function bootstrap(): Promise<void> {
     refreshTabBar();
     updateFileStatus();
     scheduleSessionSave();
+    fileWatch?.sync();
   }
 
   // ── Session persistence ──────────────────────────────────────────
@@ -404,6 +413,63 @@ async function bootstrap(): Promise<void> {
     }
   }
 
+  // ── External-change reload policy ─────────────────────────────────
+  function openPaths(): string[] {
+    return tabManager
+      .getAllTabs()
+      .map((t) => t.filePath)
+      .filter((p): p is string => p !== null);
+  }
+
+  function fileBasename(p: string): string {
+    const n = p.replace(/\\/g, '/');
+    const i = n.lastIndexOf('/');
+    return i >= 0 ? n.slice(i + 1) : n;
+  }
+
+  /** Reload a tab's editor from disk content, clearing dirty state. */
+  function applyReload(tab: TabState, disk: string): void {
+    if (tab.editorView) {
+      tab.editorView.dispatch({
+        changes: { from: 0, to: tab.editorView.state.doc.length, insert: disk },
+      });
+    }
+    tab.lastCommittedDoc = disk;
+    tab.isDirty = false;
+    if (tab.id === tabManager.getActiveTabId()) {
+      schedulePreviewRender(disk);
+      updateFileStatus();
+    }
+    refreshTabBar();
+  }
+
+  /** Handle an external (on-disk) change to a watched file: silent reload when
+   * clean, conflict prompt when dirty. Never clobbers unsaved edits. */
+  async function onExternalChange(changedPath: string): Promise<void> {
+    const tabs = tabManager.getAllTabs().filter((t) => t.filePath === changedPath);
+    if (tabs.length === 0) return;
+    const disk = await readTextFile(changedPath);
+    if (disk === null) {
+      status.info('File no longer available on disk');
+      return;
+    }
+    for (const tab of tabs) {
+      const current = tab.editorView?.state.doc.toString() ?? tab.lastCommittedDoc;
+      if (current === disk) continue;
+      if (!tab.isDirty) {
+        applyReload(tab, disk);
+      } else {
+        const proceed = await confirm(
+          `"${fileBasename(changedPath)}" changed on disk. Reload and discard your edits?`,
+          { title: 'File Changed', kind: 'warning' }
+        );
+        if (proceed) applyReload(tab, disk);
+      }
+    }
+  }
+
+  fileWatch = setupFileWatch({ getOpenPaths: openPaths, onExternalChange });
+
   initialTab.editorView!.focus();
   host.dataset.editor = 'mounted';
   previewElement.dataset.preview = 'ready';
@@ -432,6 +498,7 @@ async function bootstrap(): Promise<void> {
     onOpen(content, path) {
       createNewTab(content, path);
       void recordRecent(path);
+      fileWatch?.sync();
     },
     onLoadExample(content) {
       createNewTab(content);
@@ -453,6 +520,7 @@ async function bootstrap(): Promise<void> {
       updateFileStatus();
       refreshTabBar();
       scheduleSessionSave();
+      fileWatch?.sync();
     },
     getPath() {
       return tabManager.getActiveTab()?.filePath ?? null;
@@ -473,6 +541,7 @@ async function bootstrap(): Promise<void> {
       }
       createNewTab(content, path);
       await recordRecent(path);
+      fileWatch?.sync();
     },
   });
 

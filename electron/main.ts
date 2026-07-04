@@ -93,6 +93,7 @@ function registerIpc(): void {
   // use, so native behavior is fully preserved.
   const stubOpen = process.env.GVJS_E2E_OPEN; // path to return from dialog:openText
   const stubSave = process.env.GVJS_E2E_SAVE; // path to return from dialog:save
+  const stubConfirm = process.env.GVJS_E2E_CONFIRM; // 'ok' | 'cancel'
 
   ipcMain.handle('dialog:openText', async (_e, filters: DiagramFilter[]) => {
     if (stubOpen) {
@@ -144,6 +145,7 @@ function registerIpc(): void {
   });
 
   ipcMain.handle('dialog:confirm', async (_e, message: string, opts?: ConfirmOptions) => {
+    if (stubConfirm) return stubConfirm === 'ok';
     const win = BrowserWindow.getFocusedWindow();
     const res = await dialog.showMessageBox(win!, {
       type: opts?.kind ? kindToType[opts.kind] : 'question',
