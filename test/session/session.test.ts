@@ -39,6 +39,8 @@ describe('deserializeSession', () => {
     expect(deserializeSession(null)).toBeNull();
     expect(deserializeSession({ tabs: 'no' })).toBeNull();
     expect(deserializeSession({ tabs: [{ filePath: 1 }], activeIndex: 0 })).toBeNull();
+    expect(deserializeSession({ tabs: [1, 2] })).toBeNull();
+    expect(deserializeSession({ tabs: [{}] })).toBeNull();
   });
   it('clamps activeIndex and defaults a missing engine to dot', () => {
     const raw = { tabs: [{ filePath: null, content: 'c', savedContent: 'c' }], activeIndex: 9 };
@@ -75,6 +77,12 @@ describe('migrateLegacyDrafts', () => {
     expect(migrateLegacyDrafts(undefined)).toBeNull();
     expect(migrateLegacyDrafts({ tabs: [] })).toBeNull();
   });
+  it('rejects a legacy entry with a non-string filePath', () => {
+    expect(migrateLegacyDrafts({ tabs: [{ content: 'a', filePath: 42 }] })).toBeNull();
+  });
+  it('migrates a legacy entry with a missing filePath to null', () => {
+    expect(migrateLegacyDrafts({ tabs: [{ content: 'a' }] })?.tabs[0].filePath).toBeNull();
+  });
 });
 
 describe('loadSession / persistSession', () => {
@@ -94,6 +102,12 @@ describe('loadSession / persistSession', () => {
   });
   it('returns null when neither exists', async () => {
     expect(await loadSession(store({}))).toBeNull();
+  });
+  it('prefers a present stored session over stale legacy drafts', async () => {
+    const s = { tabs: [tab(null, 'sess', 'sess')], activeIndex: 0 };
+    const legacy = { tabs: [{ content: 'legacy', filePath: null }], timestamp: 't' };
+    const out = await loadSession(store({ [SESSION_KEY]: s, [TAB_DRAFTS_KEY]: legacy }));
+    expect(out?.tabs[0].content).toBe('sess');
   });
   it('persistSession writes under SESSION_KEY', async () => {
     const s = store({});

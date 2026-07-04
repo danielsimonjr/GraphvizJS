@@ -81,6 +81,8 @@ export function migrateLegacyDrafts(raw: unknown): SessionData | null {
     if (typeof entry !== 'object' || entry === null) return null;
     const t = entry as Record<string, unknown>;
     if (typeof t.content !== 'string') return null;
+    if (t.filePath !== null && t.filePath !== undefined && typeof t.filePath !== 'string')
+      return null;
     tabs.push({
       filePath: (t.filePath as string | null) ?? null,
       content: t.content,
@@ -94,7 +96,7 @@ export function migrateLegacyDrafts(raw: unknown): SessionData | null {
 /** Load the session, falling back to migrating legacy drafts. */
 export async function loadSession(store: PlatformStore): Promise<SessionData | null> {
   const session = deserializeSession(await store.get<unknown>(SESSION_KEY));
-  if (session && session.tabs.length > 0) return session;
+  if (session) return session;
   return migrateLegacyDrafts(await store.get<unknown>(TAB_DRAFTS_KEY));
 }
 
