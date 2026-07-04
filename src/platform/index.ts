@@ -13,6 +13,10 @@ export function pickSavePath(opts: {
   return window.graphviz.pickSavePath(opts);
 }
 
+export function readTextFile(path: string): Promise<string | null> {
+  return window.graphviz.readTextFile(path);
+}
+
 export function writeTextFile(path: string, content: string): Promise<void> {
   return window.graphviz.writeTextFile(path, content);
 }

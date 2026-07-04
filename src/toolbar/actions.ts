@@ -6,6 +6,7 @@ import { setupFind } from './find';
 import { setupFormat } from './format';
 import { setupNewDiagramAction } from './new-diagram';
 import { setupOpenDiagramAction } from './open-diagram';
+import { setupRecentMenu } from './recent-menu';
 import { setupSaveDiagramAction } from './save-diagram';
 
 const EXAMPLES = loadExamples();
@@ -19,6 +20,8 @@ export interface ToolbarActionsOptions {
   exportMenu: HTMLDivElement | null;
   examplesButton: HTMLButtonElement | null;
   examplesMenu: HTMLDivElement | null;
+  recentButton: HTMLButtonElement | null;
+  recentMenu: HTMLDivElement | null;
   findButton: HTMLButtonElement | null;
   formatButton: HTMLButtonElement | null;
   commitDocument: (doc: string, options?: { saved?: boolean }) => void;
@@ -28,6 +31,8 @@ export interface ToolbarActionsOptions {
   onPathChange: (path: string | null) => void;
   onFormat: (doc: string) => void;
   getPath: () => string | null;
+  getRecent: () => string[];
+  onPickRecent: (path: string) => void;
 }
 
 export function setupToolbarActions(options: ToolbarActionsOptions): void {
@@ -89,6 +94,13 @@ export function setupToolbarActions(options: ToolbarActionsOptions): void {
       },
     });
   }
+
+  setupRecentMenu({
+    button: options.recentButton,
+    menu: options.recentMenu,
+    getRecent: options.getRecent,
+    onPick: options.onPickRecent,
+  });
 }
 
 function loadExamples(): ExampleItem[] {

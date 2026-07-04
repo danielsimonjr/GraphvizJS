@@ -385,6 +385,13 @@ body.dark .status-file[data-dirty="true"] {
   cursor: pointer;
 }
 
+.toolbar-menu-empty {
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  color: rgba(15, 23, 42, 0.5);
+  cursor: default;
+}
+
 body.dark .toolbar-menu {
   background: rgba(17, 24, 39, 0.9);
   border-color: rgba(148, 163, 184, 0.2);
@@ -394,6 +401,10 @@ body.dark .toolbar-menu {
 body.dark .toolbar-menu-item:hover,
 body.dark .toolbar-menu-item:focus-visible {
   background: rgba(59, 130, 246, 0.25);
+}
+
+body.dark .toolbar-menu-empty {
+  color: rgba(226, 232, 240, 0.5);
 }
 
 .toolbar-button {

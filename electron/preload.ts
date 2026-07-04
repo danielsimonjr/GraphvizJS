@@ -4,6 +4,7 @@ import type { ConfirmOptions, DiagramFilter, GraphvizApi } from '../src/platform
 const api: GraphvizApi = {
   openTextFile: (filters: DiagramFilter[]) => ipcRenderer.invoke('dialog:openText', filters),
   pickSavePath: (opts) => ipcRenderer.invoke('dialog:save', opts),
+  readTextFile: (path: string) => ipcRenderer.invoke('fs:readText', path),
   writeTextFile: (path, content) => ipcRenderer.invoke('fs:writeText', path, content),
   writeBinaryFile: (path, bytes) => ipcRenderer.invoke('fs:writeBinary', path, bytes),
   storeGet: (key) => ipcRenderer.invoke('store:get', key),

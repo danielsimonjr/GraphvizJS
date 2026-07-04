@@ -112,6 +112,14 @@ function registerIpc(): void {
     }
   );
 
+  ipcMain.handle('fs:readText', async (_e, p: string) => {
+    try {
+      return await readFile(p, 'utf-8');
+    } catch {
+      return null;
+    }
+  });
+
   ipcMain.handle('fs:writeText', (_e, p: string, content: string) =>
     writeFile(p, content, 'utf-8')
   );

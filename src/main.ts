@@ -17,7 +17,7 @@ import {
   createEditorZoomKeymap,
 } from './editor/zoom';
 import { setupHelpDialog } from './help/dialog';
-import { confirm, store as platformStore } from './platform';
+import { confirm, store as platformStore, readTextFile } from './platform';
 import { initGraphviz } from './preview/graphviz';
 import { createPreview } from './preview/render';
 import {
@@ -26,6 +26,7 @@ import {
   setupZoomControls,
   updateLevelDisplay,
 } from './preview/zoom';
+import { addRecent, loadRecent, removeRecent, saveRecent } from './recent/recent-files';
 import type { TabState } from './tabs/manager';
 import { MAX_TABS, TabManager } from './tabs/manager';
 import { renderTabBar, setupTabBar } from './tabs/tab-bar';
@@ -63,6 +64,10 @@ async function bootstrap(): Promise<void> {
   const examplesButton = document.querySelector<HTMLButtonElement>('[data-action="examples-menu"]');
   const examplesMenu = document.querySelector<HTMLDivElement>(
     '[data-dropdown="examples"] .toolbar-menu'
+  );
+  const recentButton = document.querySelector<HTMLButtonElement>('[data-action="recent-menu"]');
+  const recentMenu = document.querySelector<HTMLDivElement>(
+    '[data-dropdown="recent"] .toolbar-menu'
   );
   const exportButton = document.querySelector<HTMLButtonElement>('[data-action="export-menu"]');
   const exportMenu = document.querySelector<HTMLDivElement>(
@@ -124,6 +129,13 @@ async function bootstrap(): Promise<void> {
 
   // ── Tab Manager ──────────────────────────────────────────────────
   const tabManager = new TabManager();
+
+  // ── Recent files ─────────────────────────────────────────────────
+  let recentFiles: string[] = await loadRecent(platformStore);
+  async function recordRecent(path: string): Promise<void> {
+    recentFiles = addRecent(recentFiles, path);
+    await saveRecent(platformStore, recentFiles);
+  }
 
   const { extension: zoomExtension, compartment: zoomCompartment } = createEditorZoomExtension();
   const savedEditorZoom = await loadEditorZoom();
@@ -374,6 +386,8 @@ async function bootstrap(): Promise<void> {
     exportMenu,
     examplesButton,
     examplesMenu,
+    recentButton,
+    recentMenu,
     findButton,
     formatButton,
     commitDocument,
@@ -382,6 +396,7 @@ async function bootstrap(): Promise<void> {
     },
     onOpen(content, path) {
       createNewTab(content, path);
+      void recordRecent(path);
     },
     onLoadExample(content) {
       createNewTab(content);
@@ -399,11 +414,29 @@ async function bootstrap(): Promise<void> {
       if (path === null || path !== previousPath) {
         tab.lastSavedAt = null;
       }
+      if (path) void recordRecent(path);
       updateFileStatus();
       refreshTabBar();
     },
     getPath() {
       return tabManager.getActiveTab()?.filePath ?? null;
+    },
+    getRecent: () => recentFiles,
+    async onPickRecent(path) {
+      const existing = tabManager.getAllTabs().find((t) => t.filePath === path);
+      if (existing) {
+        switchToTab(existing.id);
+        return;
+      }
+      const content = await readTextFile(path);
+      if (content === null) {
+        status.info('File no longer available');
+        recentFiles = removeRecent(recentFiles, path);
+        await saveRecent(platformStore, recentFiles);
+        return;
+      }
+      createNewTab(content, path);
+      await recordRecent(path);
     },
   });
 
