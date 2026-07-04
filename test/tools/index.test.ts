@@ -10,11 +10,9 @@ describe('buildAnalysis (real repo)', () => {
     }
   });
 
-  it('wires the 12 pre-existing IPC channels with no gaps', () => {
-    expect(a.ipc.fullyWired).toHaveLength(12);
-    // `menu:setRecent` is contract+preload-only until Task 3 adds its `ipcMain.handle`
-    // (see test/tools/ipc.test.ts for the rationale).
-    expect(a.ipc.missingHandlers).toHaveLength(1);
+  it('wires all 13 IPC channels with no gaps', () => {
+    expect(a.ipc.fullyWired).toHaveLength(13);
+    expect(a.ipc.missingHandlers).toHaveLength(0);
     expect(a.ipc.orphanHandlers).toHaveLength(0);
     expect(a.ipc.missingContract).toHaveLength(0);
   });
