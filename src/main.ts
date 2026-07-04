@@ -1,4 +1,4 @@
-import { indentWithTab } from '@codemirror/commands';
+import { indentWithTab, redo, undo } from '@codemirror/commands';
 import { Compartment, EditorState, StateEffect } from '@codemirror/state';
 import { keymap } from '@codemirror/view';
 import { basicSetup, EditorView } from 'codemirror';
@@ -14,9 +14,11 @@ import {
   createEditorZoomController,
   createEditorZoomExtension,
   createEditorZoomKeymap,
+  type EditorZoomController,
 } from './editor/zoom';
 import { setupHelpDialog } from './help/dialog';
-import { confirm, store as platformStore, readTextFile } from './platform';
+import { type MenuCommandHandlers, setupMenuCommands } from './menu/commands';
+import { confirm, store as platformStore, readTextFile, setMenuRecent } from './platform';
 import type { LayoutEngine } from './preview/graphviz';
 import { initGraphviz } from './preview/graphviz';
 import { createPreview } from './preview/render';
@@ -115,6 +117,7 @@ async function bootstrap(): Promise<void> {
   // Declared before createPreview() so the getEngine closure below can
   // reference it (invoked lazily at render time, after this is assigned).
   const tabManager = new TabManager();
+  const editorZoomByTab = new Map<string, EditorZoomController>();
 
   // Declared here (before session restore, which calls createNewTab) and assigned
   // after restore completes. createNewTab/closeTab call `fileWatch?.sync()`; using
@@ -143,9 +146,11 @@ async function bootstrap(): Promise<void> {
 
   // ── Recent files ─────────────────────────────────────────────────
   let recentFiles: string[] = await loadRecent(platformStore);
+  void setMenuRecent(recentFiles);
   async function recordRecent(path: string): Promise<void> {
     recentFiles = addRecent(recentFiles, path);
     await saveRecent(platformStore, recentFiles);
+    void setMenuRecent(recentFiles);
   }
 
   const { extension: zoomExtension, compartment: zoomCompartment } = createEditorZoomExtension();
@@ -272,6 +277,7 @@ async function bootstrap(): Promise<void> {
     editorView.dispatch({
       effects: StateEffect.appendConfig.of(createEditorZoomKeymap(editorZoom)),
     });
+    editorZoomByTab.set(tab.id, editorZoom);
 
     tab.lastCommittedDoc = savedContent;
     tab.isDirty = content !== savedContent;
@@ -334,6 +340,7 @@ async function bootstrap(): Promise<void> {
     }
 
     const newActiveTab = tabManager.closeTab(tabId);
+    editorZoomByTab.delete(tabId);
     if (newActiveTab?.editorView) {
       newActiveTab.editorView.dom.style.display = '';
       newActiveTab.editorView.focus();
@@ -478,6 +485,26 @@ async function bootstrap(): Promise<void> {
   previewElement.dataset.preview = 'ready';
   initHorizontalResize(workspace, editorPane, previewPane, divider);
 
+  /** Resolve a recent-file path: switch to it if already open, else load it into a new tab. */
+  async function pickRecent(path: string): Promise<void> {
+    const existing = tabManager.getAllTabs().find((t) => t.filePath === path);
+    if (existing) {
+      switchToTab(existing.id);
+      return;
+    }
+    const content = await readTextFile(path);
+    if (content === null) {
+      status.info('File no longer available');
+      recentFiles = removeRecent(recentFiles, path);
+      await saveRecent(platformStore, recentFiles);
+      void setMenuRecent(recentFiles);
+      return;
+    }
+    createNewTab(content, path);
+    await recordRecent(path);
+    fileWatch?.sync();
+  }
+
   setupToolbarActions({
     getEditor() {
       return tabManager.getActiveTab()!.editorView!;
@@ -529,23 +556,7 @@ async function bootstrap(): Promise<void> {
       return tabManager.getActiveTab()?.filePath ?? null;
     },
     getRecent: () => recentFiles,
-    async onPickRecent(path) {
-      const existing = tabManager.getAllTabs().find((t) => t.filePath === path);
-      if (existing) {
-        switchToTab(existing.id);
-        return;
-      }
-      const content = await readTextFile(path);
-      if (content === null) {
-        status.info('File no longer available');
-        recentFiles = removeRecent(recentFiles, path);
-        await saveRecent(platformStore, recentFiles);
-        return;
-      }
-      createNewTab(content, path);
-      await recordRecent(path);
-      fileWatch?.sync();
-    },
+    onPickRecent: pickRecent,
   });
 
   setupToolbarShortcuts({
@@ -568,15 +579,17 @@ async function bootstrap(): Promise<void> {
     },
   });
 
-  setupLayoutEngine((engine) => {
+  /** Apply a layout engine change to the active tab, re-render, and persist. */
+  function applyEngine(engine: LayoutEngine): void {
     const tab = tabManager.getActiveTab();
     if (!tab) return;
     tab.layoutEngine = engine;
-    if (tab.editorView) {
-      schedulePreviewRender(tab.editorView.state.doc.toString());
-    }
+    syncEngineSelect(engine);
+    if (tab.editorView) schedulePreviewRender(tab.editorView.state.doc.toString());
     scheduleSessionSave();
-  });
+  }
+
+  setupLayoutEngine(applyEngine);
 
   // Backstop: persist the session on a 30s interval, in addition to the
   // debounced saves triggered by tab/content lifecycle events.
@@ -585,6 +598,44 @@ async function bootstrap(): Promise<void> {
   }, AUTOSAVE_INTERVAL);
 
   setupHelpDialog(helpButton);
+
+  // ── Native menu wiring ───────────────────────────────────────────
+  const menuHandlers: MenuCommandHandlers = {
+    new: () => createNewTab(DEFAULT_SNIPPET),
+    newTab: () => createNewTab(DEFAULT_SNIPPET),
+    open: () => openButton?.click(),
+    openRecent: (path) => void pickRecent(path),
+    save: () => saveButton?.click(),
+    saveAs: () => saveAsButton?.click(),
+    export: (format) =>
+      document.querySelector<HTMLButtonElement>(`[data-export="${format}"]`)?.click(),
+    closeTab: () => {
+      const t = tabManager.getActiveTab();
+      if (t) void closeTab(t.id);
+    },
+    undo: () => {
+      const v = tabManager.getActiveTab()?.editorView;
+      if (v) {
+        undo(v);
+        v.focus();
+      }
+    },
+    redo: () => {
+      const v = tabManager.getActiveTab()?.editorView;
+      if (v) {
+        redo(v);
+        v.focus();
+      }
+    },
+    find: () => findButton?.click(),
+    format: () => formatButton?.click(),
+    setEngine: (engine) => applyEngine(engine as LayoutEngine),
+    zoomIn: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.zoomIn(),
+    zoomOut: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.zoomOut(),
+    zoomReset: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.reset(),
+    help: () => helpButton?.click(),
+  };
+  setupMenuCommands(menuHandlers);
 }
 
 type StatusLevel = 'idle' | 'loading' | 'success' | 'error' | 'info';
