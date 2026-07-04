@@ -441,6 +441,9 @@ async function bootstrap(): Promise<void> {
       updateFileStatus();
     }
     refreshTabBar();
+    // Persist immediately so a background-tab reload isn't lost if the app quits
+    // before the 30s backstop (the doc-change listener only fires for the active tab).
+    scheduleSessionSave();
   }
 
   /** Handle an external (on-disk) change to a watched file: silent reload when
