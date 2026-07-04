@@ -6,6 +6,7 @@ export interface ToolbarShortcutsOptions {
   newButton?: HTMLButtonElement | null;
   openButton?: HTMLButtonElement | null;
   saveButton?: HTMLButtonElement | null;
+  saveAsButton?: HTMLButtonElement | null;
   onNewTab?: () => void;
   onCloseTab?: () => void;
   onNextTab?: () => void;
@@ -29,9 +30,16 @@ export function setupToolbarShortcuts(options: ToolbarShortcutsOptions): () => v
 
     const key = event.key.toLowerCase();
 
-    if (key === 's' && trigger(options.saveButton)) {
-      event.preventDefault();
-      return;
+    if (key === 's') {
+      if (event.shiftKey) {
+        if (trigger(options.saveAsButton)) {
+          event.preventDefault();
+          return;
+        }
+      } else if (trigger(options.saveButton)) {
+        event.preventDefault();
+        return;
+      }
     }
 
     if (key === 'o' && trigger(options.openButton)) {

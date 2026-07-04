@@ -7,6 +7,7 @@ import { setupFormat } from './format';
 import { setupNewDiagramAction } from './new-diagram';
 import { setupOpenDiagramAction } from './open-diagram';
 import { setupRecentMenu } from './recent-menu';
+import { setupSaveAsAction } from './save-as';
 import { setupSaveDiagramAction } from './save-diagram';
 
 const EXAMPLES = loadExamples();
@@ -16,6 +17,7 @@ export interface ToolbarActionsOptions {
   newDiagramButton: HTMLButtonElement | null;
   openButton: HTMLButtonElement | null;
   saveButton: HTMLButtonElement | null;
+  saveAsButton: HTMLButtonElement | null;
   exportButton: HTMLButtonElement | null;
   exportMenu: HTMLDivElement | null;
   examplesButton: HTMLButtonElement | null;
@@ -63,6 +65,16 @@ export function setupToolbarActions(options: ToolbarActionsOptions): void {
   setupSaveDiagramAction({
     getEditor,
     button: saveButton,
+    getPath,
+    onPathChange,
+    onSave(doc) {
+      commitDocument(doc, { saved: true });
+    },
+  });
+
+  setupSaveAsAction({
+    button: options.saveAsButton,
+    getEditor,
     getPath,
     onPathChange,
     onSave(doc) {

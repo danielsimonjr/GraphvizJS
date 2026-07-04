@@ -60,6 +60,7 @@ async function bootstrap(): Promise<void> {
   const previewElement = document.querySelector<HTMLDivElement>('#preview-host');
   const newDiagramButton = document.querySelector<HTMLButtonElement>('[data-action="new-diagram"]');
   const saveButton = document.querySelector<HTMLButtonElement>('[data-action="save-diagram"]');
+  const saveAsButton = document.querySelector<HTMLButtonElement>('[data-action="save-as-diagram"]');
   const openButton = document.querySelector<HTMLButtonElement>('[data-action="open-diagram"]');
   const examplesButton = document.querySelector<HTMLButtonElement>('[data-action="examples-menu"]');
   const examplesMenu = document.querySelector<HTMLDivElement>(
@@ -382,6 +383,7 @@ async function bootstrap(): Promise<void> {
     newDiagramButton,
     openButton,
     saveButton,
+    saveAsButton,
     exportButton,
     exportMenu,
     examplesButton,
@@ -444,6 +446,7 @@ async function bootstrap(): Promise<void> {
     newButton: newDiagramButton,
     openButton,
     saveButton,
+    saveAsButton,
     onNewTab: () => createNewTab(DEFAULT_SNIPPET),
     onCloseTab: () => {
       const tab = tabManager.getActiveTab();
