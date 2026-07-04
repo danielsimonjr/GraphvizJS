@@ -324,6 +324,7 @@ async function bootstrap(): Promise<void> {
     if (newActiveTab?.editorView) {
       newActiveTab.editorView.dom.style.display = '';
       newActiveTab.editorView.focus();
+      syncEngineSelect(newActiveTab.layoutEngine);
       schedulePreviewRender(newActiveTab.editorView.state.doc.toString());
     }
 
