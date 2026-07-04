@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-07-04
+
+### Added
+
+- Native application menu (File / Edit / View / Help, plus the macOS app menu)
+  replacing the default Electron menu. Menu items mirror the toolbar actions —
+  New / Open / Save / Save As, Export (PNG/PNG×2/SVG/PDF), Open Recent, Find,
+  Format, Undo / Redo, a Layout Engine submenu, editor Zoom, Help, and About /
+  View Source. Existing keyboard shortcuts are unchanged: duplicated
+  accelerators are shown as labels only, so nothing double-fires.
+
 ## [1.3.0] - 2026-07-03
 
 ### Added

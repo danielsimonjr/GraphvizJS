@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 42,
-    "moduleCount": 14,
-    "totalLoc": 4343,
-    "edgeCount": 68,
-    "exportCount": 128
+    "fileCount": 44,
+    "moduleCount": 15,
+    "totalLoc": 4747,
+    "edgeCount": 71,
+    "exportCount": 137
   },
   "modules": {
     "autosave": [
@@ -27,6 +27,10 @@
     ],
     "root": [
       "src/main.ts"
+    ],
+    "menu": [
+      "src/menu/commands.ts",
+      "src/menu/menu-template.ts"
     ],
     "platform": [
       "src/platform/contract.ts",
@@ -89,6 +93,7 @@
       "autosave",
       "editor",
       "help",
+      "menu",
       "platform",
       "preview",
       "recent",
@@ -98,6 +103,9 @@
       "watch",
       "window",
       "workspace"
+    ],
+    "menu": [
+      "platform"
     ],
     "preview": [
       "utils"
@@ -155,10 +163,6 @@
       {
         "file": "src/editor/structure-lint.ts",
         "name": "StructuralDiagnostic"
-      },
-      {
-        "file": "src/editor/zoom.ts",
-        "name": "EditorZoomController"
       },
       {
         "file": "src/platform/contract.ts",
@@ -332,6 +336,18 @@
     {
       "file": "src/main.ts",
       "testFiles": []
+    },
+    {
+      "file": "src/menu/commands.ts",
+      "testFiles": [
+        "test/menu/commands.test.ts"
+      ]
+    },
+    {
+      "file": "src/menu/menu-template.ts",
+      "testFiles": [
+        "test/menu/menu-template.test.ts"
+      ]
     },
     {
       "file": "src/platform/contract.ts",
@@ -561,6 +577,13 @@
         "hasHandler": true
       },
       {
+        "channel": "menu:setRecent",
+        "method": "setMenuRecent",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
         "channel": "shell:openExternal",
         "method": "openExternal",
         "hasContract": true,
@@ -706,12 +729,31 @@
     },
     {
       "path": "src/main.ts",
-      "loc": 720,
+      "loc": 771,
       "exports": []
     },
     {
+      "path": "src/menu/commands.ts",
+      "loc": 77,
+      "exports": [
+        "dispatchMenuAction",
+        "setupMenuCommands",
+        "MenuCommandHandlers"
+      ]
+    },
+    {
+      "path": "src/menu/menu-template.ts",
+      "loc": 266,
+      "exports": [
+        "LAYOUT_ENGINES",
+        "buildMenuTemplate",
+        "MenuBuildOptions",
+        "MenuActionId"
+      ]
+    },
+    {
       "path": "src/platform/contract.ts",
-      "loc": 30,
+      "loc": 32,
       "exports": [
         "DiagramFilter",
         "OpenedFile",
@@ -721,7 +763,7 @@
     },
     {
       "path": "src/platform/index.ts",
-      "loc": 54,
+      "loc": 62,
       "exports": [
         "store",
         "openTextFile",
@@ -734,6 +776,8 @@
         "appInfo",
         "setWatchedPaths",
         "onFileChanged",
+        "onMenuAction",
+        "setMenuRecent",
         "PlatformStore"
       ]
     },

@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 42 |
-| Modules | 14 |
-| Lines of code | 4343 |
-| Internal edges | 68 |
-| Exports | 128 |
+| Files | 44 |
+| Modules | 15 |
+| Lines of code | 4747 |
+| Internal edges | 71 |
+| Exports | 137 |
 
 ## Modules
 
@@ -34,6 +34,11 @@
 ### help
 
 - `src/help/dialog.ts`
+
+### menu
+
+- `src/menu/commands.ts`
+- `src/menu/menu-template.ts`
 
 ### platform
 
@@ -104,9 +109,10 @@
 | --- | --- |
 | editor | preview |
 | help | platform |
+| menu | platform |
 | preview | utils |
 | recent | platform |
-| root | autosave, editor, help, platform, preview, recent, session, tabs, toolbar, watch, window, workspace |
+| root | autosave, editor, help, menu, platform, preview, recent, session, tabs, toolbar, watch, window, workspace |
 | session | autosave, platform, preview |
 | tabs | preview |
 | toolbar | editor, platform, preview |
@@ -128,7 +134,6 @@ None. ✅
 - `BalanceResult` in `src/editor/scan-dot.ts`
 - `SpanKind` in `src/editor/scan-dot.ts`
 - `StructuralDiagnostic` in `src/editor/structure-lint.ts`
-- `EditorZoomController` in `src/editor/zoom.ts`
 - `GraphvizApi` in `src/platform/contract.ts`
 - `PageGeometry` in `src/preview/export-pdf.ts`
 - `PdfPageMode` in `src/preview/export-pdf.ts`
@@ -171,6 +176,8 @@ None. ✅
 | `src/editor/zoom.ts` | `test/editor/zoom.test.ts` |
 | `src/help/dialog.ts` | — |
 | `src/main.ts` | — |
+| `src/menu/commands.ts` | `test/menu/commands.test.ts` |
+| `src/menu/menu-template.ts` | `test/menu/menu-template.test.ts` |
 | `src/platform/contract.ts` | — |
 | `src/platform/index.ts` | `test/help/dialog.test.ts`, `test/platform/index.test.ts`, `test/toolbar/export-diagram.test.ts`, `test/toolbar/open-diagram.test.ts`, `test/toolbar/save-as.test.ts`, `test/toolbar/save-diagram.test.ts`, `test/window/state.test.ts` |
 | `src/preview/export-pdf.ts` | `test/preview/export-pdf.test.ts` |
@@ -212,6 +219,7 @@ None. ✅
 | `fs:readText` | readTextFile | ✅ wired |
 | `fs:writeBinary` | writeBinaryFile | ✅ wired |
 | `fs:writeText` | writeTextFile | ✅ wired |
+| `menu:setRecent` | setMenuRecent | ✅ wired |
 | `shell:openExternal` | openExternal | ✅ wired |
 | `store:delete` | storeDelete | ✅ wired |
 | `store:get` | storeGet | ✅ wired |
