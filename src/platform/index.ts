@@ -52,3 +52,11 @@ export function setWatchedPaths(paths: string[]): Promise<void> {
 export function onFileChanged(cb: (path: string) => void): () => void {
   return window.graphviz.onFileChanged(cb);
 }
+
+export function onMenuAction(cb: (action: string, payload?: string) => void): () => void {
+  return window.graphviz.onMenuAction(cb);
+}
+
+export function setMenuRecent(paths: string[]): Promise<void> {
+  return window.graphviz.setMenuRecent(paths);
+}

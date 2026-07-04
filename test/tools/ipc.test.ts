@@ -84,7 +84,7 @@ describe('analyzeIpc', () => {
 });
 
 describe('analyzeIpcFromRoot (real repo)', () => {
-  it('reports all 12 GraphvizApi channels as fully wired, none missing/orphan', () => {
+  it('reports all 12 pre-existing GraphvizApi channels as fully wired, none missing/orphan', () => {
     const r = analyzeIpcFromRoot(process.cwd());
     expect(r.fullyWired.map((c) => c.channel).sort()).toEqual(
       [
@@ -103,7 +103,10 @@ describe('analyzeIpcFromRoot (real repo)', () => {
       ].sort()
     );
     expect(r.missingContract).toEqual([]);
-    expect(r.missingHandlers).toEqual([]);
+    // `menu:setRecent` is intentionally contract+preload-only at this point in the
+    // native-app-menu cycle: its `ipcMain.handle` lands in Task 3 (electron/app-menu.ts +
+    // main.ts wiring), alongside `onMenuAction`'s push-based `menu:action` channel.
+    expect(r.missingHandlers.map((c) => c.channel)).toEqual(['menu:setRecent']);
     expect(r.orphanHandlers).toEqual([]);
   });
 });

@@ -19,6 +19,13 @@ const api: GraphvizApi = {
     ipcRenderer.on('file:changed', listener);
     return () => ipcRenderer.removeListener('file:changed', listener);
   },
+  onMenuAction: (cb) => {
+    const listener = (_e: IpcRendererEvent, msg: { action: string; payload?: string }) =>
+      cb(msg.action, msg.payload);
+    ipcRenderer.on('menu:action', listener);
+    return () => ipcRenderer.removeListener('menu:action', listener);
+  },
+  setMenuRecent: (paths) => ipcRenderer.invoke('menu:setRecent', paths),
 };
 
 contextBridge.exposeInMainWorld('graphviz', api);
