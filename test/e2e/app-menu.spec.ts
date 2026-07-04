@@ -1,11 +1,8 @@
-import { mkdtempSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { _electron as electron, expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { launchApp } from './helpers';
 
 test('installs a native application menu with a File menu', async () => {
-  const app = await electron.launch({ args: ['.'] });
-  const page = await app.firstWindow();
+  const { app, page } = await launchApp();
   await page.locator('#editor-host[data-editor="mounted"]').waitFor();
 
   const labels = await app.evaluate(({ Menu }) => {
@@ -18,12 +15,7 @@ test('installs a native application menu with a File menu', async () => {
 });
 
 test('File→New Tab menu item creates a new tab (menu:action round-trip)', async () => {
-  const userData = mkdtempSync(join(tmpdir(), 'gvjs-menu-'));
-  const app = await electron.launch({
-    args: ['.'],
-    env: { ...process.env, GVJS_E2E_USERDATA: userData },
-  });
-  const page = await app.firstWindow();
+  const { app, page } = await launchApp();
   await page.locator('#editor-host[data-editor="mounted"]').waitFor();
   await expect(page.locator('[role="tab"]')).toHaveCount(1);
 

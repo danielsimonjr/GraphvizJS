@@ -1,15 +1,15 @@
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { _electron as electron, expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { launchApp } from './helpers';
 
 test('recently opened file appears in the Recent menu and reopens', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'gvjs-recent-'));
   const file = join(dir, 'sample.dot');
   writeFileSync(file, 'digraph { a -> b }', 'utf-8');
 
-  const app = await electron.launch({ args: ['.'], env: { ...process.env, GVJS_E2E_OPEN: file } });
-  const page = await app.firstWindow();
+  const { app, page } = await launchApp({ GVJS_E2E_OPEN: file });
   await page.locator('#editor-host[data-editor="mounted"]').waitFor();
 
   await page.locator('[data-action="open-diagram"]').click();
