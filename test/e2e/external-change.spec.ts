@@ -1,16 +1,15 @@
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { _electron as electron, expect, test } from '@playwright/test';
-import { activeEditorContent } from './helpers';
+import { expect, test } from '@playwright/test';
+import { activeEditorContent, launchApp } from './helpers';
 
 test('a clean tab auto-reloads when its file changes on disk', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'gvjs-ext-'));
   const file = join(dir, 'watched.dot');
   writeFileSync(file, 'digraph { before_edit }', 'utf-8');
 
-  const app = await electron.launch({ args: ['.'], env: { ...process.env, GVJS_E2E_OPEN: file } });
-  const page = await app.firstWindow();
+  const { app, page } = await launchApp({ GVJS_E2E_OPEN: file });
   await page.locator('#editor-host[data-editor="mounted"]').waitFor();
   await page.locator('[data-action="open-diagram"]').click();
   await expect(page.locator('#editor-host')).toContainText('before_edit');
@@ -25,11 +24,7 @@ test('a dirty tab keeps edits when the reload prompt is cancelled', async () => 
   const file = join(dir, 'watched.dot');
   writeFileSync(file, 'digraph { base }', 'utf-8');
 
-  const app = await electron.launch({
-    args: ['.'],
-    env: { ...process.env, GVJS_E2E_OPEN: file, GVJS_E2E_CONFIRM: 'cancel' },
-  });
-  const page = await app.firstWindow();
+  const { app, page } = await launchApp({ GVJS_E2E_OPEN: file, GVJS_E2E_CONFIRM: 'cancel' });
   await page.locator('#editor-host[data-editor="mounted"]').waitFor();
   await page.locator('[data-action="open-diagram"]').click();
 

@@ -6,10 +6,15 @@ import { type ElectronApplication, _electron as electron, expect, Page } from '@
 /**
  * Launch the real Electron app via Playwright's Electron runner.
  *
- * Each launch gets its own throwaway `--user-data-dir` so runs are isolated:
- * electron-store persistence (window state, autosave drafts) never leaks between
- * tests, which also prevents the native "recover unsaved draft" dialog — which
- * Playwright cannot dismiss — from ever appearing and hanging the suite.
+ * Each launch gets its own throwaway user-data dir so runs are isolated:
+ * electron-store persistence (window state, recent files, and the restored
+ * session) never leaks between tests. Isolation is applied two ways for the
+ * same throwaway dir: the Chromium `--user-data-dir` switch AND the app's own
+ * `GVJS_E2E_USERDATA` seam (which calls `app.setPath('userData', …)` before the
+ * electron-store instance is constructed) — the latter guarantees the store is
+ * redirected regardless of how Electron maps the Chromium switch. Without this,
+ * a spec that opens a file persists a `session`, and the next launch silently
+ * restores it, causing order-dependent full-suite failures.
  *
  * @param env Extra environment variables (e.g. GVJS_E2E_OPEN / GVJS_E2E_SAVE)
  *            merged over the current process env for the launched app.
@@ -26,7 +31,7 @@ export async function launchApp(
   if (process.platform === 'linux') args.push('--no-sandbox');
   const app = await electron.launch({
     args,
-    env: { ...process.env, ...env } as Record<string, string>,
+    env: { ...process.env, GVJS_E2E_USERDATA: userDataDir, ...env } as Record<string, string>,
     // First cold spawn (Electron + WASM init) can be slow; be generous.
     timeout: 60000,
   });
