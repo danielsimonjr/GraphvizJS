@@ -84,7 +84,7 @@ describe('analyzeIpc', () => {
 });
 
 describe('analyzeIpcFromRoot (real repo)', () => {
-  it('reports all 10 GraphvizApi channels as fully wired, none missing/orphan', () => {
+  it('reports all 12 GraphvizApi channels as fully wired, none missing/orphan', () => {
     const r = analyzeIpcFromRoot(process.cwd());
     expect(r.fullyWired.map((c) => c.channel).sort()).toEqual(
       [
@@ -92,12 +92,14 @@ describe('analyzeIpcFromRoot (real repo)', () => {
         'dialog:confirm',
         'dialog:openText',
         'dialog:save',
+        'fs:readText',
         'fs:writeBinary',
         'fs:writeText',
         'shell:openExternal',
         'store:delete',
         'store:get',
         'store:set',
+        'watch:setPaths',
       ].sort()
     );
     expect(r.missingContract).toEqual([]);
