@@ -18,6 +18,7 @@ import {
 } from './editor/zoom';
 import { setupHelpDialog } from './help/dialog';
 import { confirm, store as platformStore, readTextFile } from './platform';
+import type { LayoutEngine } from './preview/graphviz';
 import { initGraphviz } from './preview/graphviz';
 import { createPreview } from './preview/render';
 import {
@@ -32,7 +33,7 @@ import { MAX_TABS, TabManager } from './tabs/manager';
 import { renderTabBar, setupTabBar } from './tabs/tab-bar';
 import { setupToolbarActions } from './toolbar/actions';
 import { makeFormatKeymap } from './toolbar/format';
-import { getCurrentEngine, setupLayoutEngine } from './toolbar/layout-engine';
+import { setupLayoutEngine } from './toolbar/layout-engine';
 import { setupToolbarShortcuts } from './toolbar/shortcuts';
 import { loadEditorZoom, saveEditorZoom } from './window/state';
 import { initHorizontalResize } from './workspace/resize';
@@ -109,6 +110,11 @@ async function bootstrap(): Promise<void> {
   const status = createStatusController(statusMessage);
   const fileStatus = createFileStatusController(statusFile);
 
+  // ── Tab Manager ──────────────────────────────────────────────────
+  // Declared before createPreview() so the getEngine closure below can
+  // reference it (invoked lazily at render time, after this is assigned).
+  const tabManager = new TabManager();
+
   const schedulePreviewRender = createPreview(previewElement, RENDER_DELAY, {
     callbacks: {
       onRenderStart() {
@@ -125,11 +131,8 @@ async function bootstrap(): Promise<void> {
         status.error(details);
       },
     },
-    getEngine: getCurrentEngine,
+    getEngine: () => tabManager.getActiveTab()?.layoutEngine ?? 'dot',
   });
-
-  // ── Tab Manager ──────────────────────────────────────────────────
-  const tabManager = new TabManager();
 
   // ── Recent files ─────────────────────────────────────────────────
   let recentFiles: string[] = await loadRecent(platformStore);
@@ -149,7 +152,7 @@ async function bootstrap(): Promise<void> {
       createDotAutocomplete(),
       createSearch(),
       keymap.of([makeFormatKeymap((doc) => schedulePreviewRender(doc))]),
-      createDotLinter({ getEngine: getCurrentEngine }),
+      createDotLinter({ getEngine: () => tabManager.getActiveTab()?.layoutEngine ?? 'dot' }),
       lintGutter(),
       EditorView.lineWrapping,
       EDITOR_THEME,
@@ -219,10 +222,20 @@ async function bootstrap(): Promise<void> {
     renderTabBar(tabManager.getAllTabs(), tabManager.getActiveTabId(), tabBarContainer);
   }
 
+  /** Sync the layout engine <select> to reflect the given engine. */
+  function syncEngineSelect(engine: LayoutEngine): void {
+    const select = document.querySelector<HTMLSelectElement>('#layout-engine');
+    if (select) select.value = engine;
+  }
+
   /** Create a new tab with content and optional file path. Returns the tab or null if at limit. */
-  function createNewTab(content: string, filePath: string | null = null): TabState | null {
+  function createNewTab(
+    content: string,
+    filePath: string | null = null,
+    engine: LayoutEngine = 'dot'
+  ): TabState | null {
     const editorView = createTabEditor(content, true);
-    const tab = tabManager.createTab({ content, filePath, editorView });
+    const tab = tabManager.createTab({ content, filePath, editorView, layoutEngine: engine });
     if (!tab) {
       // At tab limit -- destroy the orphan editor and notify user
       editorView.destroy();
@@ -257,6 +270,7 @@ async function bootstrap(): Promise<void> {
     updateFileStatus();
     schedulePreviewRender(content);
     editorView.focus();
+    syncEngineSelect(tab.layoutEngine);
 
     return tab;
   }
@@ -280,6 +294,7 @@ async function bootstrap(): Promise<void> {
 
     refreshTabBar();
     updateFileStatus();
+    syncEngineSelect(newTab.layoutEngine);
     schedulePreviewRender(newTab.editorView.state.doc.toString());
   }
 
@@ -462,9 +477,11 @@ async function bootstrap(): Promise<void> {
     },
   });
 
-  setupLayoutEngine(() => {
+  setupLayoutEngine((engine) => {
     const tab = tabManager.getActiveTab();
-    if (tab?.editorView) {
+    if (!tab) return;
+    tab.layoutEngine = engine;
+    if (tab.editorView) {
       schedulePreviewRender(tab.editorView.state.doc.toString());
     }
   });

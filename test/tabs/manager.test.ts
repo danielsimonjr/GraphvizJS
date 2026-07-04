@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { LayoutEngine } from '../../src/preview/graphviz';
 import { MAX_TABS, TabManager } from '../../src/tabs/manager';
 
 describe('tabs/manager', () => {
@@ -66,6 +67,14 @@ describe('tabs/manager', () => {
         const overflow = manager.createTab();
         expect(overflow).toBeNull();
         expect(manager.getTabCount()).toBe(MAX_TABS);
+      });
+
+      it('defaults layoutEngine to dot and accepts an override', () => {
+        const mgr = new TabManager();
+        const a = mgr.createTab();
+        expect(a?.layoutEngine).toBe('dot');
+        const b = mgr.createTab({ layoutEngine: 'neato' as LayoutEngine });
+        expect(b?.layoutEngine).toBe('neato');
       });
     });
 
