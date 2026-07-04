@@ -4,8 +4,7 @@ import { keymap } from '@codemirror/view';
 import { basicSetup, EditorView } from 'codemirror';
 import 'remixicon/fonts/remixicon.css';
 
-import { clearDraft, setupMultiTabAutosave } from './autosave/manager';
-import { checkForMultiTabRecovery, promptMultiTabRecovery } from './autosave/recovery';
+import { AUTOSAVE_INTERVAL, TAB_DRAFTS_KEY } from './autosave/constants';
 import { createDotAutocomplete } from './editor/autocomplete';
 import { createDotLanguage } from './editor/language';
 import { createDotLinter, lintGutter } from './editor/linting';
@@ -28,6 +27,7 @@ import {
   updateLevelDisplay,
 } from './preview/zoom';
 import { addRecent, loadRecent, removeRecent, saveRecent } from './recent/recent-files';
+import { captureSession, loadSession, persistSession, type SessionData } from './session/session';
 import type { TabState } from './tabs/manager';
 import { MAX_TABS, TabManager } from './tabs/manager';
 import { renderTabBar, setupTabBar } from './tabs/tab-bar';
@@ -186,6 +186,7 @@ async function bootstrap(): Promise<void> {
     tab.isDirty = doc !== tab.lastCommittedDoc;
     updateFileStatus();
     refreshTabBar();
+    scheduleSessionSave();
   }
 
   /** Mark a tab's document as committed (clean). */
@@ -197,12 +198,12 @@ async function bootstrap(): Promise<void> {
     tab.isDirty = false;
     if (options?.saved) {
       tab.lastSavedAt = new Date();
-      clearDraft(platformStore);
     } else if (!tab.filePath) {
       tab.lastSavedAt = null;
     }
     updateFileStatus();
     refreshTabBar();
+    scheduleSessionSave();
   }
 
   /** Update the file status bar from the active tab. */
@@ -232,7 +233,8 @@ async function bootstrap(): Promise<void> {
   function createNewTab(
     content: string,
     filePath: string | null = null,
-    engine: LayoutEngine = 'dot'
+    engine: LayoutEngine = 'dot',
+    savedContent: string = content
   ): TabState | null {
     const editorView = createTabEditor(content, true);
     const tab = tabManager.createTab({ content, filePath, editorView, layoutEngine: engine });
@@ -264,13 +266,15 @@ async function bootstrap(): Promise<void> {
       effects: StateEffect.appendConfig.of(createEditorZoomKeymap(editorZoom)),
     });
 
-    tab.lastCommittedDoc = content;
+    tab.lastCommittedDoc = savedContent;
+    tab.isDirty = content !== savedContent;
 
     refreshTabBar();
     updateFileStatus();
     schedulePreviewRender(content);
     editorView.focus();
     syncEngineSelect(tab.layoutEngine);
+    scheduleSessionSave();
 
     return tab;
   }
@@ -296,6 +300,7 @@ async function bootstrap(): Promise<void> {
     updateFileStatus();
     syncEngineSelect(newTab.layoutEngine);
     schedulePreviewRender(newTab.editorView.state.doc.toString());
+    scheduleSessionSave();
   }
 
   /** Close a tab by ID. Prompts if dirty. */
@@ -330,7 +335,29 @@ async function bootstrap(): Promise<void> {
 
     refreshTabBar();
     updateFileStatus();
+    scheduleSessionSave();
   }
+
+  // ── Session persistence ──────────────────────────────────────────
+  const captureCurrentSession = (): SessionData =>
+    captureSession(
+      tabManager.getAllTabs().map((t) => ({
+        filePath: t.filePath,
+        content: t.editorView?.state.doc.toString() ?? t.lastCommittedDoc,
+        savedContent: t.lastCommittedDoc,
+        engine: t.layoutEngine,
+      })),
+      tabManager.getAllTabs().findIndex((t) => t.id === tabManager.getActiveTabId())
+    );
+
+  let sessionSaveTimer: number | null = null;
+  const scheduleSessionSave = (): void => {
+    if (sessionSaveTimer !== null) window.clearTimeout(sessionSaveTimer);
+    sessionSaveTimer = window.setTimeout(() => {
+      sessionSaveTimer = null;
+      void persistSession(platformStore, captureCurrentSession());
+    }, 500);
+  };
 
   // ── Tab bar setup ────────────────────────────────────────────────
   if (tabBarContainer) {
@@ -350,40 +377,28 @@ async function bootstrap(): Promise<void> {
 
   commitDocument(initialTab.editorView!.state.doc.toString());
 
-  // Check for unsaved draft recovery before focusing editor
+  // Silent session restore: rehydrate the previous open-tab session, if any.
   {
-    const recoveryData = await checkForMultiTabRecovery(platformStore);
-    if (recoveryData) {
-      const shouldRecover = await promptMultiTabRecovery(recoveryData);
-      if (shouldRecover) {
-        // Restore first tab into the initial tab
-        const firstDraft = recoveryData.tabs[0];
-        if (firstDraft) {
-          const editor = initialTab.editorView!;
-          editor.dispatch({
-            changes: { from: 0, to: editor.state.doc.length, insert: firstDraft.content },
-          });
-          if (firstDraft.filePath) {
-            initialTab.filePath = firstDraft.filePath;
-          }
-          handleDocChange(initialTab, firstDraft.content);
-        }
-
-        // Restore additional tabs
-        for (let i = 1; i < recoveryData.tabs.length; i++) {
-          const draft = recoveryData.tabs[i];
-          createNewTab(draft.content, draft.filePath);
-        }
-
-        // Switch back to first tab
-        if (recoveryData.tabs.length > 1) {
-          switchToTab(initialTab.id);
-        }
+    const session = await loadSession(platformStore);
+    if (session && session.tabs.length > 0) {
+      const [first, ...rest] = session.tabs;
+      const editor = initialTab.editorView!;
+      editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: first.content } });
+      initialTab.filePath = first.filePath;
+      initialTab.layoutEngine = first.engine;
+      initialTab.lastCommittedDoc = first.savedContent;
+      initialTab.isDirty = first.content !== first.savedContent;
+      for (const t of rest) {
+        createNewTab(t.content, t.filePath, t.engine, t.savedContent);
       }
-      // Clear draft regardless of user choice: accepting restores the content,
-      // declining means the user intentionally discarded it. Either way, we don't
-      // want the same recovery prompt on next startup.
-      await clearDraft(platformStore);
+      const restored = tabManager.getAllTabs();
+      const target = restored[Math.min(session.activeIndex, restored.length - 1)];
+      if (target) switchToTab(target.id);
+      syncEngineSelect(tabManager.getActiveTab()?.layoutEngine ?? 'dot');
+      updateFileStatus();
+      refreshTabBar();
+      // One-time cleanup of the legacy draft key now that it's migrated.
+      await platformStore.delete(TAB_DRAFTS_KEY);
     }
   }
 
@@ -435,6 +450,7 @@ async function bootstrap(): Promise<void> {
       if (path) void recordRecent(path);
       updateFileStatus();
       refreshTabBar();
+      scheduleSessionSave();
     },
     getPath() {
       return tabManager.getActiveTab()?.filePath ?? null;
@@ -487,22 +503,11 @@ async function bootstrap(): Promise<void> {
     }
   });
 
-  // Start autosave (all tabs saved every 30s when content changes)
-  {
-    setupMultiTabAutosave(
-      {
-        store: platformStore,
-        getTabDrafts: () =>
-          tabManager.getAllTabs().map((tab) => ({
-            content: tab.editorView?.state.doc.toString() ?? '',
-            filePath: tab.filePath,
-          })),
-      },
-      () => {
-        status.success('Draft saved');
-      }
-    );
-  }
+  // Backstop: persist the session on a 30s interval, in addition to the
+  // debounced saves triggered by tab/content lifecycle events.
+  window.setInterval(() => {
+    void persistSession(platformStore, captureCurrentSession());
+  }, AUTOSAVE_INTERVAL);
 
   setupHelpDialog(helpButton);
 }

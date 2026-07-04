@@ -6,6 +6,13 @@ import Store from 'electron-store';
 import type { ConfirmOptions, DiagramFilter } from '../src/platform/contract';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Test seam: isolate persisted state to a temp dir under Playwright so session
+// restore can be exercised deterministically. Must run before Store construction.
+if (process.env.GVJS_E2E_USERDATA) {
+  app.setPath('userData', process.env.GVJS_E2E_USERDATA);
+}
+
 const store = new Store<Record<string, unknown>>();
 
 interface WindowState {
