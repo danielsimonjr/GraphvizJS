@@ -4,6 +4,7 @@ import { keymap } from '@codemirror/view';
 import { basicSetup, EditorView } from 'codemirror';
 import 'remixicon/fonts/remixicon.css';
 
+import type { LayoutEngine } from '../core/types';
 import { AUTOSAVE_INTERVAL, TAB_DRAFTS_KEY } from './autosave/constants';
 import { createDotAutocomplete } from './editor/autocomplete';
 import { createDotLanguage } from './editor/language';
@@ -26,8 +27,6 @@ import {
   setMenuRecent,
   validateDot,
 } from './platform';
-import type { LayoutEngine } from './preview/graphviz';
-import { initGraphviz } from './preview/graphviz';
 import { createPreview } from './preview/render';
 import {
   createZoomController,
@@ -103,8 +102,6 @@ async function bootstrap(): Promise<void> {
   if (!host || !previewElement) {
     return;
   }
-
-  await initGraphviz();
 
   const zoomController = createZoomController(previewElement, (level) => {
     if (zoomLevelDisplay) {
@@ -568,6 +565,7 @@ async function bootstrap(): Promise<void> {
     },
     getRecent: () => recentFiles,
     onPickRecent: pickRecent,
+    getEngine: () => tabManager.getActiveTab()?.layoutEngine ?? 'dot',
   });
 
   setupToolbarShortcuts({

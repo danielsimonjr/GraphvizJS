@@ -1,4 +1,5 @@
 import type { EditorView } from 'codemirror';
+import type { LayoutEngine } from '../../core/types';
 import { type ExampleItem, setupExamplesMenu } from './examples-menu';
 import { createExportHandler } from './export-diagram';
 import { setupExportMenu } from './export-menu';
@@ -35,6 +36,7 @@ export interface ToolbarActionsOptions {
   getPath: () => string | null;
   getRecent: () => string[];
   onPickRecent: (path: string) => void;
+  getEngine: () => LayoutEngine;
 }
 
 export function setupToolbarActions(options: ToolbarActionsOptions): void {
@@ -88,6 +90,7 @@ export function setupToolbarActions(options: ToolbarActionsOptions): void {
   const handleExport = createExportHandler({
     getEditor,
     getPath,
+    getEngine: options.getEngine,
   });
 
   setupExportMenu({

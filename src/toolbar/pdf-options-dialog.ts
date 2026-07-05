@@ -1,4 +1,4 @@
-import type { PdfExportOptions } from '../preview/export-pdf';
+import type { PdfExportOptions } from '../../core/types';
 
 /**
  * Open a modal dialog to choose PDF page options. Resolves the chosen options

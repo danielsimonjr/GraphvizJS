@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { LayoutEngine } from '../../src/preview/graphviz';
+import type { LayoutEngine } from '../../core/types';
 import { MAX_TABS, TabManager } from '../../src/tabs/manager';
 
 describe('tabs/manager', () => {

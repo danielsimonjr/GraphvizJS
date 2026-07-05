@@ -1,5 +1,5 @@
+import type { LayoutEngine } from '../../core/types';
 import { debounce } from '../utils/debounce';
-import type { LayoutEngine } from './graphviz';
 
 export type PreviewScheduler = (doc: string) => void;
 
