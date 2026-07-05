@@ -143,7 +143,7 @@
 
 ## Architecture rules
 
-> Layer policy: `core` is a leaf; `cli` → `core`; `electron` → `core`/renderer; the renderer (`src/`) may import `core` only as type-only `core/types`.
+> Layer policy: `core` is a leaf; `cli` → `core`; `electron` → `core` + the shared renderer modules (`menu`/`watch`/`platform`); the renderer (`src/`) may import `core` only as type-only `core/types`.
 
 All layer boundaries respected ✅
 

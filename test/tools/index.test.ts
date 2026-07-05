@@ -1,5 +1,25 @@
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { buildAnalysis } from '../../tools/dependency-graph/index';
+import { buildAnalysis, staleDocs, writeOutputs } from '../../tools/dependency-graph/index';
+
+describe('staleDocs', () => {
+  const a = buildAnalysis(process.cwd());
+
+  it('reports every generated doc as stale when none are written yet', () => {
+    const empty = mkdtempSync(join(tmpdir(), 'dgt-stale-'));
+    expect(staleDocs(empty, a)).toHaveLength(3); // md, json, mermaid all missing
+  });
+
+  it('reports none right after writeOutputs, and the changed one after an edit', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'dgt-fresh-'));
+    const written = writeOutputs(dir, a);
+    expect(staleDocs(dir, a)).toEqual([]);
+    writeFileSync(written[0], 'tampered', 'utf-8'); // corrupt DEPENDENCY_GRAPH.md
+    expect(staleDocs(dir, a)).toEqual(['docs/architecture/DEPENDENCY_GRAPH.md']);
+  });
+});
 
 describe('buildAnalysis (real repo)', () => {
   const a = buildAnalysis(process.cwd());
