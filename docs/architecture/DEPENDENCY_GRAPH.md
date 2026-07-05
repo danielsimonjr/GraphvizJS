@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 44 |
+| Files | 42 |
 | Modules | 15 |
-| Lines of code | 4747 |
-| Internal edges | 71 |
-| Exports | 137 |
+| Lines of code | 4341 |
+| Internal edges | 59 |
+| Exports | 127 |
 
 ## Modules
 
@@ -47,8 +47,6 @@
 
 ### preview
 
-- `src/preview/export-pdf.ts`
-- `src/preview/graphviz.ts`
 - `src/preview/render.ts`
 - `src/preview/zoom.ts`
 
@@ -107,15 +105,13 @@
 
 | Module | Depends on |
 | --- | --- |
-| editor | preview |
 | help | platform |
 | menu | platform |
 | preview | utils |
 | recent | platform |
 | root | autosave, editor, help, menu, platform, preview, recent, session, tabs, toolbar, watch, window, workspace |
-| session | autosave, platform, preview |
-| tabs | preview |
-| toolbar | editor, platform, preview |
+| session | autosave, platform |
+| toolbar | editor, platform |
 | watch | platform |
 | window | platform |
 
@@ -135,11 +131,6 @@ None. ✅
 - `SpanKind` in `src/editor/scan-dot.ts`
 - `StructuralDiagnostic` in `src/editor/structure-lint.ts`
 - `GraphvizApi` in `src/platform/contract.ts`
-- `PageGeometry` in `src/preview/export-pdf.ts`
-- `PdfPageMode` in `src/preview/export-pdf.ts`
-- `PdfPageSize` in `src/preview/export-pdf.ts`
-- `PdfOrientation` in `src/preview/export-pdf.ts`
-- `isGraphvizReady` in `src/preview/graphviz.ts`
 - `PreviewStatusCallbacks` in `src/preview/render.ts`
 - `PreviewOptions` in `src/preview/render.ts`
 - `PreviewScheduler` in `src/preview/render.ts`
@@ -180,8 +171,6 @@ None. ✅
 | `src/menu/menu-template.ts` | `test/menu/menu-template.test.ts` |
 | `src/platform/contract.ts` | — |
 | `src/platform/index.ts` | `test/help/dialog.test.ts`, `test/platform/index.test.ts`, `test/toolbar/export-diagram.test.ts`, `test/toolbar/open-diagram.test.ts`, `test/toolbar/save-as.test.ts`, `test/toolbar/save-diagram.test.ts`, `test/window/state.test.ts` |
-| `src/preview/export-pdf.ts` | `test/preview/export-pdf.test.ts` |
-| `src/preview/graphviz.ts` | `test/editor/linting.test.ts`, `test/tabs/manager.test.ts`, `test/toolbar/export-diagram.test.ts` |
 | `src/preview/render.ts` | — |
 | `src/preview/zoom.ts` | `test/preview/zoom.test.ts` |
 | `src/recent/recent-files.ts` | `test/recent/recent-files.test.ts` |
@@ -197,7 +186,7 @@ None. ✅
 | `src/toolbar/layout-engine.ts` | `test/toolbar/layout-engine.test.ts` |
 | `src/toolbar/new-diagram.ts` | `test/toolbar/new-diagram.test.ts` |
 | `src/toolbar/open-diagram.ts` | `test/toolbar/open-diagram.test.ts` |
-| `src/toolbar/pdf-options-dialog.ts` | `test/toolbar/pdf-options-dialog.test.ts` |
+| `src/toolbar/pdf-options-dialog.ts` | `test/toolbar/export-diagram.test.ts`, `test/toolbar/pdf-options-dialog.test.ts` |
 | `src/toolbar/recent-menu.ts` | `test/toolbar/recent-menu.test.ts` |
 | `src/toolbar/save-as.ts` | `test/toolbar/save-as.test.ts` |
 | `src/toolbar/save-diagram.ts` | `test/toolbar/save-diagram.test.ts` |
@@ -216,10 +205,13 @@ None. ✅
 | `dialog:confirm` | confirm | ✅ wired |
 | `dialog:openText` | openTextFile | ✅ wired |
 | `dialog:save` | pickSavePath | ✅ wired |
+| `export:render` | exportRender | ✅ wired |
 | `fs:readText` | readTextFile | ✅ wired |
 | `fs:writeBinary` | writeBinaryFile | ✅ wired |
 | `fs:writeText` | writeTextFile | ✅ wired |
 | `menu:setRecent` | setMenuRecent | ✅ wired |
+| `render:svg` | renderSvg | ✅ wired |
+| `render:validate` | validateDot | ✅ wired |
 | `shell:openExternal` | openExternal | ✅ wired |
 | `store:delete` | storeDelete | ✅ wired |
 | `store:get` | storeGet | ✅ wired |

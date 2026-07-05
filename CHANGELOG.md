@@ -6,7 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-## [1.4.0] - 2026-07-04
+## [2.0.0] - 2026-07-04
+
+### Changed
+
+- **Re-architected around a headless core.** All diagram rendering and SVG / PNG /
+  PDF export now run in a Node-only `core/` used by the Electron main process.
+  The renderer contains zero Graphviz — it drives the live preview, linting, and
+  export over IPC. Behavior is unchanged for GUI users, and the renderer bundle
+  no longer ships the Graphviz WebAssembly module.
+
+### Added
+
+- **`graphvizjs` CLI.** `graphvizjs render <input.dot> -o <output>` with
+  `--engine`, `--format` (svg/png/pdf), `--scale`, `--pdf-page`, and
+  `--pdf-orientation`, plus stdin via `-`. The GUI and CLI share the same
+  render/export core.
+
+### Fixed
+
+- Image/PDF export now uses the tab's selected layout engine, matching the live
+  preview. Previously export always rendered with the default `dot` engine
+  regardless of the chosen engine.
 
 ### Added
 
