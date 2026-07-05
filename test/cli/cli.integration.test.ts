@@ -2,7 +2,7 @@
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { main } from '../../cli/index';
 
 describe('graphvizjs CLI', () => {
@@ -31,5 +31,18 @@ describe('graphvizjs CLI', () => {
   it('exits 2 on bad args, 1 on missing input file', async () => {
     expect(await main(['render'])).toBe(2);
     expect(await main(['render', join(dir, 'nope.dot'), '-o', join(dir, 'x.svg')])).toBe(1);
+  });
+
+  it('prints the package version resolved from the nearest package.json', async () => {
+    const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf-8'));
+    const writes: string[] = [];
+    const spy = vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
+      writes.push(String(chunk));
+      return true;
+    });
+    const code = await main(['--version']);
+    spy.mockRestore();
+    expect(code).toBe(0);
+    expect(writes.join('')).toBe(`graphvizjs ${pkg.version}\n`);
   });
 });

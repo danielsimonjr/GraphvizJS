@@ -1,6 +1,6 @@
 {
   "name": "graphvizjs-desktop-client",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Desktop editor for Graphviz DOT diagrams with real-time preview, syntax highlighting, and SVG/PNG export.",
   "license": "MIT",
   "author": {
@@ -10,11 +10,16 @@
   "type": "module",
   "main": "dist-electron/main.js",
   "bin": {
-    "graphvizjs": "cli/index.ts"
+    "graphvizjs": "dist-cli/cli/index.js"
   },
+  "files": [
+    "dist-cli"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:cli": "tsc -p tsconfig.cli.json",
+    "prepack": "pnpm build:cli",
     "package": "electron-builder",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",

@@ -27,10 +27,20 @@ step 16 pulls the next item). Statuses: 🟢 READY · 🟡 IN PROGRESS · ✅ DO
   `electron/main.ts`, `electron/preload.ts` as entry-like). Graph went 15→18 modules / 42→54 files,
   0 unused files, still IPC 16/16 and 0 cycles; the `cli → core` / `platform → core` edges are now
   visible. Tests added in `categorize.test.ts` + `index.test.ts`.
-- ⏸️ **Make the `graphvizjs` CLI a distributable binary** — deferred (Daniel, 2026-07-04). Ship
-  via the tsc approach (compile `cli/`+`core/` to `dist-cli/`, shebang, `bin`→compiled JS, natives
-  as normal deps). NOT `@vercel/ncc` — investigated and rejected (ESM + jsdom `__dirname` crash;
-  61 MB Windows-DLL folder). See memory `project_graphvizjs_cli_distribution`.
+- ✅ **Make the `graphvizjs` CLI a distributable binary** (v2.1.0, branch `feat/cli-distributable`)
+  — shipped via the tsc approach (`tsconfig.cli.json` compiles `cli/`+`core/` → `dist-cli/` as Node
+  ESM; `#!/usr/bin/env node` shebang; `bin`→`dist-cli/cli/index.js`; `files:["dist-cli"]`; natives
+  as normal deps). NOT `@vercel/ncc` (rejected: ESM + jsdom `__dirname` crash). Verified by running
+  the compiled binary from outside the repo (svg/png/pdf/stdin/--version) + a durable subprocess
+  integration test. Three root-cause fixes surfaced by the DGT bedrock audit + validation:
+  - Added explicit `.js` extensions to relative imports in `cli/`+`core/` (NodeNext requirement).
+  - Made the `--version` read layout-independent (walk up to the nearest `package.json`) so it works
+    in both the source (tsx) and compiled layouts.
+  - **Pre-existing bug fixed:** `render -` (stdin) was rejected as an unknown flag despite being
+    advertised in USAGE and implemented in `readInput` — the parser guard now exempts a bare `-`.
+  - **DGT tool fixed:** `resolveImport`/`resolveCandidates` now map a TS-ESM `.js` specifier to its
+    `.ts` source (the `.js` extensions had silently dropped the `cli → core` edge).
+  See memory `project_graphvizjs_cli_distribution`.
 
 ## No action (reviewed, acceptable-as-is)
 

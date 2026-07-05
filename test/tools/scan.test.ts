@@ -80,10 +80,16 @@ describe('resolveImport', () => {
   it('returns null for non-relative specifiers', () => {
     expect(resolveImport('src/a.ts', '@hpcc-js/wasm')).toBeNull();
   });
+  it('maps a TS-ESM ".js" specifier to its ".ts" source', () => {
+    expect(resolveImport('cli/index.ts', '../core/export.js')).toBe('core/export.ts');
+  });
 });
 
 describe('resolveCandidates', () => {
   it('offers a directory index.ts candidate', () => {
     expect(resolveCandidates('src/toolbar/actions.ts', '../tabs')).toContain('src/tabs/index.ts');
+  });
+  it('maps a TS-ESM ".js" specifier to its ".ts" source', () => {
+    expect(resolveCandidates('cli/index.ts', '../core/export.js')).toEqual(['core/export.ts']);
   });
 });

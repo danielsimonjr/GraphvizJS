@@ -2,7 +2,7 @@
   "stats": {
     "fileCount": 54,
     "moduleCount": 18,
-    "totalLoc": 5470,
+    "totalLoc": 5499,
     "edgeCount": 91,
     "exportCount": 153
   },
@@ -994,7 +994,7 @@
     },
     {
       "path": "src/toolbar/export-menu.ts",
-      "loc": 95,
+      "loc": 96,
       "exports": [
         "setupExportMenu",
         "ExportMenuOptions"
@@ -1174,7 +1174,7 @@
     },
     {
       "path": "cli/args.ts",
-      "loc": 166,
+      "loc": 172,
       "exports": [
         "parseArgs",
         "ParsedArgs",
@@ -1183,7 +1183,7 @@
     },
     {
       "path": "cli/index.ts",
-      "loc": 57,
+      "loc": 79,
       "exports": [
         "main"
       ]

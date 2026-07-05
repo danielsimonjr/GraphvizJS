@@ -8,7 +8,7 @@
  */
 
 import { Graphviz } from '@hpcc-js/wasm';
-import type { DotValidationError, LayoutEngine } from './types';
+import type { DotValidationError, LayoutEngine } from './types.js';
 
 // Singleton instance - only load WASM once
 let graphvizInstance: Awaited<ReturnType<typeof Graphviz.load>> | null = null;

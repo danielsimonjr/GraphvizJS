@@ -114,6 +114,8 @@ export function resolveImport(fromRelPath: string, spec: string): string | null 
   if (!spec.startsWith('.')) return null;
   const fromDir = path.posix.dirname(fromRelPath);
   const joined = path.posix.normalize(path.posix.join(fromDir, spec));
+  // A ".js" specifier in TS-ESM source (NodeNext) points at its sibling ".ts".
+  if (joined.endsWith('.js')) return `${joined.slice(0, -3)}.ts`;
   if (joined.endsWith('.ts')) return joined;
   return `${joined}.ts`;
 }
@@ -123,6 +125,8 @@ export function resolveCandidates(fromRelPath: string, spec: string): string[] {
   if (!spec.startsWith('.')) return [];
   const fromDir = path.posix.dirname(fromRelPath);
   const joined = path.posix.normalize(path.posix.join(fromDir, spec));
+  // A ".js" specifier in TS-ESM source (NodeNext) points at its sibling ".ts".
+  if (joined.endsWith('.js')) return [`${joined.slice(0, -3)}.ts`];
   if (joined.endsWith('.ts')) return [joined];
   return [`${joined}.ts`, `${joined}/index.ts`];
 }
