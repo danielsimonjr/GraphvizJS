@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **Architecture enforcement in the dependency-graph tool.** `pnpm graph:check` verifies the
+  headless-core layer policy (`core/` is a leaf, `cli/` → `core/` only, the renderer may import
+  `core/` only as type-only `core/types`) plus no runtime cycles and a fully-wired IPC surface,
+  exiting non-zero on any violation — now a CI gate. `pnpm graph -- --impact <file>` prints a
+  file's transitive reverse-dependencies (blast radius). The written report gained an
+  "Architecture rules" section. Dev-tooling only; no app behavior change.
+
 ### Changed
 
 - **Dependency-graph tool (`pnpm graph`)** now treats `.js`/`.jsx`/`.mjs`/`.cjs` files as
