@@ -1,6 +1,5 @@
 import { debounce } from '../utils/debounce';
 import type { LayoutEngine } from './graphviz';
-import { renderDotToSvg } from './graphviz';
 
 export type PreviewScheduler = (doc: string) => void;
 
@@ -14,18 +13,24 @@ export interface PreviewStatusCallbacks {
 export interface PreviewOptions {
   callbacks?: PreviewStatusCallbacks;
   getEngine?: () => LayoutEngine;
+  render: (dot: string, engine: LayoutEngine) => Promise<string>;
 }
+
+type LegacyPreviewOptions = PreviewStatusCallbacks & Pick<PreviewOptions, 'render'>;
 
 export function createPreview(
   previewEl: HTMLElement,
   delay: number,
-  callbacksOrOptions: PreviewStatusCallbacks | PreviewOptions = {}
+  callbacksOrOptions: LegacyPreviewOptions | PreviewOptions
 ): PreviewScheduler {
   // Support both old and new API signatures
   const isNewApi = 'callbacks' in callbacksOrOptions || 'getEngine' in callbacksOrOptions;
   const options: PreviewOptions = isNewApi
     ? (callbacksOrOptions as PreviewOptions)
-    : { callbacks: callbacksOrOptions as PreviewStatusCallbacks };
+    : {
+        callbacks: callbacksOrOptions as PreviewStatusCallbacks,
+        render: callbacksOrOptions.render,
+      };
 
   const callbacks = options.callbacks ?? {};
   const getEngine = options.getEngine ?? (() => 'dot' as LayoutEngine);
@@ -43,7 +48,7 @@ export function createPreview(
 
     try {
       const engine = getEngine();
-      const svg = await renderDotToSvg(trimmed, engine);
+      const svg = await options.render(trimmed, engine);
       if (token !== latestToken) return;
       previewEl.classList.remove('preview-empty', 'preview-error');
       previewEl.innerHTML = svg;

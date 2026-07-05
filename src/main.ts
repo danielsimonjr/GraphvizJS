@@ -18,7 +18,13 @@ import {
 } from './editor/zoom';
 import { setupHelpDialog } from './help/dialog';
 import { type MenuCommandHandlers, setupMenuCommands } from './menu/commands';
-import { confirm, store as platformStore, readTextFile, setMenuRecent } from './platform';
+import {
+  confirm,
+  store as platformStore,
+  readTextFile,
+  renderSvg,
+  setMenuRecent,
+} from './platform';
 import type { LayoutEngine } from './preview/graphviz';
 import { initGraphviz } from './preview/graphviz';
 import { createPreview } from './preview/render';
@@ -142,6 +148,7 @@ async function bootstrap(): Promise<void> {
       },
     },
     getEngine: () => tabManager.getActiveTab()?.layoutEngine ?? 'dot',
+    render: renderSvg,
   });
 
   // ── Recent files ─────────────────────────────────────────────────
