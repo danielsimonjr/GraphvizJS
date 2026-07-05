@@ -196,7 +196,12 @@ app.whenReady().then(() => {
   setupFileWatcher();
   createWindow();
   setupAppMenu();
-  void initGraphviz();
+  // Warm up the WASM engine eagerly; failures re-surface (and are handled) on the
+  // first render:svg/export:render IPC call, so just log here rather than crash the
+  // main process with an unhandled rejection.
+  initGraphviz().catch((error) => {
+    console.error('Failed to pre-initialize Graphviz', error);
+  });
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-GraphvizJS is an Electron desktop app for editing Graphviz DOT diagrams with live preview. The frontend is TypeScript/Vite with CodeMirror 6 for editing and `@hpcc-js/wasm` for client-side Graphviz rendering via WebAssembly. Based on [MermaidJS Desktop Client](https://github.com/skydiver/mermaidjs-desktop-client).
+GraphvizJS is an Electron desktop app for editing Graphviz DOT diagrams with live preview. The frontend is TypeScript/Vite with CodeMirror 6 for editing. All Graphviz work — DOT→SVG render, validation, and SVG/PNG/PDF export — runs headlessly in a Node-only `core/` in the **main process**; the renderer holds zero Graphviz and drives preview, linting, and export over IPC. A `graphvizjs` CLI (`cli/`) consumes the same core. Rendering uses `@hpcc-js/wasm` (WebAssembly), PNG export `@resvg/resvg-js`, and vector PDF export jsPDF + svg2pdf.js in a jsdom + node-canvas environment. Based on [MermaidJS Desktop Client](https://github.com/skydiver/mermaidjs-desktop-client).
 
 ## Commands
 
@@ -35,41 +35,47 @@ Run a single E2E test: `npx playwright test test/e2e/rendering.spec.ts`
 ### Bootstrap Flow (`src/main.ts`)
 
 The app bootstraps on `DOMContentLoaded` via a single `bootstrap()` function that:
-1. Initializes Graphviz WASM (`initGraphviz`)
-2. Loads persisted window state and settings from electron-store
-3. Creates zoom controllers (preview + editor)
-4. Creates the TabManager and initial tab with CodeMirror editor
-5. Checks for multi-tab autosave recovery and prompts user
-6. Wires up tab bar, toolbar actions, keyboard shortcuts, layout engine selector, and autosave
+1. Loads persisted window state and settings from electron-store
+2. Creates zoom controllers (preview + editor)
+3. Creates the `TabManager` and initial tab with a CodeMirror editor
+4. Silently restores the previously open session (`loadSession` — tabs, unsaved edits, and per-tab layout engine) instead of prompting for crash recovery
+5. Wires up the tab bar, toolbar actions, keyboard shortcuts, the layout-engine selector, and session persistence
 
-State is managed via a `TabManager` instance in `bootstrap()`. Each tab holds its own `TabState` (filePath, isDirty, lastCommittedDoc, lastSavedAt, editorView, editorZoomLevel). The `commitDocument()` function delegates to the active tab. Only the active tab's editor is visible (others hidden via `display:none`).
+The main process (not the renderer) initializes Graphviz. State is managed via a `TabManager` instance in `bootstrap()`. Each tab holds its own `TabState` (id, file path, dirty flag, last-committed and saved-content baselines, editor instance, editor zoom, and layout engine). The `commitDocument()` function delegates to the active tab. Only the active tab's editor is visible (others hidden via `display:none`).
 
 ### Module Boundaries
 
-Each `src/` subdirectory exports setup functions that receive DOM elements and callbacks. There is no shared global state or event bus — modules communicate through the callback options passed from `main.ts`.
+The **`core/`** directory (repo root, Node-only, no DOM) owns all Graphviz work: `render.ts` (DOT→SVG + validation via `@hpcc-js/wasm`), `normalize-svg.ts` (pure-string viewBox/padding rewrite — no DOM `getBBox`), `export-png.ts` (`@resvg/resvg-js`), `export-pdf.ts` (headless vector PDF), and the `export.ts` orchestrator (`exportDiagram`). Both the Electron main process and the **`cli/`** binary (`graphvizjs`) consume it. Types live in `core/types.ts`.
 
-- **editor/** — CodeMirror extensions: DOT language grammar (`language.ts`), theme (`theme.ts`), font zoom (`zoom.ts`), syntax linting (`linting.ts`)
-- **preview/** — Graphviz WASM init (`graphviz.ts`), debounced SVG rendering (`render.ts`), preview zoom (`zoom.ts`)
-- **toolbar/** — Each action is a separate module: `new-diagram.ts`, `open-diagram.ts`, `save-diagram.ts`, `export-diagram.ts`, `export-menu.ts`, `examples-menu.ts`, `layout-engine.ts`, `shortcuts.ts`. Orchestrated by `actions.ts`.
-- **tabs/** — Multi-tab management: `manager.ts` (TabManager class, TabState interface), `tab-bar.ts` (tab bar UI rendering and event delegation)
-- **autosave/** — Periodic draft saving (`manager.ts`) and crash recovery (`recovery.ts`). Supports multi-tab drafts via `tabDrafts` store key. Uses electron-store with keys defined in `constants.ts`.
-- **workspace/** — Horizontal resizable pane divider
-- **window/** — Window position/size persistence via electron-store
-- **help/** — Help dialog with keyboard shortcuts and app info (`dialog.ts`)
-- **utils/** — Shared utilities (`debounce.ts`)
-- **examples/** — `.dot` files loaded via `import.meta.glob` (Vite eager glob import with `?raw` query)
+Within `src/` (the renderer), each subdirectory exports setup functions that receive DOM elements and callbacks. There is no shared global state or event bus — modules communicate through the callback options passed from `main.ts`, and reach Graphviz only over IPC.
+
+- **platform/** — the renderer↔main IPC boundary: `contract.ts` (the `GraphvizApi` interface exposed on `window.graphviz`) and `index.ts` (thin renderer-side wrappers, incl. `renderSvg`/`validateDot`/`exportRender`)
+- **editor/** — CodeMirror extensions: DOT grammar (`language.ts`), theme, font zoom, autocomplete + snippets (`autocomplete.ts`, `dot-data.ts`), find/replace (`search.ts`), formatting (`format.ts`), a literal-aware scanner (`scan-dot.ts`), and linting — `linting.ts` (validates via the `render:validate` IPC) plus local `structure-lint.ts`
+- **preview/** — debounced live preview (`render.ts`, renders via the `render:svg` IPC) and preview zoom (`zoom.ts`)
+- **toolbar/** — each action is a separate module (`new-diagram.ts`, `open-diagram.ts`, `save-diagram.ts`, `save-as.ts`, `export-diagram.ts` [calls `export:render`], `export-menu.ts`, `examples-menu.ts`, `recent-menu.ts`, `layout-engine.ts`, `find.ts`, `format.ts`, `pdf-options-dialog.ts`, `shortcuts.ts`), orchestrated by `actions.ts`
+- **tabs/** — multi-tab management: `manager.ts` (TabManager class, TabState interface), `tab-bar.ts` (tab bar UI + event delegation)
+- **session/** — silent session capture/restore/persist across launches (`session.ts`, the `session` store key)
+- **recent/** — recent-files list core (`recent-files.ts`)
+- **watch/** — external-change detection (`watch-plan.ts` pure core; renderer side reacts to the `file:changed` push and reloads clean tabs / prompts dirty ones)
+- **menu/** — native application menu: `menu-template.ts` (pure `buildMenuTemplate`) and `commands.ts` (dispatch for `menu:action`)
+- **workspace/** — horizontal resizable pane divider
+- **window/** — window position/size persistence via electron-store
+- **help/** — help dialog with shortcuts and app info (`dialog.ts`)
+- **autosave/** — legacy autosave constants only (`constants.ts`); the old draft-manager/recovery modules were replaced by `session/`
+- **utils/** — shared utilities (`debounce.ts`)
+- **examples/** — `.dot` files loaded via `import.meta.glob` (Vite eager glob import with `?raw`)
 
 ### Rendering Pipeline
 
-Editor changes trigger a debounced render (300ms). `createPreview()` returns a `schedulePreviewRender(doc)` function. The render uses the currently selected layout engine (dot, neato, fdp, etc.) via `getCurrentEngine()`. Output is SVG injected into the preview host element.
+Editor changes trigger a debounced render (`RENDER_DELAY` = 300ms). `createPreview()` returns a `schedulePreviewRender(doc)` function that sends the DOT plus the active tab's layout engine over the `render:svg` IPC to the core in the main process, receives the SVG string, and injects it into the preview host element (a stale-token check cancels superseded renders). The engine is read per-tab via a `getEngine` closure over the active tab — there is no global engine getter.
 
 ### Electron Integration
 
-Native capabilities are accessed through Electron APIs and `electron-store` for key-value persistence. File dialogs and filesystem access are handled via Electron's `dialog` and `fs` modules, exposed through the preload script (`electron/preload.ts`).
+The main process hosts the headless `core/` and registers the IPC handlers the renderer calls: `render:svg`, `render:validate`, and `export:render` (DOT in, SVG / diagnostics / export bytes out), alongside file-dialog/filesystem, `electron-store` key-value, external-file-watch, and native-menu channels. All are exposed to the renderer through the preload script (`electron/preload.ts`) as `window.graphviz`, wrapped by `src/platform/`. `menu:action`/`file:changed` are push channels (main→renderer).
 
 ### Vite Configuration
 
-The Vite root is `src/` (not project root). HTML entry point is `src/index.html`. The `@hpcc-js/wasm` package is excluded from dependency optimization (`optimizeDeps.exclude`).
+The Vite root is `src/` (not project root). HTML entry point is `src/index.html`. `@hpcc-js/wasm` is excluded from renderer dependency optimization (`optimizeDeps.exclude`). The Electron **main** build (via `vite-plugin-electron`) externalizes the native/heavy Node deps the core loads at runtime — `@hpcc-js/wasm`, `@resvg/resvg-js`, `canvas`, `jsdom`, `jspdf`, `svg2pdf.js` — because rollup cannot bundle a native `.node` binary; electron-builder includes them in the installer and `asarUnpack`s the natives.
 
 ## Testing
 
@@ -99,4 +105,4 @@ Version is maintained in `package.json` → `"version"`.
 
 **New example diagram**: Add numbered `.dot` file to `src/examples/` (e.g., `08-cluster.dot`), add menu item in `src/index.html` under `[data-menu="examples"]`. Auto-loaded via Vite glob import.
 
-**New export format**: Add to `ExportFormat` type in `src/toolbar/export-menu.ts`, add HTML menu item, handle in `src/toolbar/export-diagram.ts`.
+**New export format**: Add to the `ExportFormat` type in `core/types.ts` (and the `export-menu.ts` menu type), add the HTML menu item, handle the format in `core/export.ts` (`exportDiagram`), and wire the menu action in `src/toolbar/export-diagram.ts` (which calls the `export:render` IPC). The renderer never renders/exports directly.

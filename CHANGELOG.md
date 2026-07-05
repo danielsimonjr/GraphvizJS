@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-07-05
+
+### Security
+
+- Tightened the renderer Content-Security-Policy `script-src` to `'self'`, removing
+  `'unsafe-eval'` and `'wasm-unsafe-eval'`. Those were only required by the in-renderer
+  Graphviz/PDF libraries that moved to the headless core in v2.0.0; the renderer bundle now
+  contains no `new Function`, `eval`, or `WebAssembly`.
+
+### Changed
+
+- The main process now logs a Graphviz pre-initialization failure instead of raising an
+  unhandled promise rejection (the engine still re-initializes on the first render/export call).
+
 ## [2.0.0] - 2026-07-04
 
 ### Changed

@@ -16,22 +16,11 @@ export interface PreviewOptions {
   render: (dot: string, engine: LayoutEngine) => Promise<string>;
 }
 
-type LegacyPreviewOptions = PreviewStatusCallbacks & Pick<PreviewOptions, 'render'>;
-
 export function createPreview(
   previewEl: HTMLElement,
   delay: number,
-  callbacksOrOptions: LegacyPreviewOptions | PreviewOptions
+  options: PreviewOptions
 ): PreviewScheduler {
-  // Support both old and new API signatures
-  const isNewApi = 'callbacks' in callbacksOrOptions || 'getEngine' in callbacksOrOptions;
-  const options: PreviewOptions = isNewApi
-    ? (callbacksOrOptions as PreviewOptions)
-    : {
-        callbacks: callbacksOrOptions as PreviewStatusCallbacks,
-        render: callbacksOrOptions.render,
-      };
-
   const callbacks = options.callbacks ?? {};
   const getEngine = options.getEngine ?? (() => 'dot' as LayoutEngine);
 

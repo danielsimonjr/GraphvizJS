@@ -177,26 +177,10 @@ describe('render', () => {
     });
   });
 
-  describe('Backward-compatible API (PreviewStatusCallbacks)', () => {
-    it('works when passing callbacks directly (old API)', async () => {
+  describe('PreviewOptions API', () => {
+    it('wires callbacks passed under { callbacks }', async () => {
       const { createPreview } = await import('../../src/preview/render');
       const onRenderSuccess = vi.fn();
-      // Old API: pass PreviewStatusCallbacks directly, not wrapped in { callbacks }
-      const scheduler = createPreview(previewEl, 100, {
-        render: createRenderSpy(),
-        onRenderSuccess,
-      });
-
-      scheduler('digraph { a -> b }');
-      await vi.advanceTimersByTimeAsync(100);
-
-      expect(onRenderSuccess).toHaveBeenCalledTimes(1);
-    });
-
-    it('works when passing PreviewOptions with callbacks (new API)', async () => {
-      const { createPreview } = await import('../../src/preview/render');
-      const onRenderSuccess = vi.fn();
-      // New API: wrap in { callbacks }
       const scheduler = createPreview(previewEl, 100, {
         render: createRenderSpy(),
         callbacks: { onRenderSuccess },

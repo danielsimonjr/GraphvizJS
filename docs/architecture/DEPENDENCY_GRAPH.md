@@ -6,17 +6,31 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 42 |
-| Modules | 15 |
-| Lines of code | 4341 |
-| Internal edges | 59 |
-| Exports | 127 |
+| Files | 54 |
+| Modules | 18 |
+| Lines of code | 5470 |
+| Internal edges | 91 |
+| Exports | 153 |
 
 ## Modules
 
 ### autosave
 
 - `src/autosave/constants.ts`
+
+### cli
+
+- `cli/args.ts`
+- `cli/index.ts`
+
+### core
+
+- `core/export-pdf.ts`
+- `core/export-png.ts`
+- `core/export.ts`
+- `core/normalize-svg.ts`
+- `core/render.ts`
+- `core/types.ts`
 
 ### editor
 
@@ -30,6 +44,13 @@
 - `src/editor/structure-lint.ts`
 - `src/editor/theme.ts`
 - `src/editor/zoom.ts`
+
+### electron
+
+- `electron/app-menu.ts`
+- `electron/file-watcher.ts`
+- `electron/main.ts`
+- `electron/preload.ts`
 
 ### help
 
@@ -105,13 +126,18 @@
 
 | Module | Depends on |
 | --- | --- |
+| cli | core |
+| editor | core |
+| electron | core, menu, platform, watch |
 | help | platform |
 | menu | platform |
-| preview | utils |
+| platform | core |
+| preview | core, utils |
 | recent | platform |
-| root | autosave, editor, help, menu, platform, preview, recent, session, tabs, toolbar, watch, window, workspace |
-| session | autosave, platform |
-| toolbar | editor, platform |
+| root | autosave, core, editor, help, menu, platform, preview, recent, session, tabs, toolbar, watch, window, workspace |
+| session | autosave, core, platform |
+| tabs | core |
+| toolbar | core, editor, platform |
 | watch | platform |
 | window | platform |
 
@@ -130,7 +156,6 @@ None. ✅
 - `BalanceResult` in `src/editor/scan-dot.ts`
 - `SpanKind` in `src/editor/scan-dot.ts`
 - `StructuralDiagnostic` in `src/editor/structure-lint.ts`
-- `GraphvizApi` in `src/platform/contract.ts`
 - `PreviewStatusCallbacks` in `src/preview/render.ts`
 - `PreviewOptions` in `src/preview/render.ts`
 - `PreviewScheduler` in `src/preview/render.ts`
@@ -149,6 +174,14 @@ None. ✅
 - `SaveAsOptions` in `src/toolbar/save-as.ts`
 - `ToolbarShortcutsOptions` in `src/toolbar/shortcuts.ts`
 - `FileWatchOptions` in `src/watch/file-watch.ts`
+- `PageGeometry` in `core/export-pdf.ts`
+- `NormalizedSvg` in `core/normalize-svg.ts`
+- `isGraphvizReady` in `core/render.ts`
+- `PdfPageMode` in `core/types.ts`
+- `PdfPageSize` in `core/types.ts`
+- `ParsedArgs` in `cli/args.ts`
+- `ParseError` in `cli/args.ts`
+- `rebuildAppMenu` in `electron/app-menu.ts`
 
 ## Test coverage (src ↔ test)
 
@@ -196,6 +229,18 @@ None. ✅
 | `src/watch/watch-plan.ts` | `test/watch/watch-plan.test.ts` |
 | `src/window/state.ts` | `test/window/state.test.ts` |
 | `src/workspace/resize.ts` | `test/workspace/resize.test.ts` |
+| `core/export-pdf.ts` | `test/core/export-pdf.test.ts` |
+| `core/export-png.ts` | `test/core/export-png.test.ts` |
+| `core/export.ts` | `test/core/export.test.ts` |
+| `core/normalize-svg.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts` |
+| `core/render.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts`, `test/core/render.test.ts` |
+| `core/types.ts` | `test/editor/linting.test.ts`, `test/tabs/manager.test.ts` |
+| `cli/args.ts` | `test/cli/args.test.ts` |
+| `cli/index.ts` | `test/cli/cli.integration.test.ts` |
+| `electron/app-menu.ts` | — |
+| `electron/file-watcher.ts` | — |
+| `electron/main.ts` | — |
+| `electron/preload.ts` | — |
 
 ## IPC boundary (renderer ↔ Electron)
 
