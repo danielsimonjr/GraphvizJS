@@ -14,7 +14,7 @@ describe('validateDot', () => {
 
   describe('valid DOT input', () => {
     it('returns null for valid DOT', async () => {
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('digraph { a -> b }');
 
@@ -22,7 +22,7 @@ describe('validateDot', () => {
     });
 
     it('returns null for valid graph (undirected)', async () => {
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('graph { a -- b }');
 
@@ -30,7 +30,7 @@ describe('validateDot', () => {
     });
 
     it('returns null for complex valid DOT', async () => {
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const dotSource = `
         digraph G {
@@ -49,7 +49,7 @@ describe('validateDot', () => {
   describe('error with line number extraction', () => {
     it('parses "in line N" format', async () => {
       configureMockError(new Error('Error: <stdin>: syntax error in line 5'));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -61,7 +61,7 @@ describe('validateDot', () => {
 
     it('parses "syntax error in line N near token" format', async () => {
       configureMockError(new Error("Error: <stdin>: syntax error in line 3 near 'digraph'"));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -71,7 +71,7 @@ describe('validateDot', () => {
 
     it('parses simple "syntax error in line N" format', async () => {
       configureMockError(new Error('syntax error in line 10'));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -81,7 +81,7 @@ describe('validateDot', () => {
 
     it('parses "Error: ... in line N ..." format', async () => {
       configureMockError(new Error('Error: unexpected token in line 7 at position 12'));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -91,7 +91,7 @@ describe('validateDot', () => {
 
     it('parses "line N:" format', async () => {
       configureMockError(new Error('line 15: unexpected end of file'));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -101,7 +101,7 @@ describe('validateDot', () => {
 
     it('parses ":N:N:" (file:line:column) format', async () => {
       configureMockError(new Error('file.dot:8:12: syntax error'));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -112,7 +112,7 @@ describe('validateDot', () => {
 
     it('parses case-insensitive "IN LINE N"', async () => {
       configureMockError(new Error('ERROR: SYNTAX ERROR IN LINE 4'));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -124,7 +124,7 @@ describe('validateDot', () => {
   describe('error without parseable line number', () => {
     it('returns message-only error when no line number present', async () => {
       configureMockError(new Error('Unknown error occurred'));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -136,7 +136,7 @@ describe('validateDot', () => {
 
     it('returns message-only for non-standard error format', async () => {
       configureMockError(new Error('GraphViz internal error'));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -147,7 +147,7 @@ describe('validateDot', () => {
 
     it('handles non-Error thrown values', async () => {
       configureMockError('string error' as unknown as Error);
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -158,7 +158,7 @@ describe('validateDot', () => {
     it('handles thrown objects without message property', async () => {
       const errorObj = { code: 'ERR_SYNTAX' };
       configureMockError(errorObj as unknown as Error);
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -171,7 +171,7 @@ describe('validateDot', () => {
     it('validates empty string input', async () => {
       // Note: Empty string may or may not throw depending on Graphviz behavior
       // In our mock, it will succeed since we don't configure an error
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('');
 
@@ -180,7 +180,7 @@ describe('validateDot', () => {
     });
 
     it('validates whitespace-only input', async () => {
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('   \n\t\n   ');
 
@@ -189,7 +189,7 @@ describe('validateDot', () => {
 
     it('handles error from empty input when Graphviz rejects it', async () => {
       configureMockError(new Error('syntax error in line 1'));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('');
 
@@ -200,7 +200,7 @@ describe('validateDot', () => {
 
   describe('engine parameter', () => {
     it('passes engine parameter to layout call', async () => {
-      const { validateDot, initGraphviz } = await import('../../src/preview/graphviz');
+      const { validateDot, initGraphviz } = await import('../../core/render');
       await initGraphviz();
 
       await validateDot('graph { a -- b }', 'neato');
@@ -210,7 +210,7 @@ describe('validateDot', () => {
     });
 
     it('uses default "dot" engine when not specified', async () => {
-      const { validateDot, initGraphviz } = await import('../../src/preview/graphviz');
+      const { validateDot, initGraphviz } = await import('../../core/render');
       await initGraphviz();
 
       await validateDot('digraph { a -> b }');
@@ -220,7 +220,7 @@ describe('validateDot', () => {
     });
 
     it('passes fdp engine correctly', async () => {
-      const { validateDot, initGraphviz } = await import('../../src/preview/graphviz');
+      const { validateDot, initGraphviz } = await import('../../core/render');
       await initGraphviz();
 
       await validateDot('graph { a -- b -- c }', 'fdp');
@@ -230,7 +230,7 @@ describe('validateDot', () => {
     });
 
     it('passes circo engine correctly', async () => {
-      const { validateDot, initGraphviz } = await import('../../src/preview/graphviz');
+      const { validateDot, initGraphviz } = await import('../../core/render');
       await initGraphviz();
 
       await validateDot('digraph { a -> b -> c -> a }', 'circo');
@@ -240,7 +240,7 @@ describe('validateDot', () => {
     });
 
     it('passes twopi engine correctly', async () => {
-      const { validateDot, initGraphviz } = await import('../../src/preview/graphviz');
+      const { validateDot, initGraphviz } = await import('../../core/render');
       await initGraphviz();
 
       await validateDot('digraph { root -> child1; root -> child2 }', 'twopi');
@@ -254,7 +254,7 @@ describe('validateDot', () => {
     });
 
     it('passes sfdp engine correctly', async () => {
-      const { validateDot, initGraphviz } = await import('../../src/preview/graphviz');
+      const { validateDot, initGraphviz } = await import('../../core/render');
       await initGraphviz();
 
       await validateDot('graph { a -- b }', 'sfdp');
@@ -264,7 +264,7 @@ describe('validateDot', () => {
     });
 
     it('passes osage engine correctly', async () => {
-      const { validateDot, initGraphviz } = await import('../../src/preview/graphviz');
+      const { validateDot, initGraphviz } = await import('../../core/render');
       await initGraphviz();
 
       await validateDot('graph { a -- b }', 'osage');
@@ -274,7 +274,7 @@ describe('validateDot', () => {
     });
 
     it('passes patchwork engine correctly', async () => {
-      const { validateDot, initGraphviz } = await import('../../src/preview/graphviz');
+      const { validateDot, initGraphviz } = await import('../../core/render');
       await initGraphviz();
 
       await validateDot('graph { a -- b }', 'patchwork');
@@ -287,7 +287,7 @@ describe('validateDot', () => {
   describe('edge cases for line number parsing', () => {
     it('ignores line 0 (invalid)', async () => {
       configureMockError(new Error('syntax error in line 0'));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -297,7 +297,7 @@ describe('validateDot', () => {
 
     it('ignores negative line numbers', async () => {
       configureMockError(new Error('syntax error in line -5'));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -307,7 +307,7 @@ describe('validateDot', () => {
 
     it('handles very large line numbers', async () => {
       configureMockError(new Error('syntax error in line 999999'));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -317,7 +317,7 @@ describe('validateDot', () => {
 
     it('handles column 0 as undefined in :N:N: format', async () => {
       configureMockError(new Error('file.dot:5:0: error'));
-      const { validateDot } = await import('../../src/preview/graphviz');
+      const { validateDot } = await import('../../core/render');
 
       const result = await validateDot('invalid DOT');
 
@@ -329,7 +329,7 @@ describe('validateDot', () => {
 
   describe('Graphviz initialization', () => {
     it('initializes Graphviz if not already initialized', async () => {
-      const { validateDot, isGraphvizReady } = await import('../../src/preview/graphviz');
+      const { validateDot, isGraphvizReady } = await import('../../core/render');
 
       // Should not be ready initially
       expect(isGraphvizReady()).toBe(false);

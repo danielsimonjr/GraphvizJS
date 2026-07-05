@@ -1,233 +1,48 @@
 import type { EditorView } from 'codemirror';
-import { pickSavePath, writeBinaryFile, writeTextFile } from '../platform';
-
-import { svgToPdfBytes } from '../preview/export-pdf';
-import { renderDotToSvg } from '../preview/graphviz';
+import type { LayoutEngine } from '../../core/types';
+import { exportRender, pickSavePath, writeBinaryFile } from '../platform';
 import type { ExportFormat } from './export-menu';
 import { openPdfOptionsDialog } from './pdf-options-dialog';
 
 interface ExportDiagramOptions {
   getEditor: () => EditorView;
   getPath: () => string | null;
+  getEngine: () => LayoutEngine;
 }
 
-interface RenderedDiagram {
-  svg: string;
-  width: number;
-  height: number;
-}
+const FILTERS: Record<ExportFormat, { name: string; ext: string; suffix?: string }> = {
+  svg: { name: 'SVG Image', ext: 'svg' },
+  png: { name: 'PNG Image', ext: 'png' },
+  pngx2: { name: 'PNG Image', ext: 'png', suffix: '@2x' },
+  pdf: { name: 'PDF Document', ext: 'pdf' },
+};
 
-const PNG_MIN_BASE = 512;
-const PNG_MIN_DOUBLE = 1024;
-const EXPORT_PADDING = 10;
-
-export function createExportHandler({ getEditor, getPath }: ExportDiagramOptions) {
+export function createExportHandler({ getEditor, getPath, getEngine }: ExportDiagramOptions) {
   return async (format: ExportFormat) => {
-    const documentContent = getEditor().state.doc.toString().trim();
-    if (!documentContent.length) {
+    const dot = getEditor().state.doc.toString().trim();
+    if (!dot.length) {
       console.warn('Cannot export an empty diagram.');
       return;
     }
-
     try {
-      const rendered = await renderDiagram(documentContent);
+      const options = format === 'pdf' ? await openPdfOptionsDialog() : undefined;
+      if (format === 'pdf' && !options) return; // cancelled
+      const meta = FILTERS[format];
       const baseName = inferBaseName(getPath());
-
-      if (format === 'svg') {
-        await exportAsSvg(rendered.svg, baseName);
-        return;
-      }
-
-      if (format === 'pdf') {
-        await exportAsPdf(rendered, baseName);
-        return;
-      }
-
-      const scale = format === 'pngx2' ? 2 : 1;
-      await exportAsPng(rendered, baseName, scale);
+      const targetPath = await pickSavePath({
+        defaultPath: `${baseName}${meta.suffix ?? ''}.${meta.ext}`,
+        filters: [
+          { name: meta.name, extensions: [meta.ext] },
+          { name: 'All Files', extensions: ['*'] },
+        ],
+      });
+      if (!targetPath) return;
+      const bytes = await exportRender(dot, getEngine(), format, options ?? undefined);
+      await writeBinaryFile(targetPath, bytes);
     } catch (error) {
       console.error('Failed to export diagram', error);
     }
   };
-}
-
-async function exportAsSvg(svg: string, baseName: string): Promise<void> {
-  const targetPath = await pickSavePath({
-    defaultPath: `${baseName}.svg`,
-    filters: [
-      { name: 'SVG Image', extensions: ['svg'] },
-      { name: 'All Files', extensions: ['*'] },
-    ],
-  });
-  if (!targetPath) return;
-  await writeTextFile(targetPath, svg);
-}
-
-async function exportAsPdf(diagram: RenderedDiagram, baseName: string): Promise<void> {
-  const options = await openPdfOptionsDialog();
-  if (!options) return; // cancelled
-  const targetPath = await pickSavePath({
-    defaultPath: `${baseName}.pdf`,
-    filters: [
-      { name: 'PDF Document', extensions: ['pdf'] },
-      { name: 'All Files', extensions: ['*'] },
-    ],
-  });
-  if (!targetPath) return;
-  const pdfBytes = await svgToPdfBytes(diagram.svg, diagram.width, diagram.height, options);
-  await writeBinaryFile(targetPath, pdfBytes);
-}
-
-async function exportAsPng(
-  diagram: RenderedDiagram,
-  baseName: string,
-  scale: number
-): Promise<void> {
-  const suffix = scale > 1 ? '@2x' : '';
-  const targetPath = await pickSavePath({
-    defaultPath: `${baseName}${suffix}.png`,
-    filters: [
-      { name: 'PNG Image', extensions: ['png'] },
-      { name: 'All Files', extensions: ['*'] },
-    ],
-  });
-  if (!targetPath) return;
-  const pngBytes = await convertSvgToPng(diagram, scale);
-  await writeBinaryFile(targetPath, pngBytes);
-}
-
-async function renderDiagram(source: string): Promise<RenderedDiagram> {
-  const svgString = await renderDotToSvg(source);
-
-  // Parse the SVG string to get dimensions
-  const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.left = '-9999px';
-  container.style.top = '-9999px';
-  container.style.visibility = 'hidden';
-  document.body.appendChild(container);
-
-  try {
-    container.innerHTML = svgString;
-    const svgElement = container.querySelector('svg');
-
-    if (!svgElement) {
-      throw new Error('Graphviz render did not produce an SVG element.');
-    }
-
-    return normalizeSvg(svgElement);
-  } finally {
-    container.remove();
-  }
-}
-
-function normalizeSvg(svgElement: SVGSVGElement): RenderedDiagram {
-  const ns = 'http://www.w3.org/2000/svg';
-  const bbox = svgElement.getBBox();
-  const paddedWidth = sanitizeDimension(bbox.width) + EXPORT_PADDING * 2;
-  const paddedHeight = sanitizeDimension(bbox.height) + EXPORT_PADDING * 2;
-  const minX = bbox.x - EXPORT_PADDING;
-  const minY = bbox.y - EXPORT_PADDING;
-
-  const normalized = svgElement.cloneNode(true) as SVGSVGElement;
-
-  normalized.setAttribute('xmlns', normalized.getAttribute('xmlns') ?? ns);
-  normalized.setAttribute('width', `${paddedWidth}`);
-  normalized.setAttribute('height', `${paddedHeight}`);
-  normalized.setAttribute('viewBox', `${minX} ${minY} ${paddedWidth} ${paddedHeight}`);
-  normalized.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-  normalized.removeAttribute('x');
-  normalized.removeAttribute('y');
-
-  const serialized = new XMLSerializer().serializeToString(normalized);
-  return { svg: serialized, width: paddedWidth, height: paddedHeight };
-}
-
-function sanitizeDimension(value: number | null | undefined): number {
-  if (!value || !Number.isFinite(value) || value <= 0) {
-    return 1;
-  }
-  return value;
-}
-
-async function convertSvgToPng(diagram: RenderedDiagram, scale: number): Promise<Uint8Array> {
-  const { svg, width, height } = diagram;
-  const dataUrl = encodeSvgDataUri(svg);
-
-  const image = await loadImage(dataUrl, width, height);
-  const minDimension = scale > 1 ? PNG_MIN_DOUBLE : PNG_MIN_BASE;
-  const requiredScale = Math.max(scale, minDimension / width, minDimension / height);
-  const exportWidth = Math.max(1, Math.round(width * requiredScale));
-  const exportHeight = Math.max(1, Math.round(height * requiredScale));
-
-  const canvas = document.createElement('canvas');
-  canvas.width = exportWidth;
-  canvas.height = exportHeight;
-
-  const context = canvas.getContext('2d');
-  if (!context) {
-    throw new Error('Unable to acquire canvas context.');
-  }
-
-  context.save();
-  context.globalAlpha = 1;
-  context.fillStyle = '#ffffff';
-  context.fillRect(0, 0, exportWidth, exportHeight);
-  context.restore();
-
-  context.drawImage(image, 0, 0, exportWidth, exportHeight);
-
-  const pngBlob = await new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob(
-      (result) => {
-        if (result) {
-          resolve(result);
-        } else {
-          reject(new Error('Canvas export produced no data.'));
-        }
-      },
-      'image/png',
-      1
-    );
-  });
-
-  const arrayBuffer = await pngBlob.arrayBuffer();
-  return new Uint8Array(arrayBuffer);
-}
-
-function encodeSvgDataUri(svg: string): string {
-  const encoded = encodeURIComponent(svg)
-    .replace(/%0A/g, '')
-    .replace(/%20/g, ' ')
-    .replace(/%3D/g, '=')
-    .replace(/%3A/g, ':')
-    .replace(/%2F/g, '/');
-  return `data:image/svg+xml;charset=utf-8,${encoded}`;
-}
-
-function loadImage(url: string, width: number, height: number): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.crossOrigin = 'anonymous';
-    image.onload = async () => {
-      try {
-        if ('decode' in image) {
-          await image.decode();
-        }
-      } catch {
-        // Ignore decode failures and fall back to onload pixels.
-      }
-
-      if (!image.naturalWidth || !image.naturalHeight) {
-        image.width = width;
-        image.height = height;
-      }
-      resolve(image);
-    };
-    image.onerror = (event) =>
-      reject(event instanceof ErrorEvent ? event.error : new Error('Image failed to load.'));
-    image.src = url;
-  });
 }
 
 function inferBaseName(path: string | null): string {

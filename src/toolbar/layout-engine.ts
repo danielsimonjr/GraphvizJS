@@ -9,7 +9,7 @@
  *   to clear this state between test runs.
  */
 
-import type { LayoutEngine } from '../preview/graphviz';
+import type { LayoutEngine } from '../../core/types';
 
 const VALID_ENGINES: ReadonlySet<string> = new Set<LayoutEngine>([
   'dot',

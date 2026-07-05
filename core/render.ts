@@ -8,30 +8,10 @@
  */
 
 import { Graphviz } from '@hpcc-js/wasm';
+import type { DotValidationError, LayoutEngine } from './types';
 
 // Singleton instance - only load WASM once
 let graphvizInstance: Awaited<ReturnType<typeof Graphviz.load>> | null = null;
-
-/**
- * Available Graphviz layout engines
- * - dot: hierarchical/directed graphs (default)
- * - neato: spring model for undirected graphs
- * - fdp: force-directed placement
- * - sfdp: scalable force-directed placement (large graphs)
- * - circo: circular layout
- * - twopi: radial layout
- * - osage: array-based layout
- * - patchwork: squarified treemap layout
- */
-export type LayoutEngine =
-  | 'dot'
-  | 'neato'
-  | 'fdp'
-  | 'sfdp'
-  | 'circo'
-  | 'twopi'
-  | 'osage'
-  | 'patchwork';
 
 /**
  * Initialize the Graphviz WASM module
@@ -64,18 +44,6 @@ export async function renderDotToSvg(
  */
 export function isGraphvizReady(): boolean {
   return graphvizInstance !== null;
-}
-
-/**
- * Structured error information from DOT validation
- */
-export interface DotValidationError {
-  /** Error message from Graphviz */
-  message: string;
-  /** Line number where the error occurred (1-indexed) */
-  line?: number;
-  /** Column number where the error occurred (1-indexed) */
-  column?: number;
 }
 
 /**

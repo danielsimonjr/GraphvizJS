@@ -1,5 +1,5 @@
 import type { EditorView } from 'codemirror';
-import type { LayoutEngine } from '../preview/graphviz';
+import type { LayoutEngine } from '../../core/types';
 
 /** Maximum number of tabs allowed */
 export const MAX_TABS = 10;

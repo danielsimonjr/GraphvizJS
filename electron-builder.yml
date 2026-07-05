@@ -5,5 +5,12 @@ directories:
 files:
   - dist/**
   - dist-electron/**
+# The main process loads native render/export deps (canvas, @resvg/resvg-js) from
+# node_modules at runtime — electron-builder includes production dependencies
+# automatically, but native .node binaries must be unpacked from the asar to load.
+asarUnpack:
+  - "**/*.node"
+  - "**/node_modules/canvas/**"
+  - "**/node_modules/@resvg/**"
 win:
   target: nsis

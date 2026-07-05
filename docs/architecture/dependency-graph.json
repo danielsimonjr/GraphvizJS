@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 44,
+    "fileCount": 42,
     "moduleCount": 15,
-    "totalLoc": 4747,
-    "edgeCount": 71,
-    "exportCount": 137
+    "totalLoc": 4341,
+    "edgeCount": 59,
+    "exportCount": 127
   },
   "modules": {
     "autosave": [
@@ -37,8 +37,6 @@
       "src/platform/index.ts"
     ],
     "preview": [
-      "src/preview/export-pdf.ts",
-      "src/preview/graphviz.ts",
       "src/preview/render.ts",
       "src/preview/zoom.ts"
     ],
@@ -83,9 +81,6 @@
     ]
   },
   "moduleEdges": {
-    "editor": [
-      "preview"
-    ],
     "help": [
       "platform"
     ],
@@ -115,15 +110,10 @@
     ],
     "session": [
       "autosave",
-      "platform",
-      "preview"
-    ],
-    "tabs": [
-      "preview"
+      "platform"
     ],
     "toolbar": [
       "platform",
-      "preview",
       "editor"
     ],
     "watch": [
@@ -167,26 +157,6 @@
       {
         "file": "src/platform/contract.ts",
         "name": "GraphvizApi"
-      },
-      {
-        "file": "src/preview/export-pdf.ts",
-        "name": "PageGeometry"
-      },
-      {
-        "file": "src/preview/export-pdf.ts",
-        "name": "PdfPageMode"
-      },
-      {
-        "file": "src/preview/export-pdf.ts",
-        "name": "PdfPageSize"
-      },
-      {
-        "file": "src/preview/export-pdf.ts",
-        "name": "PdfOrientation"
-      },
-      {
-        "file": "src/preview/graphviz.ts",
-        "name": "isGraphvizReady"
       },
       {
         "file": "src/preview/render.ts",
@@ -366,20 +336,6 @@
       ]
     },
     {
-      "file": "src/preview/export-pdf.ts",
-      "testFiles": [
-        "test/preview/export-pdf.test.ts"
-      ]
-    },
-    {
-      "file": "src/preview/graphviz.ts",
-      "testFiles": [
-        "test/editor/linting.test.ts",
-        "test/tabs/manager.test.ts",
-        "test/toolbar/export-diagram.test.ts"
-      ]
-    },
-    {
       "file": "src/preview/render.ts",
       "testFiles": []
     },
@@ -469,6 +425,7 @@
     {
       "file": "src/toolbar/pdf-options-dialog.ts",
       "testFiles": [
+        "test/toolbar/export-diagram.test.ts",
         "test/toolbar/pdf-options-dialog.test.ts"
       ]
     },
@@ -556,6 +513,13 @@
         "hasHandler": true
       },
       {
+        "channel": "export:render",
+        "method": "exportRender",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
         "channel": "fs:readText",
         "method": "readTextFile",
         "hasContract": true,
@@ -579,6 +543,20 @@
       {
         "channel": "menu:setRecent",
         "method": "setMenuRecent",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
+        "channel": "render:svg",
+        "method": "renderSvg",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
+        "channel": "render:validate",
+        "method": "validateDot",
         "hasContract": true,
         "hasPreload": true,
         "hasHandler": true
@@ -669,7 +647,7 @@
     },
     {
       "path": "src/editor/linting.ts",
-      "loc": 176,
+      "loc": 184,
       "exports": [
         "lintGutter",
         "createDotLinter",
@@ -729,7 +707,7 @@
     },
     {
       "path": "src/main.ts",
-      "loc": 771,
+      "loc": 780,
       "exports": []
     },
     {
@@ -753,7 +731,7 @@
     },
     {
       "path": "src/platform/contract.ts",
-      "loc": 32,
+      "loc": 47,
       "exports": [
         "DiagramFilter",
         "OpenedFile",
@@ -763,7 +741,7 @@
     },
     {
       "path": "src/platform/index.ts",
-      "loc": 62,
+      "loc": 85,
       "exports": [
         "store",
         "openTextFile",
@@ -778,37 +756,15 @@
         "onFileChanged",
         "onMenuAction",
         "setMenuRecent",
+        "renderSvg",
+        "validateDot",
+        "exportRender",
         "PlatformStore"
       ]
     },
     {
-      "path": "src/preview/export-pdf.ts",
-      "loc": 124,
-      "exports": [
-        "computePageGeometry",
-        "svgToPdfBytes",
-        "PdfExportOptions",
-        "PageGeometry",
-        "PdfPageMode",
-        "PdfPageSize",
-        "PdfOrientation"
-      ]
-    },
-    {
-      "path": "src/preview/graphviz.ts",
-      "loc": 161,
-      "exports": [
-        "initGraphviz",
-        "renderDotToSvg",
-        "isGraphvizReady",
-        "validateDot",
-        "DotValidationError",
-        "LayoutEngine"
-      ]
-    },
-    {
       "path": "src/preview/render.ts",
-      "loc": 90,
+      "loc": 95,
       "exports": [
         "createPreview",
         "PreviewStatusCallbacks",
@@ -841,7 +797,7 @@
     },
     {
       "path": "src/session/session.ts",
-      "loc": 106,
+      "loc": 107,
       "exports": [
         "SESSION_KEY",
         "captureSession",
@@ -876,7 +832,7 @@
     },
     {
       "path": "src/toolbar/actions.ts",
-      "loc": 164,
+      "loc": 167,
       "exports": [
         "setupToolbarActions",
         "ToolbarActionsOptions"
@@ -893,7 +849,7 @@
     },
     {
       "path": "src/toolbar/export-diagram.ts",
-      "loc": 250,
+      "loc": 65,
       "exports": [
         "createExportHandler"
       ]

@@ -4,6 +4,7 @@ import { keymap } from '@codemirror/view';
 import { basicSetup, EditorView } from 'codemirror';
 import 'remixicon/fonts/remixicon.css';
 
+import type { LayoutEngine } from '../core/types';
 import { AUTOSAVE_INTERVAL, TAB_DRAFTS_KEY } from './autosave/constants';
 import { createDotAutocomplete } from './editor/autocomplete';
 import { createDotLanguage } from './editor/language';
@@ -18,9 +19,14 @@ import {
 } from './editor/zoom';
 import { setupHelpDialog } from './help/dialog';
 import { type MenuCommandHandlers, setupMenuCommands } from './menu/commands';
-import { confirm, store as platformStore, readTextFile, setMenuRecent } from './platform';
-import type { LayoutEngine } from './preview/graphviz';
-import { initGraphviz } from './preview/graphviz';
+import {
+  confirm,
+  store as platformStore,
+  readTextFile,
+  renderSvg,
+  setMenuRecent,
+  validateDot,
+} from './platform';
 import { createPreview } from './preview/render';
 import {
   createZoomController,
@@ -97,8 +103,6 @@ async function bootstrap(): Promise<void> {
     return;
   }
 
-  await initGraphviz();
-
   const zoomController = createZoomController(previewElement, (level) => {
     if (zoomLevelDisplay) {
       updateLevelDisplay(zoomLevelDisplay, level);
@@ -142,6 +146,7 @@ async function bootstrap(): Promise<void> {
       },
     },
     getEngine: () => tabManager.getActiveTab()?.layoutEngine ?? 'dot',
+    render: renderSvg,
   });
 
   // ── Recent files ─────────────────────────────────────────────────
@@ -164,7 +169,10 @@ async function bootstrap(): Promise<void> {
       createDotAutocomplete(),
       createSearch(),
       keymap.of([makeFormatKeymap((doc) => schedulePreviewRender(doc))]),
-      createDotLinter({ getEngine: () => tabManager.getActiveTab()?.layoutEngine ?? 'dot' }),
+      createDotLinter({
+        getEngine: () => tabManager.getActiveTab()?.layoutEngine ?? 'dot',
+        validate: validateDot,
+      }),
       lintGutter(),
       EditorView.lineWrapping,
       EDITOR_THEME,
@@ -557,6 +565,7 @@ async function bootstrap(): Promise<void> {
     },
     getRecent: () => recentFiles,
     onPickRecent: pickRecent,
+    getEngine: () => tabManager.getActiveTab()?.layoutEngine ?? 'dot',
   });
 
   setupToolbarShortcuts({

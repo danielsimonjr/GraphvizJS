@@ -1,3 +1,9 @@
+import type {
+  DotValidationError,
+  ExportFormat,
+  LayoutEngine,
+  PdfExportOptions,
+} from '../../core/types';
 import type { ConfirmOptions, DiagramFilter, OpenedFile } from './contract';
 
 export type { ConfirmOptions, DiagramFilter, OpenedFile } from './contract';
@@ -59,4 +65,21 @@ export function onMenuAction(cb: (action: string, payload?: string) => void): ()
 
 export function setMenuRecent(paths: string[]): Promise<void> {
   return window.graphviz.setMenuRecent(paths);
+}
+
+export function renderSvg(dot: string, engine: LayoutEngine): Promise<string> {
+  return window.graphviz.renderSvg(dot, engine);
+}
+
+export function validateDot(dot: string, engine: LayoutEngine): Promise<DotValidationError | null> {
+  return window.graphviz.validateDot(dot, engine);
+}
+
+export function exportRender(
+  dot: string,
+  engine: LayoutEngine,
+  format: ExportFormat,
+  options?: PdfExportOptions
+): Promise<Uint8Array> {
+  return window.graphviz.exportRender(dot, engine, format, options);
 }

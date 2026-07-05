@@ -1,7 +1,8 @@
 // src/session/session.ts
+
+import type { LayoutEngine } from '../../core/types';
 import { TAB_DRAFTS_KEY } from '../autosave/constants';
 import type { PlatformStore } from '../platform';
-import type { LayoutEngine } from '../preview/graphviz';
 
 /** Store key for the persisted open-tab session. */
 export const SESSION_KEY = 'session';
