@@ -2,7 +2,7 @@
   "stats": {
     "fileCount": 42,
     "moduleCount": 15,
-    "totalLoc": 4341,
+    "totalLoc": 4330,
     "edgeCount": 59,
     "exportCount": 127
   },
@@ -764,7 +764,7 @@
     },
     {
       "path": "src/preview/render.ts",
-      "loc": 95,
+      "loc": 84,
       "exports": [
         "createPreview",
         "PreviewStatusCallbacks",
