@@ -24,6 +24,7 @@ const analysis = (): Analysis => ({
     missingHandlers: [],
     orphanHandlers: [],
   },
+  layerViolations: [],
   stats: { fileCount: 1, moduleCount: 1, totalLoc: 10, edgeCount: 0, exportCount: 1 },
 });
 
@@ -73,6 +74,23 @@ describe('renderMarkdown', () => {
     const md = renderMarkdown(a);
     expect(md).toContain('app:driftedChannel');
     expect(md).toMatch(/no contract/i);
+  });
+
+  it('renders the architecture rules section: clean vs. a violation', () => {
+    expect(renderMarkdown(analysis())).toMatch(/Architecture rules[\s\S]*respected ✅/);
+    const a = analysis();
+    a.layerViolations = [
+      {
+        from: 'src/preview/render.ts',
+        to: 'core/render.ts',
+        spec: '../../core/render',
+        typeOnly: false,
+        rule: 'renderer may import core only as type-only core/types (renderer purity)',
+      },
+    ];
+    const md = renderMarkdown(a);
+    expect(md).toContain('⛔');
+    expect(md).toContain('`src/preview/render.ts` → `core/render.ts`');
   });
 
   it('renders "none" for dormant files when there are none, and lists them when present', () => {

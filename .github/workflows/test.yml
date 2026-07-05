@@ -36,6 +36,9 @@ jobs:
       - name: Run type check
         run: pnpm typecheck
 
+      - name: Check architecture invariants (dependency graph)
+        run: pnpm graph:check
+
       - name: Run unit tests with coverage
         run: pnpm test:coverage
 

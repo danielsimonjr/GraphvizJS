@@ -141,6 +141,12 @@
 | watch | platform |
 | window | platform |
 
+## Architecture rules
+
+> Layer policy: `core` is a leaf; `cli` → `core`; `electron` → `core`/renderer; the renderer (`src/`) may import `core` only as type-only `core/types`.
+
+All layer boundaries respected ✅
+
 ## Circular dependencies
 
 None. ✅

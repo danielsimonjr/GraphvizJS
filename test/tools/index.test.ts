@@ -32,6 +32,10 @@ describe('buildAnalysis (real repo)', () => {
     expect(a.unused.dormantFiles).toEqual([]);
   });
 
+  it('respects every architecture layer boundary', () => {
+    expect(a.layerViolations).toEqual([]);
+  });
+
   it('wires all 16 IPC channels with no gaps', () => {
     expect(a.ipc.fullyWired).toHaveLength(16);
     expect(a.ipc.missingHandlers).toHaveLength(0);

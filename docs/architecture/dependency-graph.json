@@ -740,6 +740,7 @@
     "missingHandlers": [],
     "orphanHandlers": []
   },
+  "layerViolations": [],
   "files": [
     {
       "path": "src/autosave/constants.ts",

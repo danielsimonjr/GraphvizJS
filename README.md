@@ -89,6 +89,11 @@ graphvizjs --version
 - `pnpm lint` – Run [Biome](https://biomejs.dev/) linter and formatter checks
 - `pnpm lint:fix` – Automatically apply Biome fixes
 - `pnpm typecheck` – Type-check TypeScript without emitting files
+- `pnpm graph` – Regenerate the dependency-graph report in `docs/architecture/`
+- `pnpm graph:check` – Verify architecture invariants (layer boundaries, no cycles, IPC wiring) without writing; exits non-zero on any violation (run in CI)
+- `pnpm graph -- --impact <file>` – Print the transitive reverse-dependencies (blast radius) of a source file
+
+The dependency-graph tool enforces the headless-core layering: `core/` is a self-contained leaf, `cli/` depends only on `core/`, and the renderer (`src/`) may reference `core/` only as the type-only `core/types` contract. A broken boundary fails `pnpm graph:check` (and CI).
 
 ## Testing
 
