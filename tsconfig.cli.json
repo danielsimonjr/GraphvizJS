@@ -1,0 +1,18 @@
+{
+  // Emits the headless CLI (cli/ + the core/ it consumes) to dist-cli/ as real
+  // Node ESM. Distinct from the root config (moduleResolution "Bundler",
+  // noEmit) because the compiled binary runs under Node's own ESM loader, which
+  // needs NodeNext resolution and the explicit .js import extensions in source.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noEmit": false,
+    "outDir": "dist-cli",
+    "rootDir": ".",
+    "declaration": false,
+    "sourceMap": false
+  },
+  "include": ["cli/**/*.ts", "core/**/*.ts"]
+}
