@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  computeImpact,
   computeStats,
   detectCycles,
   detectUnused,
@@ -126,6 +127,31 @@ describe('mapTestCoverage', () => {
   it('lists a src file with no tests as uncovered', () => {
     const src = [f('src/lonely.ts')];
     expect(mapTestCoverage(src, [])).toEqual([{ file: 'src/lonely.ts', testFiles: [] }]);
+  });
+});
+
+describe('computeImpact', () => {
+  it('returns the transitive reverse-dependencies of a file', () => {
+    // chain: a -> b -> c ; and a test importing a
+    const files = [
+      f('src/a.ts', [{ file: './b' }]),
+      f('src/b.ts', [{ file: './c' }]),
+      f('src/c.ts'),
+    ];
+    const tests = [f('test/a.test.ts', [{ file: '../src/a' }])];
+    const r = computeImpact(files, tests, 'src/c.ts');
+    expect(r.found).toBe(true);
+    expect(r.importers).toEqual(['src/a.ts', 'src/b.ts', 'test/a.test.ts']);
+  });
+
+  it('reports found:false for an unknown target', () => {
+    const r = computeImpact([f('src/a.ts')], [], 'src/nope.ts');
+    expect(r).toEqual({ found: false, importers: [] });
+  });
+
+  it('returns an empty blast radius for a leaf nothing imports', () => {
+    const r = computeImpact([f('src/a.ts', [{ file: './b' }]), f('src/b.ts')], [], 'src/a.ts');
+    expect(r).toEqual({ found: true, importers: [] });
   });
 });
 

@@ -18,6 +18,7 @@ export function renderJson(a: Analysis): string {
     unused: a.unused,
     coverage: a.coverage,
     ipc: a.ipc,
+    layerViolations: a.layerViolations,
     files: a.files.map((f) => ({ path: f.path, loc: f.loc, exports: f.exports })),
   };
   return `${JSON.stringify(model, null, 2)}\n`;
@@ -72,6 +73,22 @@ export function renderMarkdown(a: Analysis): string {
         .map(([from, tos]) => [from, [...tos].sort().join(', ')])
     )
   );
+  out.push('');
+
+  out.push('## Architecture rules');
+  out.push('');
+  out.push(
+    '> Layer policy: `core` is a leaf; `cli` → `core`; `electron` → `core`/renderer; ' +
+      'the renderer (`src/`) may import `core` only as type-only `core/types`.'
+  );
+  out.push('');
+  if (a.layerViolations.length === 0) {
+    out.push('All layer boundaries respected ✅');
+  } else {
+    for (const v of a.layerViolations) {
+      out.push(`- ⛔ \`${v.from}\` → \`${v.to}\` — ${v.rule}`);
+    }
+  }
   out.push('');
 
   out.push('## Circular dependencies');

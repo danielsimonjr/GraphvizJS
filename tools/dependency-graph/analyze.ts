@@ -140,6 +140,46 @@ export function mapTestCoverage(srcFiles: ParsedFile[], testFiles: ParsedFile[])
   }));
 }
 
+/**
+ * Transitive reverse-dependencies of `target`: every source or test file that
+ * imports it directly or indirectly (its "blast radius"). `found` is false when
+ * no scanned file matches `target`.
+ */
+export function computeImpact(
+  files: ParsedFile[],
+  testFiles: ParsedFile[],
+  target: string
+): { found: boolean; importers: string[] } {
+  const all = [...files, ...testFiles];
+  const known = new Set(all.map((f) => f.path));
+  if (!known.has(target)) return { found: false, importers: [] };
+
+  // Reverse adjacency: imported file -> files that import it.
+  const importedBy = new Map<string, string[]>();
+  for (const f of all) {
+    for (const dep of f.internalDeps) {
+      const to = resolveCandidates(f.path, dep.file).find((c) => known.has(c));
+      if (!to) continue;
+      const list = importedBy.get(to) ?? [];
+      list.push(f.path);
+      importedBy.set(to, list);
+    }
+  }
+
+  const impacted = new Set<string>();
+  const stack = [target];
+  while (stack.length > 0) {
+    const cur = stack.pop() as string;
+    for (const importer of importedBy.get(cur) ?? []) {
+      if (!impacted.has(importer)) {
+        impacted.add(importer);
+        stack.push(importer);
+      }
+    }
+  }
+  return { found: true, importers: [...impacted].sort() };
+}
+
 export function computeStats(files: ParsedFile[], modules: ModuleMap, edges: ModuleEdges): Stats {
   const known = new Set(files.map((f) => f.path));
   let edgeCount = 0;

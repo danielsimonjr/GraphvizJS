@@ -72,6 +72,19 @@ export interface IpcReport {
   orphanHandlers: IpcChannel[];
 }
 
+/** An import edge that breaks the architecture layer policy. */
+export interface LayerViolation {
+  /** Importing file (repo-relative). */
+  from: string;
+  /** Resolved imported file (repo-relative). */
+  to: string;
+  /** Raw specifier as written. */
+  spec: string;
+  typeOnly: boolean;
+  /** Human-readable rule that was broken. */
+  rule: string;
+}
+
 export interface Stats {
   fileCount: number;
   moduleCount: number;
@@ -90,10 +103,16 @@ export interface Analysis {
   unused: UnusedReport;
   coverage: CoverageRow[];
   ipc: IpcReport;
+  /** Import edges that break the architecture layer policy (empty = clean). */
+  layerViolations: LayerViolation[];
   stats: Stats;
 }
 
 export interface CliOptions {
   /** Reserved flag: include test-only files as their own module rows. */
   includeTests: boolean;
+  /** --check: verify invariants without writing docs; exit non-zero on any hard violation. */
+  check: boolean;
+  /** --impact <file>: print the transitive reverse-dependencies (blast radius) of a file. */
+  impact?: string;
 }
