@@ -16,6 +16,14 @@ describe('moduleOf', () => {
   it('buckets root-level src files under "root"', () => {
     expect(moduleOf('src/main.ts')).toBe('root');
   });
+  it('maps top-level app layers to the layer name', () => {
+    expect(moduleOf('core/render.ts')).toBe('core');
+    expect(moduleOf('cli/index.ts')).toBe('cli');
+    expect(moduleOf('electron/main.ts')).toBe('electron');
+  });
+  it('still buckets the test tree by its subdir', () => {
+    expect(moduleOf('test/preview/render.test.ts')).toBe('preview');
+  });
 });
 
 describe('categorize', () => {

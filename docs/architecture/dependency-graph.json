@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 42,
-    "moduleCount": 15,
-    "totalLoc": 4330,
-    "edgeCount": 59,
-    "exportCount": 127
+    "fileCount": 54,
+    "moduleCount": 18,
+    "totalLoc": 5468,
+    "edgeCount": 90,
+    "exportCount": 154
   },
   "modules": {
     "autosave": [
@@ -78,13 +78,35 @@
     ],
     "workspace": [
       "src/workspace/resize.ts"
+    ],
+    "core": [
+      "core/export-pdf.ts",
+      "core/export-png.ts",
+      "core/export.ts",
+      "core/normalize-svg.ts",
+      "core/render.ts",
+      "core/types.ts"
+    ],
+    "cli": [
+      "cli/args.ts",
+      "cli/index.ts"
+    ],
+    "electron": [
+      "electron/app-menu.ts",
+      "electron/file-watcher.ts",
+      "electron/main.ts",
+      "electron/preload.ts"
     ]
   },
   "moduleEdges": {
+    "editor": [
+      "core"
+    ],
     "help": [
       "platform"
     ],
     "root": [
+      "core",
       "autosave",
       "editor",
       "help",
@@ -102,17 +124,26 @@
     "menu": [
       "platform"
     ],
+    "platform": [
+      "core"
+    ],
     "preview": [
+      "core",
       "utils"
     ],
     "recent": [
       "platform"
     ],
     "session": [
+      "core",
       "autosave",
       "platform"
     ],
+    "tabs": [
+      "core"
+    ],
     "toolbar": [
+      "core",
       "platform",
       "editor"
     ],
@@ -120,6 +151,15 @@
       "platform"
     ],
     "window": [
+      "platform"
+    ],
+    "cli": [
+      "core"
+    ],
+    "electron": [
+      "menu",
+      "watch",
+      "core",
       "platform"
     ]
   },
@@ -153,10 +193,6 @@
       {
         "file": "src/editor/structure-lint.ts",
         "name": "StructuralDiagnostic"
-      },
-      {
-        "file": "src/platform/contract.ts",
-        "name": "GraphvizApi"
       },
       {
         "file": "src/preview/render.ts",
@@ -229,6 +265,38 @@
       {
         "file": "src/watch/file-watch.ts",
         "name": "FileWatchOptions"
+      },
+      {
+        "file": "core/export-pdf.ts",
+        "name": "PageGeometry"
+      },
+      {
+        "file": "core/normalize-svg.ts",
+        "name": "NormalizedSvg"
+      },
+      {
+        "file": "core/render.ts",
+        "name": "isGraphvizReady"
+      },
+      {
+        "file": "core/types.ts",
+        "name": "PdfPageMode"
+      },
+      {
+        "file": "core/types.ts",
+        "name": "PdfPageSize"
+      },
+      {
+        "file": "cli/args.ts",
+        "name": "ParsedArgs"
+      },
+      {
+        "file": "cli/args.ts",
+        "name": "ParseError"
+      },
+      {
+        "file": "electron/app-menu.ts",
+        "name": "rebuildAppMenu"
       }
     ]
   },
@@ -480,6 +548,76 @@
       "testFiles": [
         "test/workspace/resize.test.ts"
       ]
+    },
+    {
+      "file": "core/export-pdf.ts",
+      "testFiles": [
+        "test/core/export-pdf.test.ts"
+      ]
+    },
+    {
+      "file": "core/export-png.ts",
+      "testFiles": [
+        "test/core/export-png.test.ts"
+      ]
+    },
+    {
+      "file": "core/export.ts",
+      "testFiles": [
+        "test/core/export.test.ts"
+      ]
+    },
+    {
+      "file": "core/normalize-svg.ts",
+      "testFiles": [
+        "test/core/export-pdf.test.ts",
+        "test/core/export-png.test.ts",
+        "test/core/normalize-svg.test.ts"
+      ]
+    },
+    {
+      "file": "core/render.ts",
+      "testFiles": [
+        "test/core/export-pdf.test.ts",
+        "test/core/export-png.test.ts",
+        "test/core/normalize-svg.test.ts",
+        "test/core/render.test.ts"
+      ]
+    },
+    {
+      "file": "core/types.ts",
+      "testFiles": [
+        "test/editor/linting.test.ts",
+        "test/tabs/manager.test.ts"
+      ]
+    },
+    {
+      "file": "cli/args.ts",
+      "testFiles": [
+        "test/cli/args.test.ts"
+      ]
+    },
+    {
+      "file": "cli/index.ts",
+      "testFiles": [
+        "test/cli/cli.integration.test.ts"
+      ]
+    },
+    {
+      "file": "electron/app-menu.ts",
+      "testFiles": []
+    },
+    {
+      "file": "electron/file-watcher.ts",
+      "testFiles": []
+    },
+    {
+      "file": "electron/main.ts",
+      "testFiles": []
+    },
+    {
+      "file": "electron/preload.ts",
+      "testFiles": []
     }
   ],
   "ipc": {
@@ -979,6 +1117,103 @@
       "exports": [
         "initHorizontalResize"
       ]
+    },
+    {
+      "path": "core/export-pdf.ts",
+      "loc": 218,
+      "exports": [
+        "computePageGeometry",
+        "svgToPdfBytes",
+        "PageGeometry"
+      ]
+    },
+    {
+      "path": "core/export-png.ts",
+      "loc": 35,
+      "exports": [
+        "toPngBytes"
+      ]
+    },
+    {
+      "path": "core/export.ts",
+      "loc": 36,
+      "exports": [
+        "exportDiagram"
+      ]
+    },
+    {
+      "path": "core/normalize-svg.ts",
+      "loc": 92,
+      "exports": [
+        "normalizeSvg",
+        "NormalizedSvg"
+      ]
+    },
+    {
+      "path": "core/render.ts",
+      "loc": 129,
+      "exports": [
+        "initGraphviz",
+        "renderDotToSvg",
+        "isGraphvizReady",
+        "validateDot"
+      ]
+    },
+    {
+      "path": "core/types.ts",
+      "loc": 58,
+      "exports": [
+        "DotValidationError",
+        "PdfExportOptions",
+        "ExportResult",
+        "LayoutEngine",
+        "ExportFormat",
+        "PdfPageMode",
+        "PdfPageSize",
+        "PdfOrientation"
+      ]
+    },
+    {
+      "path": "cli/args.ts",
+      "loc": 166,
+      "exports": [
+        "parseArgs",
+        "ParsedArgs",
+        "ParseError"
+      ]
+    },
+    {
+      "path": "cli/index.ts",
+      "loc": 57,
+      "exports": [
+        "main"
+      ]
+    },
+    {
+      "path": "electron/app-menu.ts",
+      "loc": 48,
+      "exports": [
+        "rebuildAppMenu",
+        "setupAppMenu",
+        "setMenuRecentFiles"
+      ]
+    },
+    {
+      "path": "electron/file-watcher.ts",
+      "loc": 52,
+      "exports": [
+        "setupFileWatcher"
+      ]
+    },
+    {
+      "path": "electron/main.ts",
+      "loc": 212,
+      "exports": []
+    },
+    {
+      "path": "electron/preload.ts",
+      "loc": 35,
+      "exports": []
     }
   ]
 }

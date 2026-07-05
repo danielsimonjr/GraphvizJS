@@ -1,6 +1,9 @@
 graph LR
   autosave["autosave"]
+  cli["cli"]
+  core["core"]
   editor["editor"]
+  electron["electron"]
   help["help"]
   menu["menu"]
   platform["platform"]
@@ -14,11 +17,20 @@ graph LR
   watch["watch"]
   window["window"]
   workspace["workspace"]
+  cli --> core
+  editor --> core
+  electron --> core
+  electron --> menu
+  electron --> platform
+  electron --> watch
   help --> platform
   menu --> platform
+  platform --> core
+  preview --> core
   preview --> utils
   recent --> platform
   root --> autosave
+  root --> core
   root --> editor
   root --> help
   root --> menu
@@ -32,7 +44,10 @@ graph LR
   root --> window
   root --> workspace
   session --> autosave
+  session --> core
   session --> platform
+  tabs --> core
+  toolbar --> core
   toolbar --> editor
   toolbar --> platform
   watch --> platform

@@ -14,15 +14,32 @@ export function parseCli(argv: string[]): CliOptions {
 }
 
 export function buildAnalysis(root: string): Analysis {
-  const files = scanDir(root, 'src');
+  // The whole application: the renderer (src/) plus the headless layers the main
+  // process and CLI share (core/, cli/, electron/). tools/ audits itself elsewhere.
+  const files = [
+    ...scanDir(root, 'src'),
+    ...scanDir(root, 'core'),
+    ...scanDir(root, 'cli'),
+    ...scanDir(root, 'electron'),
+  ];
   const testFiles = scanDir(root, 'test');
   const modules = categorize(files);
   const moduleEdges = computeModuleEdges(files);
   // Entry-like files that legitimately have no importer:
-  //  - src/main.ts (app entry, loaded by index.html)
+  //  - src/main.ts (renderer entry, loaded by index.html)
   //  - src/examples/** (loaded via Vite import.meta.glob, not static imports)
+  //  - cli/index.ts (bin entry), electron/main.ts + electron/preload.ts (Electron entries)
   const entryLike = new Set(
-    files.map((f) => f.path).filter((p) => p === 'src/main.ts' || p.startsWith('src/examples/'))
+    files
+      .map((f) => f.path)
+      .filter(
+        (p) =>
+          p === 'src/main.ts' ||
+          p.startsWith('src/examples/') ||
+          p === 'cli/index.ts' ||
+          p === 'electron/main.ts' ||
+          p === 'electron/preload.ts'
+      )
   );
   return {
     files,

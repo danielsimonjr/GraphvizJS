@@ -1,11 +1,20 @@
 import { resolveCandidates } from './scan';
 import type { ModuleEdges, ModuleMap, ParsedFile } from './types';
 
-/** Module name for a repo-relative path: 'src/<module>/...' → <module>; 'src/x.ts' → 'root'. */
+/**
+ * Module name for a repo-relative path.
+ *  - Renderer/test tree: 'src/<module>/...' or 'test/<module>/...' → <module>;
+ *    a top-level file ('src/main.ts') → 'root'.
+ *  - Top-level app layers ('core/render.ts', 'cli/index.ts', 'electron/main.ts')
+ *    → the layer name itself ('core', 'cli', 'electron').
+ */
 export function moduleOf(relPath: string): string {
   const parts = relPath.split('/');
-  // parts[0] is 'src' or 'test'; a nested file has a subdir at parts[1].
-  return parts.length > 2 ? parts[1] : 'root';
+  if (parts[0] === 'src' || parts[0] === 'test') {
+    // parts[1] is the subdir module; a file directly under src/ or test/ is 'root'.
+    return parts.length > 2 ? parts[1] : 'root';
+  }
+  return parts[0];
 }
 
 export function categorize(files: ParsedFile[]): ModuleMap {

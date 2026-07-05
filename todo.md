@@ -22,10 +22,11 @@ step 16 pulls the next item). Statuses: 🟢 READY · 🟡 IN PROGRESS · ✅ DO
 - 🔵 **Minor: de-duplicate the `ExportFormat` type** — identical `'png'|'pngx2'|'svg'|'pdf'` union is
   defined twice (`core/types.ts:35` + `src/toolbar/export-menu.ts:1`); the renderer copy could
   `import type` from `core/types` (type-only, purity-safe) to avoid drift.
-- 🟢 **Extend the dependency-graph tool to `core/` + `cli/` + `electron/`** — needs a `moduleOf`
-  refactor (top-level dirs currently collapse to `root`), add the new entry points to `entryLike`,
-  and update the tool's test expectations. Note: the durable `renderer-purity.test.ts` already
-  guards the central constraint, so this is completeness, not coverage of a gap.
+- ✅ **Extend the dependency-graph tool to `core/` + `cli/` + `electron/`** — `moduleOf` now maps
+  top-level layers to themselves; `buildAnalysis` scans all three (+ `cli/index.ts`,
+  `electron/main.ts`, `electron/preload.ts` as entry-like). Graph went 15→18 modules / 42→54 files,
+  0 unused files, still IPC 16/16 and 0 cycles; the `cli → core` / `platform → core` edges are now
+  visible. Tests added in `categorize.test.ts` + `index.test.ts`.
 - ⏸️ **Make the `graphvizjs` CLI a distributable binary** — deferred (Daniel, 2026-07-04). Ship
   via the tsc approach (compile `cli/`+`core/` to `dist-cli/`, shebang, `bin`→compiled JS, natives
   as normal deps). NOT `@vercel/ncc` — investigated and rejected (ESM + jsdom `__dirname` crash;
