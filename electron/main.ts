@@ -3,6 +3,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, dialog, ipcMain, screen, shell } from 'electron';
 import Store from 'electron-store';
+import { exportDiagram } from '../core/export';
+import { initGraphviz, renderDotToSvg, validateDot } from '../core/render';
+import type { ExportFormat, LayoutEngine, PdfExportOptions } from '../core/types';
 import type { ConfirmOptions, DiagramFilter } from '../src/platform/contract';
 import { setMenuRecentFiles, setupAppMenu } from './app-menu';
 import { setupFileWatcher } from './file-watcher';
@@ -169,6 +172,23 @@ function registerIpc(): void {
   ipcMain.handle('menu:setRecent', (_e, paths: string[]) => {
     setMenuRecentFiles(paths);
   });
+
+  ipcMain.handle('render:svg', (_e, dot: string, engine: LayoutEngine) =>
+    renderDotToSvg(dot, engine)
+  );
+  ipcMain.handle('render:validate', (_e, dot: string, engine: LayoutEngine) =>
+    validateDot(dot, engine)
+  );
+  ipcMain.handle(
+    'export:render',
+    async (
+      _e,
+      dot: string,
+      engine: LayoutEngine,
+      format: ExportFormat,
+      options?: PdfExportOptions
+    ) => (await exportDiagram(dot, engine, format, options)).bytes
+  );
 }
 
 app.whenReady().then(() => {
@@ -176,6 +196,7 @@ app.whenReady().then(() => {
   setupFileWatcher();
   createWindow();
   setupAppMenu();
+  void initGraphviz();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });

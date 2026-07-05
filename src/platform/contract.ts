@@ -1,3 +1,10 @@
+import type {
+  DotValidationError,
+  ExportFormat,
+  LayoutEngine,
+  PdfExportOptions,
+} from '../../core/types';
+
 export interface DiagramFilter {
   name: string;
   extensions: string[];
@@ -29,4 +36,12 @@ export interface GraphvizApi {
   onFileChanged(cb: (path: string) => void): () => void;
   onMenuAction(cb: (action: string, payload?: string) => void): () => void;
   setMenuRecent(paths: string[]): Promise<void>;
+  renderSvg(dot: string, engine: LayoutEngine): Promise<string>;
+  validateDot(dot: string, engine: LayoutEngine): Promise<DotValidationError | null>;
+  exportRender(
+    dot: string,
+    engine: LayoutEngine,
+    format: ExportFormat,
+    options?: PdfExportOptions
+  ): Promise<Uint8Array>;
 }
