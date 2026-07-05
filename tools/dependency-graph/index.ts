@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import {
   computeImpact,
@@ -78,16 +78,44 @@ export function buildAnalysis(root: string): Analysis {
   };
 }
 
-export function writeOutputs(root: string, a: Analysis): string[] {
+/** The three generated docs and their freshly-rendered content, for a root. */
+function renderOutputs(root: string, a: Analysis): { path: string; content: string }[] {
   const dir = path.join(root, OUT_DIR);
-  mkdirSync(dir, { recursive: true });
-  const md = path.join(dir, 'DEPENDENCY_GRAPH.md');
-  const json = path.join(dir, 'dependency-graph.json');
-  const mermaid = path.join(dir, 'dependency-graph.mermaid');
-  writeFileSync(md, renderMarkdown(a), 'utf-8');
-  writeFileSync(json, renderJson(a), 'utf-8');
-  writeFileSync(mermaid, renderMermaid(a.modules, a.moduleEdges), 'utf-8');
-  return [md, json, mermaid];
+  return [
+    { path: path.join(dir, 'DEPENDENCY_GRAPH.md'), content: renderMarkdown(a) },
+    { path: path.join(dir, 'dependency-graph.json'), content: renderJson(a) },
+    {
+      path: path.join(dir, 'dependency-graph.mermaid'),
+      content: renderMermaid(a.modules, a.moduleEdges),
+    },
+  ];
+}
+
+export function writeOutputs(root: string, a: Analysis): string[] {
+  mkdirSync(path.join(root, OUT_DIR), { recursive: true });
+  const outputs = renderOutputs(root, a);
+  for (const o of outputs) writeFileSync(o.path, o.content, 'utf-8');
+  return outputs.map((o) => o.path);
+}
+
+/**
+ * Repo-relative paths of generated docs whose committed content differs from a
+ * fresh render (or that are missing) — i.e. the snapshot is stale and `pnpm
+ * graph` needs re-running. EOL-normalized so it is robust to CRLF checkouts.
+ */
+export function staleDocs(root: string, a: Analysis): string[] {
+  const norm = (s: string) => s.replace(/\r\n/g, '\n');
+  return renderOutputs(root, a)
+    .filter((o) => {
+      let existing: string;
+      try {
+        existing = readFileSync(o.path, 'utf-8');
+      } catch {
+        return true; // missing → stale
+      }
+      return norm(existing) !== norm(o.content);
+    })
+    .map((o) => path.relative(root, o.path).split(path.sep).join('/'));
 }
 
 function printViolations(a: Analysis): void {
@@ -116,7 +144,8 @@ export function main(argv: string[]): void {
       'Usage: pnpm graph [--include-tests] [--check] [--impact <file>]\n' +
         '  (default)        Write docs/architecture/{DEPENDENCY_GRAPH.md,.json,.mermaid}\n' +
         '  --check          Verify architecture invariants without writing; exit 1 on any\n' +
-        '                   layer violation, runtime cycle, or broken IPC channel.\n' +
+        '                   layer violation, runtime cycle, broken IPC channel, or a\n' +
+        '                   stale committed report (run `pnpm graph` to refresh).\n' +
         '  --impact <file>  Print the transitive reverse-dependencies (blast radius) of a file.'
     );
     return;
@@ -141,10 +170,15 @@ export function main(argv: string[]): void {
   const failures = hardViolationCount(a);
 
   if (opts.check) {
+    const stale = staleDocs(root, a);
     console.log(summaryLine(a, 'Architecture check —'));
     if (failures > 0) {
       console.error(`\n${failures} architecture violation(s):`);
       printViolations(a);
+      process.exitCode = 1;
+    }
+    if (stale.length > 0) {
+      console.error(`\nStale generated docs (run \`pnpm graph\`): ${stale.join(', ')}`);
       process.exitCode = 1;
     }
     return;

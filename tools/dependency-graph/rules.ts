@@ -1,3 +1,4 @@
+import { moduleOf } from './categorize';
 import { resolveCandidates } from './scan';
 import type { LayerViolation, ParsedFile } from './types';
 
@@ -20,9 +21,13 @@ const CORE_TYPES = 'core/types.ts';
 const POLICY: Record<string, ReadonlySet<string>> = {
   core: new Set(),
   cli: new Set(['core']),
-  electron: new Set(['core', 'renderer']),
+  electron: new Set(['core']), // renderer handled specially (shared modules only)
   renderer: new Set(),
 };
+
+// Pure, DOM-free renderer modules the Electron main process may legitimately
+// reuse. Anything else in src/ is renderer UI and must stay out of main.
+const ELECTRON_SHARED_RENDERER = new Set(['menu', 'watch', 'platform']);
 
 /**
  * Check every resolved internal edge against the layer policy. Returns one
@@ -51,6 +56,18 @@ export function checkLayering(files: ParsedFile[]): LayerViolation[] {
           spec: dep.file,
           typeOnly: dep.typeOnly,
           rule: 'renderer may import core only as type-only core/types (renderer purity)',
+        });
+        continue;
+      }
+      if (from === 'electron' && toLayer === 'renderer') {
+        // Electron main may reuse only the pure shared renderer modules, not UI.
+        if (ELECTRON_SHARED_RENDERER.has(moduleOf(to))) continue;
+        out.push({
+          from: file.path,
+          to,
+          spec: dep.file,
+          typeOnly: dep.typeOnly,
+          rule: `electron may import only the shared renderer modules (${[...ELECTRON_SHARED_RENDERER].join(', ')}), not ${moduleOf(to)}`,
         });
         continue;
       }

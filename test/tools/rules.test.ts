@@ -55,7 +55,26 @@ describe('checkLayering', () => {
     expect(checkLayering(files)).toHaveLength(1);
   });
 
-  it('passes a clean graph (core leaf, cli->core, electron->core+renderer, renderer type-only core)', () => {
+  it('allows electron to import a shared pure renderer module (menu/watch/platform)', () => {
+    const files = [
+      f('electron/app-menu.ts', [{ file: '../src/menu/menu-template' }]),
+      f('src/menu/menu-template.ts'),
+    ];
+    expect(checkLayering(files)).toEqual([]);
+  });
+
+  it('flags electron reaching into renderer UI (not a shared module)', () => {
+    const files = [
+      f('electron/main.ts', [{ file: '../src/preview/render' }]),
+      f('src/preview/render.ts'),
+    ];
+    const v = checkLayering(files);
+    expect(v).toHaveLength(1);
+    expect(v[0]).toMatchObject({ from: 'electron/main.ts', to: 'src/preview/render.ts' });
+    expect(v[0].rule).toMatch(/shared renderer module/i);
+  });
+
+  it('passes a clean graph (core leaf, cli->core, electron->core+shared, renderer type-only core)', () => {
     const files = [
       f('electron/m.ts', [{ file: '../core/c' }, { file: '../src/menu/t' }]),
       f('cli/i.ts', [{ file: '../core/c' }]),

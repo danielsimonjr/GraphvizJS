@@ -78,8 +78,9 @@ export function renderMarkdown(a: Analysis): string {
   out.push('## Architecture rules');
   out.push('');
   out.push(
-    '> Layer policy: `core` is a leaf; `cli` → `core`; `electron` → `core`/renderer; ' +
-      'the renderer (`src/`) may import `core` only as type-only `core/types`.'
+    '> Layer policy: `core` is a leaf; `cli` → `core`; `electron` → `core` + the shared ' +
+      'renderer modules (`menu`/`watch`/`platform`); the renderer (`src/`) may import `core` ' +
+      'only as type-only `core/types`.'
   );
   out.push('');
   if (a.layerViolations.length === 0) {
