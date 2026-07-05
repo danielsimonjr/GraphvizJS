@@ -5,7 +5,16 @@ describe('buildAnalysis (real repo)', () => {
   const a = buildAnalysis(process.cwd());
 
   it('discovers the real module structure incl. the headless layers', () => {
-    for (const mod of ['editor', 'preview', 'toolbar', 'tabs', 'platform', 'core', 'cli', 'electron']) {
+    for (const mod of [
+      'editor',
+      'preview',
+      'toolbar',
+      'tabs',
+      'platform',
+      'core',
+      'cli',
+      'electron',
+    ]) {
       expect(a.modules.has(mod)).toBe(true);
     }
   });
