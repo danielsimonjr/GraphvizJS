@@ -19,9 +19,9 @@ step 16 pulls the next item). Statuses: 🟢 READY · 🟡 IN PROGRESS · ✅ DO
   Electron Integration (render/validate/export + push channels), Vite config (native-dep
   externalization), and the export-format recipe. Every claim verified against current code.
   (`README.md` had no architecture staleness — not touched.)
-- 🔵 **Minor: de-duplicate the `ExportFormat` type** — identical `'png'|'pngx2'|'svg'|'pdf'` union is
-  defined twice (`core/types.ts:35` + `src/toolbar/export-menu.ts:1`); the renderer copy could
-  `import type` from `core/types` (type-only, purity-safe) to avoid drift.
+- ✅ **De-duplicate the `ExportFormat` type** — `src/toolbar/export-menu.ts` now type-only
+  re-exports `ExportFormat` from `core/types` (single source of truth; purity-safe). typecheck 0,
+  purity test green.
 - ✅ **Extend the dependency-graph tool to `core/` + `cli/` + `electron/`** — `moduleOf` now maps
   top-level layers to themselves; `buildAnalysis` scans all three (+ `cli/index.ts`,
   `electron/main.ts`, `electron/preload.ts` as entry-like). Graph went 15→18 modules / 42→54 files,

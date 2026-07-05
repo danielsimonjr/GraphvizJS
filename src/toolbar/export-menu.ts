@@ -1,4 +1,6 @@
-export type ExportFormat = 'png' | 'pngx2' | 'svg' | 'pdf';
+// Single source of truth in core/types (type-only re-export — no runtime import).
+export type { ExportFormat } from '../../core/types';
+import type { ExportFormat } from '../../core/types';
 
 export interface ExportMenuOptions {
   button: HTMLButtonElement | null;

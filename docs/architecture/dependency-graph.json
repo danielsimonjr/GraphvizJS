@@ -2,9 +2,9 @@
   "stats": {
     "fileCount": 54,
     "moduleCount": 18,
-    "totalLoc": 5468,
-    "edgeCount": 90,
-    "exportCount": 154
+    "totalLoc": 5470,
+    "edgeCount": 91,
+    "exportCount": 153
   },
   "modules": {
     "autosave": [
@@ -994,11 +994,10 @@
     },
     {
       "path": "src/toolbar/export-menu.ts",
-      "loc": 93,
+      "loc": 95,
       "exports": [
         "setupExportMenu",
-        "ExportMenuOptions",
-        "ExportFormat"
+        "ExportMenuOptions"
       ]
     },
     {
