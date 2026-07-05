@@ -2,7 +2,8 @@ import { forceLinting } from '@codemirror/lint';
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { DotValidationError } from '../../src/preview/graphviz';
+import type { DotValidationError } from '../../core/types';
+import { createDotLinter, lintGutter } from '../../src/editor/linting';
 
 /** Captured diagnostic structure for testing */
 interface CapturedDiagnostic {
@@ -12,27 +13,16 @@ interface CapturedDiagnostic {
   message: string;
 }
 
-// Use vi.hoisted to create the mock before vi.mock is hoisted
-const { mockValidateDot } = vi.hoisted(() => ({
-  mockValidateDot: vi.fn<[string, string], Promise<DotValidationError | null>>(),
-}));
-
-// Mock the graphviz module
-vi.mock('../../src/preview/graphviz', () => ({
-  validateDot: mockValidateDot,
-}));
-
-// Import after mock setup
-import { createDotLinter, lintGutter } from '../../src/editor/linting';
-
 describe('editor/linting', () => {
   let container: HTMLElement;
   let mockGetEngine: ReturnType<typeof vi.fn>;
+  let mockValidate: ReturnType<
+    typeof vi.fn<(dot: string, engine: string) => Promise<DotValidationError | null>>
+  >;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockValidateDot.mockReset();
-    mockValidateDot.mockResolvedValue(null);
+    mockValidate = vi.fn().mockResolvedValue(null);
     mockGetEngine = vi.fn().mockReturnValue('dot');
 
     container = document.createElement('div');
@@ -47,12 +37,12 @@ describe('editor/linting', () => {
 
   describe('createDotLinter()', () => {
     it('returns a CodeMirror extension', () => {
-      const linterExt = createDotLinter({ getEngine: mockGetEngine });
+      const linterExt = createDotLinter({ getEngine: mockGetEngine, validate: mockValidate });
       expect(linterExt).toBeDefined();
     });
 
     it('extension can be used in EditorState', () => {
-      const linterExt = createDotLinter({ getEngine: mockGetEngine });
+      const linterExt = createDotLinter({ getEngine: mockGetEngine, validate: mockValidate });
       const state = EditorState.create({
         doc: 'digraph { a -> b }',
         extensions: [linterExt],
@@ -61,7 +51,7 @@ describe('editor/linting', () => {
     });
 
     it('extension can be used in EditorView', () => {
-      const linterExt = createDotLinter({ getEngine: mockGetEngine });
+      const linterExt = createDotLinter({ getEngine: mockGetEngine, validate: mockValidate });
       const view = new EditorView({
         state: EditorState.create({
           doc: 'digraph { a -> b }',
@@ -84,13 +74,14 @@ describe('editor/linting', () => {
       doc: string,
       validationResult: DotValidationError | null
     ): Promise<{ diagnostics: CapturedDiagnostic[]; view: EditorView }> {
-      mockValidateDot.mockResolvedValue(validationResult);
+      mockValidate.mockResolvedValue(validationResult);
 
       // Captured diagnostics
       const capturedDiagnostics: CapturedDiagnostic[] = [];
 
       const linterExt = createDotLinter({
         getEngine: mockGetEngine,
+        validate: mockValidate,
         delay: 0, // No delay for tests
       });
 
@@ -141,23 +132,23 @@ describe('editor/linting', () => {
     });
 
     it('getEngine callback is called during linting', async () => {
-      mockValidateDot.mockResolvedValue(null);
+      mockValidate.mockResolvedValue(null);
 
       const { view } = await runLinter('digraph { a -> b }', null);
 
       expect(mockGetEngine).toHaveBeenCalled();
-      expect(mockValidateDot).toHaveBeenCalledWith('digraph { a -> b }', 'dot');
+      expect(mockValidate).toHaveBeenCalledWith('digraph { a -> b }', 'dot');
 
       view.destroy();
     });
 
     it('uses the engine returned by getEngine', async () => {
       mockGetEngine.mockReturnValue('neato');
-      mockValidateDot.mockResolvedValue(null);
+      mockValidate.mockResolvedValue(null);
 
       const { view } = await runLinter('graph { a -- b }', null);
 
-      expect(mockValidateDot).toHaveBeenCalledWith('graph { a -- b }', 'neato');
+      expect(mockValidate).toHaveBeenCalledWith('graph { a -- b }', 'neato');
 
       view.destroy();
     });
@@ -256,22 +247,24 @@ describe('editor/linting', () => {
     });
 
     it('skips validation for empty documents', async () => {
-      mockValidateDot.mockResolvedValue(null);
+      mockValidate.mockResolvedValue(null);
 
       const { diagnostics, view } = await runLinter('', null);
 
-      // validateDot should not be called for empty docs
+      // validate should not be called for empty docs
       expect(diagnostics).toHaveLength(0);
+      expect(mockValidate).not.toHaveBeenCalled();
 
       view.destroy();
     });
 
     it('skips validation for whitespace-only documents', async () => {
-      mockValidateDot.mockResolvedValue(null);
+      mockValidate.mockResolvedValue(null);
 
       const { diagnostics, view } = await runLinter('   \n\t\n  ', null);
 
       expect(diagnostics).toHaveLength(0);
+      expect(mockValidate).not.toHaveBeenCalled();
 
       view.destroy();
     });

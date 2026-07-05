@@ -9,8 +9,7 @@ import type { Diagnostic, LintSource } from '@codemirror/lint';
 import { lintGutter as cmLintGutter, linter } from '@codemirror/lint';
 import type { Extension } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
-import type { LayoutEngine } from '../preview/graphviz';
-import { validateDot } from '../preview/graphviz';
+import type { DotValidationError, LayoutEngine } from '../../core/types';
 import { createStructureLintSource } from './structure-lint';
 
 /** Default debounce delay for linting (ms) */
@@ -25,6 +24,13 @@ export interface DotLinterOptions {
    * Called on each lint pass to use the appropriate engine for validation.
    */
   getEngine: () => LayoutEngine;
+
+  /**
+   * Validate DOT source against the given layout engine, returning a
+   * structured error (or null when valid). Backed by the `render:validate`
+   * IPC channel in the main process.
+   */
+  validate: (dot: string, engine: LayoutEngine) => Promise<DotValidationError | null>;
 
   /**
    * Debounce delay in milliseconds before running the linter.
@@ -125,7 +131,7 @@ function createDotLintSource(options: DotLinterOptions): LintSource {
     }
 
     const engine = options.getEngine();
-    const error = await validateDot(doc, engine);
+    const error = await options.validate(doc, engine);
 
     if (error === null) {
       // No error - document is valid
@@ -141,9 +147,10 @@ function createDotLintSource(options: DotLinterOptions): LintSource {
 /**
  * Create a DOT linter extension for CodeMirror
  *
- * The linter validates DOT source code using Graphviz WASM and displays
- * errors inline in the editor. Validation is debounced to avoid excessive
- * CPU usage during typing.
+ * The linter validates DOT source code via the injected `validate` callback
+ * (typically the `render:validate` IPC channel backed by Graphviz in the
+ * main process) and displays errors inline in the editor. Validation is
+ * debounced to avoid excessive calls during typing.
  *
  * @param options - Configuration options
  * @returns CodeMirror Extension for DOT linting
@@ -153,6 +160,7 @@ function createDotLintSource(options: DotLinterOptions): LintSource {
  * const extensions = [
  *   createDotLinter({
  *     getEngine: () => currentEngine,
+ *     validate: validateDot,
  *     delay: 500,
  *   }),
  *   lintGutter(),

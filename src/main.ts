@@ -24,6 +24,7 @@ import {
   readTextFile,
   renderSvg,
   setMenuRecent,
+  validateDot,
 } from './platform';
 import type { LayoutEngine } from './preview/graphviz';
 import { initGraphviz } from './preview/graphviz';
@@ -171,7 +172,10 @@ async function bootstrap(): Promise<void> {
       createDotAutocomplete(),
       createSearch(),
       keymap.of([makeFormatKeymap((doc) => schedulePreviewRender(doc))]),
-      createDotLinter({ getEngine: () => tabManager.getActiveTab()?.layoutEngine ?? 'dot' }),
+      createDotLinter({
+        getEngine: () => tabManager.getActiveTab()?.layoutEngine ?? 'dot',
+        validate: validateDot,
+      }),
       lintGutter(),
       EditorView.lineWrapping,
       EDITOR_THEME,
