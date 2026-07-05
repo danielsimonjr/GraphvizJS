@@ -27,6 +27,13 @@ export default defineConfig({
           build: {
             outDir: path.resolve(__dirname, 'dist-electron'),
             emptyOutDir: false,
+            rollupOptions: {
+              // The main process now imports the headless render/export core, which
+              // pulls native (.node) and heavy Node modules. These must NOT be bundled
+              // by rollup (it can't parse `canvas.node`); they load from node_modules at
+              // runtime and are bundled into the installer by electron-builder.
+              external: ['@hpcc-js/wasm', '@resvg/resvg-js', 'canvas', 'jsdom', 'jspdf', 'svg2pdf.js'],
+            },
           },
         },
       },
