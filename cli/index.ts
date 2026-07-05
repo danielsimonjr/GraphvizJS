@@ -1,12 +1,35 @@
+#!/usr/bin/env node
 import { readFile, writeFile } from 'node:fs/promises';
-import { pathToFileURL } from 'node:url';
-import { exportDiagram } from '../core/export';
-import type { ExportFormat } from '../core/types';
-import { parseArgs } from './args';
+import { dirname, join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { exportDiagram } from '../core/export.js';
+import type { ExportFormat } from '../core/types.js';
+import { parseArgs } from './args.js';
 
 const USAGE = `graphvizjs render <input.dot|-> -o <output> [--engine E] [--format svg|png|pdf]
   [--scale 1|2] [--pdf-page fit|letter|a4] [--pdf-orientation auto|portrait|landscape]
 graphvizjs --help | --version`;
+
+/**
+ * Read this package's version from the nearest ancestor package.json. Walking up
+ * from the module's own location (rather than a fixed relative path) keeps the
+ * lookup correct whether we run from source via tsx (`cli/index.ts`) or from the
+ * compiled binary (`dist-cli/cli/index.js`), where the depth to package.json differs.
+ */
+async function readPackageVersion(): Promise<string> {
+  let dir = dirname(fileURLToPath(import.meta.url));
+  for (;;) {
+    try {
+      const pkg = JSON.parse(await readFile(join(dir, 'package.json'), 'utf-8'));
+      if (typeof pkg.version === 'string') return pkg.version;
+    } catch {
+      // No readable package.json at this level — keep walking toward the root.
+    }
+    const parent = dirname(dir);
+    if (parent === dir) return '0.0.0';
+    dir = parent;
+  }
+}
 
 async function readInput(input: string): Promise<string> {
   if (input === '-') {
@@ -29,8 +52,7 @@ export async function main(argv: string[]): Promise<number> {
     return 0;
   }
   if (parsed.command === 'version') {
-    const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf-8'));
-    process.stdout.write(`graphvizjs ${pkg.version}\n`);
+    process.stdout.write(`graphvizjs ${await readPackageVersion()}\n`);
     return 0;
   }
   // render

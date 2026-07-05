@@ -1,8 +1,8 @@
-import { svgToPdfBytes } from './export-pdf';
-import { toPngBytes } from './export-png';
-import { normalizeSvg } from './normalize-svg';
-import { renderDotToSvg } from './render';
-import type { ExportFormat, ExportResult, LayoutEngine, PdfExportOptions } from './types';
+import { svgToPdfBytes } from './export-pdf.js';
+import { toPngBytes } from './export-png.js';
+import { normalizeSvg } from './normalize-svg.js';
+import { renderDotToSvg } from './render.js';
+import type { ExportFormat, ExportResult, LayoutEngine, PdfExportOptions } from './types.js';
 
 const DEFAULT_PDF_OPTIONS: PdfExportOptions = {
   mode: 'fit',

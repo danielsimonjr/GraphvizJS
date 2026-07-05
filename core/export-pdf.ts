@@ -11,7 +11,7 @@
 
 import { createCanvas, Image } from 'canvas';
 import { JSDOM } from 'jsdom';
-import type { PdfExportOptions } from './types';
+import type { PdfExportOptions } from './types.js';
 
 /** CSS px are 96 dpi; PDF points are 72 dpi. */
 const PX_TO_PT = 72 / 96;

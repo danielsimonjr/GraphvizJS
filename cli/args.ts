@@ -1,5 +1,10 @@
 import { extname } from 'node:path';
-import type { ExportFormat, LayoutEngine, PdfExportOptions, PdfOrientation } from '../core/types';
+import type {
+  ExportFormat,
+  LayoutEngine,
+  PdfExportOptions,
+  PdfOrientation,
+} from '../core/types.js';
 
 const ENGINES: readonly LayoutEngine[] = [
   'dot',
