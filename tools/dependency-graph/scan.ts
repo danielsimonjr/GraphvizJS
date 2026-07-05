@@ -43,6 +43,36 @@ export function scanDir(root: string, subdir: string): ParsedFile[] {
 const IMPORT_RE =
   /import\s+(type\s+)?(?:(?:{([^}]+)}|(\w+)|\*\s+as\s+(\w+))(?:\s*,\s*(?:{([^}]+)}|(\w+)))?)\s+from\s+['"]([^'"]+)['"]/g;
 
+// Dynamic import: an optional destructuring assignment in front of `import('x')`
+// / `await import('x')`. Group 1 = destructured bindings (if any), group 2 = spec.
+// Static `import ... from` never contains `import(`, so this can't match those.
+const DYNAMIC_IMPORT_RE =
+  /(?:\{\s*([^}]+?)\s*\}\s*=\s*)?(?:await\s+)?import\(\s*['"]([^'"]+)['"]\s*\)/g;
+
+function parseDynamicImports(content: string): InternalDep[] {
+  const deps: InternalDep[] = [];
+  let m: RegExpExecArray | null;
+  DYNAMIC_IMPORT_RE.lastIndex = 0;
+  while ((m = DYNAMIC_IMPORT_RE.exec(content)) !== null) {
+    const source = m[2];
+    if (!source.startsWith('.')) continue; // internal (relative) only
+    const imports = m[1]
+      ? m[1]
+          .split(',')
+          // `{ foo: local }` imports `foo`; strip the rename and `type` modifier.
+          .map((raw) =>
+            raw
+              .replace(/^type\s+/, '')
+              .split(':')[0]
+              .trim()
+          )
+          .filter(Boolean)
+      : ['*']; // bare `import('x')` binds nothing by name → treat as wildcard
+    deps.push({ file: source, imports, typeOnly: false });
+  }
+  return deps;
+}
+
 function parseImports(content: string): InternalDep[] {
   const deps: InternalDep[] = [];
   let m: RegExpExecArray | null;
@@ -118,7 +148,7 @@ function countLoc(content: string): number {
 export function parseFile(relPath: string, content: string): ParsedFile {
   return {
     path: relPath,
-    internalDeps: parseImports(content),
+    internalDeps: [...parseImports(content), ...parseDynamicImports(content)],
     exports: parseExports(content),
     loc: countLoc(content),
   };

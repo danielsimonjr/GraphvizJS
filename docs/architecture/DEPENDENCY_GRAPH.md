@@ -184,7 +184,6 @@ None. ✅
 - `FileWatchOptions` in `src/watch/file-watch.ts`
 - `PageGeometry` in `core/export-pdf.ts`
 - `NormalizedSvg` in `core/normalize-svg.ts`
-- `isGraphvizReady` in `core/render.ts`
 - `PdfPageMode` in `core/types.ts`
 - `PdfPageSize` in `core/types.ts`
 - `ParsedArgs` in `cli/args.ts`
@@ -206,19 +205,19 @@ None. ✅
 | `src/editor/structure-lint.ts` | `test/editor/structure-lint.test.ts` |
 | `src/editor/theme.ts` | `test/editor/theme.test.ts` |
 | `src/editor/zoom.ts` | `test/editor/zoom.test.ts` |
-| `src/help/dialog.ts` | — |
+| `src/help/dialog.ts` | `test/help/dialog.test.ts` |
 | `src/main.ts` | — |
 | `src/menu/commands.ts` | `test/menu/commands.test.ts` |
 | `src/menu/menu-template.ts` | `test/menu/menu-template.test.ts` |
 | `src/platform/contract.ts` | — |
 | `src/platform/index.ts` | `test/help/dialog.test.ts`, `test/platform/index.test.ts`, `test/toolbar/export-diagram.test.ts`, `test/toolbar/open-diagram.test.ts`, `test/toolbar/save-as.test.ts`, `test/toolbar/save-diagram.test.ts`, `test/window/state.test.ts` |
-| `src/preview/render.ts` | — |
+| `src/preview/render.ts` | `test/preview/render.test.ts` |
 | `src/preview/zoom.ts` | `test/preview/zoom.test.ts` |
 | `src/recent/recent-files.ts` | `test/recent/recent-files.test.ts` |
 | `src/session/session.ts` | `test/session/session.test.ts` |
 | `src/tabs/manager.ts` | `test/tabs/manager.test.ts`, `test/tabs/tab-bar.test.ts` |
 | `src/tabs/tab-bar.ts` | `test/tabs/tab-bar.test.ts` |
-| `src/toolbar/actions.ts` | — |
+| `src/toolbar/actions.ts` | `test/toolbar/actions.test.ts` |
 | `src/toolbar/examples-menu.ts` | `test/toolbar/examples-menu.test.ts` |
 | `src/toolbar/export-diagram.ts` | `test/toolbar/export-diagram.test.ts` |
 | `src/toolbar/export-menu.ts` | `test/toolbar/export-menu.test.ts` |
@@ -241,7 +240,7 @@ None. ✅
 | `core/export-png.ts` | `test/core/export-png.test.ts` |
 | `core/export.ts` | `test/core/export.test.ts` |
 | `core/normalize-svg.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts` |
-| `core/render.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts`, `test/core/render.test.ts` |
+| `core/render.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts`, `test/core/render.test.ts`, `test/core/validate.test.ts` |
 | `core/types.ts` | `test/editor/linting.test.ts`, `test/tabs/manager.test.ts` |
 | `cli/args.ts` | `test/cli/args.test.ts` |
 | `cli/index.ts` | `test/cli/cli.integration.test.ts` |

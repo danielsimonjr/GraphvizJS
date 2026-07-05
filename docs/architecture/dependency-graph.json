@@ -276,10 +276,6 @@
         "name": "NormalizedSvg"
       },
       {
-        "file": "core/render.ts",
-        "name": "isGraphvizReady"
-      },
-      {
         "file": "core/types.ts",
         "name": "PdfPageMode"
       },
@@ -370,7 +366,9 @@
     },
     {
       "file": "src/help/dialog.ts",
-      "testFiles": []
+      "testFiles": [
+        "test/help/dialog.test.ts"
+      ]
     },
     {
       "file": "src/main.ts",
@@ -406,7 +404,9 @@
     },
     {
       "file": "src/preview/render.ts",
-      "testFiles": []
+      "testFiles": [
+        "test/preview/render.test.ts"
+      ]
     },
     {
       "file": "src/preview/zoom.ts",
@@ -441,7 +441,9 @@
     },
     {
       "file": "src/toolbar/actions.ts",
-      "testFiles": []
+      "testFiles": [
+        "test/toolbar/actions.test.ts"
+      ]
     },
     {
       "file": "src/toolbar/examples-menu.ts",
@@ -582,7 +584,8 @@
         "test/core/export-pdf.test.ts",
         "test/core/export-png.test.ts",
         "test/core/normalize-svg.test.ts",
-        "test/core/render.test.ts"
+        "test/core/render.test.ts",
+        "test/core/validate.test.ts"
       ]
     },
     {
