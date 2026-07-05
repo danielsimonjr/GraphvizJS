@@ -4,17 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!--
-      CSP: 'unsafe-eval'/'wasm-unsafe-eval' are retained defensively for the renderer's
-      bundled dependencies even though Graphviz itself now runs headlessly in the main
-      process (see core/render.ts, invoked over IPC) — the renderer holds zero Graphviz.
-      Crucially, 'unsafe-inline' is NOT in script-src, so inline scripts / inline event
-      handlers in the Graphviz-produced SVG that gets injected via innerHTML are still
-      blocked — which is the actual injection vector this policy defends. object-src
-      'none', base-uri 'none', and connect-src 'self' remain strict.
+      CSP: script-src is 'self' only. 'unsafe-eval'/'wasm-unsafe-eval' were previously
+      required by @hpcc-js/wasm's Graphviz loader (new Function + WebAssembly), but Graphviz
+      now runs headlessly in the main process (core/render.ts, invoked over IPC) — the
+      renderer holds zero Graphviz, and the built renderer bundle contains no `new Function`,
+      `eval`, or `WebAssembly` (verified). 'unsafe-inline' is NOT in script-src, so inline
+      scripts / inline event handlers in the Graphviz-produced SVG injected via innerHTML are
+      blocked — the actual injection vector this policy defends. object-src 'none', base-uri
+      'none', and connect-src 'self' remain strict.
     -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none';"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none';"
     />
     <title>GraphvizJS Desktop</title>
     <link rel="stylesheet" href="./styles.css" />
