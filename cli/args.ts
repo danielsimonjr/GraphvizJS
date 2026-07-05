@@ -133,7 +133,8 @@ export function parseArgs(argv: string[]): ParsedArgs | ParseError {
         break;
       }
       default: {
-        if (arg.startsWith('-')) {
+        // A bare "-" is the stdin input marker (see readInput), not a flag.
+        if (arg !== '-' && arg.startsWith('-')) {
           return { error: `Unknown flag: ${arg}` };
         }
         if (input === undefined) {

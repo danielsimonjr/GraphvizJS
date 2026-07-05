@@ -36,4 +36,11 @@ describe('parseArgs', () => {
     expect(parseArgs(['--help'])).toMatchObject({ command: 'help' });
     expect(parseArgs(['-v'])).toMatchObject({ command: 'version' });
   });
+  it('accepts "-" as the stdin input, not an unknown flag', () => {
+    expect(parseArgs(['render', '-', '-o', 'out.svg'])).toMatchObject({
+      command: 'render',
+      input: '-',
+      output: 'out.svg',
+    });
+  });
 });
