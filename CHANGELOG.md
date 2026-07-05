@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-07-05
+
+### Added
+
+- **Distributable `graphvizjs` CLI.** `pnpm build:cli` compiles the headless `cli/` + `core/`
+  to `dist-cli/` as a real Node-ESM binary with a `#!/usr/bin/env node` shebang; `bin.graphvizjs`
+  now points at the compiled `dist-cli/cli/index.js` (previously raw TypeScript, runnable only via
+  tsx) and `files: ["dist-cli"]` ships it in the package. The command is installable via `npm link`
+  or the packed tarball on Windows/macOS/Linux. The rendering deps (`@resvg/resvg-js`, `canvas`,
+  `@hpcc-js/wasm`, `jsdom`) stay as normal dependencies resolved at runtime — not bundled — which
+  is what makes vector PDF export work in the compiled binary.
+
+### Fixed
+
+- **CLI `-` (stdin) input now works.** Reading DOT from stdin was advertised in the usage text and
+  implemented in `readInput`, but the argument parser rejected a bare `-` as an unknown flag, making
+  the feature unreachable. The parser now treats `-` as the input marker.
+- **`graphvizjs --version` is layout-independent.** It reads the version from the nearest ancestor
+  `package.json` instead of a fixed relative path, so it is correct whether run from source (tsx) or
+  the compiled binary, where the depth to `package.json` differs.
+- **Dependency-graph tool resolves TS-ESM `.js` import specifiers.** The compiled-CLI work added
+  explicit `.js` extensions to relative imports in `cli/` and `core/`; the `pnpm graph` resolver now
+  maps a `.js` specifier to its `.ts` source, restoring the `cli → core` edge in the report.
+
 ## [2.0.1] - 2026-07-05
 
 ### Security

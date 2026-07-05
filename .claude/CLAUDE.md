@@ -12,7 +12,9 @@ GraphvizJS is an Electron desktop app for editing Graphviz DOT diagrams with liv
 pnpm install                # Install dependencies
 pnpm dev                    # Frontend-only dev server (http://localhost:5173)
 pnpm build                  # TypeScript compile + Vite bundle
+pnpm build:cli              # Compile the headless graphvizjs CLI to dist-cli/
 pnpm package                # Build distributable installer (electron-builder)
+pnpm graphvizjs -- ...      # Run the CLI from source via tsx (e.g. render g.dot -o o.svg)
 
 pnpm test                   # Unit tests (Vitest + happy-dom)
 pnpm test:watch             # Unit tests in watch mode
@@ -76,6 +78,10 @@ The main process hosts the headless `core/` and registers the IPC handlers the r
 ### Vite Configuration
 
 The Vite root is `src/` (not project root). HTML entry point is `src/index.html`. `@hpcc-js/wasm` is excluded from renderer dependency optimization (`optimizeDeps.exclude`). The Electron **main** build (via `vite-plugin-electron`) externalizes the native/heavy Node deps the core loads at runtime — `@hpcc-js/wasm`, `@resvg/resvg-js`, `canvas`, `jsdom`, `jspdf`, `svg2pdf.js` — because rollup cannot bundle a native `.node` binary; electron-builder includes them in the installer and `asarUnpack`s the natives.
+
+### CLI Distributable (`dist-cli/`)
+
+`pnpm build:cli` (`tsconfig.cli.json`) `tsc`-compiles `cli/` + `core/` to `dist-cli/` as real Node ESM — **not** bundled (bundling jsdom crashes on `__dirname`; the native `.node` binaries can't be inlined anyway). `bin.graphvizjs` → `dist-cli/cli/index.js` (shebang preserved by `tsc`), and `files: ["dist-cli"]` ships it in `npm pack`. Because the output runs under Node's own ESM loader, relative imports **within `cli/` and `core/` must carry explicit `.js` extensions** (NodeNext resolution) — these resolve identically under tsx, Vitest, and both Vite builds, so they don't affect the app. The natives/WASM/jsdom stay ordinary `dependencies`, resolved from `node_modules` at runtime (prebuilds install cross-platform). `test/cli/dist.integration.test.ts` builds and subprocess-runs the compiled binary as the durable guard.
 
 ## Testing
 

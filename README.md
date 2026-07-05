@@ -61,6 +61,28 @@ pnpm package
 
 GraphvizJS targets **Windows only**. The `release/` directory contains the generated NSIS `.exe` installer.
 
+## Command-Line Interface
+
+The same headless rendering core also ships as a `graphvizjs` CLI for scripting and CI — no desktop app or browser required.
+
+```bash
+# Compile the CLI to dist-cli/ (also runs automatically on `npm pack`)
+pnpm build:cli
+
+# Render DOT to SVG / PNG / PDF
+graphvizjs render diagram.dot -o diagram.svg
+graphvizjs render diagram.dot -o diagram.png --format png --scale 2
+graphvizjs render diagram.dot -o diagram.pdf --engine neato --pdf-page a4
+
+# Read DOT from stdin
+cat diagram.dot | graphvizjs render - -o out.svg
+
+graphvizjs --help
+graphvizjs --version
+```
+
+`bin.graphvizjs` points at the compiled `dist-cli/cli/index.js`, so `npm link` (or a global install of the packed tarball) exposes the `graphvizjs` command on any platform. To run it from source without building, use `pnpm graphvizjs -- render diagram.dot -o out.svg` (via tsx). The native rendering deps (`@resvg/resvg-js`, `canvas`) and WASM Graphviz install as normal dependencies with cross-platform prebuilds.
+
 ## Tooling
 
 - `pnpm clean` – Remove build artifacts (`dist/`)
