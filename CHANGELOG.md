@@ -17,6 +17,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   prints a file's transitive reverse-dependencies (blast radius). The written report gained an
   "Architecture rules" section. Dev-tooling only; no app behavior change.
 
+### Fixed
+
+- **Dependency-graph tool now parses dynamic `import()`.** The scanner only read static
+  `import … from`, so files imported via `await import('…')` (the pattern in several test suites)
+  were invisible — causing false "uncovered" rows for `src/help/dialog.ts`, `src/preview/render.ts`,
+  and `src/toolbar/actions.ts`, and a false "unused export" for `isGraphvizReady`. Dynamic imports
+  (destructured or bare) are now recorded, so coverage, edges, and unused-export detection are
+  accurate. Dev-tooling only.
+
 ### Changed
 
 - **Dependency-graph tool (`pnpm graph`)** now treats `.js`/`.jsx`/`.mjs`/`.cjs` files as

@@ -32,6 +32,37 @@ describe('parseFile', () => {
     expect(f.internalDeps).toEqual([]);
   });
 
+  it('records dynamic import() dependencies (destructured names and bare)', () => {
+    const f = parseFile(
+      'test/x.test.ts',
+      "const { a, b } = await import('../src/foo');\nawait import('./bare');\n"
+    );
+    expect(f.internalDeps).toContainEqual({
+      file: '../src/foo',
+      imports: ['a', 'b'],
+      typeOnly: false,
+    });
+    // A bare dynamic import binds nothing by name → treat as wildcard (consumes all).
+    expect(f.internalDeps).toContainEqual({ file: './bare', imports: ['*'], typeOnly: false });
+  });
+
+  it('resolves the imported name before a rename in a dynamic import', () => {
+    const f = parseFile(
+      'test/x.test.ts',
+      "const { createPreview: cp } = await import('../src/p');"
+    );
+    expect(f.internalDeps).toContainEqual({
+      file: '../src/p',
+      imports: ['createPreview'],
+      typeOnly: false,
+    });
+  });
+
+  it('ignores non-relative dynamic imports', () => {
+    const f = parseFile('src/a.ts', "const x = await import('node:fs');\n");
+    expect(f.internalDeps).toEqual([]);
+  });
+
   it('collects exported identifiers across const/function/class/interface/type', () => {
     const f = parseFile(
       'src/a.ts',
