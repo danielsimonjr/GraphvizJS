@@ -81,6 +81,37 @@ describe('detectUnused', () => {
     const r = detectUnused(files, [], new Set(['src/a.ts']));
     expect(r.unusedExports).toEqual([]); // namespace import consumes all exports of ns.ts
   });
+
+  it('distinguishes a dead-cluster leaf (dormant) from its unused root', () => {
+    const files = [
+      f('src/entry.ts', [{ file: './live' }]),
+      f('src/live.ts'),
+      f('src/deadRoot.ts', [{ file: './deadLeaf' }]), // nothing imports deadRoot
+      f('src/deadLeaf.ts'), // only deadRoot (itself dead) imports it
+    ];
+    const r = detectUnused(files, [], new Set(['src/entry.ts']));
+    expect(r.unusedFiles).toEqual(['src/deadRoot.ts']); // 0 importers → unused
+    expect(r.dormantFiles).toEqual(['src/deadLeaf.ts']); // has an importer, but it's dead code
+  });
+
+  it('treats a mutually-importing cluster with no entry as all dormant', () => {
+    const files = [
+      f('src/entry.ts', [{ file: './live' }]),
+      f('src/live.ts'),
+      f('src/x.ts', [{ file: './y' }]),
+      f('src/y.ts', [{ file: './x' }]), // x<->y cycle, unreachable from entry
+    ];
+    const r = detectUnused(files, [], new Set(['src/entry.ts']));
+    expect(r.unusedFiles).toEqual([]); // each has an importer (the other)
+    expect(r.dormantFiles).toEqual(['src/x.ts', 'src/y.ts']);
+  });
+
+  it('does not flag a file reachable only through a test as dormant', () => {
+    const files = [f('src/helper.ts', [], ['h'])];
+    const tests = [f('test/helper.test.ts', [{ file: '../src/helper', imports: ['h'] }])];
+    const r = detectUnused(files, tests, new Set());
+    expect(r.dormantFiles).toEqual([]);
+  });
 });
 
 describe('mapTestCoverage', () => {

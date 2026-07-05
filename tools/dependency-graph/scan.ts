@@ -2,9 +2,24 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import type { InternalDep, ParsedFile } from './types';
 
-const EXCLUDE_DIRS = new Set(['dist', 'dist-electron', 'node_modules', 'coverage', 'e2e']);
+const EXCLUDE_DIRS = new Set([
+  'dist',
+  'dist-cli',
+  'dist-electron',
+  'node_modules',
+  'coverage',
+  'e2e',
+]);
 
-/** Recursively collect repo-relative POSIX paths of .ts files under `${root}/${subdir}`. */
+/** TS or JS source extensions the graph understands (declaration files excluded). */
+const SOURCE_EXT_RE = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/;
+
+/** A scannable source file: any TS/JS module, but not a `.d.ts` declaration. */
+export function isSourceFile(name: string): boolean {
+  return !name.endsWith('.d.ts') && SOURCE_EXT_RE.test(name);
+}
+
+/** Recursively collect repo-relative POSIX paths of source files under `${root}/${subdir}`. */
 function walk(root: string, dirAbs: string, out: string[]): void {
   for (const entry of readdirSync(dirAbs)) {
     const abs = path.join(dirAbs, entry);
@@ -12,7 +27,7 @@ function walk(root: string, dirAbs: string, out: string[]): void {
       if (!EXCLUDE_DIRS.has(entry)) walk(root, abs, out);
       continue;
     }
-    if (!entry.endsWith('.ts') || entry.endsWith('.d.ts')) continue;
+    if (!isSourceFile(entry)) continue;
     out.push(path.relative(root, abs).split(path.sep).join('/'));
   }
 }
@@ -109,24 +124,40 @@ export function parseFile(relPath: string, content: string): ParsedFile {
   };
 }
 
-/** Resolve a relative specifier to a repo-relative POSIX `.ts` path (best-guess), or null. */
+// Source extensions to try for an extensionless specifier, TS first (this is a
+// TS-first repo; the .find(known.has) caller picks whichever file exists).
+const RESOLVE_EXTS = ['ts', 'tsx', 'mts', 'cts', 'js', 'jsx', 'mjs', 'cjs'];
+
+// An explicit ESM ".js"-family specifier maps first to its TS source sibling
+// (TS-ESM writes `./x.js` for `x.ts`), then to a real same-name JS file.
+const JS_TO_TS: Record<string, string> = { js: 'ts', jsx: 'tsx', mjs: 'mts', cjs: 'cts' };
+
+/** Ordered candidate targets for a normalized relative path (file first, then dir-index). */
+function candidatesFor(joined: string): string[] {
+  const jsMatch = joined.match(/\.(js|jsx|mjs|cjs)$/);
+  if (jsMatch) {
+    const base = joined.slice(0, -jsMatch[0].length);
+    return [`${base}.${JS_TO_TS[jsMatch[1]]}`, joined]; // .ts sibling, then the real .js
+  }
+  if (/\.(ts|tsx|mts|cts)$/.test(joined)) return [joined];
+  return [
+    ...RESOLVE_EXTS.map((e) => `${joined}.${e}`),
+    ...RESOLVE_EXTS.map((e) => `${joined}/index.${e}`),
+  ];
+}
+
+/** Resolve a relative specifier to a repo-relative POSIX source path (best-guess), or null. */
 export function resolveImport(fromRelPath: string, spec: string): string | null {
   if (!spec.startsWith('.')) return null;
   const fromDir = path.posix.dirname(fromRelPath);
   const joined = path.posix.normalize(path.posix.join(fromDir, spec));
-  // A ".js" specifier in TS-ESM source (NodeNext) points at its sibling ".ts".
-  if (joined.endsWith('.js')) return `${joined.slice(0, -3)}.ts`;
-  if (joined.endsWith('.ts')) return joined;
-  return `${joined}.ts`;
+  return candidatesFor(joined)[0] ?? null;
 }
 
-/** Both candidate targets for a relative specifier: file and directory-index. */
+/** All candidate targets for a relative specifier, in resolution priority order. */
 export function resolveCandidates(fromRelPath: string, spec: string): string[] {
   if (!spec.startsWith('.')) return [];
   const fromDir = path.posix.dirname(fromRelPath);
   const joined = path.posix.normalize(path.posix.join(fromDir, spec));
-  // A ".js" specifier in TS-ESM source (NodeNext) points at its sibling ".ts".
-  if (joined.endsWith('.js')) return [`${joined.slice(0, -3)}.ts`];
-  if (joined.endsWith('.ts')) return [joined];
-  return [`${joined}.ts`, `${joined}/index.ts`];
+  return candidatesFor(joined);
 }

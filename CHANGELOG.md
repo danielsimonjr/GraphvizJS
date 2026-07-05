@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Dependency-graph tool (`pnpm graph`)** now treats `.js`/`.jsx`/`.mjs`/`.cjs` files as
+  first-class source (not just `.ts`) and resolves a `.js` import specifier to either its `.ts`
+  sibling (TS-ESM) or a real same-name `.js` file. It also reports **dormant files** — files that
+  have importers but are unreachable from any entry-like or test root (dead import clusters the
+  zero-importer "unused files" check cannot see). Dev-tooling only; no app behavior change.
+
 ## [2.1.0] - 2026-07-05
 
 ### Added

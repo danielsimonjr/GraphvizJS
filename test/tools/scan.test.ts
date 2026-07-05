@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { parseFile, resolveCandidates, resolveImport } from '../../tools/dependency-graph/scan';
+import {
+  isSourceFile,
+  parseFile,
+  resolveCandidates,
+  resolveImport,
+} from '../../tools/dependency-graph/scan';
 
 describe('parseFile', () => {
   it('records relative runtime imports and their identifiers', () => {
@@ -80,7 +85,7 @@ describe('resolveImport', () => {
   it('returns null for non-relative specifiers', () => {
     expect(resolveImport('src/a.ts', '@hpcc-js/wasm')).toBeNull();
   });
-  it('maps a TS-ESM ".js" specifier to its ".ts" source', () => {
+  it('prefers the ".ts" source sibling for a TS-ESM ".js" specifier', () => {
     expect(resolveImport('cli/index.ts', '../core/export.js')).toBe('core/export.ts');
   });
 });
@@ -89,7 +94,32 @@ describe('resolveCandidates', () => {
   it('offers a directory index.ts candidate', () => {
     expect(resolveCandidates('src/toolbar/actions.ts', '../tabs')).toContain('src/tabs/index.ts');
   });
-  it('maps a TS-ESM ".js" specifier to its ".ts" source', () => {
-    expect(resolveCandidates('cli/index.ts', '../core/export.js')).toEqual(['core/export.ts']);
+  it('offers both the ".ts" sibling and the real ".js" for a ".js" specifier', () => {
+    // TS-ESM writes `./x.js` for `x.ts`; a hand-authored `x.js` must still resolve.
+    // The .find(known.has) caller picks whichever file actually exists.
+    expect(resolveCandidates('cli/index.ts', '../core/export.js')).toEqual([
+      'core/export.ts',
+      'core/export.js',
+    ]);
+  });
+  it('offers js/jsx/mjs source candidates for an extensionless specifier', () => {
+    const c = resolveCandidates('src/a.ts', './b');
+    expect(c).toContain('src/b.ts');
+    expect(c).toContain('src/b.js');
+    expect(c).toContain('src/b.mjs');
+    expect(c).toContain('src/b/index.js');
+  });
+});
+
+describe('isSourceFile', () => {
+  it('accepts every TS/JS source extension', () => {
+    for (const name of ['a.ts', 'a.tsx', 'a.mts', 'a.cts', 'a.js', 'a.jsx', 'a.mjs', 'a.cjs']) {
+      expect(isSourceFile(name)).toBe(true);
+    }
+  });
+  it('rejects declarations and non-source files', () => {
+    for (const name of ['a.d.ts', 'a.css', 'a.json', 'a.dot', 'README.md']) {
+      expect(isSourceFile(name)).toBe(false);
+    }
   });
 });

@@ -169,6 +169,7 @@
   },
   "unused": {
     "unusedFiles": [],
+    "dormantFiles": [],
     "unusedExports": [
       {
         "file": "src/editor/format.ts",

@@ -28,6 +28,10 @@ describe('buildAnalysis (real repo)', () => {
     expect(a.unused.unusedFiles).toEqual([]);
   });
 
+  it('has no dormant files (no dead import clusters unreachable from entries)', () => {
+    expect(a.unused.dormantFiles).toEqual([]);
+  });
+
   it('wires all 16 IPC channels with no gaps', () => {
     expect(a.ipc.fullyWired).toHaveLength(16);
     expect(a.ipc.missingHandlers).toHaveLength(0);

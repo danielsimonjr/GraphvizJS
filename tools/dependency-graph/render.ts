@@ -90,6 +90,13 @@ export function renderMarkdown(a: Analysis): string {
   for (const f of a.unused.unusedFiles) out.push(`- \`${f}\``);
   out.push('');
   out.push(
+    a.unused.dormantFiles.length === 0
+      ? '**Dormant files** (imported only within clusters unreachable from any entry): none ✅'
+      : '**Dormant files** (imported only within clusters unreachable from any entry):'
+  );
+  for (const f of a.unused.dormantFiles) out.push(`- \`${f}\``);
+  out.push('');
+  out.push(
     a.unused.unusedExports.length === 0 ? '**Unused exports:** none ✅' : '**Unused exports:**'
   );
   for (const e of a.unused.unusedExports) out.push(`- \`${e.name}\` in \`${e.file}\``);
