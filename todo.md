@@ -13,12 +13,15 @@ step 16 pulls the next item). Statuses: 🟢 READY · 🟡 IN PROGRESS · ✅ DO
   of an unhandled promise rejection.
 - ✅ **Remove `createPreview` legacy dual-signature** — 0 production callers; deleted the
   flat-callbacks branch + its backward-compat test.
-- 🟢 **Update `CLAUDE.md` (+ `README.md`) for the v2.0.0 headless-core architecture** — doc-rot
-  discovered 2026-07-05: the architecture section still describes the pre-v2.0.0 app (renderer
-  "Initializes Graphviz WASM", lists the deleted `preview/graphviz.ts`, `@hpcc-js/wasm` as
-  "client-side rendering", the removed `getCurrentEngine()`; no `core/`, `cli/`, or IPC channels).
-  Rewrite to current state (headless `core/`, IPC boundary, CLI), no version/date in the doc.
-  Verify every claim with honest-claude.
+- ✅ **Update `CLAUDE.md` for the v2.0.0 headless-core architecture** — rewrote Overview,
+  Bootstrap Flow, Module Boundaries (added `core/`/`cli/`/`platform/`/`session/`/`recent/`/`watch/`/
+  `menu/`; fixed `preview/`, `autosave/`, `editor/`), Rendering Pipeline (IPC, no `getCurrentEngine`),
+  Electron Integration (render/validate/export + push channels), Vite config (native-dep
+  externalization), and the export-format recipe. Every claim verified against current code.
+  (`README.md` had no architecture staleness — not touched.)
+- 🔵 **Minor: de-duplicate the `ExportFormat` type** — identical `'png'|'pngx2'|'svg'|'pdf'` union is
+  defined twice (`core/types.ts:35` + `src/toolbar/export-menu.ts:1`); the renderer copy could
+  `import type` from `core/types` (type-only, purity-safe) to avoid drift.
 - 🟢 **Extend the dependency-graph tool to `core/` + `cli/` + `electron/`** — needs a `moduleOf`
   refactor (top-level dirs currently collapse to `root`), add the new entry points to `entryLike`,
   and update the tool's test expectations. Note: the durable `renderer-purity.test.ts` already
