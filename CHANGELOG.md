@@ -9,10 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - **Architecture enforcement in the dependency-graph tool.** `pnpm graph:check` verifies the
-  headless-core layer policy (`core/` is a leaf, `cli/` → `core/` only, the renderer may import
-  `core/` only as type-only `core/types`) plus no runtime cycles and a fully-wired IPC surface,
-  exiting non-zero on any violation — now a CI gate. `pnpm graph -- --impact <file>` prints a
-  file's transitive reverse-dependencies (blast radius). The written report gained an
+  headless-core layer policy (`core/` is a leaf, `cli/` → `core/` only, `electron/` → `core/` plus
+  only the shared pure renderer modules `menu`/`watch`/`platform`, and the renderer may import
+  `core/` only as type-only `core/types`) plus no runtime cycles, a fully-wired IPC surface, and a
+  **non-stale committed report** (it re-renders in memory and fails if `docs/architecture/` drifted
+  from source) — exiting non-zero on any violation. Now a CI gate. `pnpm graph -- --impact <file>`
+  prints a file's transitive reverse-dependencies (blast radius). The written report gained an
   "Architecture rules" section. Dev-tooling only; no app behavior change.
 
 ### Changed
