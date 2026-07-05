@@ -8,7 +8,7 @@ const analysis = (): Analysis => ({
   modules: new Map([['preview', ['src/preview/render.ts']]]),
   moduleEdges: new Map([['toolbar', new Set(['preview'])]]),
   cycles: { runtime: [], typeOnly: [] },
-  unused: { unusedFiles: [], unusedExports: [] },
+  unused: { unusedFiles: [], dormantFiles: [], unusedExports: [] },
   coverage: [{ file: 'src/preview/render.ts', testFiles: ['test/preview/render.test.ts'] }],
   ipc: {
     fullyWired: [
@@ -73,5 +73,14 @@ describe('renderMarkdown', () => {
     const md = renderMarkdown(a);
     expect(md).toContain('app:driftedChannel');
     expect(md).toMatch(/no contract/i);
+  });
+
+  it('renders "none" for dormant files when there are none, and lists them when present', () => {
+    expect(renderMarkdown(analysis())).toMatch(/Dormant files.*none ✅/);
+    const a = analysis();
+    a.unused.dormantFiles = ['src/dead/leaf.ts'];
+    const md = renderMarkdown(a);
+    expect(md).toContain('Dormant files');
+    expect(md).toContain('`src/dead/leaf.ts`');
   });
 });

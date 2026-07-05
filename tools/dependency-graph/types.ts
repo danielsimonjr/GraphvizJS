@@ -35,6 +35,12 @@ export interface CycleReport {
 export interface UnusedReport {
   /** Non-entry files that nothing imports. */
   unusedFiles: string[];
+  /**
+   * Files that DO have importers but are unreachable from any entry-like or
+   * test root — i.e. they live in a dead import cluster the `unusedFiles`
+   * degree check cannot see. A healthy graph has none.
+   */
+  dormantFiles: string[];
   /** Exports that no file (src or test) imports by name. */
   unusedExports: { file: string; name: string }[];
 }

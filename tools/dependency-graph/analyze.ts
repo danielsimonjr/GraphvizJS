@@ -73,11 +73,14 @@ export function detectUnused(
   const known = new Set(files.map((f) => f.path));
   const importedFiles = new Set<string>();
   const importedNames = new Map<string, Set<string>>();
+  const adjacency = new Map<string, string[]>();
 
   for (const file of [...files, ...testFiles]) {
+    const targets: string[] = [];
     for (const dep of file.internalDeps) {
       const target = resolveCandidates(file.path, dep.file).find((c) => known.has(c));
       if (!target) continue;
+      targets.push(target);
       importedFiles.add(target);
       const set = importedNames.get(target) ?? new Set<string>();
       for (const imp of dep.imports) {
@@ -85,11 +88,30 @@ export function detectUnused(
       }
       importedNames.set(target, set);
     }
+    adjacency.set(file.path, targets);
   }
 
   const unusedFiles = files
     .map((f) => f.path)
     .filter((p) => !importedFiles.has(p) && !entryLike.has(p));
+
+  // Files reachable by following imports out of any entry-like or test root.
+  const reachable = new Set<string>();
+  const stack = [...entryLike, ...testFiles.map((t) => t.path)];
+  while (stack.length > 0) {
+    const cur = stack.pop() as string;
+    if (reachable.has(cur)) continue;
+    reachable.add(cur);
+    for (const next of adjacency.get(cur) ?? []) {
+      if (!reachable.has(next)) stack.push(next);
+    }
+  }
+  // Dormant = has an importer (so `unusedFiles` misses it) yet is unreachable
+  // from every root — a dead import cluster.
+  const dormantFiles = files
+    .map((f) => f.path)
+    .filter((p) => importedFiles.has(p) && !reachable.has(p) && !entryLike.has(p))
+    .sort();
 
   const unusedExports: { file: string; name: string }[] = [];
   for (const file of files) {
@@ -99,7 +121,7 @@ export function detectUnused(
       if (!used?.has(name)) unusedExports.push({ file: file.path, name });
     }
   }
-  return { unusedFiles, unusedExports };
+  return { unusedFiles, dormantFiles, unusedExports };
 }
 
 export function mapTestCoverage(srcFiles: ParsedFile[], testFiles: ParsedFile[]): CoverageRow[] {
