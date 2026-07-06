@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-07-05
+
+### Added
+
+- **Application icon.** Replaced the default Electron icon with an on-brand directed-graph mark
+  (`build/icon.svg` → `build/icon.png` via `pnpm build:icon`, using the bundled resvg renderer).
+  electron-builder embeds it in the Windows installer and executable; the window uses it in dev.
+
 ## [2.3.0] - 2026-07-05
 
 ### Added
