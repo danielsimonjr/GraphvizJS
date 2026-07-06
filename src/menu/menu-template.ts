@@ -18,6 +18,7 @@ export type MenuActionId =
   | 'format'
   | 'set-engine'
   | 'set-theme'
+  | 'command-palette'
   | 'zoom-in'
   | 'zoom-out'
   | 'zoom-reset'
@@ -198,6 +199,15 @@ function buildEditMenu(opts: MenuBuildOptions): MenuItemConstructorOptions {
 
 function buildViewMenu(opts: MenuBuildOptions): MenuItemConstructorOptions {
   const submenu: MenuItemConstructorOptions[] = [
+    {
+      id: 'command-palette',
+      label: 'Command Palette…',
+      // The renderer owns this shortcut (label-only here, no double-fire).
+      accelerator: 'CmdOrCtrl+Shift+P',
+      registerAccelerator: false,
+      click: () => opts.onAction('command-palette'),
+    },
+    { type: 'separator' },
     {
       label: 'Layout Engine',
       submenu: LAYOUT_ENGINES.map((engine) => ({

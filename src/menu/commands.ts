@@ -16,6 +16,7 @@ export interface MenuCommandHandlers {
   format: () => void;
   setEngine: (engine: string) => void;
   setTheme: (scheme: string) => void;
+  commandPalette: () => void;
   zoomIn: () => void;
   zoomOut: () => void;
   zoomReset: () => void;
@@ -62,6 +63,8 @@ export function dispatchMenuAction(
     case 'set-theme':
       if (payload) handlers.setTheme(payload);
       return;
+    case 'command-palette':
+      return handlers.commandPalette();
     case 'zoom-in':
       return handlers.zoomIn();
     case 'zoom-out':

@@ -19,6 +19,8 @@ import {
 } from './editor/zoom';
 import { setupHelpDialog } from './help/dialog';
 import { type MenuCommandHandlers, setupMenuCommands } from './menu/commands';
+import { LAYOUT_ENGINES } from './menu/menu-template';
+import { type Command, type CommandPalette, createCommandPalette } from './palette/command-palette';
 import {
   confirm,
   store as platformStore,
@@ -117,6 +119,8 @@ async function bootstrap(): Promise<void> {
   // init, minimizing any flash of the wrong theme.
   const themeButton = document.querySelector<HTMLButtonElement>('#theme-toggle');
   let colorScheme: ColorSchemeController | undefined;
+  // Command palette (built after menuHandlers, opened via the menu/keybinding).
+  let palette: CommandPalette | undefined;
   const updateThemeButton = themeButton
     ? setupThemeButton({ button: themeButton, onCycle: () => void colorScheme?.cycle() })
     : (_scheme: ColorScheme) => {
@@ -669,12 +673,93 @@ async function bootstrap(): Promise<void> {
     format: () => formatButton?.click(),
     setEngine: (engine) => applyEngine(engine as LayoutEngine),
     setTheme: (scheme) => void colorScheme?.set(scheme as ColorScheme),
+    commandPalette: () => palette?.open(),
     zoomIn: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.zoomIn(),
     zoomOut: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.zoomOut(),
     zoomReset: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.reset(),
     help: () => helpButton?.click(),
   };
   setupMenuCommands(menuHandlers);
+
+  // ── Command palette (Ctrl/Cmd+Shift+P) ───────────────────────────
+  const paletteCommands: Command[] = [
+    { id: 'new', label: 'New Diagram', group: 'File', run: menuHandlers.new },
+    { id: 'new-tab', label: 'New Tab', group: 'File', run: menuHandlers.newTab },
+    { id: 'open', label: 'Open File…', group: 'File', run: menuHandlers.open },
+    { id: 'save', label: 'Save', group: 'File', run: menuHandlers.save },
+    { id: 'save-as', label: 'Save As…', group: 'File', run: menuHandlers.saveAs },
+    { id: 'close-tab', label: 'Close Tab', group: 'File', run: menuHandlers.closeTab },
+    {
+      id: 'export-svg',
+      label: 'Export as SVG',
+      group: 'Export',
+      run: () => menuHandlers.export('svg'),
+    },
+    {
+      id: 'export-png',
+      label: 'Export as PNG',
+      group: 'Export',
+      run: () => menuHandlers.export('png'),
+    },
+    {
+      id: 'export-pngx2',
+      label: 'Export as PNG (2×)',
+      group: 'Export',
+      run: () => menuHandlers.export('pngx2'),
+    },
+    {
+      id: 'export-pdf',
+      label: 'Export as PDF',
+      group: 'Export',
+      run: () => menuHandlers.export('pdf'),
+    },
+    { id: 'undo', label: 'Undo', group: 'Edit', run: menuHandlers.undo },
+    { id: 'redo', label: 'Redo', group: 'Edit', run: menuHandlers.redo },
+    { id: 'find', label: 'Find', group: 'Edit', run: menuHandlers.find },
+    { id: 'format', label: 'Format Document', group: 'Edit', run: menuHandlers.format },
+    { id: 'zoom-in', label: 'Zoom In', group: 'View', run: menuHandlers.zoomIn },
+    { id: 'zoom-out', label: 'Zoom Out', group: 'View', run: menuHandlers.zoomOut },
+    { id: 'zoom-reset', label: 'Reset Zoom', group: 'View', run: menuHandlers.zoomReset },
+    ...LAYOUT_ENGINES.map((engine) => ({
+      id: `engine-${engine}`,
+      label: `Layout Engine: ${engine}`,
+      group: 'View',
+      run: () => menuHandlers.setEngine(engine),
+    })),
+    {
+      id: 'theme-system',
+      label: 'Theme: System',
+      group: 'View',
+      run: () => menuHandlers.setTheme('system'),
+    },
+    {
+      id: 'theme-light',
+      label: 'Theme: Light',
+      group: 'View',
+      run: () => menuHandlers.setTheme('light'),
+    },
+    {
+      id: 'theme-dark',
+      label: 'Theme: Dark',
+      group: 'View',
+      run: () => menuHandlers.setTheme('dark'),
+    },
+    { id: 'help', label: 'Help', group: 'Help', run: menuHandlers.help },
+  ];
+  palette = createCommandPalette(paletteCommands);
+
+  const isMacPlatform = /mac/i.test(
+    (navigator as Navigator & { userAgentData?: { platform: string } }).userAgentData?.platform ??
+      navigator.platform
+  );
+  window.addEventListener('keydown', (event) => {
+    if (event.repeat) return;
+    const mod = isMacPlatform ? event.metaKey : event.ctrlKey;
+    if (mod && event.shiftKey && !event.altKey && event.key.toLowerCase() === 'p') {
+      event.preventDefault();
+      palette?.open();
+    }
+  });
 }
 
 type StatusLevel = 'idle' | 'loading' | 'success' | 'error' | 'info';

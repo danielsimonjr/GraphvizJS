@@ -834,6 +834,79 @@ body.dark .editor-host .cm-scroller::-webkit-scrollbar-thumb {
   }
 }
 
+/* Command Palette */
+.command-palette {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.command-palette[hidden] {
+  display: none;
+}
+
+.command-palette-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.command-palette-box {
+  position: relative;
+  margin-top: 12vh;
+  width: min(560px, 90%);
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+body.dark .command-palette-box {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+.command-palette-input {
+  border: none;
+  outline: none;
+  padding: 14px 16px;
+  font-size: 15px;
+  background: transparent;
+  color: inherit;
+  border-bottom: 1px solid var(--header-border);
+}
+
+.command-palette-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+}
+
+.command-palette-item {
+  padding: 9px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.command-palette-item.is-selected,
+.command-palette-item:hover {
+  background: rgba(37, 99, 235, 0.12);
+}
+
+body.dark .command-palette-item.is-selected,
+body.dark .command-palette-item:hover {
+  background: rgba(96, 165, 250, 0.18);
+}
+
 /* Help Dialog */
 .help-dialog {
   border: none;

@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 56 |
-| Modules | 19 |
-| Lines of code | 5710 |
-| Internal edges | 97 |
-| Exports | 168 |
+| Files | 57 |
+| Modules | 20 |
+| Lines of code | 5981 |
+| Internal edges | 99 |
+| Exports | 173 |
 
 ## Modules
 
@@ -60,6 +60,10 @@
 
 - `src/menu/commands.ts`
 - `src/menu/menu-template.ts`
+
+### palette
+
+- `src/palette/command-palette.ts`
 
 ### platform
 
@@ -139,7 +143,7 @@
 | platform | core |
 | preview | core, utils |
 | recent | platform |
-| root | autosave, core, editor, help, menu, platform, preview, recent, session, tabs, theme, toolbar, watch, window, workspace |
+| root | autosave, core, editor, help, menu, palette, platform, preview, recent, session, tabs, theme, toolbar, watch, window, workspace |
 | session | autosave, core, platform |
 | tabs | core |
 | theme | platform |
@@ -219,6 +223,7 @@ None. ✅
 | `src/main.ts` | — |
 | `src/menu/commands.ts` | `test/menu/commands.test.ts` |
 | `src/menu/menu-template.ts` | `test/menu/menu-template.test.ts` |
+| `src/palette/command-palette.ts` | `test/palette/command-palette.test.ts` |
 | `src/platform/contract.ts` | — |
 | `src/platform/index.ts` | `test/help/dialog.test.ts`, `test/platform/index.test.ts`, `test/theme/color-scheme.test.ts`, `test/toolbar/export-diagram.test.ts`, `test/toolbar/open-diagram.test.ts`, `test/toolbar/save-as.test.ts`, `test/toolbar/save-diagram.test.ts`, `test/window/state.test.ts` |
 | `src/preview/render.ts` | `test/preview/render.test.ts` |
