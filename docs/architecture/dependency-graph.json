@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 57,
-    "moduleCount": 20,
-    "totalLoc": 5986,
-    "edgeCount": 99,
-    "exportCount": 173
+    "fileCount": 58,
+    "moduleCount": 21,
+    "totalLoc": 6133,
+    "edgeCount": 101,
+    "exportCount": 176
   },
   "modules": {
     "autosave": [
@@ -38,6 +38,9 @@
     "platform": [
       "src/platform/contract.ts",
       "src/platform/index.ts"
+    ],
+    "preferences": [
+      "src/preferences/preferences-dialog.ts"
     ],
     "preview": [
       "src/preview/render.ts",
@@ -120,6 +123,7 @@
       "menu",
       "palette",
       "platform",
+      "preferences",
       "preview",
       "recent",
       "session",
@@ -136,6 +140,9 @@
     ],
     "platform": [
       "core"
+    ],
+    "preferences": [
+      "theme"
     ],
     "preview": [
       "core",
@@ -211,6 +218,14 @@
         "name": "StructuralDiagnostic"
       },
       {
+        "file": "src/preferences/preferences-dialog.ts",
+        "name": "PreferencesDialogOptions"
+      },
+      {
+        "file": "src/preferences/preferences-dialog.ts",
+        "name": "PreferencesDialog"
+      },
+      {
         "file": "src/preview/render.ts",
         "name": "PreviewStatusCallbacks"
       },
@@ -245,10 +260,6 @@
       {
         "file": "src/tabs/tab-bar.ts",
         "name": "TabBarOptions"
-      },
-      {
-        "file": "src/theme/color-scheme.ts",
-        "name": "COLOR_SCHEMES"
       },
       {
         "file": "src/theme/color-scheme.ts",
@@ -438,6 +449,12 @@
         "test/toolbar/save-as.test.ts",
         "test/toolbar/save-diagram.test.ts",
         "test/window/state.test.ts"
+      ]
+    },
+    {
+      "file": "src/preferences/preferences-dialog.ts",
+      "testFiles": [
+        "test/preferences/preferences-dialog.test.ts"
       ]
     },
     {
@@ -907,12 +924,12 @@
     },
     {
       "path": "src/main.ts",
-      "loc": 895,
+      "loc": 905,
       "exports": []
     },
     {
       "path": "src/menu/commands.ts",
-      "loc": 84,
+      "loc": 87,
       "exports": [
         "dispatchMenuAction",
         "setupMenuCommands",
@@ -921,7 +938,7 @@
     },
     {
       "path": "src/menu/menu-template.ts",
-      "loc": 299,
+      "loc": 317,
       "exports": [
         "LAYOUT_ENGINES",
         "buildMenuTemplate",
@@ -972,6 +989,15 @@
         "validateDot",
         "exportRender",
         "PlatformStore"
+      ]
+    },
+    {
+      "path": "src/preferences/preferences-dialog.ts",
+      "loc": 116,
+      "exports": [
+        "createPreferencesDialog",
+        "PreferencesDialogOptions",
+        "PreferencesDialog"
       ]
     },
     {

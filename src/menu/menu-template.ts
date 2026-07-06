@@ -19,6 +19,7 @@ export type MenuActionId =
   | 'set-engine'
   | 'set-theme'
   | 'command-palette'
+  | 'preferences'
   | 'zoom-in'
   | 'zoom-out'
   | 'zoom-reset'
@@ -74,6 +75,13 @@ function buildAppMenu(opts: MenuBuildOptions): MenuItemConstructorOptions {
     label: 'GraphvizJS',
     submenu: [
       { id: 'about-mac', label: 'About GraphvizJS', click: () => opts.onAbout() },
+      { type: 'separator' },
+      {
+        id: 'preferences-mac',
+        label: 'Preferences…',
+        accelerator: 'CmdOrCtrl+,',
+        click: () => opts.onAction('preferences'),
+      },
       { type: 'separator' },
       { role: 'services' },
       { type: 'separator' },
@@ -156,45 +164,55 @@ function buildFileMenu(opts: MenuBuildOptions): MenuItemConstructorOptions {
 }
 
 function buildEditMenu(opts: MenuBuildOptions): MenuItemConstructorOptions {
-  return {
-    label: 'Edit',
-    submenu: [
-      {
-        id: 'undo',
-        label: 'Undo',
-        accelerator: 'CmdOrCtrl+Z',
-        registerAccelerator: false,
-        click: () => opts.onAction('undo'),
-      },
-      {
-        id: 'redo',
-        label: 'Redo',
-        accelerator: 'CmdOrCtrl+Y',
-        registerAccelerator: false,
-        click: () => opts.onAction('redo'),
-      },
+  const submenu: MenuItemConstructorOptions[] = [
+    {
+      id: 'undo',
+      label: 'Undo',
+      accelerator: 'CmdOrCtrl+Z',
+      registerAccelerator: false,
+      click: () => opts.onAction('undo'),
+    },
+    {
+      id: 'redo',
+      label: 'Redo',
+      accelerator: 'CmdOrCtrl+Y',
+      registerAccelerator: false,
+      click: () => opts.onAction('redo'),
+    },
+    { type: 'separator' },
+    { role: 'cut' },
+    { role: 'copy' },
+    { role: 'paste' },
+    { role: 'selectAll' },
+    { type: 'separator' },
+    {
+      id: 'find',
+      label: 'Find',
+      accelerator: 'CmdOrCtrl+F',
+      registerAccelerator: false,
+      click: () => opts.onAction('find'),
+    },
+    {
+      id: 'format',
+      label: 'Format Document',
+      accelerator: 'Shift+Alt+F',
+      registerAccelerator: false,
+      click: () => opts.onAction('format'),
+    },
+  ];
+  // On macOS, Preferences lives in the app menu instead.
+  if (!opts.isMac) {
+    submenu.push(
       { type: 'separator' },
-      { role: 'cut' },
-      { role: 'copy' },
-      { role: 'paste' },
-      { role: 'selectAll' },
-      { type: 'separator' },
       {
-        id: 'find',
-        label: 'Find',
-        accelerator: 'CmdOrCtrl+F',
-        registerAccelerator: false,
-        click: () => opts.onAction('find'),
-      },
-      {
-        id: 'format',
-        label: 'Format Document',
-        accelerator: 'Shift+Alt+F',
-        registerAccelerator: false,
-        click: () => opts.onAction('format'),
-      },
-    ],
-  };
+        id: 'preferences',
+        label: 'Preferences…',
+        accelerator: 'CmdOrCtrl+,',
+        click: () => opts.onAction('preferences'),
+      }
+    );
+  }
+  return { label: 'Edit', submenu };
 }
 
 function buildViewMenu(opts: MenuBuildOptions): MenuItemConstructorOptions {

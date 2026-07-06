@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 57 |
-| Modules | 20 |
-| Lines of code | 5986 |
-| Internal edges | 99 |
-| Exports | 173 |
+| Files | 58 |
+| Modules | 21 |
+| Lines of code | 6133 |
+| Internal edges | 101 |
+| Exports | 176 |
 
 ## Modules
 
@@ -69,6 +69,10 @@
 
 - `src/platform/contract.ts`
 - `src/platform/index.ts`
+
+### preferences
+
+- `src/preferences/preferences-dialog.ts`
 
 ### preview
 
@@ -141,9 +145,10 @@
 | help | platform |
 | menu | platform, theme |
 | platform | core |
+| preferences | theme |
 | preview | core, utils |
 | recent | platform |
-| root | autosave, core, editor, help, menu, palette, platform, preview, recent, session, tabs, theme, toolbar, watch, window, workspace |
+| root | autosave, core, editor, help, menu, palette, platform, preferences, preview, recent, session, tabs, theme, toolbar, watch, window, workspace |
 | session | autosave, core, platform |
 | tabs | core |
 | theme | platform |
@@ -174,6 +179,8 @@ None. ✅
 - `BalanceResult` in `src/editor/scan-dot.ts`
 - `SpanKind` in `src/editor/scan-dot.ts`
 - `StructuralDiagnostic` in `src/editor/structure-lint.ts`
+- `PreferencesDialogOptions` in `src/preferences/preferences-dialog.ts`
+- `PreferencesDialog` in `src/preferences/preferences-dialog.ts`
 - `PreviewStatusCallbacks` in `src/preview/render.ts`
 - `PreviewOptions` in `src/preview/render.ts`
 - `PreviewScheduler` in `src/preview/render.ts`
@@ -183,7 +190,6 @@ None. ✅
 - `CreateTabOptions` in `src/tabs/manager.ts`
 - `TabBarCallbacks` in `src/tabs/tab-bar.ts`
 - `TabBarOptions` in `src/tabs/tab-bar.ts`
-- `COLOR_SCHEMES` in `src/theme/color-scheme.ts`
 - `COLOR_SCHEME_KEY` in `src/theme/color-scheme.ts`
 - `ColorSchemeDeps` in `src/theme/color-scheme.ts`
 - `ToolbarActionsOptions` in `src/toolbar/actions.ts`
@@ -226,6 +232,7 @@ None. ✅
 | `src/palette/command-palette.ts` | `test/palette/command-palette.test.ts` |
 | `src/platform/contract.ts` | — |
 | `src/platform/index.ts` | `test/help/dialog.test.ts`, `test/platform/index.test.ts`, `test/theme/color-scheme.test.ts`, `test/toolbar/export-diagram.test.ts`, `test/toolbar/open-diagram.test.ts`, `test/toolbar/save-as.test.ts`, `test/toolbar/save-diagram.test.ts`, `test/window/state.test.ts` |
+| `src/preferences/preferences-dialog.ts` | `test/preferences/preferences-dialog.test.ts` |
 | `src/preview/render.ts` | `test/preview/render.test.ts` |
 | `src/preview/zoom.ts` | `test/preview/zoom.test.ts` |
 | `src/recent/recent-files.ts` | `test/recent/recent-files.test.ts` |

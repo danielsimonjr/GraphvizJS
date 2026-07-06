@@ -907,6 +907,90 @@ body.dark .command-palette-item:hover {
   background: rgba(96, 165, 250, 0.18);
 }
 
+/* Preferences Dialog */
+.preferences-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preferences-dialog[hidden] {
+  display: none;
+}
+
+.preferences-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.preferences-box {
+  position: relative;
+  width: min(420px, 90%);
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+body.dark .preferences-box {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+.preferences-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--header-border);
+}
+
+.preferences-header h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.preferences-close {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.preferences-section {
+  border: none;
+  margin: 0;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preferences-section legend {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  padding: 0;
+  margin-bottom: 6px;
+}
+
+.preferences-radio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
 /* Help Dialog */
 .help-dialog {
   border: none;
