@@ -57,8 +57,7 @@ describe('createCommandPalette', () => {
     ];
     const palette = createCommandPalette(commands);
     const input = () => palette.element.querySelector<HTMLInputElement>('.command-palette-input')!;
-    const items = () =>
-      [...palette.element.querySelectorAll<HTMLElement>('.command-palette-item')];
+    const items = () => [...palette.element.querySelectorAll<HTMLElement>('.command-palette-item')];
     const type = (value: string) => {
       input().value = value;
       input().dispatchEvent(new Event('input', { bubbles: true }));
