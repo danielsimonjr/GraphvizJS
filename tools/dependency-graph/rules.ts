@@ -60,8 +60,9 @@ export function checkLayering(files: ParsedFile[]): LayerViolation[] {
         continue;
       }
       if (from === 'electron' && toLayer === 'renderer') {
-        // Electron main may reuse only the pure shared renderer modules, not UI.
-        if (ELECTRON_SHARED_RENDERER.has(moduleOf(to))) continue;
+        // Electron main may reuse the pure shared renderer modules at runtime,
+        // or type-only-reference any renderer type (erased — no runtime coupling).
+        if (dep.typeOnly || ELECTRON_SHARED_RENDERER.has(moduleOf(to))) continue;
         out.push({
           from: file.path,
           to,
