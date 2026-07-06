@@ -19,6 +19,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "build:cli": "tsc -p tsconfig.cli.json",
+    "build:icon": "node scripts/render-icon.mjs",
     "prepack": "pnpm build:cli",
     "package": "electron-builder",
     "typecheck": "tsc --noEmit",

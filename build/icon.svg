@@ -1,0 +1,23 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6" />
+      <stop offset="1" stop-color="#1d4ed8" />
+    </linearGradient>
+    <marker id="ah" markerUnits="userSpaceOnUse" markerWidth="30" markerHeight="30"
+      refX="17" refY="15" orient="auto">
+      <path d="M0,3 L18,15 L0,27 Z" fill="#ffffff" />
+    </marker>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)" />
+  <g stroke="#ffffff" stroke-width="16" stroke-linecap="round" marker-end="url(#ah)">
+    <line x1="234" y1="195" x2="181" y2="304" />
+    <line x1="278" y1="195" x2="331" y2="304" />
+    <line x1="214" y1="356" x2="298" y2="356" />
+  </g>
+  <g fill="#ffffff">
+    <circle cx="256" cy="150" r="44" />
+    <circle cx="156" cy="356" r="44" />
+    <circle cx="356" cy="356" r="44" />
+  </g>
+</svg>
