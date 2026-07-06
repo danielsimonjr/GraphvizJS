@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 54 |
-| Modules | 18 |
-| Lines of code | 5499 |
-| Internal edges | 91 |
-| Exports | 153 |
+| Files | 56 |
+| Modules | 19 |
+| Lines of code | 5710 |
+| Internal edges | 97 |
+| Exports | 168 |
 
 ## Modules
 
@@ -88,6 +88,10 @@
 - `src/tabs/manager.ts`
 - `src/tabs/tab-bar.ts`
 
+### theme
+
+- `src/theme/color-scheme.ts`
+
 ### toolbar
 
 - `src/toolbar/actions.ts`
@@ -104,6 +108,7 @@
 - `src/toolbar/save-as.ts`
 - `src/toolbar/save-diagram.ts`
 - `src/toolbar/shortcuts.ts`
+- `src/toolbar/theme-button.ts`
 
 ### utils
 
@@ -128,16 +133,17 @@
 | --- | --- |
 | cli | core |
 | editor | core |
-| electron | core, menu, platform, watch |
+| electron | core, menu, platform, theme, watch |
 | help | platform |
-| menu | platform |
+| menu | platform, theme |
 | platform | core |
 | preview | core, utils |
 | recent | platform |
-| root | autosave, core, editor, help, menu, platform, preview, recent, session, tabs, toolbar, watch, window, workspace |
+| root | autosave, core, editor, help, menu, platform, preview, recent, session, tabs, theme, toolbar, watch, window, workspace |
 | session | autosave, core, platform |
 | tabs | core |
-| toolbar | core, editor, platform |
+| theme | platform |
+| toolbar | core, editor, platform, theme |
 | watch | platform |
 | window | platform |
 
@@ -173,6 +179,9 @@ None. ✅
 - `CreateTabOptions` in `src/tabs/manager.ts`
 - `TabBarCallbacks` in `src/tabs/tab-bar.ts`
 - `TabBarOptions` in `src/tabs/tab-bar.ts`
+- `COLOR_SCHEMES` in `src/theme/color-scheme.ts`
+- `COLOR_SCHEME_KEY` in `src/theme/color-scheme.ts`
+- `ColorSchemeDeps` in `src/theme/color-scheme.ts`
 - `ToolbarActionsOptions` in `src/toolbar/actions.ts`
 - `ExamplesMenuOptions` in `src/toolbar/examples-menu.ts`
 - `ExportMenuOptions` in `src/toolbar/export-menu.ts`
@@ -181,6 +190,7 @@ None. ✅
 - `RecentMenuOptions` in `src/toolbar/recent-menu.ts`
 - `SaveAsOptions` in `src/toolbar/save-as.ts`
 - `ToolbarShortcutsOptions` in `src/toolbar/shortcuts.ts`
+- `ThemeButtonOptions` in `src/toolbar/theme-button.ts`
 - `FileWatchOptions` in `src/watch/file-watch.ts`
 - `PageGeometry` in `core/export-pdf.ts`
 - `NormalizedSvg` in `core/normalize-svg.ts`
@@ -210,13 +220,14 @@ None. ✅
 | `src/menu/commands.ts` | `test/menu/commands.test.ts` |
 | `src/menu/menu-template.ts` | `test/menu/menu-template.test.ts` |
 | `src/platform/contract.ts` | — |
-| `src/platform/index.ts` | `test/help/dialog.test.ts`, `test/platform/index.test.ts`, `test/toolbar/export-diagram.test.ts`, `test/toolbar/open-diagram.test.ts`, `test/toolbar/save-as.test.ts`, `test/toolbar/save-diagram.test.ts`, `test/window/state.test.ts` |
+| `src/platform/index.ts` | `test/help/dialog.test.ts`, `test/platform/index.test.ts`, `test/theme/color-scheme.test.ts`, `test/toolbar/export-diagram.test.ts`, `test/toolbar/open-diagram.test.ts`, `test/toolbar/save-as.test.ts`, `test/toolbar/save-diagram.test.ts`, `test/window/state.test.ts` |
 | `src/preview/render.ts` | `test/preview/render.test.ts` |
 | `src/preview/zoom.ts` | `test/preview/zoom.test.ts` |
 | `src/recent/recent-files.ts` | `test/recent/recent-files.test.ts` |
 | `src/session/session.ts` | `test/session/session.test.ts` |
 | `src/tabs/manager.ts` | `test/tabs/manager.test.ts`, `test/tabs/tab-bar.test.ts` |
 | `src/tabs/tab-bar.ts` | `test/tabs/tab-bar.test.ts` |
+| `src/theme/color-scheme.ts` | `test/theme/color-scheme.test.ts` |
 | `src/toolbar/actions.ts` | `test/toolbar/actions.test.ts` |
 | `src/toolbar/examples-menu.ts` | `test/toolbar/examples-menu.test.ts` |
 | `src/toolbar/export-diagram.ts` | `test/toolbar/export-diagram.test.ts` |
@@ -231,6 +242,7 @@ None. ✅
 | `src/toolbar/save-as.ts` | `test/toolbar/save-as.test.ts` |
 | `src/toolbar/save-diagram.ts` | `test/toolbar/save-diagram.test.ts` |
 | `src/toolbar/shortcuts.ts` | `test/toolbar/shortcuts.test.ts` |
+| `src/toolbar/theme-button.ts` | `test/toolbar/theme-button.test.ts` |
 | `src/utils/debounce.ts` | `test/utils/debounce.test.ts` |
 | `src/watch/file-watch.ts` | — |
 | `src/watch/watch-plan.ts` | `test/watch/watch-plan.test.ts` |
@@ -262,6 +274,7 @@ None. ✅
 | `fs:writeBinary` | writeBinaryFile | ✅ wired |
 | `fs:writeText` | writeTextFile | ✅ wired |
 | `menu:setRecent` | setMenuRecent | ✅ wired |
+| `menu:setTheme` | setMenuTheme | ✅ wired |
 | `render:svg` | renderSvg | ✅ wired |
 | `render:validate` | validateDot | ✅ wired |
 | `shell:openExternal` | openExternal | ✅ wired |

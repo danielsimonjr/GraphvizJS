@@ -12,6 +12,7 @@ function opts(over: Partial<MenuBuildOptions> = {}): MenuBuildOptions {
     isMac: false,
     isDev: false,
     recentFiles: [],
+    currentTheme: 'system',
     onAction: vi.fn(),
     onOpenSource: vi.fn(),
     onAbout: vi.fn(),
@@ -70,6 +71,17 @@ describe('buildMenuTemplate', () => {
     expect(onAction).toHaveBeenCalledWith('set-engine', LAYOUT_ENGINES[1]);
     (findById(t, 'recent:0')!.click as () => void)();
     expect(onAction).toHaveBeenCalledWith('open-recent', 'C:/a/first.dot');
+  });
+
+  it('builds a radio Theme submenu reflecting currentTheme and dispatching set-theme', () => {
+    const onAction = vi.fn();
+    const t = buildMenuTemplate(opts({ currentTheme: 'dark', onAction }));
+    const darkItem = findById(t, 'theme:dark')!;
+    expect(darkItem.type).toBe('radio');
+    expect(darkItem.checked).toBe(true);
+    expect(findById(t, 'theme:system')!.checked).toBe(false);
+    (darkItem.click as () => void)();
+    expect(onAction).toHaveBeenCalledWith('set-theme', 'dark');
   });
 
   it('shows a disabled empty item when there are no recent files', () => {

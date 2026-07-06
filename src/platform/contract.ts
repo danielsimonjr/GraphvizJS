@@ -36,6 +36,7 @@ export interface GraphvizApi {
   onFileChanged(cb: (path: string) => void): () => void;
   onMenuAction(cb: (action: string, payload?: string) => void): () => void;
   setMenuRecent(paths: string[]): Promise<void>;
+  setMenuTheme(scheme: string): Promise<void>;
   renderSvg(dot: string, engine: LayoutEngine): Promise<string>;
   validateDot(dot: string, engine: LayoutEngine): Promise<DotValidationError | null>;
   exportRender(

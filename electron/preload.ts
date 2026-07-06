@@ -26,6 +26,7 @@ const api: GraphvizApi = {
     return () => ipcRenderer.removeListener('menu:action', listener);
   },
   setMenuRecent: (paths) => ipcRenderer.invoke('menu:setRecent', paths),
+  setMenuTheme: (scheme) => ipcRenderer.invoke('menu:setTheme', scheme),
   renderSvg: (dot, engine) => ipcRenderer.invoke('render:svg', dot, engine),
   validateDot: (dot, engine) => ipcRenderer.invoke('render:validate', dot, engine),
   exportRender: (dot, engine, format, options) =>

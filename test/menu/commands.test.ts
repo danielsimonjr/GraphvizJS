@@ -16,6 +16,7 @@ function handlers(): MenuCommandHandlers {
     find: vi.fn(),
     format: vi.fn(),
     setEngine: vi.fn(),
+    setTheme: vi.fn(),
     zoomIn: vi.fn(),
     zoomOut: vi.fn(),
     zoomReset: vi.fn(),
@@ -39,6 +40,8 @@ describe('dispatchMenuAction', () => {
     expect(h.export).toHaveBeenCalledWith('svg');
     dispatchMenuAction(h, 'set-engine', 'neato');
     expect(h.setEngine).toHaveBeenCalledWith('neato');
+    dispatchMenuAction(h, 'set-theme', 'dark');
+    expect(h.setTheme).toHaveBeenCalledWith('dark');
     dispatchMenuAction(h, 'open-recent', 'C:/x.dot');
     expect(h.openRecent).toHaveBeenCalledWith('C:/x.dot');
   });

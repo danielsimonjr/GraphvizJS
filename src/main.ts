@@ -25,6 +25,7 @@ import {
   readTextFile,
   renderSvg,
   setMenuRecent,
+  setMenuTheme,
   validateDot,
 } from './platform';
 import { createPreview } from './preview/render';
@@ -39,10 +40,18 @@ import { captureSession, loadSession, persistSession, type SessionData } from '.
 import type { TabState } from './tabs/manager';
 import { MAX_TABS, TabManager } from './tabs/manager';
 import { renderTabBar, setupTabBar } from './tabs/tab-bar';
+import {
+  type ColorScheme,
+  type ColorSchemeController,
+  createColorSchemeController,
+  loadColorScheme,
+  saveColorScheme,
+} from './theme/color-scheme';
 import { setupToolbarActions } from './toolbar/actions';
 import { makeFormatKeymap } from './toolbar/format';
 import { setupLayoutEngine } from './toolbar/layout-engine';
 import { setupToolbarShortcuts } from './toolbar/shortcuts';
+import { setupThemeButton } from './toolbar/theme-button';
 import { setupFileWatch } from './watch/file-watch';
 import { loadEditorZoom, saveEditorZoom } from './window/state';
 import { initHorizontalResize } from './workspace/resize';
@@ -102,6 +111,26 @@ async function bootstrap(): Promise<void> {
   if (!host || !previewElement) {
     return;
   }
+
+  // ── Color scheme (theme) ─────────────────────────────────────────
+  // Set up early so the persisted theme applies before the heavy editor/tab
+  // init, minimizing any flash of the wrong theme.
+  const themeButton = document.querySelector<HTMLButtonElement>('#theme-toggle');
+  let colorScheme: ColorSchemeController | undefined;
+  const updateThemeButton = themeButton
+    ? setupThemeButton({ button: themeButton, onCycle: () => void colorScheme?.cycle() })
+    : (_scheme: ColorScheme) => {
+        /* no theme button in the DOM */
+      };
+  colorScheme = createColorSchemeController({
+    initial: await loadColorScheme(),
+    media: window.matchMedia('(prefers-color-scheme: dark)'),
+    persist: saveColorScheme,
+    onChange: (scheme) => {
+      void setMenuTheme(scheme);
+      updateThemeButton(scheme);
+    },
+  });
 
   const zoomController = createZoomController(previewElement, (level) => {
     if (zoomLevelDisplay) {
@@ -639,6 +668,7 @@ async function bootstrap(): Promise<void> {
     find: () => findButton?.click(),
     format: () => formatButton?.click(),
     setEngine: (engine) => applyEngine(engine as LayoutEngine),
+    setTheme: (scheme) => void colorScheme?.set(scheme as ColorScheme),
     zoomIn: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.zoomIn(),
     zoomOut: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.zoomOut(),
     zoomReset: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.reset(),

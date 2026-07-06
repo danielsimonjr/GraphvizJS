@@ -10,6 +10,7 @@ import {
   loadColorScheme,
   nextScheme,
   resolveDark,
+  saveColorScheme,
 } from '../../src/theme/color-scheme';
 
 /** A controllable stand-in for a `matchMedia('(prefers-color-scheme: dark)')` result. */
@@ -69,6 +70,15 @@ describe('loadColorScheme', () => {
     expect(await loadColorScheme()).toBe('system');
     (store.get as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('nope'));
     expect(await loadColorScheme()).toBe('system');
+  });
+});
+
+describe('saveColorScheme', () => {
+  it('persists the scheme, and swallows store errors', async () => {
+    await saveColorScheme('dark');
+    expect(store.set).toHaveBeenCalledWith('colorScheme', 'dark');
+    (store.set as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('nope'));
+    await expect(saveColorScheme('light')).resolves.not.toThrow();
   });
 });
 

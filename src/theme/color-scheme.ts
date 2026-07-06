@@ -35,6 +35,15 @@ export async function loadColorScheme(): Promise<ColorScheme> {
   }
 }
 
+/** Persist the chosen scheme, swallowing store errors (theme still applies). */
+export async function saveColorScheme(scheme: ColorScheme): Promise<void> {
+  try {
+    await store.set(COLOR_SCHEME_KEY, scheme);
+  } catch (error) {
+    console.warn('Saving color scheme failed', error);
+  }
+}
+
 export interface ColorSchemeController {
   get(): ColorScheme;
   /** Set, apply, persist, and notify. */
