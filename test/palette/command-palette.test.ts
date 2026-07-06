@@ -106,4 +106,16 @@ describe('createCommandPalette', () => {
     expect(palette.isOpen()).toBe(false);
     expect(run.open).not.toHaveBeenCalled();
   });
+
+  it('restores focus to the previously-focused element on close', () => {
+    const { palette, key } = setup();
+    const trigger = document.createElement('button');
+    document.body.appendChild(trigger);
+    trigger.focus();
+    expect(document.activeElement).toBe(trigger);
+    palette.open(); // focus moves to the palette input
+    expect(document.activeElement).not.toBe(trigger);
+    key('Escape');
+    expect(document.activeElement).toBe(trigger);
+  });
 });

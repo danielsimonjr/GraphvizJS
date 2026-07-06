@@ -2,7 +2,7 @@
   "stats": {
     "fileCount": 57,
     "moduleCount": 20,
-    "totalLoc": 5975,
+    "totalLoc": 5981,
     "edgeCount": 99,
     "exportCount": 173
   },
@@ -907,7 +907,7 @@
     },
     {
       "path": "src/main.ts",
-      "loc": 894,
+      "loc": 895,
       "exports": []
     },
     {
@@ -931,7 +931,7 @@
     },
     {
       "path": "src/palette/command-palette.ts",
-      "loc": 167,
+      "loc": 172,
       "exports": [
         "fuzzyScore",
         "filterCommands",

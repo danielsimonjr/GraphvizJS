@@ -753,6 +753,7 @@ async function bootstrap(): Promise<void> {
       navigator.platform
   );
   window.addEventListener('keydown', (event) => {
+    if (event.repeat) return;
     const mod = isMacPlatform ? event.metaKey : event.ctrlKey;
     if (mod && event.shiftKey && !event.altKey && event.key.toLowerCase() === 'p') {
       event.preventDefault();

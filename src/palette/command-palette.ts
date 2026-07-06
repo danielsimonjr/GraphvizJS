@@ -83,6 +83,7 @@ export function createCommandPalette(
 
   let filtered: Command[] = [];
   let selected = 0;
+  let previouslyFocused: HTMLElement | null = null;
 
   const renderList = () => {
     filtered = filterCommands(commands, input.value);
@@ -113,6 +114,7 @@ export function createCommandPalette(
   };
 
   function open(): void {
+    previouslyFocused = document.activeElement as HTMLElement | null;
     input.value = '';
     selected = 0;
     renderList();
@@ -122,6 +124,9 @@ export function createCommandPalette(
 
   function close(): void {
     overlay.hidden = true;
+    // Return focus to whatever had it before the palette opened (e.g. the editor).
+    previouslyFocused?.focus?.();
+    previouslyFocused = null;
   }
 
   const isOpen = () => !overlay.hidden;
