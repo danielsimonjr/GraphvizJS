@@ -47,7 +47,7 @@ step 16 pulls the next item). Statuses: 🟢 READY · 🟡 IN PROGRESS · ✅ DO
 - `graphviz.test.ts` 8-engine / singleton coverage has no core analog — the same
   `graphvizInstance.layout()` path is exercised by `test/core/validate.test.ts` + the e2e suite.
 
-## App-shell cycle (deferred from v1.4.0)
+## App-shell cycle (deferred from v1.4.0) — ✅ COMPLETE
 
 - ✅ **Theme toggle** (v2.2.0) — System/Light/Dark selectable from View ▸ Theme (radio submenu) +
   a toolbar cycle button; System follows the OS live; choice persists (`colorScheme` store key) and
@@ -60,7 +60,8 @@ step 16 pulls the next item). Statuses: 🟢 READY · 🟡 IN PROGRESS · ✅ DO
 - ✅ **App icon** (v2.4.0) — on-brand directed-graph mark (`build/icon.svg` → `build/icon.png` via
   `pnpm build:icon`/resvg); electron-builder embeds it (win.icon), window uses it in dev. Swap the
   SVG + rerun to rebrand.
-- 🟡 **Preferences UI** — LAST App-shell item. Proposed settings (awaiting Daniel's steer on scope):
-  Appearance→Theme (System/Light/Dark), Editor→default layout engine for new diagrams, Startup→
-  restore previous session on/off. Default-engine wiring is clean (createNewTab default param reads
-  a mutable `defaultEngine`; session restore passes explicit engines, unaffected).
+- ✅ **Preferences UI** (v2.5.0) — Preferences dialog via Cmd/Ctrl+, (Edit ▸ Preferences… /
+  macOS app menu) + command palette. Scoped to **Appearance → Theme** per Daniel's choice; wired to
+  the live color-scheme controller. New `src/preferences/preferences-dialog.ts`; structured to grow
+  more sections. (Default-engine + restore-session were offered but not selected — easy to add: the
+  `createNewTab` default param can read a mutable `defaultEngine`; session restore is a guarded call.)

@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-07-05
+
+### Added
+
+- **Preferences dialog.** Opened with **Cmd/Ctrl+,** (Edit ▸ Preferences… on Windows/Linux, the
+  app menu on macOS) or the command palette. Its Appearance section hosts the theme selector
+  (System/Light/Dark), wired to the live theme so a change applies and persists immediately. Built
+  to grow additional settings.
+
 ## [2.4.0] - 2026-07-05
 
 ### Added
