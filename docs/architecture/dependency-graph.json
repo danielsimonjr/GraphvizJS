@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 56,
-    "moduleCount": 19,
-    "totalLoc": 5710,
-    "edgeCount": 97,
-    "exportCount": 168
+    "fileCount": 57,
+    "moduleCount": 20,
+    "totalLoc": 5975,
+    "edgeCount": 99,
+    "exportCount": 173
   },
   "modules": {
     "autosave": [
@@ -31,6 +31,9 @@
     "menu": [
       "src/menu/commands.ts",
       "src/menu/menu-template.ts"
+    ],
+    "palette": [
+      "src/palette/command-palette.ts"
     ],
     "platform": [
       "src/platform/contract.ts",
@@ -115,6 +118,7 @@
       "editor",
       "help",
       "menu",
+      "palette",
       "platform",
       "preview",
       "recent",
@@ -411,6 +415,12 @@
       "file": "src/menu/menu-template.ts",
       "testFiles": [
         "test/menu/menu-template.test.ts"
+      ]
+    },
+    {
+      "file": "src/palette/command-palette.ts",
+      "testFiles": [
+        "test/palette/command-palette.test.ts"
       ]
     },
     {
@@ -890,19 +900,19 @@
     },
     {
       "path": "src/help/dialog.ts",
-      "loc": 130,
+      "loc": 131,
       "exports": [
         "setupHelpDialog"
       ]
     },
     {
       "path": "src/main.ts",
-      "loc": 810,
+      "loc": 894,
       "exports": []
     },
     {
       "path": "src/menu/commands.ts",
-      "loc": 81,
+      "loc": 84,
       "exports": [
         "dispatchMenuAction",
         "setupMenuCommands",
@@ -911,12 +921,23 @@
     },
     {
       "path": "src/menu/menu-template.ts",
-      "loc": 289,
+      "loc": 299,
       "exports": [
         "LAYOUT_ENGINES",
         "buildMenuTemplate",
         "MenuBuildOptions",
         "MenuActionId"
+      ]
+    },
+    {
+      "path": "src/palette/command-palette.ts",
+      "loc": 167,
+      "exports": [
+        "fuzzyScore",
+        "filterCommands",
+        "createCommandPalette",
+        "Command",
+        "CommandPalette"
       ]
     },
     {

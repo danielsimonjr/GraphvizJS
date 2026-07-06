@@ -17,6 +17,7 @@ function handlers(): MenuCommandHandlers {
     format: vi.fn(),
     setEngine: vi.fn(),
     setTheme: vi.fn(),
+    commandPalette: vi.fn(),
     zoomIn: vi.fn(),
     zoomOut: vi.fn(),
     zoomReset: vi.fn(),
@@ -33,6 +34,8 @@ describe('dispatchMenuAction', () => {
     expect(h.save).toHaveBeenCalledTimes(1);
     dispatchMenuAction(h, 'zoom-reset');
     expect(h.zoomReset).toHaveBeenCalledTimes(1);
+    dispatchMenuAction(h, 'command-palette');
+    expect(h.commandPalette).toHaveBeenCalledTimes(1);
   });
   it('routes payload actions', () => {
     const h = handlers();

@@ -73,6 +73,15 @@ describe('buildMenuTemplate', () => {
     expect(onAction).toHaveBeenCalledWith('open-recent', 'C:/a/first.dot');
   });
 
+  it('has a Command Palette item that dispatches command-palette (renderer owns the key)', () => {
+    const onAction = vi.fn();
+    const t = buildMenuTemplate(opts({ onAction }));
+    const item = findById(t, 'command-palette')!;
+    expect(item.registerAccelerator).toBe(false);
+    (item.click as () => void)();
+    expect(onAction).toHaveBeenCalledWith('command-palette');
+  });
+
   it('builds a radio Theme submenu reflecting currentTheme and dispatching set-theme', () => {
     const onAction = vi.fn();
     const t = buildMenuTemplate(opts({ currentTheme: 'dark', onAction }));
