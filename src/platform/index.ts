@@ -67,6 +67,10 @@ export function setMenuRecent(paths: string[]): Promise<void> {
   return window.graphviz.setMenuRecent(paths);
 }
 
+export function setMenuTheme(scheme: string): Promise<void> {
+  return window.graphviz.setMenuTheme(scheme);
+}
+
 export function renderSvg(dot: string, engine: LayoutEngine): Promise<string> {
   return window.graphviz.renderSvg(dot, engine);
 }

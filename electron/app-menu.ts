@@ -1,9 +1,11 @@
 import { app, BrowserWindow, dialog, Menu, shell } from 'electron';
 import { buildMenuTemplate, type MenuActionId } from '../src/menu/menu-template';
+import type { ColorScheme } from '../src/theme/color-scheme';
 
 const REPO_URL = 'https://github.com/danielsimonjr/GraphvizJS';
 
 let recentFiles: string[] = [];
+let currentTheme: ColorScheme = 'system';
 
 function sendAction(action: MenuActionId, payload?: string): void {
   for (const win of BrowserWindow.getAllWindows()) {
@@ -29,6 +31,7 @@ export function rebuildAppMenu(): void {
     isMac: process.platform === 'darwin',
     isDev: !!process.env.VITE_DEV_SERVER_URL,
     recentFiles,
+    currentTheme,
     onAction: sendAction,
     onOpenSource: () => void shell.openExternal(REPO_URL),
     onAbout: showAbout,
@@ -45,4 +48,12 @@ export function setupAppMenu(): void {
 export function setMenuRecentFiles(paths: string[]): void {
   recentFiles = Array.isArray(paths) ? paths : [];
   rebuildAppMenu();
+}
+
+/** Update the Theme submenu's checked scheme, and rebuild the menu. */
+export function setMenuTheme(scheme: string): void {
+  if (scheme === 'system' || scheme === 'light' || scheme === 'dark') {
+    currentTheme = scheme;
+    rebuildAppMenu();
+  }
 }

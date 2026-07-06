@@ -1,4 +1,7 @@
 import type { MenuItemConstructorOptions } from 'electron';
+// Type-only: keeps color-scheme's renderer-only `store` import out of the
+// main-process menu build (this template is built in the main process).
+import type { ColorScheme } from '../theme/color-scheme';
 
 export type MenuActionId =
   | 'new'
@@ -14,6 +17,7 @@ export type MenuActionId =
   | 'find'
   | 'format'
   | 'set-engine'
+  | 'set-theme'
   | 'zoom-in'
   | 'zoom-out'
   | 'zoom-reset'
@@ -23,10 +27,19 @@ export interface MenuBuildOptions {
   isMac: boolean;
   isDev: boolean;
   recentFiles: string[];
+  /** Current color-scheme choice, for the Theme submenu's radio state. */
+  currentTheme: ColorScheme;
   onAction: (action: MenuActionId, payload?: string) => void;
   onOpenSource: () => void;
   onAbout: () => void;
 }
+
+/** Theme submenu options — kept local so the main-process build stays decoupled. */
+const THEME_ITEMS: { readonly scheme: ColorScheme; readonly label: string }[] = [
+  { scheme: 'system', label: 'System' },
+  { scheme: 'light', label: 'Light' },
+  { scheme: 'dark', label: 'Dark' },
+];
 
 export const LAYOUT_ENGINES: readonly string[] = [
   'dot',
@@ -191,6 +204,16 @@ function buildViewMenu(opts: MenuBuildOptions): MenuItemConstructorOptions {
         id: `engine:${engine}`,
         label: engine,
         click: () => opts.onAction('set-engine', engine),
+      })),
+    },
+    {
+      label: 'Theme',
+      submenu: THEME_ITEMS.map(({ scheme, label }) => ({
+        id: `theme:${scheme}`,
+        label,
+        type: 'radio' as const,
+        checked: opts.currentTheme === scheme,
+        click: () => opts.onAction('set-theme', scheme),
       })),
     },
     { type: 'separator' },

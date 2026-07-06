@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 54,
-    "moduleCount": 18,
-    "totalLoc": 5499,
-    "edgeCount": 91,
-    "exportCount": 153
+    "fileCount": 56,
+    "moduleCount": 19,
+    "totalLoc": 5710,
+    "edgeCount": 97,
+    "exportCount": 168
   },
   "modules": {
     "autosave": [
@@ -50,6 +50,9 @@
       "src/tabs/manager.ts",
       "src/tabs/tab-bar.ts"
     ],
+    "theme": [
+      "src/theme/color-scheme.ts"
+    ],
     "toolbar": [
       "src/toolbar/actions.ts",
       "src/toolbar/examples-menu.ts",
@@ -64,7 +67,8 @@
       "src/toolbar/recent-menu.ts",
       "src/toolbar/save-as.ts",
       "src/toolbar/save-diagram.ts",
-      "src/toolbar/shortcuts.ts"
+      "src/toolbar/shortcuts.ts",
+      "src/toolbar/theme-button.ts"
     ],
     "utils": [
       "src/utils/debounce.ts"
@@ -116,13 +120,15 @@
       "recent",
       "session",
       "tabs",
+      "theme",
       "toolbar",
       "watch",
       "window",
       "workspace"
     ],
     "menu": [
-      "platform"
+      "platform",
+      "theme"
     ],
     "platform": [
       "core"
@@ -142,10 +148,14 @@
     "tabs": [
       "core"
     ],
+    "theme": [
+      "platform"
+    ],
     "toolbar": [
       "core",
       "platform",
-      "editor"
+      "editor",
+      "theme"
     ],
     "watch": [
       "platform"
@@ -158,6 +168,7 @@
     ],
     "electron": [
       "menu",
+      "theme",
       "watch",
       "core",
       "platform"
@@ -232,6 +243,18 @@
         "name": "TabBarOptions"
       },
       {
+        "file": "src/theme/color-scheme.ts",
+        "name": "COLOR_SCHEMES"
+      },
+      {
+        "file": "src/theme/color-scheme.ts",
+        "name": "COLOR_SCHEME_KEY"
+      },
+      {
+        "file": "src/theme/color-scheme.ts",
+        "name": "ColorSchemeDeps"
+      },
+      {
         "file": "src/toolbar/actions.ts",
         "name": "ToolbarActionsOptions"
       },
@@ -262,6 +285,10 @@
       {
         "file": "src/toolbar/shortcuts.ts",
         "name": "ToolbarShortcutsOptions"
+      },
+      {
+        "file": "src/toolbar/theme-button.ts",
+        "name": "ThemeButtonOptions"
       },
       {
         "file": "src/watch/file-watch.ts",
@@ -395,6 +422,7 @@
       "testFiles": [
         "test/help/dialog.test.ts",
         "test/platform/index.test.ts",
+        "test/theme/color-scheme.test.ts",
         "test/toolbar/export-diagram.test.ts",
         "test/toolbar/open-diagram.test.ts",
         "test/toolbar/save-as.test.ts",
@@ -437,6 +465,12 @@
       "file": "src/tabs/tab-bar.ts",
       "testFiles": [
         "test/tabs/tab-bar.test.ts"
+      ]
+    },
+    {
+      "file": "src/theme/color-scheme.ts",
+      "testFiles": [
+        "test/theme/color-scheme.test.ts"
       ]
     },
     {
@@ -522,6 +556,12 @@
       "file": "src/toolbar/shortcuts.ts",
       "testFiles": [
         "test/toolbar/shortcuts.test.ts"
+      ]
+    },
+    {
+      "file": "src/toolbar/theme-button.ts",
+      "testFiles": [
+        "test/toolbar/theme-button.test.ts"
       ]
     },
     {
@@ -690,6 +730,13 @@
         "hasHandler": true
       },
       {
+        "channel": "menu:setTheme",
+        "method": "setMenuTheme",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
         "channel": "render:svg",
         "method": "renderSvg",
         "hasContract": true,
@@ -850,12 +897,12 @@
     },
     {
       "path": "src/main.ts",
-      "loc": 780,
+      "loc": 810,
       "exports": []
     },
     {
       "path": "src/menu/commands.ts",
-      "loc": 77,
+      "loc": 81,
       "exports": [
         "dispatchMenuAction",
         "setupMenuCommands",
@@ -864,7 +911,7 @@
     },
     {
       "path": "src/menu/menu-template.ts",
-      "loc": 266,
+      "loc": 289,
       "exports": [
         "LAYOUT_ENGINES",
         "buildMenuTemplate",
@@ -874,7 +921,7 @@
     },
     {
       "path": "src/platform/contract.ts",
-      "loc": 47,
+      "loc": 48,
       "exports": [
         "DiagramFilter",
         "OpenedFile",
@@ -884,7 +931,7 @@
     },
     {
       "path": "src/platform/index.ts",
-      "loc": 85,
+      "loc": 89,
       "exports": [
         "store",
         "openTextFile",
@@ -899,6 +946,7 @@
         "onFileChanged",
         "onMenuAction",
         "setMenuRecent",
+        "setMenuTheme",
         "renderSvg",
         "validateDot",
         "exportRender",
@@ -971,6 +1019,23 @@
         "setupTabBar",
         "TabBarCallbacks",
         "TabBarOptions"
+      ]
+    },
+    {
+      "path": "src/theme/color-scheme.ts",
+      "loc": 96,
+      "exports": [
+        "COLOR_SCHEMES",
+        "COLOR_SCHEME_KEY",
+        "resolveDark",
+        "nextScheme",
+        "applyScheme",
+        "loadColorScheme",
+        "saveColorScheme",
+        "createColorSchemeController",
+        "ColorSchemeController",
+        "ColorSchemeDeps",
+        "ColorScheme"
       ]
     },
     {
@@ -1085,6 +1150,14 @@
       ]
     },
     {
+      "path": "src/toolbar/theme-button.ts",
+      "loc": 37,
+      "exports": [
+        "setupThemeButton",
+        "ThemeButtonOptions"
+      ]
+    },
+    {
       "path": "src/utils/debounce.ts",
       "loc": 12,
       "exports": [
@@ -1195,11 +1268,12 @@
     },
     {
       "path": "electron/app-menu.ts",
-      "loc": 48,
+      "loc": 59,
       "exports": [
         "rebuildAppMenu",
         "setupAppMenu",
-        "setMenuRecentFiles"
+        "setMenuRecentFiles",
+        "setMenuTheme"
       ]
     },
     {
@@ -1211,12 +1285,12 @@
     },
     {
       "path": "electron/main.ts",
-      "loc": 212,
+      "loc": 216,
       "exports": []
     },
     {
       "path": "electron/preload.ts",
-      "loc": 35,
+      "loc": 36,
       "exports": []
     }
   ]

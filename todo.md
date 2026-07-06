@@ -47,8 +47,11 @@ step 16 pulls the next item). Statuses: 🟢 READY · 🟡 IN PROGRESS · ✅ DO
 - `graphviz.test.ts` 8-engine / singleton coverage has no core analog — the same
   `graphvizInstance.layout()` path is exercised by `test/core/validate.test.ts` + the e2e suite.
 
-## Future App-shell cycle (deferred from v1.4.0)
+## App-shell cycle (deferred from v1.4.0)
 
-- 💤 Theme toggle (dark CSS written but unreachable — no toggle/matchMedia/persistence).
+- ✅ **Theme toggle** (v2.2.0) — System/Light/Dark selectable from View ▸ Theme (radio submenu) +
+  a toolbar cycle button; System follows the OS live; choice persists (`colorScheme` store key) and
+  applies at startup. CSS-variable-driven, so one `body.dark` toggle re-themes chrome + editor.
+  New `src/theme/color-scheme.ts` + `src/toolbar/theme-button.ts`; `menu:setTheme` IPC (16→17).
 - 💤 Command palette, preferences UI.
 - 💤 App icon (256×256 `.ico`; `win.icon` currently unset → default Electron icon).

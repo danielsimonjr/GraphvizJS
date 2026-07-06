@@ -7,7 +7,7 @@ import { exportDiagram } from '../core/export';
 import { initGraphviz, renderDotToSvg, validateDot } from '../core/render';
 import type { ExportFormat, LayoutEngine, PdfExportOptions } from '../core/types';
 import type { ConfirmOptions, DiagramFilter } from '../src/platform/contract';
-import { setMenuRecentFiles, setupAppMenu } from './app-menu';
+import { setMenuRecentFiles, setMenuTheme, setupAppMenu } from './app-menu';
 import { setupFileWatcher } from './file-watcher';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -171,6 +171,10 @@ function registerIpc(): void {
 
   ipcMain.handle('menu:setRecent', (_e, paths: string[]) => {
     setMenuRecentFiles(paths);
+  });
+
+  ipcMain.handle('menu:setTheme', (_e, scheme: string) => {
+    setMenuTheme(scheme);
   });
 
   ipcMain.handle('render:svg', (_e, dot: string, engine: LayoutEngine) =>

@@ -12,6 +12,7 @@ graph LR
   root["root"]
   session["session"]
   tabs["tabs"]
+  theme["theme"]
   toolbar["toolbar"]
   utils["utils"]
   watch["watch"]
@@ -22,9 +23,11 @@ graph LR
   electron --> core
   electron --> menu
   electron --> platform
+  electron --> theme
   electron --> watch
   help --> platform
   menu --> platform
+  menu --> theme
   platform --> core
   preview --> core
   preview --> utils
@@ -39,6 +42,7 @@ graph LR
   root --> recent
   root --> session
   root --> tabs
+  root --> theme
   root --> toolbar
   root --> watch
   root --> window
@@ -47,8 +51,10 @@ graph LR
   session --> core
   session --> platform
   tabs --> core
+  theme --> platform
   toolbar --> core
   toolbar --> editor
   toolbar --> platform
+  toolbar --> theme
   watch --> platform
   window --> platform

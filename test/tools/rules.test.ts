@@ -74,6 +74,14 @@ describe('checkLayering', () => {
     expect(v[0].rule).toMatch(/shared renderer module/i);
   });
 
+  it('allows electron to type-only-import any renderer type (erased at runtime)', () => {
+    const files = [
+      f('electron/app-menu.ts', [{ file: '../src/theme/color-scheme', typeOnly: true }]),
+      f('src/theme/color-scheme.ts'),
+    ];
+    expect(checkLayering(files)).toEqual([]);
+  });
+
   it('passes a clean graph (core leaf, cli->core, electron->core+shared, renderer type-only core)', () => {
     const files = [
       f('electron/m.ts', [{ file: '../core/c' }, { file: '../src/menu/t' }]),

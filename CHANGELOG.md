@@ -6,8 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-07-05
+
 ### Added
 
+- **Theme toggle (System / Light / Dark).** The dark theme is now selectable from **View ▸ Theme**
+  (a radio submenu reflecting the current choice) and a toolbar button that cycles the three modes.
+  **System** follows the OS and updates live; the choice persists across launches (store key
+  `colorScheme`) and is applied at startup before the editor loads to avoid a flash. Because the
+  theme is CSS-variable-driven, one toggle re-themes the whole app including the CodeMirror editor.
 - **Architecture enforcement in the dependency-graph tool.** `pnpm graph:check` verifies the
   headless-core layer policy (`core/` is a leaf, `cli/` → `core/` only, `electron/` → `core/` plus
   only the shared pure renderer modules `menu`/`watch`/`platform`, and the renderer may import
