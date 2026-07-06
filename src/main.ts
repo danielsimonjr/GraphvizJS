@@ -30,6 +30,7 @@ import {
   setMenuTheme,
   validateDot,
 } from './platform';
+import { createPreferencesDialog } from './preferences/preferences-dialog';
 import { createPreview } from './preview/render';
 import {
   createZoomController,
@@ -43,6 +44,7 @@ import type { TabState } from './tabs/manager';
 import { MAX_TABS, TabManager } from './tabs/manager';
 import { renderTabBar, setupTabBar } from './tabs/tab-bar';
 import {
+  COLOR_SCHEMES,
   type ColorScheme,
   type ColorSchemeController,
   createColorSchemeController,
@@ -134,6 +136,12 @@ async function bootstrap(): Promise<void> {
       void setMenuTheme(scheme);
       updateThemeButton(scheme);
     },
+  });
+
+  const preferencesDialog = createPreferencesDialog({
+    schemes: COLOR_SCHEMES,
+    getTheme: () => colorScheme?.get() ?? 'system',
+    onTheme: (scheme) => void colorScheme?.set(scheme),
   });
 
   const zoomController = createZoomController(previewElement, (level) => {
@@ -674,6 +682,7 @@ async function bootstrap(): Promise<void> {
     setEngine: (engine) => applyEngine(engine as LayoutEngine),
     setTheme: (scheme) => void colorScheme?.set(scheme as ColorScheme),
     commandPalette: () => palette?.open(),
+    preferences: () => preferencesDialog.open(),
     zoomIn: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.zoomIn(),
     zoomOut: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.zoomOut(),
     zoomReset: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.reset(),
@@ -744,6 +753,7 @@ async function bootstrap(): Promise<void> {
       group: 'View',
       run: () => menuHandlers.setTheme('dark'),
     },
+    { id: 'preferences', label: 'Preferences…', group: 'View', run: menuHandlers.preferences },
     { id: 'help', label: 'Help', group: 'Help', run: menuHandlers.help },
   ];
   palette = createCommandPalette(paletteCommands);

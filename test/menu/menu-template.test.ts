@@ -73,6 +73,20 @@ describe('buildMenuTemplate', () => {
     expect(onAction).toHaveBeenCalledWith('open-recent', 'C:/a/first.dot');
   });
 
+  it('has a Preferences item (Edit menu on non-mac) dispatching preferences', () => {
+    const onAction = vi.fn();
+    const t = buildMenuTemplate(opts({ isMac: false, onAction }));
+    const item = findById(t, 'preferences')!;
+    expect(item.accelerator).toBe('CmdOrCtrl+,');
+    (item.click as () => void)();
+    expect(onAction).toHaveBeenCalledWith('preferences');
+  });
+
+  it('puts Preferences in the app menu on macOS', () => {
+    const t = buildMenuTemplate(opts({ isMac: true }));
+    expect(findById(t, 'preferences-mac')).toBeDefined();
+  });
+
   it('has a Command Palette item that dispatches command-palette (renderer owns the key)', () => {
     const onAction = vi.fn();
     const t = buildMenuTemplate(opts({ onAction }));

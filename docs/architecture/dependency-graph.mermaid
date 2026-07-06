@@ -8,6 +8,7 @@ graph LR
   menu["menu"]
   palette["palette"]
   platform["platform"]
+  preferences["preferences"]
   preview["preview"]
   recent["recent"]
   root["root"]
@@ -30,6 +31,7 @@ graph LR
   menu --> platform
   menu --> theme
   platform --> core
+  preferences --> theme
   preview --> core
   preview --> utils
   recent --> platform
@@ -40,6 +42,7 @@ graph LR
   root --> menu
   root --> palette
   root --> platform
+  root --> preferences
   root --> preview
   root --> recent
   root --> session
