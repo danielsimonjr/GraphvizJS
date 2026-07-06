@@ -57,6 +57,10 @@ step 16 pulls the next item). Statuses: 🟢 READY · 🟡 IN PROGRESS · ✅ DO
   edit/view/layout-engine/theme/help); View ▸ Command Palette… menu item (rides `menu:action`, no
   new IPC). New `src/palette/command-palette.ts` (pure `fuzzyScore`/`filterCommands` + overlay
   controller). Command list built from the shared `menuHandlers`.
-- 💤 Preferences UI.
-- 💤 App icon (256×256 `.ico`; `win.icon` currently unset → default Electron icon). Needs Daniel's
-  logo/mark decision, or I design a simple directed-graph mark.
+- ✅ **App icon** (v2.4.0) — on-brand directed-graph mark (`build/icon.svg` → `build/icon.png` via
+  `pnpm build:icon`/resvg); electron-builder embeds it (win.icon), window uses it in dev. Swap the
+  SVG + rerun to rebrand.
+- 🟡 **Preferences UI** — LAST App-shell item. Proposed settings (awaiting Daniel's steer on scope):
+  Appearance→Theme (System/Light/Dark), Editor→default layout engine for new diagrams, Startup→
+  restore previous session on/off. Default-engine wiring is clean (createNewTab default param reads
+  a mutable `defaultEngine`; session restore passes explicit engines, unaffected).

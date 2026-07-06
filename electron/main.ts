@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -58,8 +59,12 @@ function persistBounds(win: BrowserWindow): void {
 }
 
 function createWindow(): void {
+  // In dev, set the window/taskbar icon from build/icon.png (packaged builds
+  // embed it in the exe via electron-builder, so build/ isn't present there).
+  const devIcon = path.join(__dirname, '../build/icon.png');
   const win = new BrowserWindow({
     ...restoreBounds(),
+    ...(existsSync(devIcon) ? { icon: devIcon } : {}),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,

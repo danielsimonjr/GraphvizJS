@@ -14,3 +14,4 @@ asarUnpack:
   - "**/node_modules/@resvg/**"
 win:
   target: nsis
+  icon: build/icon.png
