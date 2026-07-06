@@ -53,5 +53,10 @@ step 16 pulls the next item). Statuses: 🟢 READY · 🟡 IN PROGRESS · ✅ DO
   a toolbar cycle button; System follows the OS live; choice persists (`colorScheme` store key) and
   applies at startup. CSS-variable-driven, so one `body.dark` toggle re-themes chrome + editor.
   New `src/theme/color-scheme.ts` + `src/toolbar/theme-button.ts`; `menu:setTheme` IPC (16→17).
-- 💤 Command palette, preferences UI.
-- 💤 App icon (256×256 `.ico`; `win.icon` currently unset → default Electron icon).
+- ✅ **Command palette** (v2.3.0) — Ctrl/Cmd+Shift+P fuzzy-search + run any command (file/export/
+  edit/view/layout-engine/theme/help); View ▸ Command Palette… menu item (rides `menu:action`, no
+  new IPC). New `src/palette/command-palette.ts` (pure `fuzzyScore`/`filterCommands` + overlay
+  controller). Command list built from the shared `menuHandlers`.
+- 💤 Preferences UI.
+- 💤 App icon (256×256 `.ico`; `win.icon` currently unset → default Electron icon). Needs Daniel's
+  logo/mark decision, or I design a simple directed-graph mark.

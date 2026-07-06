@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-07-05
+
+### Added
+
+- **Command palette (Ctrl/Cmd+Shift+P).** Fuzzy-search and run any command — new/open/save,
+  export (SVG/PNG/PNG 2×/PDF), undo/redo, find, format, zoom, every layout engine, theme, and
+  help — with ↑/↓ to move, Enter to run, Esc to dismiss. Also reachable from **View ▸ Command
+  Palette…**. The command list is built from the same handlers the menus use.
+
 ## [2.2.0] - 2026-07-05
 
 ### Added
