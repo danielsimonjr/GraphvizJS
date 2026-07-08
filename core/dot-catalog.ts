@@ -16,6 +16,10 @@ export interface DotAttributeSpec {
   default?: string;
 }
 
+// The full standard Graphviz node-shape list (https://graphviz.org/doc/info/shapes.html) —
+// polygon-based shapes plus the record shapes. Deliberately exhaustive: an incomplete list
+// here is what causes nearest() to misflag a valid-but-unlisted shape (e.g. Mdiamond, rect)
+// as a typo of a listed one it happens to sit edit-distance <=2 from.
 const SHAPE_VALUES = [
   'box',
   'polygon',
@@ -39,16 +43,44 @@ const SHAPE_VALUES = [
   'doubleoctagon',
   'invtriangle',
   'invtrapezium',
-  'record',
-  'Mrecord',
+  'invhouse',
+  'Mdiamond',
+  'Msquare',
+  'Mcircle',
+  'rect',
+  'rectangle',
+  'square',
+  'star',
+  'none',
+  'underline',
+  'cylinder',
   'note',
   'tab',
   'folder',
   'box3d',
   'component',
-  'cylinder',
-  'star',
-  'none',
+  'promoter',
+  'cds',
+  'terminator',
+  'utr',
+  'primersite',
+  'restrictionsite',
+  'fivepoverhang',
+  'threepoverhang',
+  'noverhang',
+  'assembly',
+  'signature',
+  'insulator',
+  'ribosite',
+  'rnastab',
+  'proteasesite',
+  'proteinstab',
+  'rpromoter',
+  'rarrow',
+  'larrow',
+  'lpromoter',
+  'record',
+  'Mrecord',
 ];
 
 const STYLE_VALUES = [
@@ -64,6 +96,7 @@ const STYLE_VALUES = [
   'wedged',
   'striped',
   'radial',
+  'tapered',
 ];
 
 const ARROW_VALUES = [
@@ -107,20 +140,17 @@ export const DOT_ATTRIBUTE_CATALOG: readonly DotAttributeSpec[] = [
     name: 'splines',
     contexts: ['graph'],
     type: 'enum',
-    values: ['true', 'false', 'none', 'line', 'polyline', 'curved', 'ortho', 'spline'],
+    values: ['true', 'false', 'none', 'line', 'polyline', 'curved', 'ortho', 'spline', ''],
   },
-  {
-    name: 'overlap',
-    contexts: ['graph'],
-    type: 'enum',
-    values: ['true', 'false', 'scale', 'prism', 'compress', 'vpsc'],
-  },
-  {
-    name: 'ratio',
-    contexts: ['graph'],
-    type: 'enum',
-    values: ['fill', 'compress', 'expand', 'auto'],
-  },
+  // `overlap` accepts an open-ended value space in real Graphviz (bool keywords, `scale`,
+  // `scalexy`, `prism[n]`, `voronoi`, `vpsc`, `ortho[_yx]`, `compress`, `ipsep`, plus raw
+  // numeric scaling factors) that a small enum table can't enumerate without either being
+  // wrong (missing values) or unbounded. Typed 'other' so invalid-value never checks it —
+  // a missed lint here is an acceptable false-negative; false-flagging a valid value is not.
+  { name: 'overlap', contexts: ['graph'], type: 'other' },
+  // `ratio` likewise accepts numeric aspect-ratio values in addition to the keyword forms
+  // (fill/compress/expand/auto) — see the `overlap` rationale above.
+  { name: 'ratio', contexts: ['graph'], type: 'other' },
   {
     name: 'clusterrank',
     contexts: ['graph'],

@@ -11,12 +11,23 @@ export type { StructuralDiagnostic } from './types.js';
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{3,8}$/;
 const RGB_COLOR_RE = /^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/i;
 const HSV_COLOR_RE = /^\d*\.?\d+[, ]\s*\d*\.?\d+[, ]\s*\d*\.?\d+$/;
+// X11 numbered color variant: a known base name immediately followed by digits (e.g.
+// `gray0`, `lightblue2`, `dodgerblue4`) — Graphviz's X11 scheme defines these as brightness
+// variants of the base name. Not every base name has every digit suffix in the real X11
+// table, but accepting any digit suffix on a known name is a safe over-acceptance: a missed
+// lint here is an acceptable false-negative, whereas flagging a real variant as invalid
+// (the false positive this fix targets, e.g. `gray0`) is not.
+const X11_NUMBERED_VARIANT_RE = /^([a-z]+)(\d+)$/;
 
 function isValidColor(value: string): boolean {
   if (HEX_COLOR_RE.test(value)) return true;
   if (RGB_COLOR_RE.test(value)) return true;
   if (HSV_COLOR_RE.test(value)) return true;
-  return (DOT_COLORS as readonly string[]).includes(value.toLowerCase());
+  const lower = value.toLowerCase();
+  if ((DOT_COLORS as readonly string[]).includes(lower)) return true;
+  const variant = X11_NUMBERED_VARIANT_RE.exec(lower);
+  if (variant && (DOT_COLORS as readonly string[]).includes(variant[1])) return true;
+  return false;
 }
 
 const ARROW_ATTR_NAMES = new Set(['arrowhead', 'arrowtail']);
@@ -302,13 +313,15 @@ export function semanticDiagnostics(source: string): StructuralDiagnostic[] {
           !attr.values.includes(entry.value) &&
           !isComposableArrowValue(entry.name, entry.value, attr.values)
         ) {
-          // The enum catalog transcribes only a subset of what Graphviz actually accepts
-          // for many attributes (e.g. shape, arrowhead, style are far larger/composable
-          // in real Graphviz than this table), so an unmatched value is NOT necessarily
-          // invalid. Only flag it when it's a near-miss typo of a known value (nearest()
-          // within its default edit-distance bound) — that's a real "did you mean" catch.
-          // A value with no close match is silently accepted rather than risk a false
-          // positive on legitimate Graphviz syntax this catalog doesn't enumerate.
+          // The closed enum domains (shape, style, dir, rankdir, rank, splines, ...) are
+          // transcribed to be complete against the canonical Graphviz tables, so an
+          // unmatched value here is genuinely off-domain. arrowhead/arrowtail are further
+          // guarded above by isComposableArrowValue for their o/l/r-modifier composition.
+          // Open-ended attributes (ratio, overlap) are typed 'other' in the catalog and
+          // never reach this branch at all. Still, only flag an unmatched value when it's
+          // a near-miss typo of a known value (nearest() within its default edit-distance
+          // bound) — a value with no close match is silently accepted rather than risk a
+          // false positive on Graphviz syntax this catalog doesn't (yet) enumerate.
           const suggestion = nearest(entry.value, attr.values);
           if (suggestion) {
             out.push({
@@ -329,10 +342,12 @@ export function semanticDiagnostics(source: string): StructuralDiagnostic[] {
         }
 
         if (isColorAttribute(entry.name) && !isValidColor(entry.value)) {
-          // Same rationale as invalid-value above: DOT_COLORS is a small transcribed
-          // subset of Graphviz's ~600-name X11 color scheme, so only flag a near-miss
-          // typo of a known name; an unlisted-but-valid color (e.g. "coral",
-          // "lightyellow") stays silent.
+          // DOT_COLORS is the complete canonical SVG/CSS named-color set (Graphviz's
+          // default color scheme), and isValidColor additionally accepts numbered X11
+          // variants (gray0, lightblue2, ...) of any known name. What's NOT covered is a
+          // `colorscheme`-qualified name from one of Graphviz's other (Brewer/extended
+          // X11) schemes — same rationale as invalid-value: only flag a near-miss typo of
+          // a known name, so an out-of-scheme-but-otherwise-valid color stays silent.
           const suggestion = nearest(entry.value, DOT_COLORS);
           if (suggestion) {
             out.push({

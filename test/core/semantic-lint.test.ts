@@ -144,6 +144,51 @@ describe('semanticDiagnostics', () => {
     });
   });
 
+  describe('invalid-value / invalid-color residual false positives (domain-completeness fix)', () => {
+    // Root cause of the residual: the C1/C2 fix gated invalid-value/invalid-color on
+    // nearest() to stop flagging far-unlisted values, but the enum/color domains were
+    // still INCOMPLETE — so a VALID value that happens to sit edit-distance <=2 from a
+    // listed value (e.g. `Mdiamond` vs `diamond`, `gray0` vs `gray`) was still misflagged
+    // as a typo. This fix completes the closed domains (shape, style, ...) and colors, and
+    // retypes truly open-ended attributes (ratio, overlap) to 'other' so they're never
+    // enum-checked at all. Every value below must now be silent.
+    it.each([
+      ['a [shape=Mdiamond];', 'the valid M-variant shape Mdiamond (near diamond)'],
+      ['a [shape=Mcircle];', 'the valid M-variant shape Mcircle (near circle)'],
+      ['a [shape=Msquare];', 'the valid M-variant shape Msquare'],
+      ['a [shape=rect];', 'the valid shape synonym rect'],
+      ['a [shape=rectangle];', 'the valid shape synonym rectangle'],
+      ['a [shape=square];', 'the valid shape square'],
+      ['edge [style=tapered];', 'the valid style tapered'],
+      ['a -> b [arrowhead=onormal];', 'a composable arrowhead value'],
+      ['graph [ratio=0.7];', 'a numeric ratio value (open-ended, not enum-checked)'],
+      ['graph [overlap=scalexy];', 'a keyword overlap value (open-ended, not enum-checked)'],
+      ['a [color=coral];', 'the valid SVG color coral'],
+      ['node [fillcolor=lightyellow];', 'the valid SVG color lightyellow'],
+      ['a [fontcolor=crimson];', 'the valid SVG color crimson'],
+      ['a [color=steelblue];', 'the valid SVG color steelblue (near blue)'],
+      ['a [color=gray0];', 'the valid X11 numbered variant gray0 (near gray)'],
+      ['a [color="#ff0000"];', 'a valid quoted hex color'],
+    ])('stays silent for %s (%s)', (src) => {
+      const diags = semanticDiagnostics(src).filter(
+        (d) => d.code === 'invalid-value' || d.code === 'invalid-color'
+      );
+      expect(diags).toEqual([]);
+    });
+
+    it.each([
+      ['a [rankdir=TP];', 'TB'],
+      ['a [color=rd];', 'red'],
+      ['a [shape=boxx];', 'box'],
+    ])('still flags a genuine typo for %s with fix -> %s', (src, expectedFix) => {
+      const diags = semanticDiagnostics(src).filter(
+        (d) => d.code === 'invalid-value' || d.code === 'invalid-color'
+      );
+      expect(diags).toHaveLength(1);
+      expect(diags[0].fix?.text).toBe(expectedFix);
+    });
+  });
+
   describe('wrong-context', () => {
     it('flags a node-only attribute used on an edge', () => {
       const diags = semanticDiagnostics('digraph { a -> b [shape=box]; }');
