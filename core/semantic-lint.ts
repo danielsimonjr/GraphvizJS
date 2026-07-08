@@ -2,6 +2,7 @@ import type { AttrContext } from './dot-catalog.js';
 import { findAttribute } from './dot-catalog.js';
 import { DOT_COLORS, isColorAttribute } from './dot-colors.js';
 import { nearest } from './edit-distance.js';
+import type { Span } from './scan-dot.js';
 import { scanDot } from './scan-dot.js';
 import type { StructuralDiagnostic } from './types.js';
 
@@ -123,6 +124,50 @@ function braceDepthAt(text: string, upTo: number, startDepth: number): number {
   return depth;
 }
 
+const CLUSTER_REF_ATTRS = new Set(['lhead', 'ltail']);
+
+/**
+ * Collect every subgraph/cluster name declared anywhere in the source via
+ * `subgraph <name> { ... }`, regardless of where the declaration sits relative to any
+ * `lhead`/`ltail` reference (a cluster declared later in the file still counts). Only
+ * `subgraph` keyword occurrences inside a `code` span are recognized. The name that
+ * follows may be an unquoted identifier in the same code span, or a quoted string — the
+ * very next span, when it starts exactly where the code span ended (no gap). Anonymous
+ * subgraphs (`subgraph { ... }`) and anything else ambiguous simply contribute no name —
+ * fail-safe, since an under-populated set can only suppress `undefined-cluster` findings,
+ * never fabricate one.
+ */
+function collectDeclaredSubgraphNames(source: string, spans: Span[]): Set<string> {
+  const names = new Set<string>();
+  const keywordRe = /\bsubgraph\b/g;
+  for (let idx = 0; idx < spans.length; idx++) {
+    const span = spans[idx];
+    if (span.kind !== 'code') continue;
+    const text = source.slice(span.from, span.to);
+    keywordRe.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = keywordRe.exec(text)) !== null) {
+      let j = m.index + m[0].length;
+      while (j < text.length && /\s/.test(text[j])) j++;
+      if (j < text.length) {
+        const idMatch = /^[A-Za-z0-9_.]+/.exec(text.slice(j));
+        if (idMatch) names.add(idMatch[0]);
+      } else {
+        // The name (if any) lies in the span immediately following — only a quoted
+        // string abutting this code span with no gap is trusted as that name.
+        const next = spans[idx + 1];
+        if (next && next.kind === 'string' && next.from === span.to) {
+          const raw = source.slice(next.from, next.to);
+          const inner =
+            raw.length >= 2 && raw.startsWith('"') && raw.endsWith('"') ? raw.slice(1, -1) : raw;
+          names.add(inner.replace(/\\"/g, '"'));
+        }
+      }
+    }
+  }
+  return names;
+}
+
 /**
  * Value/color semantic checks: for each `attr=value` entry in an attribute
  * list, validate `value` against the DOT attribute catalog. Only `code`
@@ -133,11 +178,13 @@ function braceDepthAt(text: string, upTo: number, startDepth: number): number {
  */
 export function semanticDiagnostics(source: string): StructuralDiagnostic[] {
   const out: StructuralDiagnostic[] = [];
+  const spans = scanDot(source);
+  const declaredClusters = collectDeclaredSubgraphNames(source, spans);
   // Brace depth carried across code spans (quoted strings/comments/HTML labels never
   // contribute braces to the graph structure, so only `code`-kind spans are counted).
   let depth = 0;
 
-  for (const span of scanDot(source)) {
+  for (const span of spans) {
     if (span.kind !== 'code') continue;
     const text = source.slice(span.from, span.to);
     const listRe = /\[([^\]]*)\]/g;
@@ -146,10 +193,37 @@ export function semanticDiagnostics(source: string): StructuralDiagnostic[] {
       const listStart = span.from + m.index + 1;
       const depthAtList = braceDepthAt(text, m.index, depth);
       const context = classifyListContext(text.slice(0, m.index), depthAtList);
+      // Names seen so far within THIS single attribute list, for duplicate-attribute.
+      const seenNames = new Set<string>();
       for (const entry of parseValueEntries(m[1])) {
         const from = listStart + entry.valueOffset;
         const to = from + entry.value.length;
         const attr = findAttribute(entry.name);
+        const nameKey = entry.name.toLowerCase();
+
+        if (seenNames.has(nameKey)) {
+          const nameFrom = listStart + entry.nameOffset;
+          const nameTo = nameFrom + entry.name.length;
+          out.push({
+            from: nameFrom,
+            to: nameTo,
+            severity: 'warning',
+            code: 'duplicate-attribute',
+            message: `Attribute '${entry.name}' is set more than once in this attribute list`,
+          });
+        } else {
+          seenNames.add(nameKey);
+        }
+
+        if (CLUSTER_REF_ATTRS.has(nameKey) && !declaredClusters.has(entry.value)) {
+          out.push({
+            from,
+            to,
+            severity: 'warning',
+            code: 'undefined-cluster',
+            message: `'${entry.name}' references undefined cluster/subgraph '${entry.value}'`,
+          });
+        }
 
         if (context && attr && !attr.contexts.includes(context)) {
           const nameFrom = listStart + entry.nameOffset;

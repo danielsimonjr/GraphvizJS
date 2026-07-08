@@ -147,4 +147,90 @@ describe('semanticDiagnostics', () => {
       expect(wrongContext[0].message).toMatch(/rankdir/);
     });
   });
+
+  describe('duplicate-attribute', () => {
+    it('flags the second occurrence of a repeated attribute in one list', () => {
+      const src = 'a [color=red, color=blue]';
+      const diags = semanticDiagnostics(src).filter((d) => d.code === 'duplicate-attribute');
+      expect(diags).toHaveLength(1);
+      expect(diags[0].severity).toBe('warning');
+      expect(diags[0].fix).toBeUndefined();
+      expect(diags[0].message).toMatch(/color/);
+      // Flagged on the SECOND occurrence, not the first.
+      const secondColorOffset = src.lastIndexOf('color');
+      expect(diags[0].from).toBe(secondColorOffset);
+      expect(diags[0].to).toBe(secondColorOffset + 'color'.length);
+    });
+
+    it('does not flag distinct attributes in one list', () => {
+      expect(codes('a [color=red, shape=box]')).not.toContain('duplicate-attribute');
+    });
+
+    it('flags every repeat when an attribute appears three or more times', () => {
+      const diags = semanticDiagnostics('a [color=red, color=blue, color=green]').filter(
+        (d) => d.code === 'duplicate-attribute'
+      );
+      expect(diags).toHaveLength(2);
+    });
+
+    it('does not carry duplicate state across separate attribute lists', () => {
+      expect(codes('a -> b [color=red] [color=blue]')).not.toContain('duplicate-attribute');
+    });
+
+    it('does not flag duplicate-attribute on any real example diagram', () => {
+      expect(exampleFiles.length).toBeGreaterThan(0);
+      for (const file of exampleFiles) {
+        const src = readFileSync(join(EXAMPLES_DIR, file), 'utf-8');
+        const dup = semanticDiagnostics(src).filter((d) => d.code === 'duplicate-attribute');
+        expect(dup, `${file} should have no duplicate-attribute diagnostics`).toEqual([]);
+      }
+    });
+  });
+
+  describe('undefined-cluster', () => {
+    it('flags lhead referencing an undeclared cluster', () => {
+      const diags = semanticDiagnostics('a -> b [lhead=cluster9]').filter(
+        (d) => d.code === 'undefined-cluster'
+      );
+      expect(diags).toHaveLength(1);
+      expect(diags[0].severity).toBe('warning');
+      expect(diags[0].fix).toBeUndefined();
+      expect(diags[0].message).toMatch(/cluster9/);
+    });
+
+    it('does not flag lhead when the cluster is declared', () => {
+      const src = 'digraph { subgraph cluster9 {} a -> b [lhead=cluster9]; }';
+      expect(codes(src)).not.toContain('undefined-cluster');
+    });
+
+    it('does not flag ltail when the cluster is declared later in the file', () => {
+      const src = 'digraph { a -> b [ltail=cluster9]; subgraph cluster9 {} }';
+      expect(codes(src)).not.toContain('undefined-cluster');
+    });
+
+    it('flags ltail referencing an undeclared cluster', () => {
+      expect(codes('a -> b [ltail=missing]')).toContain('undefined-cluster');
+    });
+
+    it('does not flag a quoted subgraph declaration as undeclared', () => {
+      const src = 'digraph { subgraph "cluster9" {} a -> b [lhead=cluster9]; }';
+      expect(codes(src)).not.toContain('undefined-cluster');
+    });
+
+    it('does not flag lhead/ltail values inside a small realistic diagram with clusters', () => {
+      const src =
+        'digraph { subgraph cluster0 { a; b; } subgraph cluster1 { c; d; } ' +
+        'a -> c [lhead=cluster1, ltail=cluster0]; }';
+      expect(codes(src)).not.toContain('undefined-cluster');
+    });
+
+    it('does not flag undefined-cluster on any real example diagram', () => {
+      expect(exampleFiles.length).toBeGreaterThan(0);
+      for (const file of exampleFiles) {
+        const src = readFileSync(join(EXAMPLES_DIR, file), 'utf-8');
+        const undef = semanticDiagnostics(src).filter((d) => d.code === 'undefined-cluster');
+        expect(undef, `${file} should have no undefined-cluster diagnostics`).toEqual([]);
+      }
+    });
+  });
 });

@@ -8,8 +8,8 @@
 | --- | --- |
 | Files | 64 |
 | Modules | 21 |
-| Lines of code | 6786 |
-| Internal edges | 118 |
+| Lines of code | 6860 |
+| Internal edges | 119 |
 | Exports | 189 |
 
 ## Modules

@@ -2,8 +2,8 @@
   "stats": {
     "fileCount": 64,
     "moduleCount": 21,
-    "totalLoc": 6786,
-    "edgeCount": 118,
+    "totalLoc": 6860,
+    "edgeCount": 119,
     "exportCount": 189
   },
   "modules": {
@@ -1370,7 +1370,7 @@
     },
     {
       "path": "core/semantic-lint.ts",
-      "loc": 214,
+      "loc": 288,
       "exports": [
         "semanticDiagnostics"
       ]
