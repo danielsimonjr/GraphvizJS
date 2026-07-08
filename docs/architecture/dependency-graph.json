@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 60,
+    "fileCount": 61,
     "moduleCount": 21,
-    "totalLoc": 6363,
+    "totalLoc": 6393,
     "edgeCount": 110,
-    "exportCount": 180
+    "exportCount": 182
   },
   "modules": {
     "autosave": [
@@ -87,6 +87,7 @@
       "src/workspace/resize.ts"
     ],
     "core": [
+      "core/dot-colors.ts",
       "core/dot-vocab.ts",
       "core/export-pdf.ts",
       "core/export-png.ts",
@@ -592,6 +593,12 @@
       "file": "src/workspace/resize.ts",
       "testFiles": [
         "test/workspace/resize.test.ts"
+      ]
+    },
+    {
+      "file": "core/dot-colors.ts",
+      "testFiles": [
+        "test/core/dot-colors.test.ts"
       ]
     },
     {
@@ -1235,6 +1242,14 @@
       "loc": 57,
       "exports": [
         "initHorizontalResize"
+      ]
+    },
+    {
+      "path": "core/dot-colors.ts",
+      "loc": 30,
+      "exports": [
+        "DOT_COLORS",
+        "isColorAttribute"
       ]
     },
     {
