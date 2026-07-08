@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 62,
+    "fileCount": 63,
     "moduleCount": 21,
-    "totalLoc": 6721,
-    "edgeCount": 105,
-    "exportCount": 188
+    "totalLoc": 6745,
+    "edgeCount": 108,
+    "exportCount": 190
   },
   "modules": {
     "autosave": [
@@ -99,7 +99,8 @@
       "core/render.ts",
       "core/scan-dot.ts",
       "core/structure-lint.ts",
-      "core/types.ts"
+      "core/types.ts",
+      "core/validate.ts"
     ],
     "cli": [
       "cli/args.ts",
@@ -334,10 +335,6 @@
         "name": "SpanKind"
       },
       {
-        "file": "core/structure-lint.ts",
-        "name": "StructuralDiagnostic"
-      },
-      {
         "file": "core/types.ts",
         "name": "DotVocabulary"
       },
@@ -348,6 +345,14 @@
       {
         "file": "core/types.ts",
         "name": "PdfPageSize"
+      },
+      {
+        "file": "core/validate.ts",
+        "name": "validateDiagram"
+      },
+      {
+        "file": "core/validate.ts",
+        "name": "DiagramDiagnostics"
       },
       {
         "file": "cli/args.ts",
@@ -708,6 +713,12 @@
       "testFiles": [
         "test/editor/linting.test.ts",
         "test/tabs/manager.test.ts"
+      ]
+    },
+    {
+      "file": "core/validate.ts",
+      "testFiles": [
+        "test/core/validate-diagram.test.ts"
       ]
     },
     {
@@ -1379,6 +1390,14 @@
         "PdfPageMode",
         "PdfPageSize",
         "PdfOrientation"
+      ]
+    },
+    {
+      "path": "core/validate.ts",
+      "loc": 24,
+      "exports": [
+        "validateDiagram",
+        "DiagramDiagnostics"
       ]
     },
     {

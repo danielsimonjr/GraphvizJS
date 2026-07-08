@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 62 |
+| Files | 63 |
 | Modules | 21 |
-| Lines of code | 6721 |
-| Internal edges | 105 |
-| Exports | 188 |
+| Lines of code | 6745 |
+| Internal edges | 108 |
+| Exports | 190 |
 
 ## Modules
 
@@ -35,6 +35,7 @@
 - `core/scan-dot.ts`
 - `core/structure-lint.ts`
 - `core/types.ts`
+- `core/validate.ts`
 
 ### editor
 
@@ -211,10 +212,11 @@ None. ✅
 - `NormalizedSvg` in `core/normalize-svg.ts`
 - `BalanceResult` in `core/scan-dot.ts`
 - `SpanKind` in `core/scan-dot.ts`
-- `StructuralDiagnostic` in `core/structure-lint.ts`
 - `DotVocabulary` in `core/types.ts`
 - `PdfPageMode` in `core/types.ts`
 - `PdfPageSize` in `core/types.ts`
+- `validateDiagram` in `core/validate.ts`
+- `DiagramDiagnostics` in `core/validate.ts`
 - `ParsedArgs` in `cli/args.ts`
 - `ParseError` in `cli/args.ts`
 - `rebuildAppMenu` in `electron/app-menu.ts`
@@ -279,6 +281,7 @@ None. ✅
 | `core/scan-dot.ts` | `test/core/scan-dot.test.ts` |
 | `core/structure-lint.ts` | `test/core/structure-lint.test.ts` |
 | `core/types.ts` | `test/editor/linting.test.ts`, `test/tabs/manager.test.ts` |
+| `core/validate.ts` | `test/core/validate-diagram.test.ts` |
 | `cli/args.ts` | `test/cli/args.test.ts` |
 | `cli/index.ts` | `test/cli/cli.integration.test.ts` |
 | `electron/app-menu.ts` | — |
