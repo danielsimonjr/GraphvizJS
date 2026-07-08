@@ -13,8 +13,11 @@ pnpm install                # Install dependencies
 pnpm dev                    # Frontend-only dev server (http://localhost:5173)
 pnpm build                  # TypeScript compile + Vite bundle
 pnpm build:cli              # Compile the headless graphvizjs CLI to dist-cli/
+pnpm build:icon             # Regenerate the app icon (scripts/render-icon.mjs)
 pnpm package                # Build distributable installer (electron-builder)
 pnpm graphvizjs -- ...      # Run the CLI from source via tsx (e.g. render g.dot -o o.svg)
+pnpm graph                  # Generate the module dependency graph (tools/dependency-graph/)
+pnpm graph:check            # Fail on dependency-graph rule violations (coverage/cycle guard)
 
 pnpm test                   # Unit tests (Vitest + happy-dom)
 pnpm test:watch             # Unit tests in watch mode
@@ -38,10 +41,11 @@ Run a single E2E test: `npx playwright test test/e2e/rendering.spec.ts`
 
 The app bootstraps on `DOMContentLoaded` via a single `bootstrap()` function that:
 1. Loads persisted window state and settings from electron-store
-2. Creates zoom controllers (preview + editor)
-3. Creates the `TabManager` and initial tab with a CodeMirror editor
-4. Silently restores the previously open session (`loadSession` — tabs, unsaved edits, and per-tab layout engine) instead of prompting for crash recovery
-5. Wires up the tab bar, toolbar actions, keyboard shortcuts, the layout-engine selector, and session persistence
+2. Applies the persisted color scheme early (before the heavy editor/tab init) to avoid a wrong-theme flash
+3. Creates zoom controllers (preview + editor)
+4. Creates the `TabManager` and initial tab with a CodeMirror editor
+5. Silently restores the previously open session (`loadSession` — tabs, unsaved edits, and per-tab layout engine) instead of prompting for crash recovery
+6. Wires up the tab bar, toolbar actions, keyboard shortcuts, the layout-engine selector, the command palette + preferences dialog, and session persistence
 
 The main process (not the renderer) initializes Graphviz. State is managed via a `TabManager` instance in `bootstrap()`. Each tab holds its own `TabState` (id, file path, dirty flag, last-committed and saved-content baselines, editor instance, editor zoom, and layout engine). The `commitDocument()` function delegates to the active tab. Only the active tab's editor is visible (others hidden via `display:none`).
 
@@ -54,7 +58,7 @@ Within `src/` (the renderer), each subdirectory exports setup functions that rec
 - **platform/** — the renderer↔main IPC boundary: `contract.ts` (the `GraphvizApi` interface exposed on `window.graphviz`) and `index.ts` (thin renderer-side wrappers, incl. `renderSvg`/`validateDot`/`exportRender`)
 - **editor/** — CodeMirror extensions: DOT grammar (`language.ts`), theme, font zoom, autocomplete + snippets (`autocomplete.ts`, `dot-data.ts`), find/replace (`search.ts`), formatting (`format.ts`), a literal-aware scanner (`scan-dot.ts`), and linting — `linting.ts` (validates via the `render:validate` IPC) plus local `structure-lint.ts`
 - **preview/** — debounced live preview (`render.ts`, renders via the `render:svg` IPC) and preview zoom (`zoom.ts`)
-- **toolbar/** — each action is a separate module (`new-diagram.ts`, `open-diagram.ts`, `save-diagram.ts`, `save-as.ts`, `export-diagram.ts` [calls `export:render`], `export-menu.ts`, `examples-menu.ts`, `recent-menu.ts`, `layout-engine.ts`, `find.ts`, `format.ts`, `pdf-options-dialog.ts`, `shortcuts.ts`), orchestrated by `actions.ts`
+- **toolbar/** — each action is a separate module (`new-diagram.ts`, `open-diagram.ts`, `save-diagram.ts`, `save-as.ts`, `export-diagram.ts` [calls `export:render`], `export-menu.ts`, `examples-menu.ts`, `recent-menu.ts`, `layout-engine.ts`, `find.ts`, `format.ts`, `pdf-options-dialog.ts`, `theme-button.ts`, `shortcuts.ts`), orchestrated by `actions.ts`
 - **tabs/** — multi-tab management: `manager.ts` (TabManager class, TabState interface), `tab-bar.ts` (tab bar UI + event delegation)
 - **session/** — silent session capture/restore/persist across launches (`session.ts`, the `session` store key)
 - **recent/** — recent-files list core (`recent-files.ts`)
@@ -62,6 +66,9 @@ Within `src/` (the renderer), each subdirectory exports setup functions that rec
 - **menu/** — native application menu: `menu-template.ts` (pure `buildMenuTemplate`) and `commands.ts` (dispatch for `menu:action`)
 - **workspace/** — horizontal resizable pane divider
 - **window/** — window position/size persistence via electron-store
+- **theme/** — color scheme (`color-scheme.ts`): `createColorSchemeController` owns the live `system`/`light`/`dark` preference (set/get/cycle, reacts to OS changes) atop pure helpers (`resolveDark`, `nextScheme`, `applyScheme` — toggles the `dark` body class that drives every dark CSS variable), persisted under the `colorScheme` store key. Set up first in `bootstrap()` to minimize a wrong-theme flash
+- **palette/** — command palette (`command-palette.ts`, Ctrl/Cmd+Shift+P): a registry of `Command`s filtered by a subsequence `fuzzyScore`
+- **preferences/** — preferences dialog (`preferences-dialog.ts`, Appearance → Theme)
 - **help/** — help dialog with shortcuts and app info (`dialog.ts`)
 - **autosave/** — legacy autosave constants only (`constants.ts`); the old draft-manager/recovery modules were replaced by `session/`
 - **utils/** — shared utilities (`debounce.ts`)
@@ -82,6 +89,10 @@ The Vite root is `src/` (not project root). HTML entry point is `src/index.html`
 ### CLI Distributable (`dist-cli/`)
 
 `pnpm build:cli` (`tsconfig.cli.json`) `tsc`-compiles `cli/` + `core/` to `dist-cli/` as real Node ESM — **not** bundled (bundling jsdom crashes on `__dirname`; the native `.node` binaries can't be inlined anyway). `bin.graphvizjs` → `dist-cli/cli/index.js` (shebang preserved by `tsc`), and `files: ["dist-cli"]` ships it in `npm pack`. Because the output runs under Node's own ESM loader, relative imports **within `cli/` and `core/` must carry explicit `.js` extensions** (NodeNext resolution) — these resolve identically under tsx, Vitest, and both Vite builds, so they don't affect the app. The natives/WASM/jsdom stay ordinary `dependencies`, resolved from `node_modules` at runtime (prebuilds install cross-platform). `test/cli/dist.integration.test.ts` builds and subprocess-runs the compiled binary as the durable guard.
+
+### Dependency Graph (`tools/dependency-graph/`)
+
+`pnpm graph` scans `src/`, `core/`, `cli/`, and `electron/` (via `tsx`), computes the module import graph, and renders JSON/Markdown/Mermaid to `docs/architecture/`. It also audits the architecture: layer violations, runtime import cycles, unused exports, and IPC channel integrity (every `render:*`/`export:render` call has a matching handler and contract entry — no orphans, no missing handlers). `pnpm graph:check` (used as a CI guard) exits non-zero on any *hard* violation (`hardViolationCount`: layer breaks, runtime cycles, broken IPC) so architectural drift fails the build. `--impact <file>` reports the transitive reverse-dependency set of a file.
 
 ## Testing
 
@@ -112,3 +123,7 @@ Version is maintained in `package.json` → `"version"`.
 **New example diagram**: Add numbered `.dot` file to `src/examples/` (e.g., `08-cluster.dot`), add menu item in `src/index.html` under `[data-menu="examples"]`. Auto-loaded via Vite glob import.
 
 **New export format**: Add to the `ExportFormat` type in `core/types.ts` (and the `export-menu.ts` menu type), add the HTML menu item, handle the format in `core/export.ts` (`exportDiagram`), and wire the menu action in `src/toolbar/export-diagram.ts` (which calls the `export:render` IPC). The renderer never renders/exports directly.
+
+**New command palette entry**: Push a `Command` (`id`, `label`, optional `group`, `run`) onto the `paletteCommands` array in `bootstrap()` (`src/main.ts`). Route user-facing actions through `menuHandlers` so the palette, native menu, and keybindings share one dispatch path rather than duplicating logic.
+
+**New IPC channel**: Add the method to `GraphvizApi` in `src/platform/contract.ts`, expose it in `electron/preload.ts`, register the main-process handler, and wrap it in `src/platform/index.ts`. `pnpm graph:check` fails on any orphan handler / missing handler / missing-contract mismatch, so all four must line up.
