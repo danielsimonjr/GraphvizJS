@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 63,
+    "fileCount": 60,
     "moduleCount": 21,
-    "totalLoc": 6793,
-    "edgeCount": 112,
-    "exportCount": 191
+    "totalLoc": 6200,
+    "edgeCount": 108,
+    "exportCount": 179
   },
   "modules": {
     "autosave": [
@@ -13,12 +13,9 @@
     "editor": [
       "src/editor/autocomplete.ts",
       "src/editor/dot-data.ts",
-      "src/editor/format.ts",
       "src/editor/language.ts",
       "src/editor/linting.ts",
-      "src/editor/scan-dot.ts",
       "src/editor/search.ts",
-      "src/editor/structure-lint.ts",
       "src/editor/theme.ts",
       "src/editor/zoom.ts"
     ],
@@ -198,28 +195,8 @@
     "dormantFiles": [],
     "unusedExports": [
       {
-        "file": "src/editor/format.ts",
-        "name": "FormatOptions"
-      },
-      {
         "file": "src/editor/linting.ts",
         "name": "DotLinterOptions"
-      },
-      {
-        "file": "src/editor/scan-dot.ts",
-        "name": "BalanceResult"
-      },
-      {
-        "file": "src/editor/scan-dot.ts",
-        "name": "SpanKind"
-      },
-      {
-        "file": "src/editor/structure-lint.ts",
-        "name": "createStructureLintSource"
-      },
-      {
-        "file": "src/editor/structure-lint.ts",
-        "name": "StructuralDiagnostic"
       },
       {
         "file": "src/preferences/preferences-dialog.ts",
@@ -375,12 +352,6 @@
       ]
     },
     {
-      "file": "src/editor/format.ts",
-      "testFiles": [
-        "test/editor/format.test.ts"
-      ]
-    },
-    {
       "file": "src/editor/language.ts",
       "testFiles": [
         "test/editor/language.test.ts"
@@ -393,21 +364,9 @@
       ]
     },
     {
-      "file": "src/editor/scan-dot.ts",
-      "testFiles": [
-        "test/editor/scan-dot.test.ts"
-      ]
-    },
-    {
       "file": "src/editor/search.ts",
       "testFiles": [
         "test/editor/search.test.ts"
-      ]
-    },
-    {
-      "file": "src/editor/structure-lint.ts",
-      "testFiles": [
-        "test/editor/structure-lint.test.ts"
       ]
     },
     {
@@ -640,6 +599,7 @@
       "testFiles": [
         "test/core/dot-vocab.test.ts",
         "test/editor/autocomplete.test.ts",
+        "test/editor/dot-data.test.ts",
         "test/editor/language.test.ts"
       ]
     },
@@ -900,21 +860,11 @@
     },
     {
       "path": "src/editor/dot-data.ts",
-      "loc": 294,
+      "loc": 124,
       "exports": [
-        "DOT_KEYWORDS",
-        "DOT_ATTRIBUTES",
         "DOT_ATTR_VALUES",
         "DOT_COLORS",
         "isColorAttribute"
-      ]
-    },
-    {
-      "path": "src/editor/format.ts",
-      "loc": 158,
-      "exports": [
-        "formatDot",
-        "FormatOptions"
       ]
     },
     {
@@ -934,30 +884,10 @@
       ]
     },
     {
-      "path": "src/editor/scan-dot.ts",
-      "loc": 149,
-      "exports": [
-        "scanDot",
-        "checkBalance",
-        "Span",
-        "BalanceResult",
-        "SpanKind"
-      ]
-    },
-    {
       "path": "src/editor/search.ts",
       "loc": 7,
       "exports": [
         "createSearch"
-      ]
-    },
-    {
-      "path": "src/editor/structure-lint.ts",
-      "loc": 116,
-      "exports": [
-        "structuralDiagnostics",
-        "createStructureLintSource",
-        "StructuralDiagnostic"
       ]
     },
     {

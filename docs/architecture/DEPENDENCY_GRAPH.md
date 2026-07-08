@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 63 |
+| Files | 60 |
 | Modules | 21 |
-| Lines of code | 6793 |
-| Internal edges | 112 |
-| Exports | 191 |
+| Lines of code | 6200 |
+| Internal edges | 108 |
+| Exports | 179 |
 
 ## Modules
 
@@ -41,12 +41,9 @@
 
 - `src/editor/autocomplete.ts`
 - `src/editor/dot-data.ts`
-- `src/editor/format.ts`
 - `src/editor/language.ts`
 - `src/editor/linting.ts`
-- `src/editor/scan-dot.ts`
 - `src/editor/search.ts`
-- `src/editor/structure-lint.ts`
 - `src/editor/theme.ts`
 - `src/editor/zoom.ts`
 
@@ -178,12 +175,7 @@ None. ✅
 **Dormant files** (imported only within clusters unreachable from any entry): none ✅
 
 **Unused exports:**
-- `FormatOptions` in `src/editor/format.ts`
 - `DotLinterOptions` in `src/editor/linting.ts`
-- `BalanceResult` in `src/editor/scan-dot.ts`
-- `SpanKind` in `src/editor/scan-dot.ts`
-- `createStructureLintSource` in `src/editor/structure-lint.ts`
-- `StructuralDiagnostic` in `src/editor/structure-lint.ts`
 - `PreferencesDialogOptions` in `src/preferences/preferences-dialog.ts`
 - `PreferencesDialog` in `src/preferences/preferences-dialog.ts`
 - `PreviewStatusCallbacks` in `src/preview/render.ts`
@@ -225,12 +217,9 @@ None. ✅
 | `src/autosave/constants.ts` | `test/session/session.test.ts` |
 | `src/editor/autocomplete.ts` | `test/editor/autocomplete.test.ts` |
 | `src/editor/dot-data.ts` | `test/editor/dot-data.test.ts` |
-| `src/editor/format.ts` | `test/editor/format.test.ts` |
 | `src/editor/language.ts` | `test/editor/language.test.ts` |
 | `src/editor/linting.ts` | `test/editor/linting.test.ts` |
-| `src/editor/scan-dot.ts` | `test/editor/scan-dot.test.ts` |
 | `src/editor/search.ts` | `test/editor/search.test.ts` |
-| `src/editor/structure-lint.ts` | `test/editor/structure-lint.test.ts` |
 | `src/editor/theme.ts` | `test/editor/theme.test.ts` |
 | `src/editor/zoom.ts` | `test/editor/zoom.test.ts` |
 | `src/help/dialog.ts` | `test/help/dialog.test.ts` |
@@ -268,7 +257,7 @@ None. ✅
 | `src/watch/watch-plan.ts` | `test/watch/watch-plan.test.ts` |
 | `src/window/state.ts` | `test/window/state.test.ts` |
 | `src/workspace/resize.ts` | `test/workspace/resize.test.ts` |
-| `core/dot-vocab.ts` | `test/core/dot-vocab.test.ts`, `test/editor/autocomplete.test.ts`, `test/editor/language.test.ts` |
+| `core/dot-vocab.ts` | `test/core/dot-vocab.test.ts`, `test/editor/autocomplete.test.ts`, `test/editor/dot-data.test.ts`, `test/editor/language.test.ts` |
 | `core/export-pdf.ts` | `test/core/export-pdf.test.ts` |
 | `core/export-png.ts` | `test/core/export-png.test.ts` |
 | `core/export.ts` | `test/core/export.test.ts` |
