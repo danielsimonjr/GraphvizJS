@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 62,
+    "fileCount": 63,
     "moduleCount": 21,
-    "totalLoc": 6527,
-    "edgeCount": 111,
-    "exportCount": 186
+    "totalLoc": 6572,
+    "edgeCount": 112,
+    "exportCount": 188
   },
   "modules": {
     "autosave": [
@@ -86,6 +86,7 @@
       "src/workspace/resize.ts"
     ],
     "core": [
+      "core/apply-fixes.ts",
       "core/dot-catalog.ts",
       "core/dot-colors.ts",
       "core/dot-vocab.ts",
@@ -600,6 +601,12 @@
       "file": "src/workspace/resize.ts",
       "testFiles": [
         "test/workspace/resize.test.ts"
+      ]
+    },
+    {
+      "file": "core/apply-fixes.ts",
+      "testFiles": [
+        "test/core/apply-fixes.test.ts"
       ]
     },
     {
@@ -1257,6 +1264,13 @@
       ]
     },
     {
+      "path": "core/apply-fixes.ts",
+      "loc": 33,
+      "exports": [
+        "applyFixes"
+      ]
+    },
+    {
       "path": "core/dot-catalog.ts",
       "loc": 185,
       "exports": [
@@ -1360,12 +1374,13 @@
     },
     {
       "path": "core/types.ts",
-      "loc": 82,
+      "loc": 94,
       "exports": [
         "DotValidationError",
         "PdfExportOptions",
         "ExportResult",
         "DotVocabulary",
+        "DiagnosticFix",
         "StructuralDiagnostic",
         "DiagramDiagnostics",
         "LayoutEngine",

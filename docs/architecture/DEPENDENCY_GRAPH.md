@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 62 |
+| Files | 63 |
 | Modules | 21 |
-| Lines of code | 6527 |
-| Internal edges | 111 |
-| Exports | 186 |
+| Lines of code | 6572 |
+| Internal edges | 112 |
+| Exports | 188 |
 
 ## Modules
 
@@ -25,6 +25,7 @@
 
 ### core
 
+- `core/apply-fixes.ts`
 - `core/dot-catalog.ts`
 - `core/dot-colors.ts`
 - `core/dot-vocab.ts`
@@ -261,6 +262,7 @@ None. ✅
 | `src/watch/watch-plan.ts` | `test/watch/watch-plan.test.ts` |
 | `src/window/state.ts` | `test/window/state.test.ts` |
 | `src/workspace/resize.ts` | `test/workspace/resize.test.ts` |
+| `core/apply-fixes.ts` | `test/core/apply-fixes.test.ts` |
 | `core/dot-catalog.ts` | `test/core/dot-catalog.test.ts`, `test/editor/autocomplete.test.ts` |
 | `core/dot-colors.ts` | `test/core/dot-colors.test.ts`, `test/editor/autocomplete.test.ts` |
 | `core/dot-vocab.ts` | `test/core/dot-catalog.test.ts`, `test/core/dot-vocab.test.ts`, `test/editor/autocomplete.test.ts`, `test/editor/language.test.ts` |
