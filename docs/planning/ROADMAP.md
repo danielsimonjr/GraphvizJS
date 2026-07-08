@@ -14,6 +14,9 @@ dependency-graph tool). Delivered so far:
 - Graphviz WebAssembly rendering with a debounced live preview and friendly error feedback
 - DOT syntax highlighting, autocomplete (keywords, attributes, value enums) and snippets
 - Inline linting — Graphviz syntax errors **and** structural warnings (delimiter balance, unknown attributes)
+- Semantic lint + quick fixes — invalid attribute values, invalid colors, wrong-context attributes,
+  "did you mean `shape`?" typo suggestions, duplicate-attribute and undefined-cluster checks; one-click
+  fixes in the editor and via `graphvizjs validate --fix`
 - Format Document (reindent + spacing) — Shift+Alt+F
 - All Graphviz layout engines, selectable per tab
 - Editor font zoom and preview zoom; resizable editor/preview panes
@@ -54,9 +57,9 @@ intelligence**, not more text features. Ranked by leverage.
 Each item is split by the **logic-vs-presentation seam** (see
 [`.claude/CLAUDE.md` → Adding Features](../../.claude/CLAUDE.md)): the *logic* part is
 built core-first with a CLI surface and tests; the *presentation* part is renderer-only.
-Sequencing preference: build the pure-logic items first (semantic lint, graph
-intelligence — ~100% core, perfect workflow fit), then the node↔source map as the shared
-foundation for the hybrid features.
+Sequencing preference: build the pure-logic items first (graph intelligence — ~100% core,
+perfect workflow fit — semantic lint already shipped), then the node↔source map as the
+shared foundation for the hybrid features.
 
 ### Tier 1 — the differentiators
 - **Source ↔ preview sync** — click a rendered node → jump to its source line; cursor on a
@@ -73,9 +76,10 @@ foundation for the hybrid features.
   exposed via CLI `complete --at N` / `attr-info`. *UI:* the popup/tooltip.
 
 ### Tier 2 — correctness & confidence
-- **Semantic lint + quick fixes** — invalid attribute *values*, wrong-context attributes,
-  deprecated attrs, "did you mean `shape`?" typo fixes, duplicate/undefined node & cluster
-  checks, color validation. ~100% core — a new `validate` verb on the existing oracle.
+
+Semantic lint (invalid values, wrong-context attributes, typo fixes, duplicate/undefined
+node & cluster checks, color validation) has shipped — see [Shipped](#shipped) above.
+Remaining: deprecated-attribute warnings.
 
 ### Tier 3 — lowering the barrier (for non-experts)
 - **Attribute inspector / property panel** — select a node → a form (shape dropdown, inline

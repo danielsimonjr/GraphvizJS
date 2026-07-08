@@ -23,7 +23,7 @@ GraphvizJS is a layered Electron app with a headless core. File counts per modul
 
 ```
 ┌───────────────────────────────────────────────────────────────┐
-│  core/         │  Graphviz + DOT language tooling (11 files)   │
+│  core/         │  Graphviz + DOT language tooling (16 files)   │
 ├───────────────────────────────────────────────────────────────┤
 │  cli/          │  graphvizjs binary (2 files)                  │
 ├───────────────────────────────────────────────────────────────┤
@@ -42,7 +42,7 @@ GraphvizJS is a layered Electron app with a headless core. File counts per modul
 └───────────────────────────────────────────────────────────────┘
 ```
 
-**Total:** 60 TypeScript files · 6,346 LOC · 21 modules · 180 exports · 19 IPC channels.
+**Total:** 64 TypeScript files · 6,948 LOC · 21 modules · 189 exports · 19 IPC channels.
 
 ---
 
@@ -69,14 +69,16 @@ into `{ message, line?, column? }` (handles `in line N`, `line N:`, `:N:M:` form
 ### validate.ts (`core/validate.ts`)
 
 **Purpose**: the oracle — combines Graphviz syntax validation with pure structural
-analysis.
+and semantic analysis.
 
 ```typescript
 interface DiagramDiagnostics { syntax: DotValidationError | null; structural: StructuralDiagnostic[]; }
 async function validateDiagram(source: string, engine?: LayoutEngine): Promise<DiagramDiagnostics>
 ```
 
-Consumed by the CLI `validate` command and the `render:validate` IPC handler.
+`structural` is `structuralDiagnostics(source)` concatenated with
+`semanticDiagnostics(source)`. Consumed by the CLI `validate` command and the
+`render:validate` IPC handler.
 
 ### structure-lint.ts (`core/structure-lint.ts`)
 
@@ -84,9 +86,13 @@ Consumed by the CLI `validate` command and the `render:validate` IPC handler.
 checks over code spans (literals are skipped via the scanner).
 
 ```typescript
-interface StructuralDiagnostic { from: number; to: number; severity: 'error' | 'warning'; message: string; }
+interface StructuralDiagnostic { from: number; to: number; severity: 'error' | 'warning'; message: string; code?: string; fix?: DiagnosticFix; }
 function structuralDiagnostics(source: string): StructuralDiagnostic[]
 ```
+
+`code` is a stable rule identifier and `fix` an optional `DiagnosticFix` (`{ from, to,
+text, label }`) applied by `core/apply-fixes.ts`; both are populated by
+`semantic-lint.ts`'s checks (see below).
 
 ### scan-dot.ts (`core/scan-dot.ts`)
 
@@ -110,6 +116,10 @@ const DOT_KEYWORDS: readonly string[]     // graph, digraph, subgraph, node, edg
 const DOT_ATTRIBUTES: readonly string[]   // shape, label, color, rankdir, …
 ```
 
+The `dot:vocabulary` IPC handler pairs these with `dot-catalog.ts`'s enum value
+domains (`attributeValues`) and `dot-colors.ts`'s `DOT_COLORS` (`colors`), so
+autocomplete can offer value-aware completions.
+
 ### format.ts (`core/format.ts`)
 
 **Purpose**: pure DOT reformatter — reindent by brace depth and normalize `->`/`--`
@@ -119,6 +129,65 @@ input unchanged on unbalanced delimiters).
 ```typescript
 interface FormatOptions { indent?: string; }
 function formatDot(source: string, opts?: FormatOptions): string
+```
+
+### dot-catalog.ts (`core/dot-catalog.ts`)
+
+**Purpose**: the DOT attribute catalog — per-attribute statement contexts (`graph` /
+`node` / `edge` / `cluster` / `subgraph`), value type, and (for `enum` attributes) the
+value domain, transcribed from the canonical Graphviz attrs table. Shared foundation
+for semantic lint and the `dot:vocabulary` IPC's `attributeValues`.
+
+```typescript
+type AttrContext = 'graph' | 'node' | 'edge' | 'cluster' | 'subgraph';
+interface DotAttributeSpec { name: string; contexts: AttrContext[]; type: AttrType; values?: string[]; default?: string; }
+const DOT_ATTRIBUTE_CATALOG: readonly DotAttributeSpec[]
+function findAttribute(name: string): DotAttributeSpec | undefined
+```
+
+### dot-colors.ts (`core/dot-colors.ts`)
+
+**Purpose**: the named-color domain accepted by color-valued attributes, plus the set
+of attributes that are color-typed.
+
+```typescript
+const DOT_COLORS: readonly string[]
+function isColorAttribute(attr: string): boolean
+```
+
+### edit-distance.ts (`core/edit-distance.ts`)
+
+**Purpose**: bounded string-similarity helpers powering "did you mean" typo
+suggestions (unknown attribute names, invalid enum/color values).
+
+```typescript
+function editDistance(a: string, b: string): number   // Levenshtein
+function nearest(word: string, candidates: readonly string[], maxDistance?: number): string | undefined
+```
+
+### semantic-lint.ts (`core/semantic-lint.ts`)
+
+**Purpose**: semantic diagnostics over an attribute list's `name=value` entries —
+invalid enum values, invalid colors, wrong-context attributes, duplicate attributes
+within one list, and `lhead`/`ltail` references to an undefined cluster/subgraph.
+Scans only `code` spans (via `scanDot`), so quoted-string/HTML-label values are
+naturally exempt — a safe false-negative, never a false-positive on valid DOT.
+
+```typescript
+function semanticDiagnostics(source: string): StructuralDiagnostic[]
+```
+
+Folded into `validate.ts`'s `validateDiagram` alongside `structuralDiagnostics`.
+
+### apply-fixes.ts (`core/apply-fixes.ts`)
+
+**Purpose**: applies the `fix` attached to a set of diagnostics to source text —
+overlapping fixes are dropped (earliest-starting wins), accepted fixes applied
+right-to-left so earlier offsets stay valid. Backs the editor's quick-fix code
+actions and the CLI's `validate --fix`.
+
+```typescript
+function applyFixes(source: string, diagnostics: StructuralDiagnostic[]): string
 ```
 
 ### export.ts / export-png.ts / export-pdf.ts / normalize-svg.ts
@@ -136,9 +205,14 @@ async function exportDiagram(dot: string, engine: LayoutEngine, format: ExportFo
 ### types.ts (`core/types.ts`)
 
 **Purpose**: shared value types crossing the IPC boundary — `LayoutEngine`,
-`ExportFormat`, `DotValidationError`, `StructuralDiagnostic`, `DiagramDiagnostics`,
-`DotVocabulary`, `PdfExportOptions`, `ExportResult`. **The only `core/` module the
-renderer may type-only import.**
+`ExportFormat`, `DotValidationError`, `StructuralDiagnostic`, `DiagnosticFix`,
+`DiagramDiagnostics`, `DotVocabulary`, `PdfExportOptions`, `ExportResult`. **The only
+`core/` module the renderer may type-only import.**
+
+```typescript
+interface DiagnosticFix { from: number; to: number; text: string; label: string; }
+interface DotVocabulary { keywords: string[]; attributes: string[]; attributeValues: Record<string, string[]>; colors: string[]; }
+```
 
 ---
 
@@ -153,7 +227,7 @@ interface ParsedArgs {
   command: 'render' | 'validate' | 'format' | 'help' | 'version';
   input?: string; output?: string; engine: LayoutEngine;
   format?: 'svg' | 'png' | 'pdf'; scale: 1 | 2; pdf: PdfExportOptions;
-  json?: boolean; strict?: boolean;   // validate only
+  json?: boolean; strict?: boolean; fix?: boolean;   // validate only
 }
 function parseArgs(argv: string[]): ParsedArgs | ParseError
 ```
@@ -167,8 +241,10 @@ async function main(argv: string[]): Promise<number>   // exit code: 0 ok, 1 fai
 function offsetToLineCol(source: string, offset: number): { line: number; column: number }
 ```
 
-`validate` prints human diagnostics or `--json`, deriving line/column for structural
-findings via `offsetToLineCol`. See [API.md](./API.md).
+`validate` prints human diagnostics or `--json` (each structural finding including its
+`code`/`fix`), deriving line/column via `offsetToLineCol`. `validate --fix` instead
+runs the diagnostics through `core/apply-fixes.ts`'s `applyFixes` and writes the
+corrected source to `-o <path>` or stdout. See [API.md](./API.md).
 
 ---
 
@@ -181,8 +257,9 @@ native menu/watcher.
 
 ```typescript
 function registerIpc(): void
-// render:svg → renderDotToSvg · render:validate → validateDiagram
-// export:render → exportDiagram · dot:format → formatDot · dot:vocabulary → vocab
+// render:svg → renderDotToSvg · render:validate → validateDiagram (incl. semantic lint)
+// export:render → exportDiagram · dot:format → formatDot
+// dot:vocabulary → keywords/attributes + attributeValues (dot-catalog) + colors (dot-colors)
 // fs:readText/writeText/writeBinary · dialog:openText/save/confirm
 // store:get/set/delete · shell:openExternal · app:info
 // menu:setRecent/setTheme · watch:setPaths
@@ -235,7 +312,10 @@ function createSearch(): Extension                                  // search.ts
 ```
 
 `linting.ts` maps both `syntax` (line/column) and `structural` (character offsets)
-from one `validateDiagram` call into CodeMirror `Diagnostic`s.
+from one `validateDiagram` call into CodeMirror `Diagnostic`s. A structural finding
+with a `fix` gets a CodeMirror quick-fix `action` that dispatches the fix's
+`from`/`to`/`text` replacement — the same `DiagnosticFix` shape `core/apply-fixes.ts`
+consumes for `validate --fix`.
 
 ### preview/ (`src/preview/`)
 
