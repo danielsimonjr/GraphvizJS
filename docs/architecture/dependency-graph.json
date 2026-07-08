@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 63,
+    "fileCount": 64,
     "moduleCount": 21,
-    "totalLoc": 6572,
-    "edgeCount": 112,
-    "exportCount": 188
+    "totalLoc": 6710,
+    "edgeCount": 117,
+    "exportCount": 189
   },
   "modules": {
     "autosave": [
@@ -98,6 +98,7 @@
       "core/normalize-svg.ts",
       "core/render.ts",
       "core/scan-dot.ts",
+      "core/semantic-lint.ts",
       "core/structure-lint.ts",
       "core/types.ts",
       "core/validate.ts"
@@ -685,6 +686,12 @@
       "file": "core/scan-dot.ts",
       "testFiles": [
         "test/core/scan-dot.test.ts"
+      ]
+    },
+    {
+      "file": "core/semantic-lint.ts",
+      "testFiles": [
+        "test/core/semantic-lint.test.ts"
       ]
     },
     {
@@ -1363,6 +1370,13 @@
         "Span",
         "BalanceResult",
         "SpanKind"
+      ]
+    },
+    {
+      "path": "core/semantic-lint.ts",
+      "loc": 138,
+      "exports": [
+        "semanticDiagnostics"
       ]
     },
     {

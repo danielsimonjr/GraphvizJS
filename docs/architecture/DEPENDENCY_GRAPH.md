@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 63 |
+| Files | 64 |
 | Modules | 21 |
-| Lines of code | 6572 |
-| Internal edges | 112 |
-| Exports | 188 |
+| Lines of code | 6710 |
+| Internal edges | 117 |
+| Exports | 189 |
 
 ## Modules
 
@@ -37,6 +37,7 @@
 - `core/normalize-svg.ts`
 - `core/render.ts`
 - `core/scan-dot.ts`
+- `core/semantic-lint.ts`
 - `core/structure-lint.ts`
 - `core/types.ts`
 - `core/validate.ts`
@@ -274,6 +275,7 @@ None. ✅
 | `core/normalize-svg.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts` |
 | `core/render.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts`, `test/core/render.test.ts`, `test/core/validate.test.ts` |
 | `core/scan-dot.ts` | `test/core/scan-dot.test.ts` |
+| `core/semantic-lint.ts` | `test/core/semantic-lint.test.ts` |
 | `core/structure-lint.ts` | `test/core/structure-lint.test.ts` |
 | `core/types.ts` | `test/editor/linting.test.ts`, `test/tabs/manager.test.ts` |
 | `core/validate.ts` | `test/core/validate-diagram.test.ts` |
