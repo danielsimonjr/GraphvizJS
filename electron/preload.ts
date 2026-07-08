@@ -29,6 +29,7 @@ const api: GraphvizApi = {
   setMenuTheme: (scheme) => ipcRenderer.invoke('menu:setTheme', scheme),
   renderSvg: (dot, engine) => ipcRenderer.invoke('render:svg', dot, engine),
   validateDot: (dot, engine) => ipcRenderer.invoke('render:validate', dot, engine),
+  formatDot: (source) => ipcRenderer.invoke('dot:format', source),
   exportRender: (dot, engine, format, options) =>
     ipcRenderer.invoke('export:render', dot, engine, format, options),
 };

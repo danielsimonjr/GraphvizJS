@@ -2,9 +2,9 @@
   "stats": {
     "fileCount": 63,
     "moduleCount": 21,
-    "totalLoc": 6745,
-    "edgeCount": 108,
-    "exportCount": 190
+    "totalLoc": 6753,
+    "edgeCount": 109,
+    "exportCount": 191
   },
   "modules": {
     "autosave": [
@@ -781,6 +781,13 @@
         "hasHandler": true
       },
       {
+        "channel": "dot:format",
+        "method": "formatDot",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
         "channel": "export:render",
         "method": "exportRender",
         "hasContract": true,
@@ -1018,7 +1025,7 @@
     },
     {
       "path": "src/platform/contract.ts",
-      "loc": 48,
+      "loc": 49,
       "exports": [
         "DiagramFilter",
         "OpenedFile",
@@ -1028,7 +1035,7 @@
     },
     {
       "path": "src/platform/index.ts",
-      "loc": 89,
+      "loc": 93,
       "exports": [
         "store",
         "openTextFile",
@@ -1046,6 +1053,7 @@
         "setMenuTheme",
         "renderSvg",
         "validateDot",
+        "formatDot",
         "exportRender",
         "PlatformStore"
       ]
@@ -1435,12 +1443,12 @@
     },
     {
       "path": "electron/main.ts",
-      "loc": 221,
+      "loc": 223,
       "exports": []
     },
     {
       "path": "electron/preload.ts",
-      "loc": 36,
+      "loc": 37,
       "exports": []
     }
   ]

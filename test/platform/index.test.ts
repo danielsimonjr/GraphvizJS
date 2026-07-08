@@ -12,6 +12,7 @@ const api = {
   confirm: vi.fn(),
   openExternal: vi.fn(),
   appInfo: vi.fn(),
+  formatDot: vi.fn(),
 };
 
 beforeEach(() => {
@@ -77,5 +78,12 @@ describe('platform', () => {
     const result = await platform.appInfo();
     expect(api.appInfo).toHaveBeenCalled();
     expect(result).toEqual({ name: 'GraphvizJS', version: '1.2.3' });
+  });
+
+  it('formatDot delegates the source and returns formatted DOT', async () => {
+    api.formatDot.mockResolvedValue('digraph {\n  a -> b\n}\n');
+    const result = await platform.formatDot('digraph{a->b}');
+    expect(api.formatDot).toHaveBeenCalledWith('digraph{a->b}');
+    expect(result).toBe('digraph {\n  a -> b\n}\n');
   });
 });

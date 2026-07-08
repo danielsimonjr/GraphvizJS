@@ -79,6 +79,10 @@ export function validateDot(dot: string, engine: LayoutEngine): Promise<DotValid
   return window.graphviz.validateDot(dot, engine);
 }
 
+export function formatDot(source: string): Promise<string> {
+  return window.graphviz.formatDot(source);
+}
+
 export function exportRender(
   dot: string,
   engine: LayoutEngine,

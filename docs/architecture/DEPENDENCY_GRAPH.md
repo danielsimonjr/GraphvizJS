@@ -8,9 +8,9 @@
 | --- | --- |
 | Files | 63 |
 | Modules | 21 |
-| Lines of code | 6745 |
-| Internal edges | 108 |
-| Exports | 190 |
+| Lines of code | 6753 |
+| Internal edges | 109 |
+| Exports | 191 |
 
 ## Modules
 
@@ -297,6 +297,7 @@ None. ✅
 | `dialog:confirm` | confirm | ✅ wired |
 | `dialog:openText` | openTextFile | ✅ wired |
 | `dialog:save` | pickSavePath | ✅ wired |
+| `dot:format` | formatDot | ✅ wired |
 | `export:render` | exportRender | ✅ wired |
 | `fs:readText` | readTextFile | ✅ wired |
 | `fs:writeBinary` | writeBinaryFile | ✅ wired |

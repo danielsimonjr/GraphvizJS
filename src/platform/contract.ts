@@ -39,6 +39,7 @@ export interface GraphvizApi {
   setMenuTheme(scheme: string): Promise<void>;
   renderSvg(dot: string, engine: LayoutEngine): Promise<string>;
   validateDot(dot: string, engine: LayoutEngine): Promise<DotValidationError | null>;
+  formatDot(source: string): Promise<string>;
   exportRender(
     dot: string,
     engine: LayoutEngine,

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, dialog, ipcMain, screen, shell } from 'electron';
 import Store from 'electron-store';
 import { exportDiagram } from '../core/export';
+import { formatDot } from '../core/format';
 import { initGraphviz, renderDotToSvg, validateDot } from '../core/render';
 import type { ExportFormat, LayoutEngine, PdfExportOptions } from '../core/types';
 import type { ConfirmOptions, DiagramFilter } from '../src/platform/contract';
@@ -198,6 +199,7 @@ function registerIpc(): void {
       options?: PdfExportOptions
     ) => (await exportDiagram(dot, engine, format, options)).bytes
   );
+  ipcMain.handle('dot:format', (_e, source: string) => formatDot(source));
 }
 
 app.whenReady().then(() => {
