@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 58,
+    "fileCount": 59,
     "moduleCount": 21,
-    "totalLoc": 6133,
+    "totalLoc": 6282,
     "edgeCount": 101,
-    "exportCount": 176
+    "exportCount": 181
   },
   "modules": {
     "autosave": [
@@ -95,6 +95,7 @@
       "core/export.ts",
       "core/normalize-svg.ts",
       "core/render.ts",
+      "core/scan-dot.ts",
       "core/types.ts"
     ],
     "cli": [
@@ -316,6 +317,18 @@
       {
         "file": "core/normalize-svg.ts",
         "name": "NormalizedSvg"
+      },
+      {
+        "file": "core/scan-dot.ts",
+        "name": "Span"
+      },
+      {
+        "file": "core/scan-dot.ts",
+        "name": "BalanceResult"
+      },
+      {
+        "file": "core/scan-dot.ts",
+        "name": "SpanKind"
       },
       {
         "file": "core/types.ts",
@@ -653,6 +666,12 @@
         "test/core/normalize-svg.test.ts",
         "test/core/render.test.ts",
         "test/core/validate.test.ts"
+      ]
+    },
+    {
+      "file": "core/scan-dot.ts",
+      "testFiles": [
+        "test/core/scan-dot.test.ts"
       ]
     },
     {
@@ -1281,6 +1300,17 @@
         "renderDotToSvg",
         "isGraphvizReady",
         "validateDot"
+      ]
+    },
+    {
+      "path": "core/scan-dot.ts",
+      "loc": 149,
+      "exports": [
+        "scanDot",
+        "checkBalance",
+        "Span",
+        "BalanceResult",
+        "SpanKind"
       ]
     },
     {

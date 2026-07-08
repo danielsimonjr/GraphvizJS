@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 58 |
+| Files | 59 |
 | Modules | 21 |
-| Lines of code | 6133 |
+| Lines of code | 6282 |
 | Internal edges | 101 |
-| Exports | 176 |
+| Exports | 181 |
 
 ## Modules
 
@@ -30,6 +30,7 @@
 - `core/export.ts`
 - `core/normalize-svg.ts`
 - `core/render.ts`
+- `core/scan-dot.ts`
 - `core/types.ts`
 
 ### editor
@@ -204,6 +205,9 @@ None. ✅
 - `FileWatchOptions` in `src/watch/file-watch.ts`
 - `PageGeometry` in `core/export-pdf.ts`
 - `NormalizedSvg` in `core/normalize-svg.ts`
+- `Span` in `core/scan-dot.ts`
+- `BalanceResult` in `core/scan-dot.ts`
+- `SpanKind` in `core/scan-dot.ts`
 - `PdfPageMode` in `core/types.ts`
 - `PdfPageSize` in `core/types.ts`
 - `ParsedArgs` in `cli/args.ts`
@@ -265,6 +269,7 @@ None. ✅
 | `core/export.ts` | `test/core/export.test.ts` |
 | `core/normalize-svg.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts` |
 | `core/render.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts`, `test/core/render.test.ts`, `test/core/validate.test.ts` |
+| `core/scan-dot.ts` | `test/core/scan-dot.test.ts` |
 | `core/types.ts` | `test/editor/linting.test.ts`, `test/tabs/manager.test.ts` |
 | `cli/args.ts` | `test/cli/args.test.ts` |
 | `cli/index.ts` | `test/cli/cli.integration.test.ts` |
