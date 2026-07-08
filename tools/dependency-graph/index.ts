@@ -1,5 +1,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import {
   computeImpact,
   computeStats,
@@ -193,7 +194,9 @@ export function main(argv: string[]): void {
   }
 }
 
-// Run when invoked directly (tsx tools/dependency-graph/index.ts).
-if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith('index.ts')) {
+// Run when invoked directly (tsx tools/dependency-graph/index.ts), NOT when imported
+// (e.g. by tools/docs-check). Compare resolved file:// URLs so this is robust on
+// Windows drive-letter paths and does not fire for other entry files named index.ts.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main(process.argv.slice(2));
 }
