@@ -4,11 +4,30 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { exportDiagram } from '../core/export.js';
 import type { ExportFormat } from '../core/types.js';
+import { validateDiagram } from '../core/validate.js';
 import { parseArgs } from './args.js';
 
 const USAGE = `graphvizjs render <input.dot|-> -o <output> [--engine E] [--format svg|png|pdf]
   [--scale 1|2] [--pdf-page fit|letter|a4] [--pdf-orientation auto|portrait|landscape]
+graphvizjs validate <input.dot|-> [--engine E] [--json] [--strict]
+graphvizjs format <input.dot|-> [-o <output>]
 graphvizjs --help | --version`;
+
+/** 1-based line/column for a 0-based character offset into `source`. */
+export function offsetToLineCol(source: string, offset: number): { line: number; column: number } {
+  let line = 1;
+  let column = 1;
+  const end = Math.min(offset, source.length);
+  for (let i = 0; i < end; i++) {
+    if (source[i] === '\n') {
+      line++;
+      column = 1;
+    } else {
+      column++;
+    }
+  }
+  return { line, column };
+}
 
 /**
  * Read this package's version from the nearest ancestor package.json. Walking up
@@ -54,6 +73,46 @@ export async function main(argv: string[]): Promise<number> {
   if (parsed.command === 'version') {
     process.stdout.write(`graphvizjs ${await readPackageVersion()}\n`);
     return 0;
+  }
+  if (parsed.command === 'validate') {
+    try {
+      const dot = await readInput(parsed.input!);
+      const { syntax, structural } = await validateDiagram(dot, parsed.engine);
+      const failed = syntax !== null || (parsed.strict === true && structural.length > 0);
+      const name = parsed.input === '-' ? '<stdin>' : parsed.input!;
+
+      if (parsed.json) {
+        process.stdout.write(
+          `${JSON.stringify({
+            input: name,
+            engine: parsed.engine,
+            valid: !failed,
+            syntax,
+            structural: structural.map((d) => ({
+              severity: d.severity,
+              message: d.message,
+              ...offsetToLineCol(dot, d.from),
+            })),
+          })}\n`
+        );
+      } else {
+        if (syntax) {
+          const loc = syntax.line
+            ? `:${syntax.line}${syntax.column ? `:${syntax.column}` : ''}`
+            : '';
+          process.stderr.write(`${name}${loc}: error: ${syntax.message}\n`);
+        }
+        for (const d of structural) {
+          const { line, column } = offsetToLineCol(dot, d.from);
+          process.stderr.write(`${name}:${line}:${column}: ${d.severity}: ${d.message}\n`);
+        }
+        if (!failed) process.stdout.write(`${name}: ok\n`);
+      }
+      return failed ? 1 : 0;
+    } catch (err) {
+      process.stderr.write(`Error: ${err instanceof Error ? err.message : String(err)}\n`);
+      return 1;
+    }
   }
   // render
   try {

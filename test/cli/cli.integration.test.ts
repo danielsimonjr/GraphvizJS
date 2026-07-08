@@ -47,4 +47,54 @@ describe('graphvizjs CLI', () => {
     expect(code).toBe(0);
     expect(writes.join('')).toBe(`graphvizjs ${pkg.version}\n`);
   });
+
+  /** Run main(argv) capturing stdout; returns { code, out }. */
+  async function runCapture(argv: string[]): Promise<{ code: number; out: string }> {
+    const writes: string[] = [];
+    const spy = vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
+      writes.push(String(chunk));
+      return true;
+    });
+    const errSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    try {
+      const code = await main(argv);
+      return { code, out: writes.join('') };
+    } finally {
+      spy.mockRestore();
+      errSpy.mockRestore();
+    }
+  }
+
+  describe('validate', () => {
+    it('valid DOT → exit 0, --json reports valid:true', async () => {
+      const { code, out } = await runCapture(['validate', input, '--json']);
+      expect(code).toBe(0);
+      const parsed = JSON.parse(out);
+      expect(parsed).toMatchObject({ valid: true, syntax: null, structural: [] });
+    }, 30000);
+
+    it('structural warning → exit 0 by default, exit 1 with --strict', async () => {
+      const warn = join(dir, 'warn.dot');
+      writeFileSync(warn, 'digraph { a [shp=box] }', 'utf-8');
+      const lenient = await runCapture(['validate', warn, '--json']);
+      expect(lenient.code).toBe(0);
+      const parsed = JSON.parse(lenient.out);
+      expect(parsed.syntax).toBeNull();
+      expect(parsed.structural.length).toBeGreaterThan(0);
+      const strict = await runCapture(['validate', warn, '--strict']);
+      expect(strict.code).toBe(1);
+    }, 30000);
+
+    it('syntax error → exit 1 and valid:false', async () => {
+      const bad = join(dir, 'bad.dot');
+      writeFileSync(bad, 'digraph { a -> }', 'utf-8');
+      const { code, out } = await runCapture(['validate', bad, '--json']);
+      expect(code).toBe(1);
+      expect(JSON.parse(out).valid).toBe(false);
+    }, 30000);
+
+    it('unknown flag → exit 2', async () => {
+      expect((await runCapture(['validate', input, '--nope'])).code).toBe(2);
+    });
+  });
 });

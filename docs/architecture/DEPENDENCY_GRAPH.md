@@ -8,9 +8,9 @@
 | --- | --- |
 | Files | 60 |
 | Modules | 21 |
-| Lines of code | 6274 |
-| Internal edges | 108 |
-| Exports | 179 |
+| Lines of code | 6333 |
+| Internal edges | 109 |
+| Exports | 180 |
 
 ## Modules
 
@@ -269,7 +269,7 @@ None. ✅
 | `core/types.ts` | `test/editor/linting.test.ts`, `test/tabs/manager.test.ts` |
 | `core/validate.ts` | `test/core/validate-diagram.test.ts` |
 | `cli/args.ts` | `test/cli/args.test.ts` |
-| `cli/index.ts` | `test/cli/cli.integration.test.ts` |
+| `cli/index.ts` | `test/cli/cli.integration.test.ts`, `test/cli/offset.test.ts` |
 | `electron/app-menu.ts` | — |
 | `electron/file-watcher.ts` | — |
 | `electron/main.ts` | — |

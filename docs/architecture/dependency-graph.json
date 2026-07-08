@@ -2,9 +2,9 @@
   "stats": {
     "fileCount": 60,
     "moduleCount": 21,
-    "totalLoc": 6274,
-    "edgeCount": 108,
-    "exportCount": 179
+    "totalLoc": 6333,
+    "edgeCount": 109,
+    "exportCount": 180
   },
   "modules": {
     "autosave": [
@@ -680,7 +680,8 @@
     {
       "file": "cli/index.ts",
       "testFiles": [
-        "test/cli/cli.integration.test.ts"
+        "test/cli/cli.integration.test.ts",
+        "test/cli/offset.test.ts"
       ]
     },
     {
@@ -1346,8 +1347,9 @@
     },
     {
       "path": "cli/index.ts",
-      "loc": 79,
+      "loc": 138,
       "exports": [
+        "offsetToLineCol",
         "main"
       ]
     },
