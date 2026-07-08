@@ -60,6 +60,15 @@ describe('graphvizjs compiled distributable', () => {
     expect(parsed).toMatchObject({ valid: true, syntax: null, structural: [] });
   }, 30000);
 
+  it('validates a fixable file to JSON, reporting a diagnostic code', () => {
+    const fixable = join(dir, 'fixable.dot');
+    writeFileSync(fixable, 'digraph { a [shape=boxx] }', 'utf-8');
+    const parsed = JSON.parse(run(['validate', fixable, '--json']));
+    expect(parsed.valid).toBe(true);
+    expect(parsed.structural.length).toBeGreaterThan(0);
+    expect(parsed.structural[0]).toHaveProperty('code');
+  }, 30000);
+
   it('formats DOT to stdout', () => {
     const out = run(['format', '-'], 'digraph G {\na->b;\n}');
     expect(out).toContain('digraph G {\n  a -> b;\n}');

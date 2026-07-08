@@ -2,8 +2,8 @@
   "stats": {
     "fileCount": 64,
     "moduleCount": 21,
-    "totalLoc": 6895,
-    "edgeCount": 120,
+    "totalLoc": 6933,
+    "edgeCount": 121,
     "exportCount": 189
   },
   "modules": {
@@ -1409,7 +1409,7 @@
     },
     {
       "path": "cli/args.ts",
-      "loc": 246,
+      "loc": 273,
       "exports": [
         "parseArgs",
         "ParsedArgs",
@@ -1418,7 +1418,7 @@
     },
     {
       "path": "cli/index.ts",
-      "loc": 156,
+      "loc": 167,
       "exports": [
         "offsetToLineCol",
         "main"

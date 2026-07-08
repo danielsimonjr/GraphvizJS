@@ -57,11 +57,30 @@ describe('parseArgs — validate', () => {
   it('rejects an unknown engine', () => {
     expect('error' in parseArgs(['validate', 'in.dot', '--engine', 'nope'])).toBe(true);
   });
-  it('rejects render-only flags on validate', () => {
+  it('rejects -o without --fix on validate', () => {
     expect('error' in parseArgs(['validate', 'in.dot', '-o', 'out.svg'])).toBe(true);
   });
   it('requires an input', () => {
     expect('error' in parseArgs(['validate'])).toBe(true);
+  });
+  it('parses `validate in.dot --fix -o out.dot`', () => {
+    const r = parseArgs(['validate', 'in.dot', '--fix', '-o', 'out.dot']);
+    expect(r).toMatchObject({ command: 'validate', fix: true, output: 'out.dot' });
+  });
+  it('allows --fix without -o (stdout)', () => {
+    const r = parseArgs(['validate', 'in.dot', '--fix']);
+    expect(r).toMatchObject({ command: 'validate', fix: true });
+    expect('error' in r).toBe(false);
+    if (!('error' in r)) expect(r.output).toBeUndefined();
+  });
+  it('still accepts --json, --strict, and --engine alongside --fix', () => {
+    const r = parseArgs(['validate', 'in.dot', '--json', '--strict', '--engine', 'neato']);
+    expect(r).toMatchObject({
+      command: 'validate',
+      json: true,
+      strict: true,
+      engine: 'neato',
+    });
   });
 });
 

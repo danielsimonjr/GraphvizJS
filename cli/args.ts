@@ -35,6 +35,8 @@ export interface ParsedArgs {
   json?: boolean;
   /** validate only: fail (exit 1) when structural warnings are present. */
   strict?: boolean;
+  /** validate only: apply available quick fixes and write the corrected source. */
+  fix?: boolean;
 }
 
 /** A parse/validation failure, distinguished from `ParsedArgs` by the `error` key. */
@@ -177,12 +179,14 @@ export function parseArgs(argv: string[]): ParsedArgs | ParseError {
   };
 }
 
-/** Parse `validate <input|-> [--engine E] [--json] [--strict]`. */
+/** Parse `validate <input|-> [--engine E] [--json] [--strict] [--fix] [-o <output>]`. */
 function parseValidate(rest: string[]): ParsedArgs | ParseError {
   let input: string | undefined;
+  let output: string | undefined;
   let engine: LayoutEngine = 'dot';
   let json = false;
   let strict = false;
+  let fix = false;
 
   for (let i = 0; i < rest.length; i++) {
     const arg = rest[i];
@@ -202,6 +206,16 @@ function parseValidate(rest: string[]): ParsedArgs | ParseError {
       case '--strict':
         strict = true;
         break;
+      case '--fix':
+        fix = true;
+        break;
+      case '-o':
+      case '--output': {
+        const value = rest[++i];
+        if (value === undefined) return { error: `Missing value for ${arg}` };
+        output = value;
+        break;
+      }
       default: {
         if (arg !== '-' && arg.startsWith('-')) return { error: `Unknown flag: ${arg}` };
         if (input === undefined) input = arg;
@@ -213,7 +227,20 @@ function parseValidate(rest: string[]): ParsedArgs | ParseError {
   if (input === undefined) {
     return { error: 'Missing input. Expected a .dot file path or "-" for stdin.' };
   }
-  return { command: 'validate', input, engine, scale: 1, pdf: DEFAULT_PDF, json, strict };
+  if (output !== undefined && !fix) {
+    return { error: '-o/--output on validate requires --fix' };
+  }
+  return {
+    command: 'validate',
+    input,
+    output,
+    engine,
+    scale: 1,
+    pdf: DEFAULT_PDF,
+    json,
+    strict,
+    fix,
+  };
 }
 
 /** Parse `format <input|-> [-o <output>]` (no output → stdout). */
