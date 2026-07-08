@@ -9,12 +9,14 @@ const EXAMPLES_DIR = join(__dirname, '../../src/examples');
 const exampleFiles = readdirSync(EXAMPLES_DIR).filter((f) => f.endsWith('.dot'));
 
 describe('semanticDiagnostics', () => {
-  it('flags an invalid enum value', () => {
-    const diags = semanticDiagnostics('a [shape=blorp];');
+  it('flags a near-miss typo enum value', () => {
+    // 'boxx' is a one-letter typo of the valid shape 'box' — a real "did you mean" catch.
+    const diags = semanticDiagnostics('a [shape=boxx];');
     expect(diags).toHaveLength(1);
     expect(diags[0].code).toBe('invalid-value');
     expect(diags[0].severity).toBe('warning');
-    expect(diags[0].message).toMatch(/blorp/);
+    expect(diags[0].message).toMatch(/boxx/);
+    expect(diags[0].fix?.text).toBe('box');
   });
 
   it('does not flag a valid enum value', () => {
@@ -76,9 +78,70 @@ describe('semanticDiagnostics', () => {
   });
 
   it('finds multiple invalid entries across one list', () => {
-    expect(codes('a [shape=blorp, color=rd];')).toEqual(
+    expect(codes('a [shape=boxx, color=rd];')).toEqual(
       expect.arrayContaining(['invalid-value', 'invalid-color'])
     );
+  });
+
+  describe('invalid-value / invalid-color false positives (C1/C2 regression)', () => {
+    // Root cause: DOT_ATTRIBUTE_CATALOG enum tables and DOT_COLORS are small transcribed
+    // subsets of what Graphviz actually accepts — flagging any unmatched value as invalid
+    // (the old behavior) flags a huge amount of valid DOT. The fix gates both rules on
+    // nearest() finding a close match: only a near-miss typo of a KNOWN value is flagged;
+    // an unlisted-but-valid value has no close match and stays silent.
+    it.each([
+      ['a [shape=square];', 'an unlisted-but-valid shape'],
+      ['a [color=coral];', 'an unlisted-but-valid color'],
+      ['node [fillcolor=lightyellow];', 'an unlisted-but-valid fillcolor'],
+      ['a -> b [arrowhead=onormal];', 'a composable arrowhead value'],
+      ['edge [style=tapered];', 'an unlisted-but-valid style'],
+      ['graph [ratio=0.7];', 'a numeric ratio value'],
+    ])('stays silent for %s (%s)', (src) => {
+      const diags = semanticDiagnostics(src).filter(
+        (d) => d.code === 'invalid-value' || d.code === 'invalid-color'
+      );
+      expect(diags).toEqual([]);
+    });
+
+    it('stays silent for an enum value with no close match at all (e.g. a typo far from box)', () => {
+      // Distinguishes "no near match → silent" from "near match → flagged": 'blorp' is
+      // edit-distance >2 from every SHAPE_VALUES entry, so unlike 'boxx' above it must
+      // NOT be flagged.
+      expect(semanticDiagnostics('a [shape=blorp];')).toEqual([]);
+    });
+
+    it('still flags a near-miss color typo with a fix (rd -> red)', () => {
+      const diags = semanticDiagnostics('a [color=rd];');
+      expect(diags).toHaveLength(1);
+      expect(diags[0].code).toBe('invalid-color');
+      expect(diags[0].fix?.text).toBe('red');
+    });
+
+    it('still flags a near-miss enum typo with a fix (rankdir=TP -> TB)', () => {
+      const diags = semanticDiagnostics('a [rankdir=TP];').filter(
+        (d) => d.code === 'invalid-value'
+      );
+      expect(diags).toHaveLength(1);
+      expect(diags[0].fix?.text).toBe('TB');
+    });
+
+    it('does not flag invalid-value on any real example diagram', () => {
+      expect(exampleFiles.length).toBeGreaterThan(0);
+      for (const file of exampleFiles) {
+        const src = readFileSync(join(EXAMPLES_DIR, file), 'utf-8');
+        const invalidValue = semanticDiagnostics(src).filter((d) => d.code === 'invalid-value');
+        expect(invalidValue, `${file} should have no invalid-value diagnostics`).toEqual([]);
+      }
+    });
+
+    it('does not flag invalid-color on any real example diagram', () => {
+      expect(exampleFiles.length).toBeGreaterThan(0);
+      for (const file of exampleFiles) {
+        const src = readFileSync(join(EXAMPLES_DIR, file), 'utf-8');
+        const invalidColor = semanticDiagnostics(src).filter((d) => d.code === 'invalid-color');
+        expect(invalidColor, `${file} should have no invalid-color diagnostics`).toEqual([]);
+      }
+    });
   });
 
   describe('wrong-context', () => {
@@ -100,6 +163,16 @@ describe('semanticDiagnostics', () => {
 
     it('does not flag a graph-only attribute used via the graph keyword', () => {
       expect(codes('graph [rankdir=LR];')).not.toContain('wrong-context');
+    });
+
+    it('flags a node-only attribute set via the graph keyword at brace-depth 1', () => {
+      // `graph [...]` at the top-level digraph body classifies as 'graph' context
+      // (braceDepth === 1); `shape` is node-only, so this is a genuine wrong-context.
+      const diags = semanticDiagnostics('digraph { graph [shape=box] }').filter(
+        (d) => d.code === 'wrong-context'
+      );
+      expect(diags).toHaveLength(1);
+      expect(diags[0].message).toMatch(/shape/);
     });
 
     it('does not flag valid contexts in a small realistic diagram', () => {

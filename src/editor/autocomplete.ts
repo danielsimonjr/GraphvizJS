@@ -29,9 +29,10 @@ function valueOptions(values: readonly string[]): Completion[] {
 }
 
 /**
- * Build the DOT completion source over a given vocabulary (keywords + attribute
- * names come from core via the dot:vocabulary IPC; value domains and colors are
- * renderer-local completion data).
+ * Build the DOT completion source over a given vocabulary — keywords, attribute
+ * names, value domains, and colors all come from core over the dot:vocabulary IPC;
+ * only which attributes are color-typed (`COLOR_ATTRS`, for picking `vocab.colors`
+ * vs. `vocab.attributeValues`) is renderer-local completion logic.
  */
 export function makeDotCompletionSource(
   vocab: DotVocabulary

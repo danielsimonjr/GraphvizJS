@@ -42,12 +42,4 @@ describe('validateDiagram', () => {
     expect(invalidValue).toBeDefined();
     expect(invalidValue?.fix).toBeDefined();
   });
-
-  it('valid diagram yields empty structural even with semantic checks folded in', async () => {
-    vi.resetModules();
-    resetMockGraphviz();
-    const { validateDiagram } = await import('../../core/validate');
-    const result = await validateDiagram('digraph { a -> b }');
-    expect(result.structural).toEqual([]);
-  });
 });

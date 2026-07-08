@@ -16,8 +16,11 @@ describe('applyFixes', () => {
   });
 
   it('applies multiple non-overlapping fixes regardless of order', () => {
+    // Passed in descending-`from` order (reverse of source order) so this actually
+    // exercises applyFixes's internal ascending sort rather than happening to already
+    // be sorted.
     const s = 'a [shp=box, dirr=both]';
-    const out = applyFixes(s, [d(3, 6, 'shape'), d(12, 16, 'dir')]);
+    const out = applyFixes(s, [d(12, 16, 'dir'), d(3, 6, 'shape')]);
     expect(out).toBe('a [shape=box, dir=both]');
   });
 

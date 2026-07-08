@@ -19,6 +19,31 @@ function isValidColor(value: string): boolean {
   return (DOT_COLORS as readonly string[]).includes(value.toLowerCase());
 }
 
+const ARROW_ATTR_NAMES = new Set(['arrowhead', 'arrowtail']);
+// Longer alternatives first so a two-char modifier (`lo`/`ol`) isn't pre-empted by its
+// single-char prefix (`l`/`o`) matching first and stranding the rest of the modifier in
+// the base-shape group.
+const ARROW_MODIFIER_RE = /^(lo|ol|o|l|r)?(.+)$/;
+
+/**
+ * `arrowhead`/`arrowtail` values are composable in real Graphviz: an optional `o` (open)
+ * and/or `l`/`r` (side-clip) modifier prefixes a base arrow shape — e.g. `onormal`,
+ * `linv`, `rodot` are all valid syntax that ARROW_VALUES (a flat list of primitives plus
+ * a few pre-composed aliases) doesn't enumerate. Without this check, a value like
+ * `onormal` sits edit-distance 1 from the listed `normal` and would otherwise be
+ * misread by `nearest()` as a typo of it. Only applies to the two arrow attributes;
+ * every other enum attribute's near-miss values fall straight through to the typo gate.
+ */
+function isComposableArrowValue(
+  attrName: string,
+  value: string,
+  values: readonly string[]
+): boolean {
+  if (!ARROW_ATTR_NAMES.has(attrName.toLowerCase())) return false;
+  const m = ARROW_MODIFIER_RE.exec(value);
+  return m !== null && values.includes(m[2]);
+}
+
 interface ValueEntry {
   name: string;
   nameOffset: number;
@@ -271,47 +296,59 @@ export function semanticDiagnostics(source: string): StructuralDiagnostic[] {
           });
         }
 
-        if (attr?.type === 'enum' && attr.values && !attr.values.includes(entry.value)) {
+        if (
+          attr?.type === 'enum' &&
+          attr.values &&
+          !attr.values.includes(entry.value) &&
+          !isComposableArrowValue(entry.name, entry.value, attr.values)
+        ) {
+          // The enum catalog transcribes only a subset of what Graphviz actually accepts
+          // for many attributes (e.g. shape, arrowhead, style are far larger/composable
+          // in real Graphviz than this table), so an unmatched value is NOT necessarily
+          // invalid. Only flag it when it's a near-miss typo of a known value (nearest()
+          // within its default edit-distance bound) — that's a real "did you mean" catch.
+          // A value with no close match is silently accepted rather than risk a false
+          // positive on legitimate Graphviz syntax this catalog doesn't enumerate.
           const suggestion = nearest(entry.value, attr.values);
-          out.push({
-            from,
-            to,
-            severity: 'warning',
-            code: 'invalid-value',
-            message: `Invalid value '${entry.value}' for attribute '${entry.name}'`,
-            ...(suggestion
-              ? {
-                  fix: {
-                    from,
-                    to,
-                    text: suggestion,
-                    label: `Change '${entry.value}' to '${suggestion}'`,
-                  },
-                }
-              : {}),
-          });
+          if (suggestion) {
+            out.push({
+              from,
+              to,
+              severity: 'warning',
+              code: 'invalid-value',
+              message: `Invalid value '${entry.value}' for attribute '${entry.name}'`,
+              fix: {
+                from,
+                to,
+                text: suggestion,
+                label: `Change '${entry.value}' to '${suggestion}'`,
+              },
+            });
+          }
           continue;
         }
 
         if (isColorAttribute(entry.name) && !isValidColor(entry.value)) {
+          // Same rationale as invalid-value above: DOT_COLORS is a small transcribed
+          // subset of Graphviz's ~600-name X11 color scheme, so only flag a near-miss
+          // typo of a known name; an unlisted-but-valid color (e.g. "coral",
+          // "lightyellow") stays silent.
           const suggestion = nearest(entry.value, DOT_COLORS);
-          out.push({
-            from,
-            to,
-            severity: 'warning',
-            code: 'invalid-color',
-            message: `Invalid color '${entry.value}' for attribute '${entry.name}'`,
-            ...(suggestion
-              ? {
-                  fix: {
-                    from,
-                    to,
-                    text: suggestion,
-                    label: `Change '${entry.value}' to '${suggestion}'`,
-                  },
-                }
-              : {}),
-          });
+          if (suggestion) {
+            out.push({
+              from,
+              to,
+              severity: 'warning',
+              code: 'invalid-color',
+              message: `Invalid color '${entry.value}' for attribute '${entry.name}'`,
+              fix: {
+                from,
+                to,
+                text: suggestion,
+                label: `Change '${entry.value}' to '${suggestion}'`,
+              },
+            });
+          }
         }
       }
     }

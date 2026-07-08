@@ -85,7 +85,7 @@ const ARROW_VALUES = [
 ];
 
 export const DOT_ATTRIBUTE_CATALOG: readonly DotAttributeSpec[] = [
-  // --- Enum attributes (value domains shared with src/editor/dot-data.ts DOT_ATTR_VALUES) ---
+  // --- Enum attributes (value domains served to the renderer over the dot:vocabulary IPC) ---
   { name: 'shape', contexts: ['node'], type: 'enum', values: SHAPE_VALUES },
   {
     name: 'style',

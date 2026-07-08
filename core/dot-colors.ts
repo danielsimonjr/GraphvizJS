@@ -23,7 +23,7 @@ export const DOT_COLORS = [
   'transparent',
 ] as const;
 
-const COLOR_ATTRIBUTES = new Set(['color', 'bgcolor', 'fillcolor', 'fontcolor']);
+const COLOR_ATTRIBUTES = new Set(['color', 'bgcolor', 'fillcolor', 'fontcolor', 'pencolor']);
 
 export function isColorAttribute(attr: string): boolean {
   return COLOR_ATTRIBUTES.has(attr.toLowerCase());
