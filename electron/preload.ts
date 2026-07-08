@@ -30,6 +30,7 @@ const api: GraphvizApi = {
   renderSvg: (dot, engine) => ipcRenderer.invoke('render:svg', dot, engine),
   validateDot: (dot, engine) => ipcRenderer.invoke('render:validate', dot, engine),
   formatDot: (source) => ipcRenderer.invoke('dot:format', source),
+  dotVocabulary: () => ipcRenderer.invoke('dot:vocabulary'),
   exportRender: (dot, engine, format, options) =>
     ipcRenderer.invoke('export:render', dot, engine, format, options),
 };

@@ -8,9 +8,9 @@
 | --- | --- |
 | Files | 63 |
 | Modules | 21 |
-| Lines of code | 6753 |
-| Internal edges | 109 |
-| Exports | 191 |
+| Lines of code | 6766 |
+| Internal edges | 110 |
+| Exports | 192 |
 
 ## Modules
 
@@ -212,7 +212,6 @@ None. ✅
 - `NormalizedSvg` in `core/normalize-svg.ts`
 - `BalanceResult` in `core/scan-dot.ts`
 - `SpanKind` in `core/scan-dot.ts`
-- `DotVocabulary` in `core/types.ts`
 - `PdfPageMode` in `core/types.ts`
 - `PdfPageSize` in `core/types.ts`
 - `validateDiagram` in `core/validate.ts`
@@ -298,6 +297,7 @@ None. ✅
 | `dialog:openText` | openTextFile | ✅ wired |
 | `dialog:save` | pickSavePath | ✅ wired |
 | `dot:format` | formatDot | ✅ wired |
+| `dot:vocabulary` | dotVocabulary | ✅ wired |
 | `export:render` | exportRender | ✅ wired |
 | `fs:readText` | readTextFile | ✅ wired |
 | `fs:writeBinary` | writeBinaryFile | ✅ wired |

@@ -1,5 +1,6 @@
 import type {
   DotValidationError,
+  DotVocabulary,
   ExportFormat,
   LayoutEngine,
   PdfExportOptions,
@@ -40,6 +41,7 @@ export interface GraphvizApi {
   renderSvg(dot: string, engine: LayoutEngine): Promise<string>;
   validateDot(dot: string, engine: LayoutEngine): Promise<DotValidationError | null>;
   formatDot(source: string): Promise<string>;
+  dotVocabulary(): Promise<DotVocabulary>;
   exportRender(
     dot: string,
     engine: LayoutEngine,

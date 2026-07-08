@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, dialog, ipcMain, screen, shell } from 'electron';
 import Store from 'electron-store';
+import { DOT_ATTRIBUTES, DOT_KEYWORDS } from '../core/dot-vocab';
 import { exportDiagram } from '../core/export';
 import { formatDot } from '../core/format';
 import { initGraphviz, renderDotToSvg, validateDot } from '../core/render';
@@ -200,6 +201,10 @@ function registerIpc(): void {
     ) => (await exportDiagram(dot, engine, format, options)).bytes
   );
   ipcMain.handle('dot:format', (_e, source: string) => formatDot(source));
+  ipcMain.handle('dot:vocabulary', () => ({
+    keywords: [...DOT_KEYWORDS],
+    attributes: [...DOT_ATTRIBUTES],
+  }));
 }
 
 app.whenReady().then(() => {

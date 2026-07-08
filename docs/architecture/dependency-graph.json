@@ -2,9 +2,9 @@
   "stats": {
     "fileCount": 63,
     "moduleCount": 21,
-    "totalLoc": 6753,
-    "edgeCount": 109,
-    "exportCount": 191
+    "totalLoc": 6766,
+    "edgeCount": 110,
+    "exportCount": 192
   },
   "modules": {
     "autosave": [
@@ -333,10 +333,6 @@
       {
         "file": "core/scan-dot.ts",
         "name": "SpanKind"
-      },
-      {
-        "file": "core/types.ts",
-        "name": "DotVocabulary"
       },
       {
         "file": "core/types.ts",
@@ -788,6 +784,13 @@
         "hasHandler": true
       },
       {
+        "channel": "dot:vocabulary",
+        "method": "dotVocabulary",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
         "channel": "export:render",
         "method": "exportRender",
         "hasContract": true,
@@ -1025,7 +1028,7 @@
     },
     {
       "path": "src/platform/contract.ts",
-      "loc": 49,
+      "loc": 51,
       "exports": [
         "DiagramFilter",
         "OpenedFile",
@@ -1035,7 +1038,7 @@
     },
     {
       "path": "src/platform/index.ts",
-      "loc": 93,
+      "loc": 98,
       "exports": [
         "store",
         "openTextFile",
@@ -1054,6 +1057,7 @@
         "renderSvg",
         "validateDot",
         "formatDot",
+        "dotVocabulary",
         "exportRender",
         "PlatformStore"
       ]
@@ -1443,12 +1447,12 @@
     },
     {
       "path": "electron/main.ts",
-      "loc": 223,
+      "loc": 228,
       "exports": []
     },
     {
       "path": "electron/preload.ts",
-      "loc": 37,
+      "loc": 38,
       "exports": []
     }
   ]

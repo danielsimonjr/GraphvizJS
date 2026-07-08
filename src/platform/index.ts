@@ -1,5 +1,6 @@
 import type {
   DotValidationError,
+  DotVocabulary,
   ExportFormat,
   LayoutEngine,
   PdfExportOptions,
@@ -81,6 +82,10 @@ export function validateDot(dot: string, engine: LayoutEngine): Promise<DotValid
 
 export function formatDot(source: string): Promise<string> {
   return window.graphviz.formatDot(source);
+}
+
+export function dotVocabulary(): Promise<DotVocabulary> {
+  return window.graphviz.dotVocabulary();
 }
 
 export function exportRender(

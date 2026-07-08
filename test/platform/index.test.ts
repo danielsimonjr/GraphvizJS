@@ -13,6 +13,7 @@ const api = {
   openExternal: vi.fn(),
   appInfo: vi.fn(),
   formatDot: vi.fn(),
+  dotVocabulary: vi.fn(),
 };
 
 beforeEach(() => {
@@ -85,5 +86,12 @@ describe('platform', () => {
     const result = await platform.formatDot('digraph{a->b}');
     expect(api.formatDot).toHaveBeenCalledWith('digraph{a->b}');
     expect(result).toBe('digraph {\n  a -> b\n}\n');
+  });
+
+  it('dotVocabulary delegates and returns the keyword/attribute lists', async () => {
+    api.dotVocabulary.mockResolvedValue({ keywords: ['digraph'], attributes: ['color'] });
+    const result = await platform.dotVocabulary();
+    expect(api.dotVocabulary).toHaveBeenCalled();
+    expect(result).toEqual({ keywords: ['digraph'], attributes: ['color'] });
   });
 });
