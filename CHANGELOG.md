@@ -9,17 +9,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - **Semantic lint + quick fixes.** Five new rule families surface as structural
-  warnings alongside the existing delimiter-balance/unknown-attribute checks:
-  invalid enum attribute values (e.g. `shape=boxx`), unknown attribute names with a
-  "did you mean `shape`?" typo suggestion, invalid color values, attributes used in
-  the wrong statement context (e.g. `rankdir` on a node), and duplicate-attribute /
-  undefined-cluster (`lhead`/`ltail` referencing a subgraph that was never declared)
-  checks. Each finding may carry a one-click quick fix: the editor now offers a
-  CodeMirror code action on applicable diagnostics, and `graphvizjs validate --fix`
-  applies every available fix and writes the corrected source to `-o <path>` or
-  stdout. `--json` output now includes each finding's stable `code` and its `fix`
-  (when one exists). Autocomplete also gained attribute-value and color completions,
-  backed by the same attribute catalog the linter checks against.
+  warnings alongside the existing delimiter-balance/unknown-attribute-name checks:
+  invalid enum attribute values (e.g. `rankdir=TP`, with a "did you mean `TB`?" typo
+  suggestion), invalid color values (e.g. `color=rd`, with a "did you mean `red`?"
+  suggestion), attributes used in the wrong statement context (e.g. `rankdir` on a
+  node), and duplicate-attribute / undefined-cluster (`lhead`/`ltail` referencing a
+  subgraph that was never declared) checks. Each finding may carry a one-click quick
+  fix: the editor now offers a CodeMirror code action on applicable diagnostics, and
+  `graphvizjs validate --fix` applies every available fix and writes the corrected
+  source to `-o <path>` or stdout. `--json` output now includes each finding's stable
+  `code` and its `fix` (when one exists). Autocomplete also gained attribute-value and
+  color completions, backed by the same attribute catalog the linter checks against.
 - **Standalone CLI executable.** `pnpm build:cli:exe` bundles the `graphvizjs` CLI + core +
   the inlined-WASM Graphviz engine into a single executable (via Node's Single Executable
   Applications), runnable with no Node install. Covers the pure/WASM subset — `format`,

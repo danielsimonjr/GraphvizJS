@@ -14,9 +14,9 @@ dependency-graph tool). Delivered so far:
 - Graphviz WebAssembly rendering with a debounced live preview and friendly error feedback
 - DOT syntax highlighting, autocomplete (keywords, attributes, value enums) and snippets
 - Inline linting — Graphviz syntax errors **and** structural warnings (delimiter balance, unknown attributes)
-- Semantic lint + quick fixes — invalid attribute values, invalid colors, wrong-context attributes,
-  "did you mean `shape`?" typo suggestions, duplicate-attribute and undefined-cluster checks; one-click
-  fixes in the editor and via `graphvizjs validate --fix`
+- Semantic lint + quick fixes — invalid attribute values and invalid colors (each with a
+  "did you mean …?" typo suggestion), wrong-context attributes, duplicate-attribute and
+  undefined-cluster checks; one-click fixes in the editor and via `graphvizjs validate --fix`
 - Format Document (reindent + spacing) — Shift+Alt+F
 - All Graphviz layout engines, selectable per tab
 - Editor font zoom and preview zoom; resizable editor/preview panes
