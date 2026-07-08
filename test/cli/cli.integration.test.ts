@@ -97,4 +97,22 @@ describe('graphvizjs CLI', () => {
       expect((await runCapture(['validate', input, '--nope'])).code).toBe(2);
     });
   });
+
+  describe('format', () => {
+    it('writes reformatted DOT to -o output', async () => {
+      const src = join(dir, 'messy.dot');
+      writeFileSync(src, 'digraph G {\na->b;\n}', 'utf-8');
+      const out = join(dir, 'formatted.dot');
+      expect(await main(['format', src, '-o', out])).toBe(0);
+      expect(readFileSync(out, 'utf-8')).toBe('digraph G {\n  a -> b;\n}');
+    });
+
+    it('prints reformatted DOT to stdout when no -o given', async () => {
+      const src = join(dir, 'messy2.dot');
+      writeFileSync(src, 'digraph G {\na->b;\n}', 'utf-8');
+      const { code, out } = await runCapture(['format', src]);
+      expect(code).toBe(0);
+      expect(out).toContain('digraph G {\n  a -> b;\n}');
+    });
+  });
 });

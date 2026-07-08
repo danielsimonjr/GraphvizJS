@@ -2,8 +2,8 @@
   "stats": {
     "fileCount": 60,
     "moduleCount": 21,
-    "totalLoc": 6333,
-    "edgeCount": 109,
+    "totalLoc": 6346,
+    "edgeCount": 110,
     "exportCount": 180
   },
   "modules": {
@@ -1347,7 +1347,7 @@
     },
     {
       "path": "cli/index.ts",
-      "loc": 138,
+      "loc": 151,
       "exports": [
         "offsetToLineCol",
         "main"

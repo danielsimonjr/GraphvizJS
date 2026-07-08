@@ -3,6 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { exportDiagram } from '../core/export.js';
+import { formatDot } from '../core/format.js';
 import type { ExportFormat } from '../core/types.js';
 import { validateDiagram } from '../core/validate.js';
 import { parseArgs } from './args.js';
@@ -109,6 +110,18 @@ export async function main(argv: string[]): Promise<number> {
         if (!failed) process.stdout.write(`${name}: ok\n`);
       }
       return failed ? 1 : 0;
+    } catch (err) {
+      process.stderr.write(`Error: ${err instanceof Error ? err.message : String(err)}\n`);
+      return 1;
+    }
+  }
+  if (parsed.command === 'format') {
+    try {
+      const dot = await readInput(parsed.input!);
+      const formatted = formatDot(dot);
+      if (parsed.output) await writeFile(parsed.output, formatted);
+      else process.stdout.write(formatted.endsWith('\n') ? formatted : `${formatted}\n`);
+      return 0;
     } catch (err) {
       process.stderr.write(`Error: ${err instanceof Error ? err.message : String(err)}\n`);
       return 1;

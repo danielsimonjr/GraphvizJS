@@ -54,4 +54,14 @@ describe('graphvizjs compiled distributable', () => {
     const b = readFileSync(out);
     expect([b[0], b[1], b[2], b[3]]).toEqual([0x89, 0x50, 0x4e, 0x47]);
   }, 30000);
+
+  it('validates a file to JSON (valid:true)', () => {
+    const parsed = JSON.parse(run(['validate', input, '--json']));
+    expect(parsed).toMatchObject({ valid: true, syntax: null, structural: [] });
+  }, 30000);
+
+  it('formats DOT to stdout', () => {
+    const out = run(['format', '-'], 'digraph G {\na->b;\n}');
+    expect(out).toContain('digraph G {\n  a -> b;\n}');
+  }, 30000);
 });
