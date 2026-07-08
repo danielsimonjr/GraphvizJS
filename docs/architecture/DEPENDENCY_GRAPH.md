@@ -8,7 +8,7 @@
 | --- | --- |
 | Files | 63 |
 | Modules | 21 |
-| Lines of code | 6766 |
+| Lines of code | 6771 |
 | Internal edges | 110 |
 | Exports | 192 |
 
@@ -157,7 +157,7 @@
 | session | autosave, core, platform |
 | tabs | core |
 | theme | platform |
-| toolbar | core, editor, platform, theme |
+| toolbar | core, platform, theme |
 | watch | platform |
 | window | platform |
 
@@ -274,7 +274,7 @@ None. ✅
 | `core/export-pdf.ts` | `test/core/export-pdf.test.ts` |
 | `core/export-png.ts` | `test/core/export-png.test.ts` |
 | `core/export.ts` | `test/core/export.test.ts` |
-| `core/format.ts` | `test/core/format.test.ts` |
+| `core/format.ts` | `test/core/format.test.ts`, `test/toolbar/format.test.ts` |
 | `core/normalize-svg.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts` |
 | `core/render.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts`, `test/core/render.test.ts`, `test/core/validate.test.ts` |
 | `core/scan-dot.ts` | `test/core/scan-dot.test.ts` |

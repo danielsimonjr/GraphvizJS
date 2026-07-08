@@ -1,11 +1,11 @@
 import type { KeyBinding } from '@codemirror/view';
 import type { EditorView } from 'codemirror';
-import { formatDot } from '../editor/format';
+import { formatDot } from '../platform';
 
-/** Reformat the given editor's document in a single transaction. */
-export function formatView(view: EditorView): boolean {
+/** Reformat the given editor's document in a single transaction. Resolves true if it changed. */
+export async function formatView(view: EditorView): Promise<boolean> {
   const current = view.state.doc.toString();
-  const next = formatDot(current);
+  const next = await formatDot(current);
   if (next === current) return false;
   view.dispatch({
     changes: { from: 0, to: current.length, insert: next },
@@ -22,20 +22,25 @@ export interface FormatActionOptions {
 
 export function setupFormat({ button, getEditor, onFormat }: FormatActionOptions): void {
   if (!button) return;
-  button.addEventListener('click', () => {
+  button.addEventListener('click', async () => {
     const view = getEditor();
-    if (formatView(view)) onFormat(view.state.doc.toString());
+    if (await formatView(view)) onFormat(view.state.doc.toString());
     view.focus();
   });
 }
 
-/** Shift-Alt-F keybinding; the run handler reformats and returns true if handled. */
+/**
+ * Shift-Alt-F keybinding. Formatting now runs over IPC (async), but a keymap
+ * `run` must report handled synchronously — so fire the format and return true;
+ * the reformat and `onFormat` land on a later tick when the promise resolves.
+ */
 export function makeFormatKeymap(onFormat: (doc: string) => void): KeyBinding {
   return {
     key: 'Shift-Alt-f',
     run: (view) => {
-      const changed = formatView(view);
-      if (changed) onFormat(view.state.doc.toString());
+      void formatView(view).then((changed) => {
+        if (changed) onFormat(view.state.doc.toString());
+      });
       return true;
     },
   };

@@ -2,7 +2,7 @@
   "stats": {
     "fileCount": 63,
     "moduleCount": 21,
-    "totalLoc": 6766,
+    "totalLoc": 6771,
     "edgeCount": 110,
     "exportCount": 192
   },
@@ -170,7 +170,6 @@
     "toolbar": [
       "core",
       "platform",
-      "editor",
       "theme"
     ],
     "watch": [
@@ -671,7 +670,8 @@
     {
       "file": "core/format.ts",
       "testFiles": [
-        "test/core/format.test.ts"
+        "test/core/format.test.ts",
+        "test/toolbar/format.test.ts"
       ]
     },
     {
@@ -1198,7 +1198,7 @@
     },
     {
       "path": "src/toolbar/format.ts",
-      "loc": 42,
+      "loc": 47,
       "exports": [
         "formatView",
         "setupFormat",
