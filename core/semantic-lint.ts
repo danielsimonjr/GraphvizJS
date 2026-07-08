@@ -131,11 +131,13 @@ const CLUSTER_REF_ATTRS = new Set(['lhead', 'ltail']);
  * `subgraph <name> { ... }`, regardless of where the declaration sits relative to any
  * `lhead`/`ltail` reference (a cluster declared later in the file still counts). Only
  * `subgraph` keyword occurrences inside a `code` span are recognized. The name that
- * follows may be an unquoted identifier in the same code span, or a quoted string — the
- * very next span, when it starts exactly where the code span ended (no gap). Anonymous
- * subgraphs (`subgraph { ... }`) and anything else ambiguous simply contribute no name —
- * fail-safe, since an under-populated set can only suppress `undefined-cluster` findings,
- * never fabricate one.
+ * follows may be an unquoted identifier in the same code span, or — after skipping any
+ * intervening `comment` spans (a comment between `subgraph` and its name is legal DOT) —
+ * a quoted string in a subsequent span that abuts the last span scanned, with no gap.
+ * Anonymous subgraphs (`subgraph { ... }`) and anything else ambiguous simply contribute
+ * no name — fail-safe, since an under-populated set can only suppress `undefined-cluster`
+ * findings; missing a legal declaration is exactly what would fabricate one, which is why
+ * comments must be skipped rather than treated as breaking the name search.
  */
 function collectDeclaredSubgraphNames(source: string, spans: Span[]): Set<string> {
   const names = new Set<string>();
@@ -152,16 +154,48 @@ function collectDeclaredSubgraphNames(source: string, spans: Span[]): Set<string
       if (j < text.length) {
         const idMatch = /^[A-Za-z0-9_.]+/.exec(text.slice(j));
         if (idMatch) names.add(idMatch[0]);
-      } else {
-        // The name (if any) lies in the span immediately following — only a quoted
-        // string abutting this code span with no gap is trusted as that name.
-        const next = spans[idx + 1];
-        if (next && next.kind === 'string' && next.from === span.to) {
+        continue;
+      }
+      // The name (if any) lies in a following span. Walk forward, skipping comment
+      // spans and whitespace-only code spans between them (both legal between
+      // `subgraph` and its name in DOT), requiring each skipped span to abut the
+      // last one with no gap, until landing on either a quoted string (the name) or
+      // a code span whose leading token is the name — anything else (a gap, an html
+      // span, or a code span with no leading identifier) stops the search with no
+      // name contributed.
+      let searchIdx = idx + 1;
+      let expectedFrom = span.to;
+      while (spans[searchIdx] && spans[searchIdx].from === expectedFrom) {
+        const next = spans[searchIdx];
+        if (next.kind === 'comment') {
+          expectedFrom = next.to;
+          searchIdx++;
+          continue;
+        }
+        if (next.kind === 'string') {
           const raw = source.slice(next.from, next.to);
           const inner =
             raw.length >= 2 && raw.startsWith('"') && raw.endsWith('"') ? raw.slice(1, -1) : raw;
           names.add(inner.replace(/\\"/g, '"'));
+          break;
         }
+        if (next.kind === 'code') {
+          const nextText = source.slice(next.from, next.to);
+          const wsMatch = /^\s*/.exec(nextText);
+          const afterWs = wsMatch ? wsMatch[0].length : 0;
+          const idMatch = /^[A-Za-z0-9_.]+/.exec(nextText.slice(afterWs));
+          if (idMatch) {
+            names.add(idMatch[0]);
+            break;
+          }
+          if (afterWs === nextText.length) {
+            // Whitespace-only code span (e.g. between two comments) — keep looking.
+            expectedFrom = next.to;
+            searchIdx++;
+            continue;
+          }
+        }
+        break;
       }
     }
   }

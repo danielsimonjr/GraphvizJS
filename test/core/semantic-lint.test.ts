@@ -217,6 +217,16 @@ describe('semanticDiagnostics', () => {
       expect(codes(src)).not.toContain('undefined-cluster');
     });
 
+    it('does not flag lhead when a comment sits between subgraph and its name', () => {
+      const src = 'digraph { subgraph /* c */ cluster9 { a; } a -> b [lhead=cluster9]; }';
+      expect(codes(src)).not.toContain('undefined-cluster');
+    });
+
+    it('does not flag lhead when a comment sits between subgraph and a quoted name', () => {
+      const src = 'digraph { subgraph /* c */ "cluster9" { a; } a -> b [lhead=cluster9]; }';
+      expect(codes(src)).not.toContain('undefined-cluster');
+    });
+
     it('does not flag lhead/ltail values inside a small realistic diagram with clusters', () => {
       const src =
         'digraph { subgraph cluster0 { a; b; } subgraph cluster1 { c; d; } ' +
