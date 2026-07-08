@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **`graphvizjs validate` CLI command.** Validates a `.dot` file (or stdin) and reports both
+  Graphviz syntax errors and structural warnings. `--json` emits a machine-readable
+  `{ input, engine, valid, syntax, structural[] }`; exit codes are `0` valid, `1` invalid
+  (syntax error, or `--strict` with warnings), `2` usage. Serves as a headless oracle for
+  troubleshooting the desktop UI: run the same input through the CLI to localize a bug to
+  `core/` versus the renderer/IPC.
+- **`graphvizjs format` CLI command.** Reformats a `.dot` file (or stdin) via the shared core
+  formatter, writing to `-o <path>` or stdout.
+
+### Changed
+
+- **DOT language tooling relocated into `core/`.** The literal-aware scanner, keyword/attribute
+  vocabulary, structural lint, and formatter now live in `core/` (`scan-dot`, `dot-vocab`,
+  `structure-lint`, `format`, `validate`), giving the CLI and the renderer one shared
+  implementation. The renderer reaches them over IPC: `render:validate` now returns combined
+  `{ syntax, structural }` diagnostics, and new `dot:format` / `dot:vocabulary` channels back the
+  Format action and editor highlighting/autocomplete. No user-visible behavior change.
+
 ## [2.5.0] - 2026-07-05
 
 ### Added

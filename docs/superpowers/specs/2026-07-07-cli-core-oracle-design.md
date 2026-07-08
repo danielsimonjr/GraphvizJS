@@ -1,7 +1,7 @@
 # CLI-first workflow + `validate`/`format` core oracles
 
 **Date:** 2026-07-07
-**Status:** Approved (design) — pending implementation plan
+**Status:** Implemented (see `docs/superpowers/plans/2026-07-07-cli-core-oracle.md`)
 **Author:** Daniel Simon Jr. (with Claude)
 
 ## Problem
