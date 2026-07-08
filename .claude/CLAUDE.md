@@ -13,11 +13,13 @@ pnpm install                # Install dependencies
 pnpm dev                    # Frontend-only dev server (http://localhost:5173)
 pnpm build                  # TypeScript compile + Vite bundle
 pnpm build:cli              # Compile the headless graphvizjs CLI to dist-cli/
+pnpm build:cli:exe          # Bundle the CLI into a standalone exe via Node SEA (dist-exe/); pure/WASM subset
 pnpm build:icon             # Regenerate the app icon (scripts/render-icon.mjs)
 pnpm package                # Build distributable installer (electron-builder)
 pnpm graphvizjs -- ...      # Run the CLI from source via tsx (e.g. render g.dot -o o.svg)
 pnpm graph                  # Generate the module dependency graph (tools/dependency-graph/)
 pnpm graph:check            # Fail on dependency-graph rule violations (coverage/cycle guard)
+pnpm docs:check             # Fail if a module/IPC channel is undocumented in docs/architecture/
 
 pnpm test                   # Unit tests (Vitest + happy-dom)
 pnpm test:watch             # Unit tests in watch mode

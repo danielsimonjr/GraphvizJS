@@ -101,6 +101,18 @@ Because `validate` and `format` call the very same `core/` functions the rendere
 
 `bin.graphvizjs` points at the compiled `dist-cli/cli/index.js`, so `npm link` (or a global install of the packed tarball) exposes the `graphvizjs` command on any platform. To run it from source without building, use `pnpm graphvizjs -- render diagram.dot -o out.svg` (via tsx). The native rendering deps (`@resvg/resvg-js`, `canvas`) and WASM Graphviz install as normal dependencies with cross-platform prebuilds.
 
+### Standalone executable
+
+```bash
+pnpm build:cli:exe   # → dist-exe/graphvizjs.exe (no Node install required to run it)
+```
+
+Bundles the CLI + core + the (inlined-WASM) Graphviz engine into a single executable via
+Node's [Single Executable Applications](https://nodejs.org/api/single-executable-applications.html).
+It covers the pure/WASM subset — **`format`, `validate`, and `render→svg`** — with no
+dependencies. `render→png/pdf` still require the full `pnpm build:cli` install, because
+their native `.node` binaries (`@resvg/resvg-js`, `canvas`) can't be inlined into one file.
+
 ## Tooling
 
 - `pnpm clean` – Remove build artifacts (`dist/`)
