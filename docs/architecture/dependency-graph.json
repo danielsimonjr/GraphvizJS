@@ -2,8 +2,8 @@
   "stats": {
     "fileCount": 64,
     "moduleCount": 21,
-    "totalLoc": 6710,
-    "edgeCount": 117,
+    "totalLoc": 6761,
+    "edgeCount": 118,
     "exportCount": 189
   },
   "modules": {
@@ -297,10 +297,6 @@
       {
         "file": "core/dot-catalog.ts",
         "name": "DotAttributeSpec"
-      },
-      {
-        "file": "core/dot-catalog.ts",
-        "name": "AttrContext"
       },
       {
         "file": "core/dot-catalog.ts",
@@ -1374,7 +1370,7 @@
     },
     {
       "path": "core/semantic-lint.ts",
-      "loc": 138,
+      "loc": 189,
       "exports": [
         "semanticDiagnostics"
       ]

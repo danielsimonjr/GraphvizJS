@@ -1,3 +1,4 @@
+import type { AttrContext } from './dot-catalog.js';
 import { findAttribute } from './dot-catalog.js';
 import { DOT_COLORS, isColorAttribute } from './dot-colors.js';
 import { nearest } from './edit-distance.js';
@@ -19,6 +20,7 @@ function isValidColor(value: string): boolean {
 
 interface ValueEntry {
   name: string;
+  nameOffset: number;
   value: string;
   valueOffset: number;
 }
@@ -56,13 +58,54 @@ function parseValueEntries(body: string): ValueEntry[] {
         j++;
       }
       const value = body.slice(valueStart, j);
-      if (name && value) entries.push({ name, value, valueOffset: valueStart });
+      if (name && value)
+        entries.push({ name, nameOffset: nameStart, value, valueOffset: valueStart });
       i = j;
     } else {
       i = j;
     }
   }
   return entries;
+}
+
+const KEYWORD_CONTEXTS: Record<string, AttrContext> = {
+  graph: 'graph',
+  node: 'node',
+  edge: 'edge',
+};
+// A statement boundary immediately before the classified token: start of the code span,
+// or the token is preceded by `;`, `{`, or `}` (with only whitespace in between).
+const STATEMENT_BOUNDARY_RE = /[;{}]$/;
+
+/**
+ * Conservatively classify the statement context of a `[...]` attribute list from the
+ * code immediately preceding it, within the same code span (a preceding token that lies
+ * in an earlier span — e.g. across a quoted string — is out of reach here and, like the
+ * rest of this heuristic, simply yields no classification). Recognizes:
+ *   - `node`/`edge`/`graph` keyword directly before `[`, at a statement boundary → that
+ *     keyword's own context (a default-attribute statement).
+ *   - a plain identifier immediately preceded by an edge operator chain (`->`/`--`) →
+ *     `edge` (the list belongs to an edge statement).
+ *   - a plain identifier at a statement boundary → `node` (a fresh node statement).
+ * Anything else (ambiguous prefix, port/compass syntax, mid-statement punctuation, etc.)
+ * returns null, and the caller must skip wrong-context checking for that list — silence
+ * over a false positive.
+ */
+function classifyListContext(prefixText: string): AttrContext | null {
+  const trimmed = prefixText.replace(/\s+$/, '');
+  const idMatch = /[A-Za-z0-9_]+$/.exec(trimmed);
+  if (!idMatch) return null;
+  const id = idMatch[0];
+  const before = trimmed.slice(0, trimmed.length - id.length).replace(/\s+$/, '');
+
+  const keywordContext = KEYWORD_CONTEXTS[id.toLowerCase()];
+  if (keywordContext) {
+    return before === '' || STATEMENT_BOUNDARY_RE.test(before) ? keywordContext : null;
+  }
+
+  if (before.endsWith('->') || before.endsWith('--')) return 'edge';
+  if (before === '' || STATEMENT_BOUNDARY_RE.test(before)) return 'node';
+  return null;
 }
 
 /**
@@ -83,10 +126,23 @@ export function semanticDiagnostics(source: string): StructuralDiagnostic[] {
     let m: RegExpExecArray | null;
     while ((m = listRe.exec(text)) !== null) {
       const listStart = span.from + m.index + 1;
+      const context = classifyListContext(text.slice(0, m.index));
       for (const entry of parseValueEntries(m[1])) {
         const from = listStart + entry.valueOffset;
         const to = from + entry.value.length;
         const attr = findAttribute(entry.name);
+
+        if (context && attr && !attr.contexts.includes(context)) {
+          const nameFrom = listStart + entry.nameOffset;
+          const nameTo = nameFrom + entry.name.length;
+          out.push({
+            from: nameFrom,
+            to: nameTo,
+            severity: 'warning',
+            code: 'wrong-context',
+            message: `Attribute '${entry.name}' is not valid in a ${context} context (valid in: ${attr.contexts.join(', ')})`,
+          });
+        }
 
         if (attr?.type === 'enum' && attr.values && !attr.values.includes(entry.value)) {
           const suggestion = nearest(entry.value, attr.values);

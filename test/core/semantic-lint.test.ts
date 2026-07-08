@@ -1,7 +1,12 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { semanticDiagnostics } from '../../core/semantic-lint';
 
 const codes = (src: string) => semanticDiagnostics(src).map((d) => d.code);
+
+const EXAMPLES_DIR = join(__dirname, '../../src/examples');
+const exampleFiles = readdirSync(EXAMPLES_DIR).filter((f) => f.endsWith('.dot'));
 
 describe('semanticDiagnostics', () => {
   it('flags an invalid enum value', () => {
@@ -42,10 +47,12 @@ describe('semanticDiagnostics', () => {
   });
 
   it('suggests a did-you-mean fix for a typo enum value', () => {
+    // `rankdir` is graph-only, so `a [rankdir=TP]` also trips wrong-context (asserted
+    // separately below) — filter to the invalid-value diagnostic under test here.
     const diags = semanticDiagnostics('a [rankdir=TP];');
-    expect(diags).toHaveLength(1);
-    expect(diags[0].code).toBe('invalid-value');
-    expect(diags[0].fix?.text).toBe('TB');
+    const invalidValue = diags.find((d) => d.code === 'invalid-value');
+    expect(invalidValue).toBeDefined();
+    expect(invalidValue?.fix?.text).toBe('TB');
   });
 
   it('does not value-check a string-typed attribute', () => {
@@ -72,5 +79,43 @@ describe('semanticDiagnostics', () => {
     expect(codes('a [shape=blorp, color=rd];')).toEqual(
       expect.arrayContaining(['invalid-value', 'invalid-color'])
     );
+  });
+
+  describe('wrong-context', () => {
+    it('flags a node-only attribute used on an edge', () => {
+      const diags = semanticDiagnostics('digraph { a -> b [shape=box]; }');
+      const wrongContext = diags.filter((d) => d.code === 'wrong-context');
+      expect(wrongContext).toHaveLength(1);
+      expect(wrongContext[0].severity).toBe('warning');
+      expect(wrongContext[0].message).toMatch(/shape/);
+      expect(wrongContext[0].fix).toBeUndefined();
+    });
+
+    it('flags a graph-only attribute used on a node', () => {
+      const diags = semanticDiagnostics('x [rankdir=LR];');
+      const wrongContext = diags.filter((d) => d.code === 'wrong-context');
+      expect(wrongContext).toHaveLength(1);
+      expect(wrongContext[0].message).toMatch(/rankdir/);
+    });
+
+    it('does not flag a graph-only attribute used via the graph keyword', () => {
+      expect(codes('graph [rankdir=LR];')).not.toContain('wrong-context');
+    });
+
+    it('does not flag valid contexts in a small realistic diagram', () => {
+      const src =
+        'digraph { rankdir=LR; a [shape=box]; a -> b [color=red]; ' +
+        'subgraph cluster0 { label="c" } }';
+      expect(codes(src)).not.toContain('wrong-context');
+    });
+
+    it('does not flag wrong-context on any real example diagram', () => {
+      expect(exampleFiles.length).toBeGreaterThan(0);
+      for (const file of exampleFiles) {
+        const src = readFileSync(join(EXAMPLES_DIR, file), 'utf-8');
+        const wrongContext = semanticDiagnostics(src).filter((d) => d.code === 'wrong-context');
+        expect(wrongContext, `${file} should have no wrong-context diagnostics`).toEqual([]);
+      }
+    });
   });
 });

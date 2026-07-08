@@ -8,8 +8,8 @@
 | --- | --- |
 | Files | 64 |
 | Modules | 21 |
-| Lines of code | 6710 |
-| Internal edges | 117 |
+| Lines of code | 6761 |
+| Internal edges | 118 |
 | Exports | 189 |
 
 ## Modules
@@ -204,7 +204,6 @@ None. ✅
 - `ThemeButtonOptions` in `src/toolbar/theme-button.ts`
 - `FileWatchOptions` in `src/watch/file-watch.ts`
 - `DotAttributeSpec` in `core/dot-catalog.ts`
-- `AttrContext` in `core/dot-catalog.ts`
 - `AttrType` in `core/dot-catalog.ts`
 - `PageGeometry` in `core/export-pdf.ts`
 - `FormatOptions` in `core/format.ts`
