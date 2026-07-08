@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **Standalone CLI executable.** `pnpm build:cli:exe` bundles the `graphvizjs` CLI + core +
+  the inlined-WASM Graphviz engine into a single executable (via Node's Single Executable
+  Applications), runnable with no Node install. Covers the pure/WASM subset — `format`,
+  `validate`, and `render→svg`; `render→png/pdf` still need the native install
+  (`pnpm build:cli`).
+
+### Changed
+
+- The native export dependencies (`@resvg/resvg-js` for PNG; `canvas` + `jsdom` for PDF) are
+  now loaded lazily on first use, so importing the core for render/validate/format (and
+  bundling the CLI) no longer pulls the native binaries. `toPngBytes` is now async.
+
 ## [2.6.0] - 2026-07-07
 
 ### Added
