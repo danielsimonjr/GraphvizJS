@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 61 |
+| Files | 62 |
 | Modules | 21 |
-| Lines of code | 6563 |
-| Internal edges | 103 |
-| Exports | 186 |
+| Lines of code | 6721 |
+| Internal edges | 105 |
+| Exports | 188 |
 
 ## Modules
 
@@ -29,6 +29,7 @@
 - `core/export-pdf.ts`
 - `core/export-png.ts`
 - `core/export.ts`
+- `core/format.ts`
 - `core/normalize-svg.ts`
 - `core/render.ts`
 - `core/scan-dot.ts`
@@ -206,8 +207,8 @@ None. ✅
 - `ThemeButtonOptions` in `src/toolbar/theme-button.ts`
 - `FileWatchOptions` in `src/watch/file-watch.ts`
 - `PageGeometry` in `core/export-pdf.ts`
+- `FormatOptions` in `core/format.ts`
 - `NormalizedSvg` in `core/normalize-svg.ts`
-- `Span` in `core/scan-dot.ts`
 - `BalanceResult` in `core/scan-dot.ts`
 - `SpanKind` in `core/scan-dot.ts`
 - `StructuralDiagnostic` in `core/structure-lint.ts`
@@ -272,6 +273,7 @@ None. ✅
 | `core/export-pdf.ts` | `test/core/export-pdf.test.ts` |
 | `core/export-png.ts` | `test/core/export-png.test.ts` |
 | `core/export.ts` | `test/core/export.test.ts` |
+| `core/format.ts` | `test/core/format.test.ts` |
 | `core/normalize-svg.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts` |
 | `core/render.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts`, `test/core/render.test.ts`, `test/core/validate.test.ts` |
 | `core/scan-dot.ts` | `test/core/scan-dot.test.ts` |

@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 61,
+    "fileCount": 62,
     "moduleCount": 21,
-    "totalLoc": 6563,
-    "edgeCount": 103,
-    "exportCount": 186
+    "totalLoc": 6721,
+    "edgeCount": 105,
+    "exportCount": 188
   },
   "modules": {
     "autosave": [
@@ -94,6 +94,7 @@
       "core/export-pdf.ts",
       "core/export-png.ts",
       "core/export.ts",
+      "core/format.ts",
       "core/normalize-svg.ts",
       "core/render.ts",
       "core/scan-dot.ts",
@@ -317,12 +318,12 @@
         "name": "PageGeometry"
       },
       {
-        "file": "core/normalize-svg.ts",
-        "name": "NormalizedSvg"
+        "file": "core/format.ts",
+        "name": "FormatOptions"
       },
       {
-        "file": "core/scan-dot.ts",
-        "name": "Span"
+        "file": "core/normalize-svg.ts",
+        "name": "NormalizedSvg"
       },
       {
         "file": "core/scan-dot.ts",
@@ -664,6 +665,12 @@
       "file": "core/export.ts",
       "testFiles": [
         "test/core/export.test.ts"
+      ]
+    },
+    {
+      "file": "core/format.ts",
+      "testFiles": [
+        "test/core/format.test.ts"
       ]
     },
     {
@@ -1312,6 +1319,14 @@
       "loc": 36,
       "exports": [
         "exportDiagram"
+      ]
+    },
+    {
+      "path": "core/format.ts",
+      "loc": 158,
+      "exports": [
+        "formatDot",
+        "FormatOptions"
       ]
     },
     {
