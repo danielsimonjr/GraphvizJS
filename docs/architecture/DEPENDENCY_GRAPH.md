@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 59 |
+| Files | 60 |
 | Modules | 21 |
-| Lines of code | 6282 |
+| Lines of code | 6460 |
 | Internal edges | 101 |
-| Exports | 181 |
+| Exports | 184 |
 
 ## Modules
 
@@ -25,6 +25,7 @@
 
 ### core
 
+- `core/dot-vocab.ts`
 - `core/export-pdf.ts`
 - `core/export-png.ts`
 - `core/export.ts`
@@ -208,6 +209,7 @@ None. ✅
 - `Span` in `core/scan-dot.ts`
 - `BalanceResult` in `core/scan-dot.ts`
 - `SpanKind` in `core/scan-dot.ts`
+- `DotVocabulary` in `core/types.ts`
 - `PdfPageMode` in `core/types.ts`
 - `PdfPageSize` in `core/types.ts`
 - `ParsedArgs` in `cli/args.ts`
@@ -264,6 +266,7 @@ None. ✅
 | `src/watch/watch-plan.ts` | `test/watch/watch-plan.test.ts` |
 | `src/window/state.ts` | `test/window/state.test.ts` |
 | `src/workspace/resize.ts` | `test/workspace/resize.test.ts` |
+| `core/dot-vocab.ts` | `test/core/dot-vocab.test.ts` |
 | `core/export-pdf.ts` | `test/core/export-pdf.test.ts` |
 | `core/export-png.ts` | `test/core/export-png.test.ts` |
 | `core/export.ts` | `test/core/export.test.ts` |

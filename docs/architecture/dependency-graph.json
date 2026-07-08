@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 59,
+    "fileCount": 60,
     "moduleCount": 21,
-    "totalLoc": 6282,
+    "totalLoc": 6460,
     "edgeCount": 101,
-    "exportCount": 181
+    "exportCount": 184
   },
   "modules": {
     "autosave": [
@@ -90,6 +90,7 @@
       "src/workspace/resize.ts"
     ],
     "core": [
+      "core/dot-vocab.ts",
       "core/export-pdf.ts",
       "core/export-png.ts",
       "core/export.ts",
@@ -329,6 +330,10 @@
       {
         "file": "core/scan-dot.ts",
         "name": "SpanKind"
+      },
+      {
+        "file": "core/types.ts",
+        "name": "DotVocabulary"
       },
       {
         "file": "core/types.ts",
@@ -630,6 +635,12 @@
       "file": "src/workspace/resize.ts",
       "testFiles": [
         "test/workspace/resize.test.ts"
+      ]
+    },
+    {
+      "file": "core/dot-vocab.ts",
+      "testFiles": [
+        "test/core/dot-vocab.test.ts"
       ]
     },
     {
@@ -1262,6 +1273,14 @@
       ]
     },
     {
+      "path": "core/dot-vocab.ts",
+      "loc": 172,
+      "exports": [
+        "DOT_KEYWORDS",
+        "DOT_ATTRIBUTES"
+      ]
+    },
+    {
       "path": "core/export-pdf.ts",
       "loc": 218,
       "exports": [
@@ -1315,11 +1334,12 @@
     },
     {
       "path": "core/types.ts",
-      "loc": 58,
+      "loc": 64,
       "exports": [
         "DotValidationError",
         "PdfExportOptions",
         "ExportResult",
+        "DotVocabulary",
         "LayoutEngine",
         "ExportFormat",
         "PdfPageMode",

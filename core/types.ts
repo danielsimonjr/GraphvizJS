@@ -56,3 +56,9 @@ export interface ExportResult {
   ext: string;
   mime: string;
 }
+
+/** DOT vocabulary handed to the renderer over IPC for highlighting/autocomplete. */
+export interface DotVocabulary {
+  keywords: string[];
+  attributes: string[];
+}
