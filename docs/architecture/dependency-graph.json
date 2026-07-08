@@ -2,7 +2,7 @@
   "stats": {
     "fileCount": 64,
     "moduleCount": 21,
-    "totalLoc": 6933,
+    "totalLoc": 6948,
     "edgeCount": 121,
     "exportCount": 189
   },
@@ -906,7 +906,7 @@
     },
     {
       "path": "src/editor/linting.ts",
-      "loc": 192,
+      "loc": 207,
       "exports": [
         "lintGutter",
         "createDotLinter",
