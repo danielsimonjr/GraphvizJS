@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 62 |
+| Files | 61 |
 | Modules | 21 |
-| Lines of code | 6578 |
-| Internal edges | 110 |
-| Exports | 187 |
+| Lines of code | 6470 |
+| Internal edges | 111 |
+| Exports | 184 |
 
 ## Modules
 
@@ -42,7 +42,6 @@
 ### editor
 
 - `src/editor/autocomplete.ts`
-- `src/editor/dot-data.ts`
 - `src/editor/language.ts`
 - `src/editor/linting.ts`
 - `src/editor/search.ts`
@@ -221,7 +220,6 @@ None. ✅
 | --- | --- |
 | `src/autosave/constants.ts` | `test/session/session.test.ts` |
 | `src/editor/autocomplete.ts` | `test/editor/autocomplete.test.ts` |
-| `src/editor/dot-data.ts` | `test/editor/dot-data.test.ts` |
 | `src/editor/language.ts` | `test/editor/language.test.ts` |
 | `src/editor/linting.ts` | `test/editor/linting.test.ts` |
 | `src/editor/search.ts` | `test/editor/search.test.ts` |
@@ -262,9 +260,9 @@ None. ✅
 | `src/watch/watch-plan.ts` | `test/watch/watch-plan.test.ts` |
 | `src/window/state.ts` | `test/window/state.test.ts` |
 | `src/workspace/resize.ts` | `test/workspace/resize.test.ts` |
-| `core/dot-catalog.ts` | `test/core/dot-catalog.test.ts` |
-| `core/dot-colors.ts` | `test/core/dot-colors.test.ts` |
-| `core/dot-vocab.ts` | `test/core/dot-catalog.test.ts`, `test/core/dot-vocab.test.ts`, `test/editor/autocomplete.test.ts`, `test/editor/dot-data.test.ts`, `test/editor/language.test.ts` |
+| `core/dot-catalog.ts` | `test/core/dot-catalog.test.ts`, `test/editor/autocomplete.test.ts` |
+| `core/dot-colors.ts` | `test/core/dot-colors.test.ts`, `test/editor/autocomplete.test.ts` |
+| `core/dot-vocab.ts` | `test/core/dot-catalog.test.ts`, `test/core/dot-vocab.test.ts`, `test/editor/autocomplete.test.ts`, `test/editor/language.test.ts` |
 | `core/export-pdf.ts` | `test/core/export-pdf.test.ts` |
 | `core/export-png.ts` | `test/core/export-png.test.ts` |
 | `core/export.ts` | `test/core/export.test.ts` |

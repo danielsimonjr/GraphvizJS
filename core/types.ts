@@ -61,6 +61,10 @@ export interface ExportResult {
 export interface DotVocabulary {
   keywords: string[];
   attributes: string[];
+  /** Enum attribute name -> its value domain (from the attribute catalog). */
+  attributeValues: Record<string, string[]>;
+  /** Named colors accepted by color-valued attributes. */
+  colors: string[];
 }
 
 /** A structural lint finding, positioned by 0-based character offsets. */

@@ -4,6 +4,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, dialog, ipcMain, screen, shell } from 'electron';
 import Store from 'electron-store';
+import { DOT_ATTRIBUTE_CATALOG } from '../core/dot-catalog';
+import { DOT_COLORS } from '../core/dot-colors';
 import { DOT_ATTRIBUTES, DOT_KEYWORDS } from '../core/dot-vocab';
 import { exportDiagram } from '../core/export';
 import { formatDot } from '../core/format';
@@ -205,6 +207,13 @@ function registerIpc(): void {
   ipcMain.handle('dot:vocabulary', () => ({
     keywords: [...DOT_KEYWORDS],
     attributes: [...DOT_ATTRIBUTES],
+    attributeValues: Object.fromEntries(
+      DOT_ATTRIBUTE_CATALOG.filter((s) => s.type === 'enum' && s.values).map((s) => [
+        s.name,
+        [...s.values!],
+      ])
+    ),
+    colors: [...DOT_COLORS],
   }));
 }
 

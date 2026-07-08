@@ -88,10 +88,16 @@ describe('platform', () => {
     expect(result).toBe('digraph {\n  a -> b\n}\n');
   });
 
-  it('dotVocabulary delegates and returns the keyword/attribute lists', async () => {
-    api.dotVocabulary.mockResolvedValue({ keywords: ['digraph'], attributes: ['color'] });
+  it('dotVocabulary delegates and returns the keyword/attribute/value/color data', async () => {
+    const vocab = {
+      keywords: ['digraph'],
+      attributes: ['color'],
+      attributeValues: { shape: ['box', 'ellipse'] },
+      colors: ['red', 'blue'],
+    };
+    api.dotVocabulary.mockResolvedValue(vocab);
     const result = await platform.dotVocabulary();
     expect(api.dotVocabulary).toHaveBeenCalled();
-    expect(result).toEqual({ keywords: ['digraph'], attributes: ['color'] });
+    expect(result).toEqual(vocab);
   });
 });

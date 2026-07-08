@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 62,
+    "fileCount": 61,
     "moduleCount": 21,
-    "totalLoc": 6578,
-    "edgeCount": 110,
-    "exportCount": 187
+    "totalLoc": 6470,
+    "edgeCount": 111,
+    "exportCount": 184
   },
   "modules": {
     "autosave": [
@@ -12,7 +12,6 @@
     ],
     "editor": [
       "src/editor/autocomplete.ts",
-      "src/editor/dot-data.ts",
       "src/editor/language.ts",
       "src/editor/linting.ts",
       "src/editor/search.ts",
@@ -360,12 +359,6 @@
       ]
     },
     {
-      "file": "src/editor/dot-data.ts",
-      "testFiles": [
-        "test/editor/dot-data.test.ts"
-      ]
-    },
-    {
       "file": "src/editor/language.ts",
       "testFiles": [
         "test/editor/language.test.ts"
@@ -611,13 +604,15 @@
     {
       "file": "core/dot-catalog.ts",
       "testFiles": [
-        "test/core/dot-catalog.test.ts"
+        "test/core/dot-catalog.test.ts",
+        "test/editor/autocomplete.test.ts"
       ]
     },
     {
       "file": "core/dot-colors.ts",
       "testFiles": [
-        "test/core/dot-colors.test.ts"
+        "test/core/dot-colors.test.ts",
+        "test/editor/autocomplete.test.ts"
       ]
     },
     {
@@ -626,7 +621,6 @@
         "test/core/dot-catalog.test.ts",
         "test/core/dot-vocab.test.ts",
         "test/editor/autocomplete.test.ts",
-        "test/editor/dot-data.test.ts",
         "test/editor/language.test.ts"
       ]
     },
@@ -880,19 +874,10 @@
     },
     {
       "path": "src/editor/autocomplete.ts",
-      "loc": 94,
+      "loc": 97,
       "exports": [
         "makeDotCompletionSource",
         "createDotAutocomplete"
-      ]
-    },
-    {
-      "path": "src/editor/dot-data.ts",
-      "loc": 124,
-      "exports": [
-        "DOT_ATTR_VALUES",
-        "DOT_COLORS",
-        "isColorAttribute"
       ]
     },
     {
@@ -1360,7 +1345,7 @@
     },
     {
       "path": "core/types.ts",
-      "loc": 78,
+      "loc": 82,
       "exports": [
         "DotValidationError",
         "PdfExportOptions",
@@ -1418,7 +1403,7 @@
     },
     {
       "path": "electron/main.ts",
-      "loc": 229,
+      "loc": 238,
       "exports": []
     },
     {
