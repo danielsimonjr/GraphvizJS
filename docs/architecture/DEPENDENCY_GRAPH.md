@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 61 |
+| Files | 62 |
 | Modules | 21 |
-| Lines of code | 6393 |
+| Lines of code | 6578 |
 | Internal edges | 110 |
-| Exports | 182 |
+| Exports | 187 |
 
 ## Modules
 
@@ -25,6 +25,7 @@
 
 ### core
 
+- `core/dot-catalog.ts`
 - `core/dot-colors.ts`
 - `core/dot-vocab.ts`
 - `core/export-pdf.ts`
@@ -200,6 +201,9 @@ None. ✅
 - `ToolbarShortcutsOptions` in `src/toolbar/shortcuts.ts`
 - `ThemeButtonOptions` in `src/toolbar/theme-button.ts`
 - `FileWatchOptions` in `src/watch/file-watch.ts`
+- `DotAttributeSpec` in `core/dot-catalog.ts`
+- `AttrContext` in `core/dot-catalog.ts`
+- `AttrType` in `core/dot-catalog.ts`
 - `PageGeometry` in `core/export-pdf.ts`
 - `FormatOptions` in `core/format.ts`
 - `NormalizedSvg` in `core/normalize-svg.ts`
@@ -258,8 +262,9 @@ None. ✅
 | `src/watch/watch-plan.ts` | `test/watch/watch-plan.test.ts` |
 | `src/window/state.ts` | `test/window/state.test.ts` |
 | `src/workspace/resize.ts` | `test/workspace/resize.test.ts` |
+| `core/dot-catalog.ts` | `test/core/dot-catalog.test.ts` |
 | `core/dot-colors.ts` | `test/core/dot-colors.test.ts` |
-| `core/dot-vocab.ts` | `test/core/dot-vocab.test.ts`, `test/editor/autocomplete.test.ts`, `test/editor/dot-data.test.ts`, `test/editor/language.test.ts` |
+| `core/dot-vocab.ts` | `test/core/dot-catalog.test.ts`, `test/core/dot-vocab.test.ts`, `test/editor/autocomplete.test.ts`, `test/editor/dot-data.test.ts`, `test/editor/language.test.ts` |
 | `core/export-pdf.ts` | `test/core/export-pdf.test.ts` |
 | `core/export-png.ts` | `test/core/export-png.test.ts` |
 | `core/export.ts` | `test/core/export.test.ts` |

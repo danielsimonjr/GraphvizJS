@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 61,
+    "fileCount": 62,
     "moduleCount": 21,
-    "totalLoc": 6393,
+    "totalLoc": 6578,
     "edgeCount": 110,
-    "exportCount": 182
+    "exportCount": 187
   },
   "modules": {
     "autosave": [
@@ -87,6 +87,7 @@
       "src/workspace/resize.ts"
     ],
     "core": [
+      "core/dot-catalog.ts",
       "core/dot-colors.ts",
       "core/dot-vocab.ts",
       "core/export-pdf.ts",
@@ -290,6 +291,18 @@
       {
         "file": "src/watch/file-watch.ts",
         "name": "FileWatchOptions"
+      },
+      {
+        "file": "core/dot-catalog.ts",
+        "name": "DotAttributeSpec"
+      },
+      {
+        "file": "core/dot-catalog.ts",
+        "name": "AttrContext"
+      },
+      {
+        "file": "core/dot-catalog.ts",
+        "name": "AttrType"
       },
       {
         "file": "core/export-pdf.ts",
@@ -596,6 +609,12 @@
       ]
     },
     {
+      "file": "core/dot-catalog.ts",
+      "testFiles": [
+        "test/core/dot-catalog.test.ts"
+      ]
+    },
+    {
       "file": "core/dot-colors.ts",
       "testFiles": [
         "test/core/dot-colors.test.ts"
@@ -604,6 +623,7 @@
     {
       "file": "core/dot-vocab.ts",
       "testFiles": [
+        "test/core/dot-catalog.test.ts",
         "test/core/dot-vocab.test.ts",
         "test/editor/autocomplete.test.ts",
         "test/editor/dot-data.test.ts",
@@ -1242,6 +1262,17 @@
       "loc": 57,
       "exports": [
         "initHorizontalResize"
+      ]
+    },
+    {
+      "path": "core/dot-catalog.ts",
+      "loc": 185,
+      "exports": [
+        "DOT_ATTRIBUTE_CATALOG",
+        "findAttribute",
+        "DotAttributeSpec",
+        "AttrContext",
+        "AttrType"
       ]
     },
     {
