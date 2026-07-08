@@ -24,13 +24,17 @@ type PdfPageArg = (typeof PDF_PAGES)[number];
 
 /** Parsed, validated CLI arguments for the `graphvizjs` command. */
 export interface ParsedArgs {
-  command: 'render' | 'help' | 'version';
+  command: 'render' | 'validate' | 'format' | 'help' | 'version';
   input?: string;
   output?: string;
   engine: LayoutEngine;
   format?: 'svg' | 'png' | 'pdf';
   scale: 1 | 2;
   pdf: PdfExportOptions;
+  /** validate only: emit machine-readable JSON instead of human output. */
+  json?: boolean;
+  /** validate only: fail (exit 1) when structural warnings are present. */
+  strict?: boolean;
 }
 
 /** A parse/validation failure, distinguished from `ParsedArgs` by the `error` key. */
@@ -65,6 +69,8 @@ export function parseArgs(argv: string[]): ParsedArgs | ParseError {
   if (first === '--version' || first === '-v') {
     return { command: 'version', engine: 'dot', scale: 1, pdf: DEFAULT_PDF };
   }
+  if (first === 'validate') return parseValidate(argv.slice(1));
+  if (first === 'format') return parseFormat(argv.slice(1));
   if (first !== 'render') {
     return { error: `Unknown command: ${first}` };
   }
@@ -169,4 +175,72 @@ export function parseArgs(argv: string[]): ParsedArgs | ParseError {
     scale,
     pdf,
   };
+}
+
+/** Parse `validate <input|-> [--engine E] [--json] [--strict]`. */
+function parseValidate(rest: string[]): ParsedArgs | ParseError {
+  let input: string | undefined;
+  let engine: LayoutEngine = 'dot';
+  let json = false;
+  let strict = false;
+
+  for (let i = 0; i < rest.length; i++) {
+    const arg = rest[i];
+    switch (arg) {
+      case '--engine': {
+        const value = rest[++i];
+        if (value === undefined) return { error: 'Missing value for --engine' };
+        if (!ENGINES.includes(value as LayoutEngine)) {
+          return { error: `Unknown engine: ${value}. Expected one of ${ENGINES.join(', ')}` };
+        }
+        engine = value as LayoutEngine;
+        break;
+      }
+      case '--json':
+        json = true;
+        break;
+      case '--strict':
+        strict = true;
+        break;
+      default: {
+        if (arg !== '-' && arg.startsWith('-')) return { error: `Unknown flag: ${arg}` };
+        if (input === undefined) input = arg;
+        else return { error: `Unexpected argument: ${arg}` };
+      }
+    }
+  }
+
+  if (input === undefined) {
+    return { error: 'Missing input. Expected a .dot file path or "-" for stdin.' };
+  }
+  return { command: 'validate', input, engine, scale: 1, pdf: DEFAULT_PDF, json, strict };
+}
+
+/** Parse `format <input|-> [-o <output>]` (no output → stdout). */
+function parseFormat(rest: string[]): ParsedArgs | ParseError {
+  let input: string | undefined;
+  let output: string | undefined;
+
+  for (let i = 0; i < rest.length; i++) {
+    const arg = rest[i];
+    switch (arg) {
+      case '-o':
+      case '--output': {
+        const value = rest[++i];
+        if (value === undefined) return { error: `Missing value for ${arg}` };
+        output = value;
+        break;
+      }
+      default: {
+        if (arg !== '-' && arg.startsWith('-')) return { error: `Unknown flag: ${arg}` };
+        if (input === undefined) input = arg;
+        else return { error: `Unexpected argument: ${arg}` };
+      }
+    }
+  }
+
+  if (input === undefined) {
+    return { error: 'Missing input. Expected a .dot file path or "-" for stdin.' };
+  }
+  return { command: 'format', input, output, engine: 'dot', scale: 1, pdf: DEFAULT_PDF };
 }

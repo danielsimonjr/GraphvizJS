@@ -44,3 +44,39 @@ describe('parseArgs', () => {
     });
   });
 });
+
+describe('parseArgs — validate', () => {
+  it('parses `validate in.dot --json`', () => {
+    const r = parseArgs(['validate', 'in.dot', '--json']);
+    expect(r).toMatchObject({ command: 'validate', input: 'in.dot', json: true });
+  });
+  it('parses `--engine` and `--strict`', () => {
+    const r = parseArgs(['validate', '-', '--engine', 'neato', '--strict']);
+    expect(r).toMatchObject({ command: 'validate', input: '-', engine: 'neato', strict: true });
+  });
+  it('rejects an unknown engine', () => {
+    expect('error' in parseArgs(['validate', 'in.dot', '--engine', 'nope'])).toBe(true);
+  });
+  it('rejects render-only flags on validate', () => {
+    expect('error' in parseArgs(['validate', 'in.dot', '-o', 'out.svg'])).toBe(true);
+  });
+  it('requires an input', () => {
+    expect('error' in parseArgs(['validate'])).toBe(true);
+  });
+});
+
+describe('parseArgs — format', () => {
+  it('parses `format in.dot -o out.dot`', () => {
+    const r = parseArgs(['format', 'in.dot', '-o', 'out.dot']);
+    expect(r).toMatchObject({ command: 'format', input: 'in.dot', output: 'out.dot' });
+  });
+  it('allows format without -o (stdout)', () => {
+    const r = parseArgs(['format', 'in.dot']);
+    expect(r).toMatchObject({ command: 'format', input: 'in.dot' });
+    expect('error' in r).toBe(false);
+    if (!('error' in r)) expect(r.output).toBeUndefined();
+  });
+  it('rejects an unknown flag on format', () => {
+    expect('error' in parseArgs(['format', 'in.dot', '--engine', 'dot'])).toBe(true);
+  });
+});

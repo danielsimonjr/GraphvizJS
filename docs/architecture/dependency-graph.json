@@ -2,7 +2,7 @@
   "stats": {
     "fileCount": 60,
     "moduleCount": 21,
-    "totalLoc": 6200,
+    "totalLoc": 6274,
     "edgeCount": 108,
     "exportCount": 179
   },
@@ -1337,7 +1337,7 @@
     },
     {
       "path": "cli/args.ts",
-      "loc": 172,
+      "loc": 246,
       "exports": [
         "parseArgs",
         "ParsedArgs",
