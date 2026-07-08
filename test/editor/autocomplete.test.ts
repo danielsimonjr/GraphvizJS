@@ -1,7 +1,13 @@
 import { CompletionContext } from '@codemirror/autocomplete';
 import { EditorState } from '@codemirror/state';
 import { describe, expect, it } from 'vitest';
-import { dotCompletionSource } from '../../src/editor/autocomplete';
+import { DOT_ATTRIBUTES, DOT_KEYWORDS } from '../../core/dot-vocab';
+import { makeDotCompletionSource } from '../../src/editor/autocomplete';
+
+const dotCompletionSource = makeDotCompletionSource({
+  keywords: [...DOT_KEYWORDS],
+  attributes: [...DOT_ATTRIBUTES],
+});
 
 /** Build a completion context at the end of `doc` (caret at |, or end if absent). */
 function contextAt(doc: string): CompletionContext {

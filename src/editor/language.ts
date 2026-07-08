@@ -1,15 +1,13 @@
 import type { StringStream } from '@codemirror/language';
 import { StreamLanguage } from '@codemirror/language';
 import type { Extension } from '@codemirror/state';
-import { DOT_ATTRIBUTES, DOT_KEYWORDS } from './dot-data';
-
-export type DotKeyword = (typeof DOT_KEYWORDS)[number];
+import type { DotVocabulary } from '../../core/types';
 
 const ARROW_TOKENS = ['->', '--'];
 
-export function createDotLanguage(): Extension {
-  const keywordSet = new Set(DOT_KEYWORDS.map((word: DotKeyword) => word.toLowerCase()));
-  const attributeSet = new Set(DOT_ATTRIBUTES.map((attr) => attr.toLowerCase()));
+export function createDotLanguage(vocab: DotVocabulary): Extension {
+  const keywordSet = new Set(vocab.keywords.map((word) => word.toLowerCase()));
+  const attributeSet = new Set(vocab.attributes.map((attr) => attr.toLowerCase()));
 
   return StreamLanguage.define({
     token(stream: StringStream) {

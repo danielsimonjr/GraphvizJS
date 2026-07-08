@@ -23,6 +23,7 @@ import { LAYOUT_ENGINES } from './menu/menu-template';
 import { type Command, type CommandPalette, createCommandPalette } from './palette/command-palette';
 import {
   confirm,
+  dotVocabulary,
   store as platformStore,
   readTextFile,
   renderSvg,
@@ -73,7 +74,6 @@ const DEFAULT_SNIPPET = `digraph G {
 
 const RENDER_DELAY = 300;
 
-const DOT_LANGUAGE = createDotLanguage();
 const EDITOR_THEME = createEditorTheme();
 
 window.addEventListener('DOMContentLoaded', bootstrap);
@@ -202,12 +202,17 @@ async function bootstrap(): Promise<void> {
   const { extension: zoomExtension, compartment: zoomCompartment } = createEditorZoomExtension();
   const savedEditorZoom = await loadEditorZoom();
 
+  // DOT language vocabulary (keywords/attributes) is owned by core and fetched
+  // once over IPC; highlighting and autocomplete are built from it.
+  const vocab = await dotVocabulary();
+  const dotLanguage = createDotLanguage(vocab);
+
   /** Create a CodeMirror editor for a tab and attach it to the editor host. */
   function createTabEditor(initialDoc: string, visible: boolean): EditorView {
     const extensions = [
       basicSetup,
-      DOT_LANGUAGE,
-      createDotAutocomplete(),
+      dotLanguage,
+      createDotAutocomplete(vocab),
       createSearch(),
       keymap.of([makeFormatKeymap((doc) => schedulePreviewRender(doc))]),
       createDotLinter({

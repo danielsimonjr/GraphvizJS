@@ -2,9 +2,9 @@
   "stats": {
     "fileCount": 63,
     "moduleCount": 21,
-    "totalLoc": 6771,
-    "edgeCount": 110,
-    "exportCount": 192
+    "totalLoc": 6778,
+    "edgeCount": 111,
+    "exportCount": 191
   },
   "modules": {
     "autosave": [
@@ -200,10 +200,6 @@
       {
         "file": "src/editor/format.ts",
         "name": "FormatOptions"
-      },
-      {
-        "file": "src/editor/language.ts",
-        "name": "DotKeyword"
       },
       {
         "file": "src/editor/linting.ts",
@@ -646,7 +642,9 @@
     {
       "file": "core/dot-vocab.ts",
       "testFiles": [
-        "test/core/dot-vocab.test.ts"
+        "test/core/dot-vocab.test.ts",
+        "test/editor/autocomplete.test.ts",
+        "test/editor/language.test.ts"
       ]
     },
     {
@@ -898,9 +896,9 @@
     },
     {
       "path": "src/editor/autocomplete.ts",
-      "loc": 90,
+      "loc": 94,
       "exports": [
-        "dotCompletionSource",
+        "makeDotCompletionSource",
         "createDotAutocomplete"
       ]
     },
@@ -925,10 +923,9 @@
     },
     {
       "path": "src/editor/language.ts",
-      "loc": 113,
+      "loc": 111,
       "exports": [
-        "createDotLanguage",
-        "DotKeyword"
+        "createDotLanguage"
       ]
     },
     {
@@ -993,7 +990,7 @@
     },
     {
       "path": "src/main.ts",
-      "loc": 905,
+      "loc": 910,
       "exports": []
     },
     {

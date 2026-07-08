@@ -8,9 +8,9 @@
 | --- | --- |
 | Files | 63 |
 | Modules | 21 |
-| Lines of code | 6771 |
-| Internal edges | 110 |
-| Exports | 192 |
+| Lines of code | 6778 |
+| Internal edges | 111 |
+| Exports | 191 |
 
 ## Modules
 
@@ -179,7 +179,6 @@ None. ✅
 
 **Unused exports:**
 - `FormatOptions` in `src/editor/format.ts`
-- `DotKeyword` in `src/editor/language.ts`
 - `DotLinterOptions` in `src/editor/linting.ts`
 - `BalanceResult` in `src/editor/scan-dot.ts`
 - `SpanKind` in `src/editor/scan-dot.ts`
@@ -270,7 +269,7 @@ None. ✅
 | `src/watch/watch-plan.ts` | `test/watch/watch-plan.test.ts` |
 | `src/window/state.ts` | `test/window/state.test.ts` |
 | `src/workspace/resize.ts` | `test/workspace/resize.test.ts` |
-| `core/dot-vocab.ts` | `test/core/dot-vocab.test.ts` |
+| `core/dot-vocab.ts` | `test/core/dot-vocab.test.ts`, `test/editor/autocomplete.test.ts`, `test/editor/language.test.ts` |
 | `core/export-pdf.ts` | `test/core/export-pdf.test.ts` |
 | `core/export-png.ts` | `test/core/export-png.test.ts` |
 | `core/export.ts` | `test/core/export.test.ts` |

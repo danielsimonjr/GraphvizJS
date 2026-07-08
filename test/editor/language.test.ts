@@ -1,17 +1,20 @@
 import { syntaxTree } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
 import { describe, expect, it } from 'vitest';
+import { DOT_ATTRIBUTES, DOT_KEYWORDS } from '../../core/dot-vocab';
 import { createDotLanguage } from '../../src/editor/language';
 
+const VOCAB = { keywords: [...DOT_KEYWORDS], attributes: [...DOT_ATTRIBUTES] };
+
 describe('language', () => {
-  describe('createDotLanguage()', () => {
+  describe('createDotLanguage(VOCAB)', () => {
     it('returns Extension', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       expect(extension).toBeDefined();
     });
 
     it('can be used with EditorState', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { a -> b }',
         extensions: [extension],
@@ -24,7 +27,7 @@ describe('language', () => {
   describe('DOT_KEYWORDS constant', () => {
     it('includes digraph', () => {
       // Verify keyword is used by creating state with it
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph G {}',
         extensions: [extension],
@@ -33,7 +36,7 @@ describe('language', () => {
     });
 
     it('includes graph', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'graph G {}',
         extensions: [extension],
@@ -42,7 +45,7 @@ describe('language', () => {
     });
 
     it('includes subgraph', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { subgraph cluster_0 {} }',
         extensions: [extension],
@@ -51,7 +54,7 @@ describe('language', () => {
     });
 
     it('includes node', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { node [shape=box] }',
         extensions: [extension],
@@ -60,7 +63,7 @@ describe('language', () => {
     });
 
     it('includes edge', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { edge [color=red] }',
         extensions: [extension],
@@ -69,7 +72,7 @@ describe('language', () => {
     });
 
     it('includes strict', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'strict digraph {}',
         extensions: [extension],
@@ -80,7 +83,7 @@ describe('language', () => {
 
   describe('Operators', () => {
     it('handles -> arrow', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { a -> b }',
         extensions: [extension],
@@ -89,7 +92,7 @@ describe('language', () => {
     });
 
     it('handles -- edge', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'graph { a -- b }',
         extensions: [extension],
@@ -100,7 +103,7 @@ describe('language', () => {
 
   describe('Comments', () => {
     it('handles // single-line comments', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { // comment\n a -> b }',
         extensions: [extension],
@@ -109,7 +112,7 @@ describe('language', () => {
     });
 
     it('handles /* */ block comments', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { /* comment */ a -> b }',
         extensions: [extension],
@@ -120,7 +123,7 @@ describe('language', () => {
 
   describe('Strings', () => {
     it('handles double-quoted strings', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { a [label="Hello World"] }',
         extensions: [extension],
@@ -129,7 +132,7 @@ describe('language', () => {
     });
 
     it('handles HTML labels', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { a [label=<table><tr><td>cell</td></tr></table>] }',
         extensions: [extension],
@@ -140,7 +143,7 @@ describe('language', () => {
 
   describe('Attributes', () => {
     it('handles label attribute', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { a [label=test] }',
         extensions: [extension],
@@ -149,7 +152,7 @@ describe('language', () => {
     });
 
     it('handles color attribute', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { a [color=red] }',
         extensions: [extension],
@@ -158,7 +161,7 @@ describe('language', () => {
     });
 
     it('handles shape attribute', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { a [shape=box] }',
         extensions: [extension],
@@ -169,7 +172,7 @@ describe('language', () => {
 
   describe('Numbers', () => {
     it('handles integer numbers', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { a [width=42] }',
         extensions: [extension],
@@ -178,7 +181,7 @@ describe('language', () => {
     });
 
     it('handles decimal numbers', () => {
-      const extension = createDotLanguage();
+      const extension = createDotLanguage(VOCAB);
       const state = EditorState.create({
         doc: 'digraph { a [width=3.14] }',
         extensions: [extension],
