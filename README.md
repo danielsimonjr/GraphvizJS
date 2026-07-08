@@ -1,6 +1,6 @@
 # GraphvizJS Desktop Client
 
-GraphvizJS is a desktop editor for [Graphviz](https://graphviz.org/) DOT diagrams with real-time preview, syntax highlighting, and SVG/PNG export. Built with Electron, it pairs a CodeMirror-based authoring experience with a live preview powered by Graphviz WebAssembly, file management helpers, and zoom controls for both editor and preview.
+GraphvizJS is a desktop editor for [Graphviz](https://graphviz.org/) DOT diagrams with real-time preview, syntax highlighting, and SVG/PNG/PDF export. Built with Electron, it pairs a multi-tab, CodeMirror-based authoring experience with a live preview powered by Graphviz WebAssembly, a light/dark theme, a command palette, and zoom controls for both editor and preview. All Graphviz work (render, validation, and export) runs headlessly in a Node-only core in the main process; the same core also ships as a `graphvizjs` CLI.
 
 Based on [MermaidJS Desktop Client](https://github.com/skydiver/mermaidjs-desktop-client) by Martín M.
 
@@ -10,24 +10,31 @@ Based on [MermaidJS Desktop Client](https://github.com/skydiver/mermaidjs-deskto
 2. [Prerequisites](#prerequisites)
 3. [Getting Started](#getting-started)
 4. [Building](#building)
-5. [Tooling](#tooling)
-6. [Testing](#testing)
-7. [Project Structure](#project-structure)
-8. [Acknowledgements](#acknowledgements)
+5. [Command-Line Interface](#command-line-interface)
+6. [Tooling](#tooling)
+7. [Testing](#testing)
+8. [Project Structure](#project-structure)
+9. [Acknowledgements](#acknowledgements)
 
 ## Features
 
-- **Live editing** – Write DOT syntax with syntax highlighting, line wrapping, and tab indentation support.
+- **Live editing** – Write DOT with syntax highlighting, autocomplete (keywords, attributes, and value enums), snippets, line wrapping, and tab indentation.
 - **Instant preview** – Debounced rendering keeps the preview in sync while typing, with friendly error feedback when diagrams fail to render.
-- **Multiple layout engines** – Support for all Graphviz layout engines (dot, neato, fdp, sfdp, circo, twopi, osage, patchwork).
-- **File workflow** – New, open, and save actions integrate with the native filesystem via Electron dialog and fs APIs. Status bar tracks unsaved changes and last saved time.
+- **Inline linting** – Real-time diagnostics combine Graphviz syntax errors with structural warnings (unbalanced delimiters, unknown attributes), shown in the gutter.
+- **Multiple layout engines** – All Graphviz engines (dot, neato, fdp, sfdp, circo, twopi, osage, patchwork), selectable per tab.
+- **Multiple tabs** – Edit several diagrams at once; each tab keeps its own file, unsaved state, and layout engine.
+- **Session restore** – Open tabs, unsaved edits, and per-tab settings are silently restored on the next launch — no crash-recovery prompt.
+- **File workflow** – New, open, save, and save-as via native dialogs; a recent-files menu; and external-change detection that reloads clean tabs (and prompts for dirty ones) when a file changes on disk.
+- **Smart exports** – Save diagrams as PNG (1× and 2× scale), SVG, or vector PDF (fit-to-page or Letter/A4, with orientation), all with built-in padding and scaling.
+- **Format document** – One-shot reindent and spacing cleanup of DOT source (Shift+Alt+F).
+- **Command palette** – Fuzzy-search and run any command with Ctrl/Cmd+Shift+P.
+- **Theme** – System, Light, or Dark, switchable from the toolbar, the command palette, or Preferences.
+- **Preferences dialog** – Cmd/Ctrl+, opens app settings (Appearance → Theme today, built to grow).
 - **Built-in examples** – Quick-start templates for directed graphs, undirected graphs, clusters, and more.
-- **Smart exports** – Save diagrams as PNG (1× and 2× scale) or SVG with built-in padding, white backgrounds, and automatic scaling.
-- **Keyboard shortcuts** – Standard shortcuts for file operations, editor zoom (Cmd/Ctrl+=/−/0), and help (F1).
-- **Editor zoom** – Zoom in/out and reset the code editor font size with keyboard shortcuts.
-- **Preview zoom** – Zoom diagrams with Ctrl+Scroll or toolbar controls.
-- **Help dialog** – Press F1 to view app info, keyboard shortcuts, and available diagram examples.
-- **Resizable workspace** – Drag the divider to resize editor/preview panes or double-click to reset.
+- **Native application menu** – Standard File/Edit/View/Help menus wired to the same actions as the toolbar and keyboard.
+- **Editor & preview zoom** – Zoom the editor font (Cmd/Ctrl+=/−/0) and the diagram (Ctrl+Scroll or toolbar controls).
+- **Help dialog** – Press F1 for app info, keyboard shortcuts, and available examples.
+- **Resizable workspace** – Drag the divider to resize editor/preview panes, or double-click to reset.
 - **Window persistence** – Window position, size, and maximized state persist between launches via electron-store.
 
 ## Prerequisites
@@ -63,7 +70,7 @@ GraphvizJS targets **Windows only**. The `release/` directory contains the gener
 
 ## Command-Line Interface
 
-The same headless rendering core also ships as a `graphvizjs` CLI for scripting and CI — no desktop app or browser required.
+The same headless core also ships as a `graphvizjs` CLI for scripting and CI — no desktop app or browser required. It exposes exactly what the desktop app does, over the same `core/`: rendering, validation, and formatting.
 
 ```bash
 # Compile the CLI to dist-cli/ (also runs automatically on `npm pack`)
@@ -74,12 +81,23 @@ graphvizjs render diagram.dot -o diagram.svg
 graphvizjs render diagram.dot -o diagram.png --format png --scale 2
 graphvizjs render diagram.dot -o diagram.pdf --engine neato --pdf-page a4
 
-# Read DOT from stdin
+# Validate DOT — syntax errors + structural warnings
+graphvizjs validate diagram.dot                 # human output; exit 0 valid, 1 invalid, 2 usage
+graphvizjs validate diagram.dot --json          # machine-readable { valid, syntax, structural[] }
+graphvizjs validate diagram.dot --strict        # also fail (exit 1) on structural warnings
+
+# Format (reindent) DOT
+graphvizjs format diagram.dot -o pretty.dot     # write to a file
+graphvizjs format diagram.dot                   # or print to stdout
+
+# Read DOT from stdin (any command)
 cat diagram.dot | graphvizjs render - -o out.svg
 
 graphvizjs --help
 graphvizjs --version
 ```
+
+Because `validate` and `format` call the very same `core/` functions the renderer reaches over IPC, the CLI doubles as an **oracle** for troubleshooting the desktop app: run a problematic diagram through `graphvizjs validate --json` and, if it reproduces the symptom, the bug is in `core/`; if not, it's in the renderer or the IPC layer.
 
 `bin.graphvizjs` points at the compiled `dist-cli/cli/index.js`, so `npm link` (or a global install of the packed tarball) exposes the `graphvizjs` command on any platform. To run it from source without building, use `pnpm graphvizjs -- render diagram.dot -o out.svg` (via tsx). The native rendering deps (`@resvg/resvg-js`, `canvas`) and WASM Graphviz install as normal dependencies with cross-platform prebuilds.
 
@@ -129,32 +147,50 @@ Coverage reports are generated in HTML and LCOV formats in the `coverage/` direc
 
 ### Test Structure
 
-Tests are organized to mirror the source structure:
-- `test/editor/` – Editor component tests (language, theme, zoom)
-- `test/preview/` – Preview rendering tests (graphviz, render, zoom)
-- `test/toolbar/` – Toolbar action tests (file operations, export, menus)
-- `test/workspace/` – Workspace resize tests
-- `test/window/` – Window state persistence tests
-- `test/help/` – Help dialog tests
-- `test/utils/` – Utility function tests (debounce)
+Tests mirror the source structure:
+- `test/core/` – Headless core: render/validate, PNG/PDF/SVG export, normalize-svg, scan-dot, structure-lint, format, dot-vocab, `validateDiagram`
+- `test/cli/` – CLI argument parsing, `main()` integration (render/validate/format), and a build-and-subprocess test of the compiled `dist-cli` binary
+- `test/editor/` – Editor extensions (language, autocomplete, linting, search, theme, zoom, dot-data)
+- `test/preview/` – Preview scheduling and zoom
+- `test/toolbar/` – Toolbar actions (file ops, export, menus, format, layout engine, theme button, …)
+- `test/tabs/`, `test/session/`, `test/recent/`, `test/watch/` – Multi-tab, session restore, recent files, external-change handling
+- `test/menu/`, `test/palette/`, `test/preferences/`, `test/theme/` – Native menu, command palette, preferences, color scheme
+- `test/platform/` – Renderer↔main IPC wrapper delegation
+- `test/workspace/`, `test/window/`, `test/help/`, `test/utils/` – Pane resize, window state, help dialog, debounce
+- `test/architecture/` – Renderer-purity guard (no Graphviz runtime imports leak into `src/`)
+- `test/tools/` – Dependency-graph tool (IPC wiring, layering)
 - `test/mocks/` – Shared mocks for Electron APIs and Graphviz WASM
 - `test/e2e/` – End-to-end tests with Playwright (app, rendering, file ops, export, examples, shortcuts)
 
 ## Project Structure
 
-- `src/` – Frontend source (TypeScript/Vite)
-  - `editor/` – CodeMirror configuration (language support, theme, zoom)
-  - `preview/` – Graphviz WASM rendering logic and zoom controls
-  - `toolbar/` – File operations, export handlers, examples menu
-  - `workspace/` – Resizable pane management
-  - `window/` – Persistence layer for window state
-  - `help/` – Help dialog with shortcuts and app info
-  - `examples/` – Built-in DOT diagram templates
-  - `platform/` – Platform abstraction interface bridging renderer and Electron main process
-- `electron/` – Electron main process (`main.ts`), preload script (`preload.ts`), and IPC handlers
+The codebase is split into a Node-only headless core, an Electron main process, a browser renderer, and a CLI. The dependency-graph tool (see [Tooling](#tooling)) enforces the layering: `core/` is a self-contained leaf, `cli/` depends only on `core/`, and the renderer (`src/`) may reference `core/` only as the type-only `core/types` contract — it reaches Graphviz strictly over IPC.
+
+- `core/` – Node-only, DOM-free. All Graphviz work **and** pure DOT language tooling: `render.ts` (DOT→SVG + syntax validation via `@hpcc-js/wasm`), `normalize-svg.ts`, `export-png.ts`/`export-pdf.ts`/`export.ts` (SVG/PNG/PDF), `scan-dot.ts` (literal-aware scanner), `dot-vocab.ts` (keyword/attribute vocabulary), `structure-lint.ts` (structural diagnostics), `format.ts` (`formatDot`), `validate.ts` (`validateDiagram` = syntax + structural), and `types.ts`. Consumed by both the Electron main process and the CLI.
+- `cli/` – The `graphvizjs` binary: `args.ts` (argument parsing) and `index.ts` (`render`/`validate`/`format` commands). Compiled to `dist-cli/`.
+- `src/` – Renderer (TypeScript/Vite); each subdirectory exports setup functions wired together by `main.ts`:
+  - `platform/` – The renderer↔main IPC boundary (`contract.ts` = the `window.graphviz` API, `index.ts` = thin wrappers)
+  - `editor/` – CodeMirror extensions: language/highlighting, autocomplete, linting, search, theme, font zoom
+  - `preview/` – Debounced live preview (over IPC) and preview zoom
+  - `toolbar/` – One module per action (new/open/save/save-as, export + export menu, examples, recent, layout engine, find, format, PDF options, theme button, shortcuts)
+  - `tabs/` – Multi-tab management (`manager.ts`, `tab-bar.ts`)
+  - `session/` – Silent session capture/restore across launches
+  - `recent/` – Recent-files list core
+  - `watch/` – External file-change detection
+  - `menu/` – Native application menu template + command dispatch
+  - `theme/` – System/Light/Dark color scheme controller
+  - `palette/` – Command palette (Ctrl/Cmd+Shift+P)
+  - `preferences/` – Preferences dialog
+  - `help/` – Help dialog
+  - `workspace/` – Resizable pane divider
+  - `window/` – Window position/size persistence
+  - `examples/` – Built-in `.dot` templates (Vite glob import)
+  - `utils/` – Shared utilities (debounce)
+- `electron/` – Electron main process (`main.ts` + IPC handlers), preload script (`preload.ts`), native menu (`app-menu.ts`), and file watcher (`file-watcher.ts`)
+- `tools/dependency-graph/` – The architecture/dependency analyzer behind `pnpm graph` / `pnpm graph:check`
 
 ## Acknowledgements
 
-Built with [Electron](https://www.electronjs.org/), [Vite 7](https://vitejs.dev/), [CodeMirror 6](https://codemirror.net/6/), [@hpcc-js/wasm](https://github.com/hpcc-systems/hpcc-js-wasm) (Graphviz WebAssembly), [electron-store](https://github.com/sindresorhus/electron-store), and [Biome](https://biomejs.dev/) for linting/formatting.
+Built with [Electron](https://www.electronjs.org/), [Vite 7](https://vitejs.dev/), [CodeMirror 6](https://codemirror.net/6/), [@hpcc-js/wasm](https://github.com/hpcc-systems/hpcc-js-wasm) (Graphviz WebAssembly), [@resvg/resvg-js](https://github.com/yisibl/resvg-js) (PNG export), [jsPDF](https://github.com/parallax/jsPDF) + [svg2pdf.js](https://github.com/yWorks/svg2pdf.js) (vector PDF export), [electron-store](https://github.com/sindresorhus/electron-store), and [Biome](https://biomejs.dev/) for linting/formatting.
 
 Based on [MermaidJS Desktop Client](https://github.com/skydiver/mermaidjs-desktop-client) by Martín M.
