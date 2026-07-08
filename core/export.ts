@@ -23,9 +23,9 @@ export async function exportDiagram(
     case 'svg':
       return { bytes: new TextEncoder().encode(svg), ext: 'svg', mime: 'image/svg+xml' };
     case 'png':
-      return { bytes: toPngBytes(svg, width, height, 1), ext: 'png', mime: 'image/png' };
+      return { bytes: await toPngBytes(svg, width, height, 1), ext: 'png', mime: 'image/png' };
     case 'pngx2':
-      return { bytes: toPngBytes(svg, width, height, 2), ext: 'png', mime: 'image/png' };
+      return { bytes: await toPngBytes(svg, width, height, 2), ext: 'png', mime: 'image/png' };
     case 'pdf':
       return {
         bytes: await svgToPdfBytes(svg, width, height, options ?? DEFAULT_PDF_OPTIONS),

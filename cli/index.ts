@@ -35,8 +35,13 @@ export function offsetToLineCol(source: string, offset: number): { line: number;
  * from the module's own location (rather than a fixed relative path) keeps the
  * lookup correct whether we run from source via tsx (`cli/index.ts`) or from the
  * compiled binary (`dist-cli/cli/index.js`), where the depth to package.json differs.
+ *
+ * The standalone SEA exe has no package.json on disk beside it, so the exe build
+ * (scripts/build-cli-exe.mjs) injects the version via an esbuild `define` of
+ * `process.env.GRAPHVIZJS_CLI_VERSION`, which this checks first.
  */
 async function readPackageVersion(): Promise<string> {
+  if (process.env.GRAPHVIZJS_CLI_VERSION) return process.env.GRAPHVIZJS_CLI_VERSION;
   let dir = dirname(fileURLToPath(import.meta.url));
   for (;;) {
     try {

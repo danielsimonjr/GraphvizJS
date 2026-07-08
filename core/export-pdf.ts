@@ -9,8 +9,6 @@
  * version until it is retired).
  */
 
-import { createCanvas, Image } from 'canvas';
-import { JSDOM } from 'jsdom';
 import type { PdfExportOptions } from './types.js';
 
 /** CSS px are 96 dpi; PDF points are 72 dpi. */
@@ -104,6 +102,12 @@ let svg2pdfFn: ((el: unknown, doc: unknown, opts: unknown) => Promise<unknown>) 
  */
 async function ensurePdfEnv(): Promise<void> {
   if (pdfEnvReady) return;
+
+  // Native/heavy modules, loaded lazily so importing this module for
+  // render/validate/format (and bundling the CLI into a standalone exe) never
+  // pulls node-canvas or jsdom until a PDF is actually requested.
+  const { createCanvas, Image } = await import('canvas');
+  const { JSDOM } = await import('jsdom');
 
   const dom = new JSDOM('<!doctype html><html><body></body></html>', { pretendToBeVisual: true });
   const g = globalThis as unknown as Record<string, unknown>;

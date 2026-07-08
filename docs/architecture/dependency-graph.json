@@ -2,7 +2,7 @@
   "stats": {
     "fileCount": 60,
     "moduleCount": 21,
-    "totalLoc": 6346,
+    "totalLoc": 6363,
     "edgeCount": 110,
     "exportCount": 180
   },
@@ -1247,7 +1247,7 @@
     },
     {
       "path": "core/export-pdf.ts",
-      "loc": 218,
+      "loc": 222,
       "exports": [
         "computePageGeometry",
         "svgToPdfBytes",
@@ -1256,7 +1256,7 @@
     },
     {
       "path": "core/export-png.ts",
-      "loc": 35,
+      "loc": 43,
       "exports": [
         "toPngBytes"
       ]
@@ -1347,7 +1347,7 @@
     },
     {
       "path": "cli/index.ts",
-      "loc": 151,
+      "loc": 156,
       "exports": [
         "offsetToLineCol",
         "main"

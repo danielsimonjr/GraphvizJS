@@ -11,6 +11,7 @@ node_modules
 dist
 dist-cli
 dist-electron
+dist-exe
 dist-ssr
 *.local
 
