@@ -117,5 +117,34 @@ describe('semanticDiagnostics', () => {
         expect(wrongContext, `${file} should have no wrong-context diagnostics`).toEqual([]);
       }
     });
+
+    it('does not flag a cluster-scoped graph attribute set via the graph keyword', () => {
+      const src = 'digraph { subgraph cluster0 { graph [pencolor=red]; a; b; a -> b; } }';
+      expect(codes(src).filter((c) => c === 'wrong-context')).toEqual([]);
+    });
+
+    it('does not flag another cluster-scoped graph attribute (peripheries)', () => {
+      const src = 'digraph { subgraph cluster0 { graph [peripheries=2]; a; b; } }';
+      expect(codes(src).filter((c) => c === 'wrong-context')).toEqual([]);
+    });
+
+    it('does not flag a graph attribute set via the graph keyword in an anonymous subgraph', () => {
+      const src = 'digraph { { graph [rank=same]; a; b; } a -> b; }';
+      expect(codes(src).filter((c) => c === 'wrong-context')).toEqual([]);
+    });
+
+    it('still flags a node-only attribute on an edge (regression guard)', () => {
+      const diags = semanticDiagnostics('a -> b [shape=box]');
+      const wrongContext = diags.filter((d) => d.code === 'wrong-context');
+      expect(wrongContext).toHaveLength(1);
+      expect(wrongContext[0].message).toMatch(/shape/);
+    });
+
+    it('still flags a graph-only attribute used on a node (regression guard)', () => {
+      const diags = semanticDiagnostics('x [rankdir=LR];');
+      const wrongContext = diags.filter((d) => d.code === 'wrong-context');
+      expect(wrongContext).toHaveLength(1);
+      expect(wrongContext[0].message).toMatch(/rankdir/);
+    });
   });
 });

@@ -83,7 +83,10 @@ const STATEMENT_BOUNDARY_RE = /[;{}]$/;
  * in an earlier span — e.g. across a quoted string — is out of reach here and, like the
  * rest of this heuristic, simply yields no classification). Recognizes:
  *   - `node`/`edge`/`graph` keyword directly before `[`, at a statement boundary → that
- *     keyword's own context (a default-attribute statement).
+ *     keyword's own context (a default-attribute statement). For the `graph` keyword
+ *     specifically, this only holds at `braceDepth === 1` (directly inside the top-level
+ *     `digraph {`/`graph {` body) — at any deeper nesting, `graph [...]` sets attributes
+ *     on the enclosing subgraph/cluster, not the root graph, so it is left unclassified.
  *   - a plain identifier immediately preceded by an edge operator chain (`->`/`--`) →
  *     `edge` (the list belongs to an edge statement).
  *   - a plain identifier at a statement boundary → `node` (a fresh node statement).
@@ -91,7 +94,7 @@ const STATEMENT_BOUNDARY_RE = /[;{}]$/;
  * returns null, and the caller must skip wrong-context checking for that list — silence
  * over a false positive.
  */
-function classifyListContext(prefixText: string): AttrContext | null {
+function classifyListContext(prefixText: string, braceDepth: number): AttrContext | null {
   const trimmed = prefixText.replace(/\s+$/, '');
   const idMatch = /[A-Za-z0-9_]+$/.exec(trimmed);
   if (!idMatch) return null;
@@ -100,12 +103,24 @@ function classifyListContext(prefixText: string): AttrContext | null {
 
   const keywordContext = KEYWORD_CONTEXTS[id.toLowerCase()];
   if (keywordContext) {
-    return before === '' || STATEMENT_BOUNDARY_RE.test(before) ? keywordContext : null;
+    if (before !== '' && !STATEMENT_BOUNDARY_RE.test(before)) return null;
+    if (id.toLowerCase() === 'graph' && braceDepth !== 1) return null;
+    return keywordContext;
   }
 
   if (before.endsWith('->') || before.endsWith('--')) return 'edge';
   if (before === '' || STATEMENT_BOUNDARY_RE.test(before)) return 'node';
   return null;
+}
+
+/** Count unmatched `{` minus `}` in `text.slice(0, upTo)`, starting from `startDepth`. */
+function braceDepthAt(text: string, upTo: number, startDepth: number): number {
+  let depth = startDepth;
+  for (let i = 0; i < upTo; i++) {
+    if (text[i] === '{') depth++;
+    else if (text[i] === '}') depth--;
+  }
+  return depth;
 }
 
 /**
@@ -118,6 +133,9 @@ function classifyListContext(prefixText: string): AttrContext | null {
  */
 export function semanticDiagnostics(source: string): StructuralDiagnostic[] {
   const out: StructuralDiagnostic[] = [];
+  // Brace depth carried across code spans (quoted strings/comments/HTML labels never
+  // contribute braces to the graph structure, so only `code`-kind spans are counted).
+  let depth = 0;
 
   for (const span of scanDot(source)) {
     if (span.kind !== 'code') continue;
@@ -126,7 +144,8 @@ export function semanticDiagnostics(source: string): StructuralDiagnostic[] {
     let m: RegExpExecArray | null;
     while ((m = listRe.exec(text)) !== null) {
       const listStart = span.from + m.index + 1;
-      const context = classifyListContext(text.slice(0, m.index));
+      const depthAtList = braceDepthAt(text, m.index, depth);
+      const context = classifyListContext(text.slice(0, m.index), depthAtList);
       for (const entry of parseValueEntries(m[1])) {
         const from = listStart + entry.valueOffset;
         const to = from + entry.value.length;
@@ -188,6 +207,7 @@ export function semanticDiagnostics(source: string): StructuralDiagnostic[] {
         }
       }
     }
+    depth = braceDepthAt(text, text.length, depth);
   }
 
   return out;
