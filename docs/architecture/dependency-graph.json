@@ -2,8 +2,8 @@
   "stats": {
     "fileCount": 64,
     "moduleCount": 21,
-    "totalLoc": 6894,
-    "edgeCount": 119,
+    "totalLoc": 6895,
+    "edgeCount": 120,
     "exportCount": 189
   },
   "modules": {
@@ -1402,7 +1402,7 @@
     },
     {
       "path": "core/validate.ts",
-      "loc": 20,
+      "loc": 21,
       "exports": [
         "validateDiagram"
       ]
