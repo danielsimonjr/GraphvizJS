@@ -2,8 +2,8 @@
   "stats": {
     "fileCount": 63,
     "moduleCount": 21,
-    "totalLoc": 6778,
-    "edgeCount": 111,
+    "totalLoc": 6793,
+    "edgeCount": 112,
     "exportCount": 191
   },
   "modules": {
@@ -215,6 +215,10 @@
       },
       {
         "file": "src/editor/structure-lint.ts",
+        "name": "createStructureLintSource"
+      },
+      {
+        "file": "src/editor/structure-lint.ts",
         "name": "StructuralDiagnostic"
       },
       {
@@ -336,14 +340,6 @@
       {
         "file": "core/types.ts",
         "name": "PdfPageSize"
-      },
-      {
-        "file": "core/validate.ts",
-        "name": "validateDiagram"
-      },
-      {
-        "file": "core/validate.ts",
-        "name": "DiagramDiagnostics"
       },
       {
         "file": "cli/args.ts",
@@ -839,7 +835,7 @@
       },
       {
         "channel": "render:validate",
-        "method": "validateDot",
+        "method": "validateDiagram",
         "hasContract": true,
         "hasPreload": true,
         "hasHandler": true
@@ -930,7 +926,7 @@
     },
     {
       "path": "src/editor/linting.ts",
-      "loc": 184,
+      "loc": 192,
       "exports": [
         "lintGutter",
         "createDotLinter",
@@ -1052,7 +1048,7 @@
         "setMenuRecent",
         "setMenuTheme",
         "renderSvg",
-        "validateDot",
+        "validateDiagram",
         "formatDot",
         "dotVocabulary",
         "exportRender",
@@ -1380,20 +1376,21 @@
     },
     {
       "path": "core/structure-lint.ts",
-      "loc": 103,
+      "loc": 99,
       "exports": [
-        "structuralDiagnostics",
-        "StructuralDiagnostic"
+        "structuralDiagnostics"
       ]
     },
     {
       "path": "core/types.ts",
-      "loc": 64,
+      "loc": 78,
       "exports": [
         "DotValidationError",
         "PdfExportOptions",
         "ExportResult",
         "DotVocabulary",
+        "StructuralDiagnostic",
+        "DiagramDiagnostics",
         "LayoutEngine",
         "ExportFormat",
         "PdfPageMode",
@@ -1403,10 +1400,9 @@
     },
     {
       "path": "core/validate.ts",
-      "loc": 24,
+      "loc": 20,
       "exports": [
-        "validateDiagram",
-        "DiagramDiagnostics"
+        "validateDiagram"
       ]
     },
     {
@@ -1444,7 +1440,7 @@
     },
     {
       "path": "electron/main.ts",
-      "loc": 228,
+      "loc": 229,
       "exports": []
     },
     {

@@ -62,3 +62,17 @@ export interface DotVocabulary {
   keywords: string[];
   attributes: string[];
 }
+
+/** A structural lint finding, positioned by 0-based character offsets. */
+export interface StructuralDiagnostic {
+  from: number;
+  to: number;
+  severity: 'error' | 'warning';
+  message: string;
+}
+
+/** The full diagnostic verdict for a diagram: Graphviz syntax + pure structural checks. */
+export interface DiagramDiagnostics {
+  syntax: DotValidationError | null;
+  structural: StructuralDiagnostic[];
+}

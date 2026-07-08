@@ -8,8 +8,8 @@
 | --- | --- |
 | Files | 63 |
 | Modules | 21 |
-| Lines of code | 6778 |
-| Internal edges | 111 |
+| Lines of code | 6793 |
+| Internal edges | 112 |
 | Exports | 191 |
 
 ## Modules
@@ -182,6 +182,7 @@ None. ✅
 - `DotLinterOptions` in `src/editor/linting.ts`
 - `BalanceResult` in `src/editor/scan-dot.ts`
 - `SpanKind` in `src/editor/scan-dot.ts`
+- `createStructureLintSource` in `src/editor/structure-lint.ts`
 - `StructuralDiagnostic` in `src/editor/structure-lint.ts`
 - `PreferencesDialogOptions` in `src/preferences/preferences-dialog.ts`
 - `PreferencesDialog` in `src/preferences/preferences-dialog.ts`
@@ -213,8 +214,6 @@ None. ✅
 - `SpanKind` in `core/scan-dot.ts`
 - `PdfPageMode` in `core/types.ts`
 - `PdfPageSize` in `core/types.ts`
-- `validateDiagram` in `core/validate.ts`
-- `DiagramDiagnostics` in `core/validate.ts`
 - `ParsedArgs` in `cli/args.ts`
 - `ParseError` in `cli/args.ts`
 - `rebuildAppMenu` in `electron/app-menu.ts`
@@ -304,7 +303,7 @@ None. ✅
 | `menu:setRecent` | setMenuRecent | ✅ wired |
 | `menu:setTheme` | setMenuTheme | ✅ wired |
 | `render:svg` | renderSvg | ✅ wired |
-| `render:validate` | validateDot | ✅ wired |
+| `render:validate` | validateDiagram | ✅ wired |
 | `shell:openExternal` | openExternal | ✅ wired |
 | `store:delete` | storeDelete | ✅ wired |
 | `store:get` | storeGet | ✅ wired |

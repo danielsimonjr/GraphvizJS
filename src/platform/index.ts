@@ -1,5 +1,5 @@
 import type {
-  DotValidationError,
+  DiagramDiagnostics,
   DotVocabulary,
   ExportFormat,
   LayoutEngine,
@@ -76,8 +76,8 @@ export function renderSvg(dot: string, engine: LayoutEngine): Promise<string> {
   return window.graphviz.renderSvg(dot, engine);
 }
 
-export function validateDot(dot: string, engine: LayoutEngine): Promise<DotValidationError | null> {
-  return window.graphviz.validateDot(dot, engine);
+export function validateDiagram(dot: string, engine: LayoutEngine): Promise<DiagramDiagnostics> {
+  return window.graphviz.validateDiagram(dot, engine);
 }
 
 export function formatDot(source: string): Promise<string> {

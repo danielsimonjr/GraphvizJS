@@ -1,12 +1,8 @@
 import { DOT_ATTRIBUTES } from './dot-vocab.js';
 import { checkBalance, scanDot } from './scan-dot.js';
+import type { StructuralDiagnostic } from './types.js';
 
-export interface StructuralDiagnostic {
-  from: number;
-  to: number;
-  severity: 'error' | 'warning';
-  message: string;
-}
+export type { StructuralDiagnostic } from './types.js';
 
 const ATTR_SET = new Set(DOT_ATTRIBUTES.map((a) => a.toLowerCase()));
 

@@ -1,5 +1,5 @@
 import type {
-  DotValidationError,
+  DiagramDiagnostics,
   DotVocabulary,
   ExportFormat,
   LayoutEngine,
@@ -39,7 +39,7 @@ export interface GraphvizApi {
   setMenuRecent(paths: string[]): Promise<void>;
   setMenuTheme(scheme: string): Promise<void>;
   renderSvg(dot: string, engine: LayoutEngine): Promise<string>;
-  validateDot(dot: string, engine: LayoutEngine): Promise<DotValidationError | null>;
+  validateDiagram(dot: string, engine: LayoutEngine): Promise<DiagramDiagnostics>;
   formatDot(source: string): Promise<string>;
   dotVocabulary(): Promise<DotVocabulary>;
   exportRender(

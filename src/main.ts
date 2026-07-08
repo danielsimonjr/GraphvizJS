@@ -29,7 +29,7 @@ import {
   renderSvg,
   setMenuRecent,
   setMenuTheme,
-  validateDot,
+  validateDiagram,
 } from './platform';
 import { createPreferencesDialog } from './preferences/preferences-dialog';
 import { createPreview } from './preview/render';
@@ -217,7 +217,7 @@ async function bootstrap(): Promise<void> {
       keymap.of([makeFormatKeymap((doc) => schedulePreviewRender(doc))]),
       createDotLinter({
         getEngine: () => tabManager.getActiveTab()?.layoutEngine ?? 'dot',
-        validate: validateDot,
+        validate: validateDiagram,
       }),
       lintGutter(),
       EditorView.lineWrapping,

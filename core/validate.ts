@@ -1,12 +1,8 @@
 import { validateDot } from './render.js';
-import { type StructuralDiagnostic, structuralDiagnostics } from './structure-lint.js';
-import type { DotValidationError, LayoutEngine } from './types.js';
+import { structuralDiagnostics } from './structure-lint.js';
+import type { DiagramDiagnostics, LayoutEngine } from './types.js';
 
-/** The full diagnostic verdict for a diagram: Graphviz syntax + pure structural checks. */
-export interface DiagramDiagnostics {
-  syntax: DotValidationError | null;
-  structural: StructuralDiagnostic[];
-}
+export type { DiagramDiagnostics } from './types.js';
 
 /**
  * The single source of truth for "what's wrong with this DOT", consumed by both

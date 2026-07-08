@@ -2,7 +2,11 @@ import { forceLinting } from '@codemirror/lint';
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { DotValidationError } from '../../core/types';
+import type {
+  DiagramDiagnostics,
+  DotValidationError,
+  StructuralDiagnostic,
+} from '../../core/types';
 import { createDotLinter, lintGutter } from '../../src/editor/linting';
 
 /** Captured diagnostic structure for testing */
@@ -17,12 +21,12 @@ describe('editor/linting', () => {
   let container: HTMLElement;
   let mockGetEngine: ReturnType<typeof vi.fn>;
   let mockValidate: ReturnType<
-    typeof vi.fn<(dot: string, engine: string) => Promise<DotValidationError | null>>
+    typeof vi.fn<(dot: string, engine: string) => Promise<DiagramDiagnostics>>
   >;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockValidate = vi.fn().mockResolvedValue(null);
+    mockValidate = vi.fn().mockResolvedValue({ syntax: null, structural: [] });
     mockGetEngine = vi.fn().mockReturnValue('dot');
 
     container = document.createElement('div');
@@ -72,9 +76,10 @@ describe('editor/linting', () => {
      */
     async function runLinter(
       doc: string,
-      validationResult: DotValidationError | null
+      validationResult: DotValidationError | null,
+      structural: StructuralDiagnostic[] = []
     ): Promise<{ diagnostics: CapturedDiagnostic[]; view: EditorView }> {
-      mockValidate.mockResolvedValue(validationResult);
+      mockValidate.mockResolvedValue({ syntax: validationResult, structural });
 
       // Captured diagnostics
       const capturedDiagnostics: CapturedDiagnostic[] = [];
@@ -132,7 +137,7 @@ describe('editor/linting', () => {
     });
 
     it('getEngine callback is called during linting', async () => {
-      mockValidate.mockResolvedValue(null);
+      mockValidate.mockResolvedValue({ syntax: null, structural: [] });
 
       const { view } = await runLinter('digraph { a -> b }', null);
 
@@ -144,7 +149,7 @@ describe('editor/linting', () => {
 
     it('uses the engine returned by getEngine', async () => {
       mockGetEngine.mockReturnValue('neato');
-      mockValidate.mockResolvedValue(null);
+      mockValidate.mockResolvedValue({ syntax: null, structural: [] });
 
       const { view } = await runLinter('graph { a -- b }', null);
 
@@ -247,7 +252,7 @@ describe('editor/linting', () => {
     });
 
     it('skips validation for empty documents', async () => {
-      mockValidate.mockResolvedValue(null);
+      mockValidate.mockResolvedValue({ syntax: null, structural: [] });
 
       const { diagnostics, view } = await runLinter('', null);
 
@@ -259,7 +264,7 @@ describe('editor/linting', () => {
     });
 
     it('skips validation for whitespace-only documents', async () => {
-      mockValidate.mockResolvedValue(null);
+      mockValidate.mockResolvedValue({ syntax: null, structural: [] });
 
       const { diagnostics, view } = await runLinter('   \n\t\n  ', null);
 
@@ -306,6 +311,56 @@ describe('editor/linting', () => {
       const line1 = view.state.doc.line(1);
       expect(diag.from).toBeLessThanOrEqual(line1.to);
       expect(diag.to).toBe(line1.to);
+
+      view.destroy();
+    });
+
+    it('maps a structural warning to an offset-based diagnostic', async () => {
+      const docContent = 'a [shp=box];';
+      const structural: StructuralDiagnostic[] = [
+        { from: 3, to: 6, severity: 'warning', message: "Unknown attribute 'shp'" },
+      ];
+
+      const { diagnostics, view } = await runLinter(docContent, null, structural);
+
+      expect(diagnostics).toHaveLength(1);
+      expect(diagnostics[0]).toMatchObject({
+        from: 3,
+        to: 6,
+        severity: 'warning',
+        message: "Unknown attribute 'shp'",
+      });
+
+      view.destroy();
+    });
+
+    it('emits both a syntax error and structural warnings from one pass', async () => {
+      const docContent = 'digraph { a [shp=box] }';
+      const error: DotValidationError = { message: 'syntax error in line 1', line: 1 };
+      const structural: StructuralDiagnostic[] = [
+        { from: 13, to: 16, severity: 'warning', message: "Unknown attribute 'shp'" },
+      ];
+
+      const { diagnostics, view } = await runLinter(docContent, error, structural);
+
+      expect(diagnostics).toHaveLength(2);
+      expect(diagnostics.some((d) => d.severity === 'error')).toBe(true);
+      expect(diagnostics.some((d) => d.severity === 'warning')).toBe(true);
+
+      view.destroy();
+    });
+
+    it('clamps structural offsets to the current document length', async () => {
+      const docContent = 'ab';
+      const structural: StructuralDiagnostic[] = [
+        { from: 100, to: 200, severity: 'warning', message: 'stale offset' },
+      ];
+
+      const { diagnostics, view } = await runLinter(docContent, null, structural);
+
+      expect(diagnostics).toHaveLength(1);
+      expect(diagnostics[0].from).toBeLessThanOrEqual(view.state.doc.length);
+      expect(diagnostics[0].to).toBeLessThanOrEqual(view.state.doc.length);
 
       view.destroy();
     });

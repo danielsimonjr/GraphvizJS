@@ -9,8 +9,7 @@ import type { Diagnostic, LintSource } from '@codemirror/lint';
 import { lintGutter as cmLintGutter, linter } from '@codemirror/lint';
 import type { Extension } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
-import type { DotValidationError, LayoutEngine } from '../../core/types';
-import { createStructureLintSource } from './structure-lint';
+import type { DiagramDiagnostics, LayoutEngine } from '../../core/types';
 
 /** Default debounce delay for linting (ms) */
 const DEFAULT_LINT_DELAY = 500;
@@ -26,11 +25,11 @@ export interface DotLinterOptions {
   getEngine: () => LayoutEngine;
 
   /**
-   * Validate DOT source against the given layout engine, returning a
-   * structured error (or null when valid). Backed by the `render:validate`
-   * IPC channel in the main process.
+   * Validate DOT source against the given layout engine, returning the combined
+   * syntax + structural diagnostics. Backed by the `render:validate` IPC channel
+   * in the main process (core's `validateDiagram`).
    */
-  validate: (dot: string, engine: LayoutEngine) => Promise<DotValidationError | null>;
+  validate: (dot: string, engine: LayoutEngine) => Promise<DiagramDiagnostics>;
 
   /**
    * Debounce delay in milliseconds before running the linter.
@@ -131,16 +130,28 @@ function createDotLintSource(options: DotLinterOptions): LintSource {
     }
 
     const engine = options.getEngine();
-    const error = await options.validate(doc, engine);
+    const { syntax, structural } = await options.validate(doc, engine);
 
-    if (error === null) {
-      // No error - document is valid
-      return [];
+    const diagnostics: Diagnostic[] = [];
+
+    // Graphviz syntax error (line/column-based).
+    if (syntax !== null) {
+      diagnostics.push(createDiagnostic(view, syntax.message, syntax.line, syntax.column));
     }
 
-    // Create diagnostic from validation error
-    const diagnostic = createDiagnostic(view, error.message, error.line, error.column);
-    return [diagnostic];
+    // Structural findings (character-offset-based). Clamp to the current doc in
+    // case it changed during the async validate round-trip.
+    const len = view.state.doc.length;
+    for (const d of structural) {
+      diagnostics.push({
+        from: Math.min(d.from, len),
+        to: Math.min(d.to, len),
+        severity: d.severity,
+        message: d.message,
+      });
+    }
+
+    return diagnostics;
   };
 }
 
@@ -160,7 +171,7 @@ function createDotLintSource(options: DotLinterOptions): LintSource {
  * const extensions = [
  *   createDotLinter({
  *     getEngine: () => currentEngine,
- *     validate: validateDot,
+ *     validate: validateDiagram,
  *     delay: 500,
  *   }),
  *   lintGutter(),
@@ -169,10 +180,7 @@ function createDotLintSource(options: DotLinterOptions): LintSource {
  */
 export function createDotLinter(options: DotLinterOptions): Extension {
   const delay = options.delay ?? DEFAULT_LINT_DELAY;
-  return [
-    linter(createDotLintSource(options), { delay }),
-    linter(createStructureLintSource(), { delay: 200 }),
-  ];
+  return linter(createDotLintSource(options), { delay });
 }
 
 /**

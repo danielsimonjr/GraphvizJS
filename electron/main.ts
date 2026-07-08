@@ -7,8 +7,9 @@ import Store from 'electron-store';
 import { DOT_ATTRIBUTES, DOT_KEYWORDS } from '../core/dot-vocab';
 import { exportDiagram } from '../core/export';
 import { formatDot } from '../core/format';
-import { initGraphviz, renderDotToSvg, validateDot } from '../core/render';
+import { initGraphviz, renderDotToSvg } from '../core/render';
 import type { ExportFormat, LayoutEngine, PdfExportOptions } from '../core/types';
+import { validateDiagram } from '../core/validate';
 import type { ConfirmOptions, DiagramFilter } from '../src/platform/contract';
 import { setMenuRecentFiles, setMenuTheme, setupAppMenu } from './app-menu';
 import { setupFileWatcher } from './file-watcher';
@@ -188,7 +189,7 @@ function registerIpc(): void {
     renderDotToSvg(dot, engine)
   );
   ipcMain.handle('render:validate', (_e, dot: string, engine: LayoutEngine) =>
-    validateDot(dot, engine)
+    validateDiagram(dot, engine)
   );
   ipcMain.handle(
     'export:render',
