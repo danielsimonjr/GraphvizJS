@@ -29,6 +29,7 @@
     "clean": "rimraf dist",
     "graph": "tsx tools/dependency-graph/index.ts",
     "graph:check": "tsx tools/dependency-graph/index.ts --check",
+    "docs:check": "tsx tools/docs-check/index.ts",
     "graphvizjs": "tsx cli/index.ts",
     "test": "vitest run",
     "test:watch": "vitest",
