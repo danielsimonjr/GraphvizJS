@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 61 |
+| Files | 62 |
 | Modules | 21 |
-| Lines of code | 6470 |
+| Lines of code | 6527 |
 | Internal edges | 111 |
-| Exports | 184 |
+| Exports | 186 |
 
 ## Modules
 
@@ -28,6 +28,7 @@
 - `core/dot-catalog.ts`
 - `core/dot-colors.ts`
 - `core/dot-vocab.ts`
+- `core/edit-distance.ts`
 - `core/export-pdf.ts`
 - `core/export-png.ts`
 - `core/export.ts`
@@ -263,6 +264,7 @@ None. ✅
 | `core/dot-catalog.ts` | `test/core/dot-catalog.test.ts`, `test/editor/autocomplete.test.ts` |
 | `core/dot-colors.ts` | `test/core/dot-colors.test.ts`, `test/editor/autocomplete.test.ts` |
 | `core/dot-vocab.ts` | `test/core/dot-catalog.test.ts`, `test/core/dot-vocab.test.ts`, `test/editor/autocomplete.test.ts`, `test/editor/language.test.ts` |
+| `core/edit-distance.ts` | `test/core/edit-distance.test.ts` |
 | `core/export-pdf.ts` | `test/core/export-pdf.test.ts` |
 | `core/export-png.ts` | `test/core/export-png.test.ts` |
 | `core/export.ts` | `test/core/export.test.ts` |

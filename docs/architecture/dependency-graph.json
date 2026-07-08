@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 61,
+    "fileCount": 62,
     "moduleCount": 21,
-    "totalLoc": 6470,
+    "totalLoc": 6527,
     "edgeCount": 111,
-    "exportCount": 184
+    "exportCount": 186
   },
   "modules": {
     "autosave": [
@@ -89,6 +89,7 @@
       "core/dot-catalog.ts",
       "core/dot-colors.ts",
       "core/dot-vocab.ts",
+      "core/edit-distance.ts",
       "core/export-pdf.ts",
       "core/export-png.ts",
       "core/export.ts",
@@ -622,6 +623,12 @@
         "test/core/dot-vocab.test.ts",
         "test/editor/autocomplete.test.ts",
         "test/editor/language.test.ts"
+      ]
+    },
+    {
+      "file": "core/edit-distance.ts",
+      "testFiles": [
+        "test/core/edit-distance.test.ts"
       ]
     },
     {
@@ -1274,6 +1281,14 @@
       "exports": [
         "DOT_KEYWORDS",
         "DOT_ATTRIBUTES"
+      ]
+    },
+    {
+      "path": "core/edit-distance.ts",
+      "loc": 57,
+      "exports": [
+        "editDistance",
+        "nearest"
       ]
     },
     {
