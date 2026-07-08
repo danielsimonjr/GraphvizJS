@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 60,
+    "fileCount": 61,
     "moduleCount": 21,
-    "totalLoc": 6460,
-    "edgeCount": 101,
-    "exportCount": 184
+    "totalLoc": 6563,
+    "edgeCount": 103,
+    "exportCount": 186
   },
   "modules": {
     "autosave": [
@@ -97,6 +97,7 @@
       "core/normalize-svg.ts",
       "core/render.ts",
       "core/scan-dot.ts",
+      "core/structure-lint.ts",
       "core/types.ts"
     ],
     "cli": [
@@ -330,6 +331,10 @@
       {
         "file": "core/scan-dot.ts",
         "name": "SpanKind"
+      },
+      {
+        "file": "core/structure-lint.ts",
+        "name": "StructuralDiagnostic"
       },
       {
         "file": "core/types.ts",
@@ -683,6 +688,12 @@
       "file": "core/scan-dot.ts",
       "testFiles": [
         "test/core/scan-dot.test.ts"
+      ]
+    },
+    {
+      "file": "core/structure-lint.ts",
+      "testFiles": [
+        "test/core/structure-lint.test.ts"
       ]
     },
     {
@@ -1330,6 +1341,14 @@
         "Span",
         "BalanceResult",
         "SpanKind"
+      ]
+    },
+    {
+      "path": "core/structure-lint.ts",
+      "loc": 103,
+      "exports": [
+        "structuralDiagnostics",
+        "StructuralDiagnostic"
       ]
     },
     {

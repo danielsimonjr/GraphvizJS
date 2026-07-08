@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 60 |
+| Files | 61 |
 | Modules | 21 |
-| Lines of code | 6460 |
-| Internal edges | 101 |
-| Exports | 184 |
+| Lines of code | 6563 |
+| Internal edges | 103 |
+| Exports | 186 |
 
 ## Modules
 
@@ -32,6 +32,7 @@
 - `core/normalize-svg.ts`
 - `core/render.ts`
 - `core/scan-dot.ts`
+- `core/structure-lint.ts`
 - `core/types.ts`
 
 ### editor
@@ -209,6 +210,7 @@ None. ✅
 - `Span` in `core/scan-dot.ts`
 - `BalanceResult` in `core/scan-dot.ts`
 - `SpanKind` in `core/scan-dot.ts`
+- `StructuralDiagnostic` in `core/structure-lint.ts`
 - `DotVocabulary` in `core/types.ts`
 - `PdfPageMode` in `core/types.ts`
 - `PdfPageSize` in `core/types.ts`
@@ -273,6 +275,7 @@ None. ✅
 | `core/normalize-svg.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts` |
 | `core/render.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts`, `test/core/render.test.ts`, `test/core/validate.test.ts` |
 | `core/scan-dot.ts` | `test/core/scan-dot.test.ts` |
+| `core/structure-lint.ts` | `test/core/structure-lint.test.ts` |
 | `core/types.ts` | `test/editor/linting.test.ts`, `test/tabs/manager.test.ts` |
 | `cli/args.ts` | `test/cli/args.test.ts` |
 | `cli/index.ts` | `test/cli/cli.integration.test.ts` |
