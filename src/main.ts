@@ -24,6 +24,7 @@ import { type Command, type CommandPalette, createCommandPalette } from './palet
 import {
   confirm,
   dotVocabulary,
+  graphStats,
   store as platformStore,
   readTextFile,
   renderSvg,
@@ -41,6 +42,7 @@ import {
 } from './preview/zoom';
 import { addRecent, loadRecent, removeRecent, saveRecent } from './recent/recent-files';
 import { captureSession, loadSession, persistSession, type SessionData } from './session/session';
+import { createStatsDialog } from './stats/stats-dialog';
 import type { TabState } from './tabs/manager';
 import { MAX_TABS, TabManager } from './tabs/manager';
 import { renderTabBar, setupTabBar } from './tabs/tab-bar';
@@ -654,6 +656,11 @@ async function bootstrap(): Promise<void> {
 
   setupHelpDialog(helpButton);
 
+  const statsDialog = createStatsDialog({
+    getSource: () => tabManager.getActiveTab()?.editorView?.state.doc.toString() ?? '',
+    graphStats,
+  });
+
   // ── Native menu wiring ───────────────────────────────────────────
   const menuHandlers: MenuCommandHandlers = {
     new: () => createNewTab(DEFAULT_SNIPPET),
@@ -692,6 +699,7 @@ async function bootstrap(): Promise<void> {
     zoomOut: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.zoomOut(),
     zoomReset: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.reset(),
     help: () => helpButton?.click(),
+    stats: () => void statsDialog.open(),
   };
   setupMenuCommands(menuHandlers);
 
@@ -759,6 +767,7 @@ async function bootstrap(): Promise<void> {
       run: () => menuHandlers.setTheme('dark'),
     },
     { id: 'preferences', label: 'Preferences…', group: 'View', run: menuHandlers.preferences },
+    { id: 'stats', label: 'Show Graph Statistics', group: 'View', run: menuHandlers.stats },
     { id: 'help', label: 'Help', group: 'Help', run: menuHandlers.help },
   ];
   palette = createCommandPalette(paletteCommands);

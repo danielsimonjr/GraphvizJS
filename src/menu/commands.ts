@@ -22,6 +22,7 @@ export interface MenuCommandHandlers {
   zoomOut: () => void;
   zoomReset: () => void;
   help: () => void;
+  stats: () => void;
 }
 
 /** Route a menu action id (+ optional payload) to its handler. Unknown ids and
@@ -76,6 +77,8 @@ export function dispatchMenuAction(
       return handlers.zoomReset();
     case 'help':
       return handlers.help();
+    case 'stats':
+      return handlers.stats();
     default:
       return;
   }

@@ -19,6 +19,7 @@ export type MenuActionId =
   | 'set-engine'
   | 'set-theme'
   | 'command-palette'
+  | 'stats'
   | 'preferences'
   | 'zoom-in'
   | 'zoom-out'
@@ -224,6 +225,11 @@ function buildViewMenu(opts: MenuBuildOptions): MenuItemConstructorOptions {
       accelerator: 'CmdOrCtrl+Shift+P',
       registerAccelerator: false,
       click: () => opts.onAction('command-palette'),
+    },
+    {
+      id: 'stats',
+      label: 'Graph Statistics…',
+      click: () => opts.onAction('stats'),
     },
     { type: 'separator' },
     {

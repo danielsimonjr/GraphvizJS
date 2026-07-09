@@ -23,6 +23,7 @@ function handlers(): MenuCommandHandlers {
     zoomOut: vi.fn(),
     zoomReset: vi.fn(),
     help: vi.fn(),
+    stats: vi.fn(),
   };
 }
 
@@ -39,6 +40,11 @@ describe('dispatchMenuAction', () => {
     expect(h.commandPalette).toHaveBeenCalledTimes(1);
     dispatchMenuAction(h, 'preferences');
     expect(h.preferences).toHaveBeenCalledTimes(1);
+  });
+  it('routes the stats action to the stats handler', () => {
+    const h = handlers();
+    dispatchMenuAction(h, 'stats');
+    expect(h.stats).toHaveBeenCalledTimes(1);
   });
   it('routes payload actions', () => {
     const h = handlers();
