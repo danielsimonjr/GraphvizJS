@@ -144,6 +144,19 @@ describe('parseGraph', () => {
     expect(m.subgraphs).toEqual([{ name: undefined, isCluster: false }]);
   });
 
+  it('records edges when a trailing attribute list follows the chain', () => {
+    const m1 = parseGraph('digraph { a -> b [label="x"] }');
+    expect(m1.nodes).toEqual(['a', 'b']);
+    expect(m1.edges).toEqual([{ from: 'a', to: 'b' }]);
+
+    const m2 = parseGraph('digraph { a -> b -> c [color=red] }');
+    expect(m2.nodes).toEqual(['a', 'b', 'c']);
+    expect(m2.edges).toEqual([
+      { from: 'a', to: 'b' },
+      { from: 'b', to: 'c' },
+    ]);
+  });
+
   it('never throws on malformed input', () => {
     expect(() => parseGraph('digraph { a -> ')).not.toThrow();
     expect(() => parseGraph('')).not.toThrow();
