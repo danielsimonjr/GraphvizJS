@@ -5,7 +5,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { applyFixes } from '../core/apply-fixes.js';
 import { exportDiagram } from '../core/export.js';
 import { formatDot } from '../core/format.js';
-import type { ExportFormat } from '../core/types.js';
+import { graphStats } from '../core/graph-stats.js';
+import type { ExportFormat, GraphStats } from '../core/types.js';
 import { validateDiagram } from '../core/validate.js';
 import { parseArgs } from './args.js';
 
@@ -13,6 +14,7 @@ const USAGE = `graphvizjs render <input.dot|-> -o <output> [--engine E] [--forma
   [--scale 1|2] [--pdf-page fit|letter|a4] [--pdf-orientation auto|portrait|landscape]
 graphvizjs validate <input.dot|-> [--engine E] [--json] [--strict] [--fix] [-o <output>]
 graphvizjs format <input.dot|-> [-o <output>]
+graphvizjs stats <input.dot|-> [--json]
 graphvizjs --help | --version`;
 
 /** 1-based line/column for a 0-based character offset into `source`. */
@@ -29,6 +31,29 @@ export function offsetToLineCol(source: string, offset: number): { line: number;
     }
   }
   return { line, column };
+}
+
+/** Render stats as aligned `label: value` lines (roots/leaves only when directed). */
+export function formatStats(stats: GraphStats): string {
+  const yn = (b: boolean): string => (b ? 'yes' : 'no');
+  const rows: [string, string][] = [
+    ['directed', yn(stats.directed)],
+    ['strict', yn(stats.strict)],
+    ['nodes', String(stats.nodeCount)],
+    ['edges', String(stats.edgeCount)],
+    ['subgraphs', String(stats.subgraphCount)],
+    ['clusters', String(stats.clusterCount)],
+  ];
+  if (stats.directed) {
+    rows.push(['roots', String(stats.roots)], ['leaves', String(stats.leaves)]);
+  }
+  rows.push(
+    ['isolated', String(stats.isolated)],
+    ['self-loops', String(stats.selfLoops)],
+    ['cycles', yn(stats.hasCycle)]
+  );
+  const width = Math.max(...rows.map(([label]) => label.length)) + 1; // +1 for the colon
+  return rows.map(([label, value]) => `${`${label}:`.padEnd(width + 1)} ${value}`).join('\n');
 }
 
 /**
@@ -137,6 +162,22 @@ export async function main(argv: string[]): Promise<number> {
       const formatted = formatDot(dot);
       if (parsed.output) await writeFile(parsed.output, formatted);
       else process.stdout.write(formatted.endsWith('\n') ? formatted : `${formatted}\n`);
+      return 0;
+    } catch (err) {
+      process.stderr.write(`Error: ${err instanceof Error ? err.message : String(err)}\n`);
+      return 1;
+    }
+  }
+  if (parsed.command === 'stats') {
+    try {
+      const dot = await readInput(parsed.input!);
+      const stats = graphStats(dot);
+      const name = parsed.input === '-' ? '<stdin>' : parsed.input!;
+      if (parsed.json) {
+        process.stdout.write(`${JSON.stringify({ input: name, ...stats })}\n`);
+      } else {
+        process.stdout.write(`${formatStats(stats)}\n`);
+      }
       return 0;
     } catch (err) {
       process.stderr.write(`Error: ${err instanceof Error ? err.message : String(err)}\n`);
