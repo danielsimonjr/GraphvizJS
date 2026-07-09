@@ -96,6 +96,35 @@ describe('graphvizjs CLI', () => {
     it('unknown flag → exit 2', async () => {
       expect((await runCapture(['validate', input, '--nope'])).code).toBe(2);
     });
+
+    it('--json output includes code and fix on a diagnostic', async () => {
+      const fixable = join(dir, 'fixable.dot');
+      writeFileSync(fixable, 'digraph { a [shape=boxx] }', 'utf-8');
+      const { code, out } = await runCapture(['validate', fixable, '--json']);
+      expect(code).toBe(0);
+      const parsed = JSON.parse(out);
+      const diag = parsed.structural.find((d: { code?: string }) => d.code === 'invalid-value');
+      expect(diag).toBeDefined();
+      expect(diag.fix).toMatchObject({ text: 'box' });
+    }, 30000);
+
+    it('--fix writes the corrected DOT to -o output', async () => {
+      const fixable = join(dir, 'fixable2.dot');
+      writeFileSync(fixable, 'digraph { a [shape=boxx] }', 'utf-8');
+      const out = join(dir, 'fixed.dot');
+      expect(await main(['validate', fixable, '--fix', '-o', out])).toBe(0);
+      expect(readFileSync(out, 'utf-8')).toContain('shape=box');
+      expect(readFileSync(out, 'utf-8')).not.toContain('boxx');
+    }, 30000);
+
+    it('--fix without -o prints the corrected DOT to stdout', async () => {
+      const fixable = join(dir, 'fixable3.dot');
+      writeFileSync(fixable, 'digraph { a [shape=boxx] }', 'utf-8');
+      const { code, out } = await runCapture(['validate', fixable, '--fix']);
+      expect(code).toBe(0);
+      expect(out).toContain('shape=box');
+      expect(out).not.toContain('boxx');
+    }, 30000);
   });
 
   describe('format', () => {

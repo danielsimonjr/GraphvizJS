@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 60,
+    "fileCount": 64,
     "moduleCount": 21,
-    "totalLoc": 6363,
-    "edgeCount": 110,
-    "exportCount": 180
+    "totalLoc": 7165,
+    "edgeCount": 121,
+    "exportCount": 189
   },
   "modules": {
     "autosave": [
@@ -12,7 +12,6 @@
     ],
     "editor": [
       "src/editor/autocomplete.ts",
-      "src/editor/dot-data.ts",
       "src/editor/language.ts",
       "src/editor/linting.ts",
       "src/editor/search.ts",
@@ -87,7 +86,11 @@
       "src/workspace/resize.ts"
     ],
     "core": [
+      "core/apply-fixes.ts",
+      "core/dot-catalog.ts",
+      "core/dot-colors.ts",
       "core/dot-vocab.ts",
+      "core/edit-distance.ts",
       "core/export-pdf.ts",
       "core/export-png.ts",
       "core/export.ts",
@@ -95,6 +98,7 @@
       "core/normalize-svg.ts",
       "core/render.ts",
       "core/scan-dot.ts",
+      "core/semantic-lint.ts",
       "core/structure-lint.ts",
       "core/types.ts",
       "core/validate.ts"
@@ -291,6 +295,14 @@
         "name": "FileWatchOptions"
       },
       {
+        "file": "core/dot-catalog.ts",
+        "name": "DotAttributeSpec"
+      },
+      {
+        "file": "core/dot-catalog.ts",
+        "name": "AttrType"
+      },
+      {
         "file": "core/export-pdf.ts",
         "name": "PageGeometry"
       },
@@ -343,12 +355,6 @@
       "file": "src/editor/autocomplete.ts",
       "testFiles": [
         "test/editor/autocomplete.test.ts"
-      ]
-    },
-    {
-      "file": "src/editor/dot-data.ts",
-      "testFiles": [
-        "test/editor/dot-data.test.ts"
       ]
     },
     {
@@ -595,12 +601,38 @@
       ]
     },
     {
+      "file": "core/apply-fixes.ts",
+      "testFiles": [
+        "test/core/apply-fixes.test.ts"
+      ]
+    },
+    {
+      "file": "core/dot-catalog.ts",
+      "testFiles": [
+        "test/core/dot-catalog.test.ts",
+        "test/editor/autocomplete.test.ts"
+      ]
+    },
+    {
+      "file": "core/dot-colors.ts",
+      "testFiles": [
+        "test/core/dot-colors.test.ts",
+        "test/editor/autocomplete.test.ts"
+      ]
+    },
+    {
       "file": "core/dot-vocab.ts",
       "testFiles": [
+        "test/core/dot-catalog.test.ts",
         "test/core/dot-vocab.test.ts",
         "test/editor/autocomplete.test.ts",
-        "test/editor/dot-data.test.ts",
         "test/editor/language.test.ts"
+      ]
+    },
+    {
+      "file": "core/edit-distance.ts",
+      "testFiles": [
+        "test/core/edit-distance.test.ts"
       ]
     },
     {
@@ -650,6 +682,12 @@
       "file": "core/scan-dot.ts",
       "testFiles": [
         "test/core/scan-dot.test.ts"
+      ]
+    },
+    {
+      "file": "core/semantic-lint.ts",
+      "testFiles": [
+        "test/core/semantic-lint.test.ts"
       ]
     },
     {
@@ -853,19 +891,10 @@
     },
     {
       "path": "src/editor/autocomplete.ts",
-      "loc": 94,
+      "loc": 98,
       "exports": [
         "makeDotCompletionSource",
         "createDotAutocomplete"
-      ]
-    },
-    {
-      "path": "src/editor/dot-data.ts",
-      "loc": 124,
-      "exports": [
-        "DOT_ATTR_VALUES",
-        "DOT_COLORS",
-        "isColorAttribute"
       ]
     },
     {
@@ -877,7 +906,7 @@
     },
     {
       "path": "src/editor/linting.ts",
-      "loc": 192,
+      "loc": 207,
       "exports": [
         "lintGutter",
         "createDotLinter",
@@ -1238,11 +1267,45 @@
       ]
     },
     {
+      "path": "core/apply-fixes.ts",
+      "loc": 33,
+      "exports": [
+        "applyFixes"
+      ]
+    },
+    {
+      "path": "core/dot-catalog.ts",
+      "loc": 215,
+      "exports": [
+        "DOT_ATTRIBUTE_CATALOG",
+        "findAttribute",
+        "DotAttributeSpec",
+        "AttrContext",
+        "AttrType"
+      ]
+    },
+    {
+      "path": "core/dot-colors.ts",
+      "loc": 164,
+      "exports": [
+        "DOT_COLORS",
+        "isColorAttribute"
+      ]
+    },
+    {
       "path": "core/dot-vocab.ts",
       "loc": 172,
       "exports": [
         "DOT_KEYWORDS",
         "DOT_ATTRIBUTES"
+      ]
+    },
+    {
+      "path": "core/edit-distance.ts",
+      "loc": 57,
+      "exports": [
+        "editDistance",
+        "nearest"
       ]
     },
     {
@@ -1306,6 +1369,13 @@
       ]
     },
     {
+      "path": "core/semantic-lint.ts",
+      "loc": 374,
+      "exports": [
+        "semanticDiagnostics"
+      ]
+    },
+    {
       "path": "core/structure-lint.ts",
       "loc": 99,
       "exports": [
@@ -1314,12 +1384,13 @@
     },
     {
       "path": "core/types.ts",
-      "loc": 78,
+      "loc": 94,
       "exports": [
         "DotValidationError",
         "PdfExportOptions",
         "ExportResult",
         "DotVocabulary",
+        "DiagnosticFix",
         "StructuralDiagnostic",
         "DiagramDiagnostics",
         "LayoutEngine",
@@ -1331,14 +1402,14 @@
     },
     {
       "path": "core/validate.ts",
-      "loc": 20,
+      "loc": 21,
       "exports": [
         "validateDiagram"
       ]
     },
     {
       "path": "cli/args.ts",
-      "loc": 246,
+      "loc": 273,
       "exports": [
         "parseArgs",
         "ParsedArgs",
@@ -1347,7 +1418,7 @@
     },
     {
       "path": "cli/index.ts",
-      "loc": 156,
+      "loc": 167,
       "exports": [
         "offsetToLineCol",
         "main"
@@ -1372,7 +1443,7 @@
     },
     {
       "path": "electron/main.ts",
-      "loc": 229,
+      "loc": 238,
       "exports": []
     },
     {

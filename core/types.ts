@@ -61,6 +61,18 @@ export interface ExportResult {
 export interface DotVocabulary {
   keywords: string[];
   attributes: string[];
+  /** Enum attribute name -> its value domain (from the attribute catalog). */
+  attributeValues: Record<string, string[]>;
+  /** Named colors accepted by color-valued attributes. */
+  colors: string[];
+}
+
+/** A quick-fix replacement for a diagnostic, positioned by 0-based character offsets. */
+export interface DiagnosticFix {
+  from: number;
+  to: number;
+  text: string;
+  label: string;
 }
 
 /** A structural lint finding, positioned by 0-based character offsets. */
@@ -69,6 +81,10 @@ export interface StructuralDiagnostic {
   to: number;
   severity: 'error' | 'warning';
   message: string;
+  /** Stable identifier for the diagnostic rule that produced this finding. */
+  code?: string;
+  /** An optional quick fix that resolves this diagnostic. */
+  fix?: DiagnosticFix;
 }
 
 /** The full diagnostic verdict for a diagram: Graphviz syntax + pure structural checks. */

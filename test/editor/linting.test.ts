@@ -1,3 +1,4 @@
+import type { Action } from '@codemirror/lint';
 import { forceLinting } from '@codemirror/lint';
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
@@ -15,6 +16,7 @@ interface CapturedDiagnostic {
   to: number;
   severity: string;
   message: string;
+  actions?: readonly Action[];
 }
 
 describe('editor/linting', () => {
@@ -361,6 +363,47 @@ describe('editor/linting', () => {
       expect(diagnostics).toHaveLength(1);
       expect(diagnostics[0].from).toBeLessThanOrEqual(view.state.doc.length);
       expect(diagnostics[0].to).toBeLessThanOrEqual(view.state.doc.length);
+
+      view.destroy();
+    });
+
+    it('attaches a quick-fix action when the structural diagnostic has a fix', async () => {
+      const docContent = 'a [shp=box];';
+      const structural: StructuralDiagnostic[] = [
+        {
+          from: 3,
+          to: 6,
+          severity: 'warning',
+          message: "Unknown attribute 'shp'",
+          fix: { from: 3, to: 6, text: 'shape', label: "Replace with 'shape'" },
+        },
+      ];
+
+      const { diagnostics, view } = await runLinter(docContent, null, structural);
+
+      expect(diagnostics).toHaveLength(1);
+      const actions = diagnostics[0].actions;
+      expect(actions).toHaveLength(1);
+      expect(actions?.[0].name).toBe("Replace with 'shape'");
+
+      const d = diagnostics[0];
+      actions?.[0].apply(view, d.from, d.to);
+
+      expect(view.state.doc.toString()).toBe('a [shape=box];');
+
+      view.destroy();
+    });
+
+    it('produces no actions for a structural diagnostic without a fix', async () => {
+      const docContent = 'a [shp=box];';
+      const structural: StructuralDiagnostic[] = [
+        { from: 3, to: 6, severity: 'warning', message: "Unknown attribute 'shp'" },
+      ];
+
+      const { diagnostics, view } = await runLinter(docContent, null, structural);
+
+      expect(diagnostics).toHaveLength(1);
+      expect(diagnostics[0].actions ?? []).toHaveLength(0);
 
       view.destroy();
     });

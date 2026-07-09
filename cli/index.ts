@@ -2,6 +2,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { applyFixes } from '../core/apply-fixes.js';
 import { exportDiagram } from '../core/export.js';
 import { formatDot } from '../core/format.js';
 import type { ExportFormat } from '../core/types.js';
@@ -10,7 +11,7 @@ import { parseArgs } from './args.js';
 
 const USAGE = `graphvizjs render <input.dot|-> -o <output> [--engine E] [--format svg|png|pdf]
   [--scale 1|2] [--pdf-page fit|letter|a4] [--pdf-orientation auto|portrait|landscape]
-graphvizjs validate <input.dot|-> [--engine E] [--json] [--strict]
+graphvizjs validate <input.dot|-> [--engine E] [--json] [--strict] [--fix] [-o <output>]
 graphvizjs format <input.dot|-> [-o <output>]
 graphvizjs --help | --version`;
 
@@ -84,6 +85,14 @@ export async function main(argv: string[]): Promise<number> {
     try {
       const dot = await readInput(parsed.input!);
       const { syntax, structural } = await validateDiagram(dot, parsed.engine);
+
+      if (parsed.fix) {
+        const corrected = applyFixes(dot, structural);
+        if (parsed.output) await writeFile(parsed.output, corrected);
+        else process.stdout.write(corrected.endsWith('\n') ? corrected : `${corrected}\n`);
+        return 0;
+      }
+
       const failed = syntax !== null || (parsed.strict === true && structural.length > 0);
       const name = parsed.input === '-' ? '<stdin>' : parsed.input!;
 
@@ -97,6 +106,8 @@ export async function main(argv: string[]): Promise<number> {
             structural: structural.map((d) => ({
               severity: d.severity,
               message: d.message,
+              code: d.code,
+              fix: d.fix,
               ...offsetToLineCol(dot, d.from),
             })),
           })}\n`

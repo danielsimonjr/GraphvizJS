@@ -143,12 +143,27 @@ function createDotLintSource(options: DotLinterOptions): LintSource {
     // case it changed during the async validate round-trip.
     const len = view.state.doc.length;
     for (const d of structural) {
-      diagnostics.push({
+      const diagnostic: Diagnostic = {
         from: Math.min(d.from, len),
         to: Math.min(d.to, len),
         severity: d.severity,
         message: d.message,
-      });
+      };
+
+      if (d.fix) {
+        const fix = d.fix;
+        const fixFrom = Math.min(fix.from, len);
+        const fixTo = Math.min(fix.to, len);
+        diagnostic.actions = [
+          {
+            name: fix.label,
+            apply: (v: EditorView) =>
+              v.dispatch({ changes: { from: fixFrom, to: fixTo, insert: fix.text } }),
+          },
+        ];
+      }
+
+      diagnostics.push(diagnostic);
     }
 
     return diagnostics;

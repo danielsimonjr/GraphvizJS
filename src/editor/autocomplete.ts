@@ -7,7 +7,10 @@ import {
 } from '@codemirror/autocomplete';
 import type { Extension } from '@codemirror/state';
 import type { DotVocabulary } from '../../core/types';
-import { DOT_ATTR_VALUES, DOT_COLORS, isColorAttribute } from './dot-data';
+
+/** Attribute names whose values are colors — a renderer-UI concern kept local
+ * (the value domain itself, `vocab.colors`, comes from core over IPC). */
+const COLOR_ATTRS = new Set(['color', 'bgcolor', 'fillcolor', 'fontcolor']);
 
 const SNIPPETS: Completion[] = [
   snippetCompletion('subgraph cluster_${1:name} {\n\t${2}\n}', {
@@ -26,9 +29,10 @@ function valueOptions(values: readonly string[]): Completion[] {
 }
 
 /**
- * Build the DOT completion source over a given vocabulary (keywords + attribute
- * names come from core via the dot:vocabulary IPC; value domains and colors are
- * renderer-local completion data).
+ * Build the DOT completion source over a given vocabulary — keywords, attribute
+ * names, value domains, and colors all come from core over the dot:vocabulary IPC;
+ * only which attributes are color-typed (`COLOR_ATTRS`, for picking `vocab.colors`
+ * vs. `vocab.attributeValues`) is renderer-local completion logic.
  */
 export function makeDotCompletionSource(
   vocab: DotVocabulary
@@ -58,7 +62,7 @@ export function makeDotCompletionSource(
         // known, otherwise nothing — but NEVER the attribute-name list (that
         // would spam names while the user types a value).
         const attr = entry.slice(0, eq).trim().toLowerCase();
-        const values = isColorAttribute(attr) ? DOT_COLORS : DOT_ATTR_VALUES[attr];
+        const values = COLOR_ATTRS.has(attr) ? vocab.colors : vocab.attributeValues[attr];
         if (!values) return null;
         const word = ctx.matchBefore(/[\w.#-]*$/);
         return {

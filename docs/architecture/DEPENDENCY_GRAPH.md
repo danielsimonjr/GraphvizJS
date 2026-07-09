@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 60 |
+| Files | 64 |
 | Modules | 21 |
-| Lines of code | 6363 |
-| Internal edges | 110 |
-| Exports | 180 |
+| Lines of code | 7165 |
+| Internal edges | 121 |
+| Exports | 189 |
 
 ## Modules
 
@@ -25,7 +25,11 @@
 
 ### core
 
+- `core/apply-fixes.ts`
+- `core/dot-catalog.ts`
+- `core/dot-colors.ts`
 - `core/dot-vocab.ts`
+- `core/edit-distance.ts`
 - `core/export-pdf.ts`
 - `core/export-png.ts`
 - `core/export.ts`
@@ -33,6 +37,7 @@
 - `core/normalize-svg.ts`
 - `core/render.ts`
 - `core/scan-dot.ts`
+- `core/semantic-lint.ts`
 - `core/structure-lint.ts`
 - `core/types.ts`
 - `core/validate.ts`
@@ -40,7 +45,6 @@
 ### editor
 
 - `src/editor/autocomplete.ts`
-- `src/editor/dot-data.ts`
 - `src/editor/language.ts`
 - `src/editor/linting.ts`
 - `src/editor/search.ts`
@@ -199,6 +203,8 @@ None. ✅
 - `ToolbarShortcutsOptions` in `src/toolbar/shortcuts.ts`
 - `ThemeButtonOptions` in `src/toolbar/theme-button.ts`
 - `FileWatchOptions` in `src/watch/file-watch.ts`
+- `DotAttributeSpec` in `core/dot-catalog.ts`
+- `AttrType` in `core/dot-catalog.ts`
 - `PageGeometry` in `core/export-pdf.ts`
 - `FormatOptions` in `core/format.ts`
 - `NormalizedSvg` in `core/normalize-svg.ts`
@@ -216,7 +222,6 @@ None. ✅
 | --- | --- |
 | `src/autosave/constants.ts` | `test/session/session.test.ts` |
 | `src/editor/autocomplete.ts` | `test/editor/autocomplete.test.ts` |
-| `src/editor/dot-data.ts` | `test/editor/dot-data.test.ts` |
 | `src/editor/language.ts` | `test/editor/language.test.ts` |
 | `src/editor/linting.ts` | `test/editor/linting.test.ts` |
 | `src/editor/search.ts` | `test/editor/search.test.ts` |
@@ -257,7 +262,11 @@ None. ✅
 | `src/watch/watch-plan.ts` | `test/watch/watch-plan.test.ts` |
 | `src/window/state.ts` | `test/window/state.test.ts` |
 | `src/workspace/resize.ts` | `test/workspace/resize.test.ts` |
-| `core/dot-vocab.ts` | `test/core/dot-vocab.test.ts`, `test/editor/autocomplete.test.ts`, `test/editor/dot-data.test.ts`, `test/editor/language.test.ts` |
+| `core/apply-fixes.ts` | `test/core/apply-fixes.test.ts` |
+| `core/dot-catalog.ts` | `test/core/dot-catalog.test.ts`, `test/editor/autocomplete.test.ts` |
+| `core/dot-colors.ts` | `test/core/dot-colors.test.ts`, `test/editor/autocomplete.test.ts` |
+| `core/dot-vocab.ts` | `test/core/dot-catalog.test.ts`, `test/core/dot-vocab.test.ts`, `test/editor/autocomplete.test.ts`, `test/editor/language.test.ts` |
+| `core/edit-distance.ts` | `test/core/edit-distance.test.ts` |
 | `core/export-pdf.ts` | `test/core/export-pdf.test.ts` |
 | `core/export-png.ts` | `test/core/export-png.test.ts` |
 | `core/export.ts` | `test/core/export.test.ts` |
@@ -265,6 +274,7 @@ None. ✅
 | `core/normalize-svg.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts` |
 | `core/render.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts`, `test/core/render.test.ts`, `test/core/validate.test.ts` |
 | `core/scan-dot.ts` | `test/core/scan-dot.test.ts` |
+| `core/semantic-lint.ts` | `test/core/semantic-lint.test.ts` |
 | `core/structure-lint.ts` | `test/core/structure-lint.test.ts` |
 | `core/types.ts` | `test/editor/linting.test.ts`, `test/tabs/manager.test.ts` |
 | `core/validate.ts` | `test/core/validate-diagram.test.ts` |

@@ -27,9 +27,15 @@ test('a dirty tab keeps edits when the reload prompt is cancelled', async () => 
   const { app, page } = await launchApp({ GVJS_E2E_OPEN: file, GVJS_E2E_CONFIRM: 'cancel' });
   await page.locator('#editor-host[data-editor="mounted"]').waitFor();
   await page.locator('[data-action="open-diagram"]').click();
+  // Wait for the file to finish loading before editing. Without this, under
+  // full-suite load the async load can clobber the edit — or typing can race
+  // editor focus and drop keystrokes — leaving the tab non-dirty (flake source).
+  await expect(page.locator('#editor-host')).toContainText('base');
 
   // Make the tab dirty.
-  await activeEditorContent(page).click();
+  const content = activeEditorContent(page);
+  await content.click();
+  await expect(content).toBeFocused();
   await page.keyboard.type(' // my edit');
   await expect(page.locator('[data-status="file"]')).toContainText('Unsaved');
 

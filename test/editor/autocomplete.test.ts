@@ -1,12 +1,21 @@
 import { CompletionContext } from '@codemirror/autocomplete';
 import { EditorState } from '@codemirror/state';
 import { describe, expect, it } from 'vitest';
+import { DOT_ATTRIBUTE_CATALOG } from '../../core/dot-catalog';
+import { DOT_COLORS } from '../../core/dot-colors';
 import { DOT_ATTRIBUTES, DOT_KEYWORDS } from '../../core/dot-vocab';
 import { makeDotCompletionSource } from '../../src/editor/autocomplete';
 
 const dotCompletionSource = makeDotCompletionSource({
   keywords: [...DOT_KEYWORDS],
   attributes: [...DOT_ATTRIBUTES],
+  attributeValues: Object.fromEntries(
+    DOT_ATTRIBUTE_CATALOG.filter((s) => s.type === 'enum' && s.values).map((s) => [
+      s.name,
+      [...s.values!],
+    ])
+  ),
+  colors: [...DOT_COLORS],
 });
 
 /** Build a completion context at the end of `doc` (caret at |, or end if absent). */
