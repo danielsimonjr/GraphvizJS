@@ -2,7 +2,7 @@
   "stats": {
     "fileCount": 67,
     "moduleCount": 22,
-    "totalLoc": 7759,
+    "totalLoc": 7791,
     "edgeCount": 129,
     "exportCount": 204
   },
@@ -1425,7 +1425,7 @@
     },
     {
       "path": "core/parse-graph.ts",
-      "loc": 289,
+      "loc": 321,
       "exports": [
         "tokenizeDot",
         "parseGraph",
