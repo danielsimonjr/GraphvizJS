@@ -99,3 +99,35 @@ describe('parseArgs — format', () => {
     expect('error' in parseArgs(['format', 'in.dot', '--engine', 'dot'])).toBe(true);
   });
 });
+
+describe('parseArgs stats', () => {
+  it('parses a stats input', () => {
+    expect(parseArgs(['stats', 'g.dot'])).toMatchObject({
+      command: 'stats',
+      input: 'g.dot',
+      json: false,
+    });
+  });
+  it('parses stats --json and stdin', () => {
+    expect(parseArgs(['stats', '-', '--json'])).toMatchObject({
+      command: 'stats',
+      input: '-',
+      json: true,
+    });
+  });
+  it('rejects --engine on stats', () => {
+    expect(parseArgs(['stats', 'g.dot', '--engine', 'neato'])).toMatchObject({
+      error: expect.stringContaining('Unknown flag'),
+    });
+  });
+  it('rejects -o on stats', () => {
+    expect(parseArgs(['stats', 'g.dot', '-o', 'x.txt'])).toMatchObject({
+      error: expect.stringContaining('Unknown flag'),
+    });
+  });
+  it('errors when input is missing', () => {
+    expect(parseArgs(['stats'])).toMatchObject({
+      error: expect.stringContaining('Missing input'),
+    });
+  });
+});

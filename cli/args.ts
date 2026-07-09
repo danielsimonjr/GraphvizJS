@@ -24,7 +24,7 @@ type PdfPageArg = (typeof PDF_PAGES)[number];
 
 /** Parsed, validated CLI arguments for the `graphvizjs` command. */
 export interface ParsedArgs {
-  command: 'render' | 'validate' | 'format' | 'help' | 'version';
+  command: 'render' | 'validate' | 'format' | 'stats' | 'help' | 'version';
   input?: string;
   output?: string;
   engine: LayoutEngine;
@@ -73,6 +73,7 @@ export function parseArgs(argv: string[]): ParsedArgs | ParseError {
   }
   if (first === 'validate') return parseValidate(argv.slice(1));
   if (first === 'format') return parseFormat(argv.slice(1));
+  if (first === 'stats') return parseStats(argv.slice(1));
   if (first !== 'render') {
     return { error: `Unknown command: ${first}` };
   }
@@ -270,4 +271,24 @@ function parseFormat(rest: string[]): ParsedArgs | ParseError {
     return { error: 'Missing input. Expected a .dot file path or "-" for stdin.' };
   }
   return { command: 'format', input, output, engine: 'dot', scale: 1, pdf: DEFAULT_PDF };
+}
+
+/** Parse `stats <input|-> [--json]` (no engine, no output). */
+function parseStats(rest: string[]): ParsedArgs | ParseError {
+  let input: string | undefined;
+  let json = false;
+  for (let i = 0; i < rest.length; i++) {
+    const arg = rest[i];
+    if (arg === '--json') {
+      json = true;
+      continue;
+    }
+    if (arg !== '-' && arg.startsWith('-')) return { error: `Unknown flag: ${arg}` };
+    if (input === undefined) input = arg;
+    else return { error: `Unexpected argument: ${arg}` };
+  }
+  if (input === undefined) {
+    return { error: 'Missing input. Expected a .dot file path or "-" for stdin.' };
+  }
+  return { command: 'stats', input, engine: 'dot', scale: 1, pdf: DEFAULT_PDF, json };
 }
