@@ -1,4 +1,5 @@
 import { scanDot } from './scan-dot.js';
+import type { GraphEdge, GraphModel, GraphSubgraph } from './types.js';
 
 export type TokKind =
   | 'id'
@@ -131,4 +132,158 @@ export function tokenizeDot(source: string): Tok[] {
     out.push(t);
   }
   return out;
+}
+
+export function parseGraph(source: string): GraphModel {
+  const toks = tokenizeDot(source);
+  const nodesSet = new Set<string>();
+  const nodeOrder: string[] = [];
+  const edges: GraphEdge[] = [];
+  const subgraphs: GraphSubgraph[] = [];
+  let directed = false;
+  let strict = false;
+  let pos = 0;
+
+  const at = (k = 0): Tok | undefined => toks[pos + k];
+  const isKw = (t: Tok | undefined, kw: string): boolean =>
+    t?.kind === 'id' && t.value.toLowerCase() === kw;
+  const addNode = (id: string): void => {
+    if (!nodesSet.has(id)) {
+      nodesSet.add(id);
+      nodeOrder.push(id);
+    }
+  };
+
+  const skipAttrList = (): void => {
+    if (at()?.kind !== 'lbracket') return;
+    let depth = 0;
+    while (pos < toks.length) {
+      const k = at()!.kind;
+      pos++;
+      if (k === 'lbracket') depth++;
+      else if (k === 'rbracket') {
+        depth--;
+        if (depth === 0) return;
+      }
+    }
+  };
+
+  // Parse a block body (lbrace already consumed); record the subgraph and
+  // return every node id declared anywhere inside (for endpoint expansion).
+  const parseBlock = (name: string | undefined): string[] => {
+    subgraphs.push({
+      name,
+      isCluster: name !== undefined && name.toLowerCase().startsWith('cluster'),
+    });
+    const members: string[] = [];
+    while (pos < toks.length && at()!.kind !== 'rbrace') {
+      for (const id of parseStatement()) members.push(id);
+    }
+    if (at()?.kind === 'rbrace') pos++;
+    return members;
+  };
+
+  // Parse an edge endpoint: `{ … }`, `subgraph [name] { … }`, or a single id.
+  const parseEndpoint = (): string[] => {
+    const t = at();
+    if (!t) return [];
+    if (t.kind === 'lbrace') {
+      pos++;
+      return parseBlock(undefined);
+    }
+    if (isKw(t, 'subgraph')) {
+      pos++;
+      let name: string | undefined;
+      if (at()?.kind === 'id') {
+        name = at()!.value;
+        pos++;
+      }
+      if (at()?.kind === 'lbrace') {
+        pos++;
+        return parseBlock(name);
+      }
+      return [];
+    }
+    if (t.kind === 'id') {
+      pos++;
+      addNode(t.value);
+      return [t.value];
+    }
+    return [];
+  };
+
+  // Parse `(edgeop endpoint)*` after a left group; add edges; return all ids seen
+  // (empty when there was no edge operator).
+  const parseEdgeRhs = (left: string[]): string[] => {
+    if (at()?.kind !== 'edgeop') return [];
+    const all = [...left];
+    let current = left;
+    while (at()?.kind === 'edgeop') {
+      pos++;
+      const right = parseEndpoint();
+      for (const a of current) for (const b of right) edges.push({ from: a, to: b });
+      for (const id of right) all.push(id);
+      current = right;
+    }
+    skipAttrList();
+    return all;
+  };
+
+  // Parse one statement; return node ids it introduced.
+  function parseStatement(): string[] {
+    const t = at();
+    if (!t) return [];
+    if (t.kind === 'semi' || t.kind === 'comma') {
+      pos++;
+      return [];
+    }
+    // node|edge|graph [ … ]  → attribute defaults, no node
+    if ((isKw(t, 'node') || isKw(t, 'edge') || isKw(t, 'graph')) && at(1)?.kind === 'lbracket') {
+      pos++;
+      skipAttrList();
+      return [];
+    }
+    // subgraph / anonymous block, possibly as an edge endpoint
+    if (t.kind === 'lbrace' || isKw(t, 'subgraph')) {
+      const left = parseEndpoint();
+      parseEdgeRhs(left);
+      return left;
+    }
+    if (t.kind === 'id') {
+      // id = id  → graph attribute assignment, no node
+      if (at(1)?.kind === 'eq') {
+        pos += 2;
+        if (at()?.kind === 'id') pos++;
+        return [];
+      }
+      pos++;
+      addNode(t.value);
+      const chained = parseEdgeRhs([t.value]);
+      if (chained.length > 0) return chained;
+      skipAttrList();
+      return [t.value];
+    }
+    pos++; // unknown token — skip defensively
+    return [];
+  }
+
+  // header: [strict] (graph|digraph) [name] {
+  if (isKw(at(), 'strict')) {
+    strict = true;
+    pos++;
+  }
+  if (isKw(at(), 'digraph')) {
+    directed = true;
+    pos++;
+  } else if (isKw(at(), 'graph')) {
+    directed = false;
+    pos++;
+  }
+  if (at()?.kind === 'id') pos++; // optional graph name
+  if (at()?.kind === 'lbrace') {
+    pos++;
+    while (pos < toks.length && at()!.kind !== 'rbrace') parseStatement();
+  }
+
+  return { directed, strict, nodes: nodeOrder, edges, subgraphs };
 }

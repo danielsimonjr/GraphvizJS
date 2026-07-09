@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { tokenizeDot } from '../../core/parse-graph';
+import { parseGraph, tokenizeDot } from '../../core/parse-graph';
 
 const kinds = (src: string) => tokenizeDot(src).map((t) => `${t.kind}:${t.value}`);
 
@@ -87,5 +87,66 @@ describe('tokenizeDot', () => {
       'id:c',
       'rbrace:}',
     ]);
+  });
+});
+
+describe('parseGraph', () => {
+  it('reads directed/strict from the header', () => {
+    expect(parseGraph('strict digraph G { }')).toMatchObject({ directed: true, strict: true });
+    expect(parseGraph('graph { }')).toMatchObject({ directed: false, strict: false });
+  });
+
+  it('collects distinct nodes in first-seen order (implicit on edges)', () => {
+    const m = parseGraph('digraph { a -> b -> c; a }');
+    expect(m.nodes).toEqual(['a', 'b', 'c']);
+    expect(m.edges).toEqual([
+      { from: 'a', to: 'b' },
+      { from: 'b', to: 'c' },
+    ]);
+  });
+
+  it('does not count attribute-list contents or default-attr statements as nodes', () => {
+    const m = parseGraph('digraph { node [shape=box]; edge [color=red]; a [label="x"] -> b }');
+    expect(m.nodes).toEqual(['a', 'b']);
+    // An attribute list attached directly to the left endpoint (before the edge
+    // operator) terminates that statement in parseGraph's grammar, so the `-> b`
+    // that follows is not chained onto `a` as an edge. `a` and `b` are still
+    // collected as nodes (see assertion above); no edge is recorded here.
+    expect(m.edges).toEqual([]);
+  });
+
+  it('treats a bare id=id as a graph attribute, not a node', () => {
+    const m = parseGraph('digraph { rankdir=LR; bgcolor="white"; a -> b }');
+    expect(m.nodes).toEqual(['a', 'b']);
+  });
+
+  it('counts a node literally named node when used as an endpoint', () => {
+    const m = parseGraph('digraph { node -> x }');
+    expect(m.nodes).toEqual(['node', 'x']);
+  });
+
+  it('records subgraphs and detects clusters by name prefix', () => {
+    const m = parseGraph('digraph { subgraph cluster_0 { a; b } subgraph s1 { c } }');
+    expect(m.subgraphs).toEqual([
+      { name: 'cluster_0', isCluster: true },
+      { name: 's1', isCluster: false },
+    ]);
+    expect(m.nodes).toEqual(['a', 'b', 'c']);
+  });
+
+  it('expands a subgraph endpoint to the cross product', () => {
+    const m = parseGraph('digraph { {a b} -> c }');
+    expect(m.edges).toEqual([
+      { from: 'a', to: 'c' },
+      { from: 'b', to: 'c' },
+    ]);
+    expect(m.nodes).toEqual(['a', 'b', 'c']);
+    expect(m.subgraphs).toEqual([{ name: undefined, isCluster: false }]);
+  });
+
+  it('never throws on malformed input', () => {
+    expect(() => parseGraph('digraph { a -> ')).not.toThrow();
+    expect(() => parseGraph('')).not.toThrow();
+    expect(() => parseGraph('not dot at all')).not.toThrow();
   });
 });
