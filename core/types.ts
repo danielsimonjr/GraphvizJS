@@ -113,3 +113,20 @@ export interface GraphModel {
   edges: GraphEdge[];
   subgraphs: GraphSubgraph[];
 }
+
+/** Structural metrics for a DOT source (see core/graph-stats.ts). */
+export interface GraphStats {
+  directed: boolean;
+  strict: boolean;
+  nodeCount: number;
+  edgeCount: number;
+  subgraphCount: number;
+  clusterCount: number;
+  isolated: number;
+  selfLoops: number;
+  hasCycle: boolean;
+  /** Directed graphs only: nodes with in-degree 0. Omitted for undirected. */
+  roots?: number;
+  /** Directed graphs only: nodes with out-degree 0. Omitted for undirected. */
+  leaves?: number;
+}
