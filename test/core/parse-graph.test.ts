@@ -70,4 +70,22 @@ describe('tokenizeDot', () => {
       'rbrace:}',
     ]);
   });
+
+  it('classifies brackets, braces, and separators by kind', () => {
+    expect(kinds('digraph { a [k=v]; b, c }')).toEqual([
+      'id:digraph',
+      'lbrace:{',
+      'id:a',
+      'lbracket:[',
+      'id:k',
+      'eq:=',
+      'id:v',
+      'rbracket:]',
+      'semi:;',
+      'id:b',
+      'comma:,',
+      'id:c',
+      'rbrace:}',
+    ]);
+  });
 });
