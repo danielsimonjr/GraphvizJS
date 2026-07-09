@@ -42,10 +42,29 @@ step 16 pulls the next item). Statuses: 🟢 READY · 🟡 IN PROGRESS · ✅ DO
     `.ts` source (the `.js` extensions had silently dropped the `cli → core` edge).
   See memory `project_graphvizjs_cli_distribution`.
 
+## Headless-core / language-tooling cycle — ✅ COMPLETE
+
+- ✅ **CLI `validate` + `format`** (v2.6.0) — the core oracle exposed headlessly; `validate --json`/`--strict`, `format` to stdout/`-o`; `dot:format`/`dot:vocabulary` IPC.
+- ✅ **Semantic lint + quick fixes & standalone exe** (v2.7.0) — 5 rule families (invalid value/color with did-you-mean, wrong-context, duplicate-attribute, undefined-cluster), editor code actions, `validate --fix`; `pnpm build:cli:exe` SEA binary (format/validate/render→svg).
+- ✅ **Graph statistics** (v2.8.0) — first Tier-4 graph-intelligence feature. Pure structural DOT parser (`core/parse-graph.ts`) + metrics/cycle-detection (`core/graph-stats.ts`); `graphvizjs stats [--json]`, `dot:stats` IPC (20th channel), Graph Statistics dialog (palette + View menu), E2E, exe coverage. Zero-throw invariant enforced (depth-guarded parser). Executed subagent-driven; final whole-branch review MERGE-READY YES.
+
+## Polish debts (from v2.8.0 final review — acceptable-as-is, low priority)
+
+- 💤 **Scope the E2E stats assertion** — `test/e2e/stats.spec.ts` asserts `'3'` unscoped (nodeCount and edgeCount are both 3 in the fixture); tighten with a `.stats-row` `hasText: 'Nodes'` locator so it strictly binds to the Nodes row.
+- 💤 **`formatStats` padding** — CLI human output pads to `width+1` then adds a literal space (one extra); cosmetic, alignment already consistent.
+
+## Next-cycle candidates (ROADMAP backlog — pull one at session-start)
+
+- 💤 **Deprecated-attribute warnings** (Tier 2 remainder) — small; folds into `core/semantic-lint.ts` + a `deprecated` flag on the attribute catalog.
+- 💤 **Source ↔ preview node map** (Tier 1 foundation) — `core/` `mapNodesToSource(dot, svg)` + CLI `map --json`; enables click-node→jump and cursor→highlight. Shared foundation for most hybrid features.
+- 💤 **Graph-intelligence follow-ons** (Tier 4) — outline navigator, cycle-in-panel highlighting, path highlighting, visual diff; reuse the `parse-graph` GraphModel.
+- 💤 **Preferences: default-engine + restore-session toggles** — offered but not selected in v2.5.0; `createNewTab` default can read a mutable `defaultEngine`; session restore is a guarded call.
+
 ## No action (reviewed, acceptable-as-is)
 
 - `graphviz.test.ts` 8-engine / singleton coverage has no core analog — the same
   `graphvizInstance.layout()` path is exercised by `test/core/validate.test.ts` + the e2e suite.
+- Deep-nesting (~500+ level) subgraphs are counted only up to `MAX_DEPTH` in `parse-graph.ts` — an intentional zero-throw guard against stack overflow; unreachable by realistic DOT.
 
 ## App-shell cycle (deferred from v1.4.0) — ✅ COMPLETE
 

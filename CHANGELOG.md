@@ -6,9 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.8.0] - 2026-07-09
+
 ### Added
 
-- Graph statistics — a `stats` capability that analyses DOT structure (node/edge/subgraph/cluster counts, directed?/strict?, roots/leaves/isolated, self-loops, and cycle detection). Available as `graphvizjs stats [--json]`, over the `dot:stats` IPC channel, and as a **Graph Statistics** dialog (command palette + View menu). Built on a new pure structural DOT parser (`core/parse-graph.ts`).
+- **Graph statistics.** A `stats` capability that analyses DOT structure —
+  node/edge/subgraph/cluster counts, directed?/strict?, roots/leaves/isolated,
+  self-loops, and cycle detection (directed via 3-color DFS, undirected via
+  union-find). Available as `graphvizjs stats [--json]`, over the `dot:stats`
+  IPC channel, and as a **Graph Statistics** dialog (command palette ▸ Show
+  Graph Statistics, or View ▸ Graph Statistics…). Built on a new pure
+  structural DOT parser (`core/parse-graph.ts`) plus metrics
+  (`core/graph-stats.ts`) — the reusable foundation for future graph-intelligence
+  features. The parser is Graphviz-faithful (implicit node creation, subgraph
+  endpoint expansion, port/HTML/quoted ids) and never throws on any input. The
+  standalone CLI executable (`pnpm build:cli:exe`) now also covers `stats`.
 
 ## [2.7.0] - 2026-07-08
 
