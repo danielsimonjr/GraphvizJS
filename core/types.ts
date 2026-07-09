@@ -92,3 +92,41 @@ export interface DiagramDiagnostics {
   syntax: DotValidationError | null;
   structural: StructuralDiagnostic[];
 }
+
+/** A directed/undirected edge between two node ids (structural, pre-layout). */
+export interface GraphEdge {
+  from: string;
+  to: string;
+}
+
+/** A subgraph or anonymous block; `isCluster` when its name starts with "cluster". */
+export interface GraphSubgraph {
+  name?: string;
+  isCluster: boolean;
+}
+
+/** A structural model of a DOT source: distinct nodes, edges, subgraphs, kind. */
+export interface GraphModel {
+  directed: boolean;
+  strict: boolean;
+  nodes: string[];
+  edges: GraphEdge[];
+  subgraphs: GraphSubgraph[];
+}
+
+/** Structural metrics for a DOT source (see core/graph-stats.ts). */
+export interface GraphStats {
+  directed: boolean;
+  strict: boolean;
+  nodeCount: number;
+  edgeCount: number;
+  subgraphCount: number;
+  clusterCount: number;
+  isolated: number;
+  selfLoops: number;
+  hasCycle: boolean;
+  /** Directed graphs only: nodes with in-degree 0. Omitted for undirected. */
+  roots?: number;
+  /** Directed graphs only: nodes with out-degree 0. Omitted for undirected. */
+  leaves?: number;
+}

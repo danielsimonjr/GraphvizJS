@@ -56,8 +56,8 @@ describe('buildAnalysis (real repo)', () => {
     expect(a.layerViolations).toEqual([]);
   });
 
-  it('wires all 19 IPC channels with no gaps', () => {
-    expect(a.ipc.fullyWired).toHaveLength(19);
+  it('wires all 20 IPC channels with no gaps', () => {
+    expect(a.ipc.fullyWired).toHaveLength(20);
     expect(a.ipc.missingHandlers).toHaveLength(0);
     expect(a.ipc.orphanHandlers).toHaveLength(0);
     expect(a.ipc.missingContract).toHaveLength(0);

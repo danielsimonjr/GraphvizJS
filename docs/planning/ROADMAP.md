@@ -39,9 +39,9 @@ dependency-graph tool). Delivered so far:
 
 ### Headless core & CLI
 - `core/` owns all Graphviz work and pure DOT language tooling (scanner, vocabulary, structural lint, formatter, validator)
-- `graphvizjs` CLI: `render` (SVG/PNG/PDF), `validate` (syntax + structural, `--json`, `--strict`), `format`
+- `graphvizjs` CLI: `render` (SVG/PNG/PDF), `validate` (syntax + structural, `--json`, `--strict`), `format`, `stats` (structural metrics + cycle detection, `--json`)
 - The CLI is an oracle for the desktop app — same core, reachable headlessly
-- Standalone executable (`pnpm build:cli:exe`, Node SEA): a single `graphvizjs.exe` an advanced user runs with no Node install. Covers the pure/WASM subset (`format`, `validate`, `render→svg`); `render→png/pdf` still need the native install (`pnpm build:cli`), since native `.node` binaries can't be inlined into one file
+- Standalone executable (`pnpm build:cli:exe`, Node SEA): a single `graphvizjs.exe` an advanced user runs with no Node install. Covers the pure/WASM subset (`format`, `validate`, `stats`, `render→svg`); `render→png/pdf` still need the native install (`pnpm build:cli`), since native `.node` binaries can't be inlined into one file
 - Dependency-graph tool (`pnpm graph` / `graph:check`) that guards layering, cycles, and IPC wiring in CI
 
 ### Platform
@@ -89,9 +89,11 @@ Remaining: deprecated-attribute warnings.
   scaffolds (state machine, ERD, flowchart, class diagram); plus **user-defined snippets**.
 
 ### Tier 4 — engineer analysis value (~100% core)
-- **Graph intelligence** — a stats panel (node/edge/cluster counts, directed?, cycles?), a
-  structure/outline navigator (nodes/subgraphs/clusters tree), cycle detection, path
-  highlighting, and visual diff between two versions. CLI `stats` / `analyze` / `outline`.
+- **Graph intelligence** — a stats panel (node/edge/subgraph/cluster counts, directed?/strict?,
+  roots/leaves/isolated, self-loops, cycle detection) has shipped — see
+  [Shipped](#shipped) above (`graphvizjs stats`, `dot:stats`, Graph Statistics dialog).
+  Remaining: a structure/outline navigator (nodes/subgraphs/clusters tree), cycle
+  highlighting inside the panel, path highlighting, and visual diff between two versions.
 
 ### Tier 5 — scale & output ergonomics
 - **Large-graph handling** — a manual/deferred render toggle for huge graphs (300 ms

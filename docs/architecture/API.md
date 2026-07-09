@@ -30,6 +30,7 @@ graphvizjs render   <input.dot|-> -o <output> [--engine E] [--format svg|png|pdf
                      [--scale 1|2] [--pdf-page fit|letter|a4] [--pdf-orientation auto|portrait|landscape]
 graphvizjs validate <input.dot|-> [--engine E] [--json] [--strict]
 graphvizjs format   <input.dot|-> [-o <output>]
+graphvizjs stats    <input.dot|-> [--json]
 graphvizjs --help | --version
 ```
 
@@ -95,6 +96,20 @@ graphvizjs format g.dot                  # to stdout
 cat g.dot | graphvizjs format -
 ```
 
+### `stats`
+
+Analyses DOT structure: node/edge/subgraph/cluster counts, directed?/strict?,
+roots/leaves (directed only), isolated nodes, self-loops, and cycle detection. Takes no
+`--engine` (it's pure — no Graphviz layout involved) and no `-o` (always prints).
+
+```bash
+graphvizjs stats g.dot                   # human, aligned label: value lines
+graphvizjs stats g.dot --json            # { input, directed, strict, nodeCount, edgeCount,
+                                          #   subgraphCount, clusterCount, isolated, selfLoops,
+                                          #   hasCycle, roots?, leaves? }
+cat g.dot | graphvizjs stats -
+```
+
 ### Exit codes
 
 | Code | Meaning |
@@ -142,13 +157,14 @@ interface GraphvizApi {
   validateDiagram(dot: string, engine: LayoutEngine): Promise<DiagramDiagnostics>;  // render:validate
   formatDot(source: string): Promise<string>;                                       // dot:format
   dotVocabulary(): Promise<DotVocabulary>;                                          // dot:vocabulary
+  graphStats(source: string): Promise<GraphStats>;                                  // dot:stats
   exportRender(dot: string, engine: LayoutEngine, format: ExportFormat, options?: PdfExportOptions): Promise<Uint8Array>; // export:render
 }
 ```
 
 The renderer imports thin wrappers (same names) from `src/platform` rather than
 touching `window.graphviz` directly — e.g. `renderSvg`, `validateDiagram`, `formatDot`,
-`dotVocabulary`, `exportRender`, and a `store` object.
+`dotVocabulary`, `graphStats`, `exportRender`, and a `store` object.
 
 ---
 
@@ -187,6 +203,12 @@ function exportDiagram(dot: string, engine: LayoutEngine, format: ExportFormat, 
 
 // core/normalize-svg.ts
 function normalizeSvg(svg: string): string   // pure viewBox/padding rewrite
+
+// core/parse-graph.ts
+function parseGraph(source: string): GraphModel   // pure, never throws
+
+// core/graph-stats.ts
+function graphStats(source: string): GraphStats    // parseGraph(source) → computeStats
 ```
 
 ---
@@ -209,6 +231,17 @@ interface DiagramDiagnostics { syntax: DotValidationError | null; structural: St
 interface DotVocabulary { keywords: string[]; attributes: string[]; }
 interface PdfExportOptions { mode: PdfPageMode; pageSize: PdfPageSize; orientation: PdfOrientation; }
 interface ExportResult { bytes: Uint8Array; ext: string; mime: string; }
+
+interface GraphEdge { from: string; to: string; }
+interface GraphSubgraph { name?: string; isCluster: boolean; }
+interface GraphModel { directed: boolean; strict: boolean; nodes: string[]; edges: GraphEdge[]; subgraphs: GraphSubgraph[]; }
+interface GraphStats {
+  directed: boolean; strict: boolean;
+  nodeCount: number; edgeCount: number; subgraphCount: number; clusterCount: number;
+  isolated: number; selfLoops: number; hasCycle: boolean;
+  roots?: number;   // directed only: in-degree 0
+  leaves?: number;  // directed only: out-degree 0
+}
 ```
 
 Renderer-side contract helper types (`src/platform/contract.ts`): `DiagramFilter`,

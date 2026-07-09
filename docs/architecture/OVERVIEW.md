@@ -21,11 +21,12 @@ work — DOT→SVG render, validation, and export — plus the pure DOT language
 | File workflow | New / open / save / save-as via native dialogs; recent-files menu; external-change detection (reload clean, prompt dirty) |
 | Export | SVG, PNG (1× / 2×), and vector PDF (fit-to-page or Letter/A4, orientation) — `exportDiagram` orchestrator |
 | Format | `formatDot` — reindent + `->`/`--` spacing normalization, literal-safe, idempotent (Shift+Alt+F, or `dot:format` IPC) |
+| Graph statistics | `graphStats` — node/edge/subgraph/cluster counts, directed/strict, roots/leaves/isolated, self-loops, cycle detection, over `dot:stats` IPC or `graphvizjs stats` |
 | Theme | System / Light / Dark color-scheme controller, applied early in bootstrap to avoid flash |
 | Command palette | Fuzzy-search-and-run any command (Ctrl/Cmd+Shift+P) via subsequence `fuzzyScore` |
 | Preferences | Preferences dialog (Cmd/Ctrl+,) — Appearance → Theme, built to grow |
 | Headless core | `core/` (Node-only, no DOM) owns all Graphviz + pure DOT language work; consumed by the Electron main process **and** the CLI |
-| CLI | `graphvizjs render` / `validate` / `format` — the same `core/` headlessly, `validate --json` as a UI-troubleshooting **oracle** |
+| CLI | `graphvizjs render` / `validate` / `format` / `stats` — the same `core/` headlessly, `validate --json` as a UI-troubleshooting **oracle** |
 | Architecture guard | `pnpm graph:check` fails the build on layer violations, runtime cycles, IPC-integrity gaps, and stale generated docs |
 
 ## Quick architecture overview
@@ -63,6 +64,7 @@ the **renderer** (bridged over IPC by the Electron main process).
 │             (jsPDF + svg2pdf.js + jsdom) · export.ts · normalize-svg.ts │
 │  Language:  scan-dot.ts · dot-vocab.ts · structure-lint.ts   │
 │             format.ts · validate.ts (validateDiagram) · types.ts │
+│  Analysis:  parse-graph.ts (GraphModel) · graph-stats.ts (graphStats) │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -118,10 +120,12 @@ core/            # Node-only, no DOM — all Graphviz + pure DOT language toolin
 ├── structure-lint.ts# structuralDiagnostics
 ├── format.ts        # formatDot
 ├── validate.ts      # validateDiagram (syntax + structural — the oracle)
+├── parse-graph.ts   # DOT source → structural GraphModel
+├── graph-stats.ts   # graphStats — structural metrics + cycle detection
 └── types.ts         # shared value types (renderer may type-only import THIS)
 
 cli/             # the graphvizjs binary (compiled to dist-cli/)
-├── args.ts          # parse render / validate / format
+├── args.ts          # parse render / validate / format / stats
 └── index.ts         # command dispatch + offsetToLineCol
 
 electron/        # Electron main process
@@ -137,7 +141,7 @@ src/             # renderer (Vite) — setup functions wired by main.ts
 ├── toolbar/         # one module per action (15)
 ├── tabs/            # TabManager + tab bar
 ├── session/  recent/  watch/       # session restore, recent files, watch reactions
-├── menu/  theme/  palette/  preferences/  help/   # app shell
+├── menu/  theme/  palette/  preferences/  help/  stats/   # app shell (stats = Graph Statistics dialog)
 ├── workspace/  window/  utils/  examples/         # panes, window state, debounce, templates
 └── main.ts          # bootstrap()
 
@@ -178,6 +182,7 @@ pnpm build:cli    # compile the graphvizjs CLI to dist-cli/
 graphvizjs render diagram.dot -o diagram.svg
 graphvizjs validate diagram.dot --json
 graphvizjs format diagram.dot -o pretty.dot
+graphvizjs stats diagram.dot --json
 ```
 
 ## Related documentation

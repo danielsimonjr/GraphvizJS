@@ -1,10 +1,10 @@
 {
   "stats": {
-    "fileCount": 64,
-    "moduleCount": 21,
-    "totalLoc": 7165,
-    "edgeCount": 121,
-    "exportCount": 189
+    "fileCount": 67,
+    "moduleCount": 22,
+    "totalLoc": 7791,
+    "edgeCount": 129,
+    "exportCount": 204
   },
   "modules": {
     "autosave": [
@@ -47,6 +47,9 @@
     ],
     "session": [
       "src/session/session.ts"
+    ],
+    "stats": [
+      "src/stats/stats-dialog.ts"
     ],
     "tabs": [
       "src/tabs/manager.ts",
@@ -95,7 +98,9 @@
       "core/export-png.ts",
       "core/export.ts",
       "core/format.ts",
+      "core/graph-stats.ts",
       "core/normalize-svg.ts",
+      "core/parse-graph.ts",
       "core/render.ts",
       "core/scan-dot.ts",
       "core/semantic-lint.ts",
@@ -133,6 +138,7 @@
       "preview",
       "recent",
       "session",
+      "stats",
       "tabs",
       "theme",
       "toolbar",
@@ -161,6 +167,9 @@
       "core",
       "autosave",
       "platform"
+    ],
+    "stats": [
+      "core"
     ],
     "tabs": [
       "core"
@@ -233,6 +242,14 @@
       {
         "file": "src/session/session.ts",
         "name": "CapturableTab"
+      },
+      {
+        "file": "src/stats/stats-dialog.ts",
+        "name": "StatsDialogOptions"
+      },
+      {
+        "file": "src/stats/stats-dialog.ts",
+        "name": "StatsDialog"
       },
       {
         "file": "src/tabs/manager.ts",
@@ -311,8 +328,20 @@
         "name": "FormatOptions"
       },
       {
+        "file": "core/graph-stats.ts",
+        "name": "computeStats"
+      },
+      {
         "file": "core/normalize-svg.ts",
         "name": "NormalizedSvg"
+      },
+      {
+        "file": "core/parse-graph.ts",
+        "name": "Tok"
+      },
+      {
+        "file": "core/parse-graph.ts",
+        "name": "TokKind"
       },
       {
         "file": "core/scan-dot.ts",
@@ -337,6 +366,10 @@
       {
         "file": "cli/args.ts",
         "name": "ParseError"
+      },
+      {
+        "file": "cli/index.ts",
+        "name": "formatStats"
       },
       {
         "file": "electron/app-menu.ts",
@@ -460,6 +493,12 @@
       "file": "src/session/session.ts",
       "testFiles": [
         "test/session/session.test.ts"
+      ]
+    },
+    {
+      "file": "src/stats/stats-dialog.ts",
+      "testFiles": [
+        "test/stats/stats-dialog.test.ts"
       ]
     },
     {
@@ -661,11 +700,23 @@
       ]
     },
     {
+      "file": "core/graph-stats.ts",
+      "testFiles": [
+        "test/core/graph-stats.test.ts"
+      ]
+    },
+    {
       "file": "core/normalize-svg.ts",
       "testFiles": [
         "test/core/export-pdf.test.ts",
         "test/core/export-png.test.ts",
         "test/core/normalize-svg.test.ts"
+      ]
+    },
+    {
+      "file": "core/parse-graph.ts",
+      "testFiles": [
+        "test/core/parse-graph.test.ts"
       ]
     },
     {
@@ -772,6 +823,13 @@
       {
         "channel": "dot:format",
         "method": "formatDot",
+        "hasContract": true,
+        "hasPreload": true,
+        "hasHandler": true
+      },
+      {
+        "channel": "dot:stats",
+        "method": "graphStats",
         "hasContract": true,
         "hasPreload": true,
         "hasHandler": true
@@ -946,12 +1004,12 @@
     },
     {
       "path": "src/main.ts",
-      "loc": 910,
+      "loc": 919,
       "exports": []
     },
     {
       "path": "src/menu/commands.ts",
-      "loc": 87,
+      "loc": 90,
       "exports": [
         "dispatchMenuAction",
         "setupMenuCommands",
@@ -960,7 +1018,7 @@
     },
     {
       "path": "src/menu/menu-template.ts",
-      "loc": 317,
+      "loc": 323,
       "exports": [
         "LAYOUT_ENGINES",
         "buildMenuTemplate",
@@ -981,7 +1039,7 @@
     },
     {
       "path": "src/platform/contract.ts",
-      "loc": 51,
+      "loc": 53,
       "exports": [
         "DiagramFilter",
         "OpenedFile",
@@ -991,7 +1049,7 @@
     },
     {
       "path": "src/platform/index.ts",
-      "loc": 98,
+      "loc": 103,
       "exports": [
         "store",
         "openTextFile",
@@ -1011,6 +1069,7 @@
         "validateDiagram",
         "formatDot",
         "dotVocabulary",
+        "graphStats",
         "exportRender",
         "PlatformStore"
       ]
@@ -1070,6 +1129,15 @@
         "SessionTab",
         "SessionData",
         "CapturableTab"
+      ]
+    },
+    {
+      "path": "src/stats/stats-dialog.ts",
+      "loc": 72,
+      "exports": [
+        "createStatsDialog",
+        "StatsDialogOptions",
+        "StatsDialog"
       ]
     },
     {
@@ -1340,11 +1408,29 @@
       ]
     },
     {
+      "path": "core/graph-stats.ts",
+      "loc": 105,
+      "exports": [
+        "computeStats",
+        "graphStats"
+      ]
+    },
+    {
       "path": "core/normalize-svg.ts",
       "loc": 92,
       "exports": [
         "normalizeSvg",
         "NormalizedSvg"
+      ]
+    },
+    {
+      "path": "core/parse-graph.ts",
+      "loc": 321,
+      "exports": [
+        "tokenizeDot",
+        "parseGraph",
+        "Tok",
+        "TokKind"
       ]
     },
     {
@@ -1384,7 +1470,7 @@
     },
     {
       "path": "core/types.ts",
-      "loc": 94,
+      "loc": 132,
       "exports": [
         "DotValidationError",
         "PdfExportOptions",
@@ -1393,6 +1479,10 @@
         "DiagnosticFix",
         "StructuralDiagnostic",
         "DiagramDiagnostics",
+        "GraphEdge",
+        "GraphSubgraph",
+        "GraphModel",
+        "GraphStats",
         "LayoutEngine",
         "ExportFormat",
         "PdfPageMode",
@@ -1409,7 +1499,7 @@
     },
     {
       "path": "cli/args.ts",
-      "loc": 273,
+      "loc": 294,
       "exports": [
         "parseArgs",
         "ParsedArgs",
@@ -1418,9 +1508,10 @@
     },
     {
       "path": "cli/index.ts",
-      "loc": 167,
+      "loc": 208,
       "exports": [
         "offsetToLineCol",
+        "formatStats",
         "main"
       ]
     },
@@ -1443,12 +1534,12 @@
     },
     {
       "path": "electron/main.ts",
-      "loc": 238,
+      "loc": 240,
       "exports": []
     },
     {
       "path": "electron/preload.ts",
-      "loc": 38,
+      "loc": 39,
       "exports": []
     }
   ]

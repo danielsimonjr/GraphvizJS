@@ -96,6 +96,15 @@ describe('buildMenuTemplate', () => {
     expect(onAction).toHaveBeenCalledWith('command-palette');
   });
 
+  it('has a Graph Statistics item (View menu) dispatching stats', () => {
+    const onAction = vi.fn();
+    const t = buildMenuTemplate(opts({ onAction }));
+    const item = findById(t, 'stats')!;
+    expect(item.label).toBe('Graph Statistics…');
+    (item.click as () => void)();
+    expect(onAction).toHaveBeenCalledWith('stats');
+  });
+
   it('builds a radio Theme submenu reflecting currentTheme and dispatching set-theme', () => {
     const onAction = vi.fn();
     const t = buildMenuTemplate(opts({ currentTheme: 'dark', onAction }));

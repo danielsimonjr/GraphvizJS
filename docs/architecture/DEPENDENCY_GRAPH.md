@@ -6,11 +6,11 @@
 
 | Metric | Value |
 | --- | --- |
-| Files | 64 |
-| Modules | 21 |
-| Lines of code | 7165 |
-| Internal edges | 121 |
-| Exports | 189 |
+| Files | 67 |
+| Modules | 22 |
+| Lines of code | 7791 |
+| Internal edges | 129 |
+| Exports | 204 |
 
 ## Modules
 
@@ -34,7 +34,9 @@
 - `core/export-png.ts`
 - `core/export.ts`
 - `core/format.ts`
+- `core/graph-stats.ts`
 - `core/normalize-svg.ts`
+- `core/parse-graph.ts`
 - `core/render.ts`
 - `core/scan-dot.ts`
 - `core/semantic-lint.ts`
@@ -97,6 +99,10 @@
 
 - `src/session/session.ts`
 
+### stats
+
+- `src/stats/stats-dialog.ts`
+
 ### tabs
 
 - `src/tabs/manager.ts`
@@ -154,8 +160,9 @@
 | preferences | theme |
 | preview | core, utils |
 | recent | platform |
-| root | autosave, core, editor, help, menu, palette, platform, preferences, preview, recent, session, tabs, theme, toolbar, watch, window, workspace |
+| root | autosave, core, editor, help, menu, palette, platform, preferences, preview, recent, session, stats, tabs, theme, toolbar, watch, window, workspace |
 | session | autosave, core, platform |
+| stats | core |
 | tabs | core |
 | theme | platform |
 | toolbar | core, platform, theme |
@@ -188,6 +195,8 @@ None. ✅
 - `ZoomController` in `src/preview/zoom.ts`
 - `SessionTab` in `src/session/session.ts`
 - `CapturableTab` in `src/session/session.ts`
+- `StatsDialogOptions` in `src/stats/stats-dialog.ts`
+- `StatsDialog` in `src/stats/stats-dialog.ts`
 - `CreateTabOptions` in `src/tabs/manager.ts`
 - `TabBarCallbacks` in `src/tabs/tab-bar.ts`
 - `TabBarOptions` in `src/tabs/tab-bar.ts`
@@ -207,13 +216,17 @@ None. ✅
 - `AttrType` in `core/dot-catalog.ts`
 - `PageGeometry` in `core/export-pdf.ts`
 - `FormatOptions` in `core/format.ts`
+- `computeStats` in `core/graph-stats.ts`
 - `NormalizedSvg` in `core/normalize-svg.ts`
+- `Tok` in `core/parse-graph.ts`
+- `TokKind` in `core/parse-graph.ts`
 - `BalanceResult` in `core/scan-dot.ts`
 - `SpanKind` in `core/scan-dot.ts`
 - `PdfPageMode` in `core/types.ts`
 - `PdfPageSize` in `core/types.ts`
 - `ParsedArgs` in `cli/args.ts`
 - `ParseError` in `cli/args.ts`
+- `formatStats` in `cli/index.ts`
 - `rebuildAppMenu` in `electron/app-menu.ts`
 
 ## Test coverage (src ↔ test)
@@ -239,6 +252,7 @@ None. ✅
 | `src/preview/zoom.ts` | `test/preview/zoom.test.ts` |
 | `src/recent/recent-files.ts` | `test/recent/recent-files.test.ts` |
 | `src/session/session.ts` | `test/session/session.test.ts` |
+| `src/stats/stats-dialog.ts` | `test/stats/stats-dialog.test.ts` |
 | `src/tabs/manager.ts` | `test/tabs/manager.test.ts`, `test/tabs/tab-bar.test.ts` |
 | `src/tabs/tab-bar.ts` | `test/tabs/tab-bar.test.ts` |
 | `src/theme/color-scheme.ts` | `test/theme/color-scheme.test.ts` |
@@ -271,7 +285,9 @@ None. ✅
 | `core/export-png.ts` | `test/core/export-png.test.ts` |
 | `core/export.ts` | `test/core/export.test.ts` |
 | `core/format.ts` | `test/core/format.test.ts`, `test/toolbar/format.test.ts` |
+| `core/graph-stats.ts` | `test/core/graph-stats.test.ts` |
 | `core/normalize-svg.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts` |
+| `core/parse-graph.ts` | `test/core/parse-graph.test.ts` |
 | `core/render.ts` | `test/core/export-pdf.test.ts`, `test/core/export-png.test.ts`, `test/core/normalize-svg.test.ts`, `test/core/render.test.ts`, `test/core/validate.test.ts` |
 | `core/scan-dot.ts` | `test/core/scan-dot.test.ts` |
 | `core/semantic-lint.ts` | `test/core/semantic-lint.test.ts` |
@@ -294,6 +310,7 @@ None. ✅
 | `dialog:openText` | openTextFile | ✅ wired |
 | `dialog:save` | pickSavePath | ✅ wired |
 | `dot:format` | formatDot | ✅ wired |
+| `dot:stats` | graphStats | ✅ wired |
 | `dot:vocabulary` | dotVocabulary | ✅ wired |
 | `export:render` | exportRender | ✅ wired |
 | `fs:readText` | readTextFile | ✅ wired |

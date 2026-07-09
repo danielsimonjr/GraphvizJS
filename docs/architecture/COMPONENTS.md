@@ -23,26 +23,26 @@ GraphvizJS is a layered Electron app with a headless core. File counts per modul
 
 ```
 ┌───────────────────────────────────────────────────────────────┐
-│  core/         │  Graphviz + DOT language tooling (16 files)   │
+│  core/         │  Graphviz + DOT language tooling (18 files)   │
 ├───────────────────────────────────────────────────────────────┤
 │  cli/          │  graphvizjs binary (2 files)                  │
 ├───────────────────────────────────────────────────────────────┤
 │  electron/     │  main process, preload, menu, watcher (4)     │
 ├───────────────────────────────────────────────────────────────┤
 │  src/platform/ │  renderer↔main IPC boundary (2 files)         │
-│  src/editor/   │  CodeMirror extensions (7 files)              │
+│  src/editor/   │  CodeMirror extensions (6 files)              │
 │  src/toolbar/  │  one module per action (15 files)             │
 │  src/preview/  │  live preview + zoom (2 files)                │
 │  src/tabs/     │  multi-tab management (2 files)               │
 │  src/menu/     │  native menu template + dispatch (2 files)    │
 │  src/watch/    │  external-change detection (2 files)          │
-│  src/{session,recent,theme,palette,preferences,help,           │
+│  src/{session,recent,theme,palette,preferences,help,stats,     │
 │       workspace,window,utils,autosave}/  (1 file each)         │
 │  src/main.ts   │  bootstrap() (module 'root')                  │
 └───────────────────────────────────────────────────────────────┘
 ```
 
-**Total:** 64 TypeScript files · 6,948 LOC · 21 modules · 189 exports · 19 IPC channels.
+**Total:** 67 TypeScript files · 7,759 LOC · 22 modules · 204 exports · 20 IPC channels.
 
 ---
 
@@ -190,6 +190,38 @@ actions and the CLI's `validate --fix`.
 function applyFixes(source: string, diagnostics: StructuralDiagnostic[]): string
 ```
 
+### parse-graph.ts (`core/parse-graph.ts`)
+
+**Purpose**: a pure, Graphviz-faithful structural parser — tokenizes DOT (literal-aware,
+via `scanDot`) and walks the token stream into a `GraphModel`: distinct node ids, edges,
+and subgraphs/clusters. Handles quoted/HTML ids, ports (`node:port`), string
+concatenation (`+`), the `id = id` default-attribute form, attribute lists (skipped for
+structure), subgraph endpoints, arbitrary nesting, and `cluster`-prefixed subgraph names —
+and never throws, degrading gracefully on malformed input. The structural foundation for
+`graph-stats.ts`.
+
+```typescript
+function tokenizeDot(source: string): Tok[]
+function parseGraph(source: string): GraphModel
+```
+
+### graph-stats.ts (`core/graph-stats.ts`)
+
+**Purpose**: computes `GraphStats` structural metrics from a `GraphModel` — node/edge/
+subgraph/cluster counts, directed/strict flags, isolated-node count, self-loop count,
+and cycle detection (iterative 3-color DFS for directed graphs, union-find for
+undirected — both treat a self-loop or parallel edge as a cycle). Directed graphs also
+report `roots` (in-degree 0) and `leaves` (out-degree 0), omitted for undirected graphs.
+
+```typescript
+function computeStats(model: GraphModel): GraphStats
+function graphStats(source: string): GraphStats   // parseGraph(source) → computeStats
+```
+
+`graphStats` is the single entry point consumed by the CLI `stats` command, the
+`dot:stats` IPC handler, and (via the IPC wrapper) the renderer's Graph Statistics
+dialog.
+
 ### export.ts / export-png.ts / export-pdf.ts / normalize-svg.ts
 
 **Purpose**: export pipeline.
@@ -220,17 +252,20 @@ interface DotVocabulary { keywords: string[]; attributes: string[]; attributeVal
 
 ### args.ts (`cli/args.ts`)
 
-**Purpose**: pure argument parsing for `render` / `validate` / `format`.
+**Purpose**: pure argument parsing for `render` / `validate` / `format` / `stats`.
 
 ```typescript
 interface ParsedArgs {
-  command: 'render' | 'validate' | 'format' | 'help' | 'version';
+  command: 'render' | 'validate' | 'format' | 'stats' | 'help' | 'version';
   input?: string; output?: string; engine: LayoutEngine;
   format?: 'svg' | 'png' | 'pdf'; scale: 1 | 2; pdf: PdfExportOptions;
   json?: boolean; strict?: boolean; fix?: boolean;   // validate only
 }
 function parseArgs(argv: string[]): ParsedArgs | ParseError
 ```
+
+`stats` takes no `--engine`/output flags — just an input (or `-` for stdin) and an
+optional `--json`.
 
 ### index.ts (`cli/index.ts`)
 
@@ -239,12 +274,15 @@ function parseArgs(argv: string[]): ParsedArgs | ParseError
 ```typescript
 async function main(argv: string[]): Promise<number>   // exit code: 0 ok, 1 fail, 2 usage
 function offsetToLineCol(source: string, offset: number): { line: number; column: number }
+function formatStats(stats: GraphStats): string        // aligned label: value lines
 ```
 
 `validate` prints human diagnostics or `--json` (each structural finding including its
 `code`/`fix`), deriving line/column via `offsetToLineCol`. `validate --fix` instead
 runs the diagnostics through `core/apply-fixes.ts`'s `applyFixes` and writes the
-corrected source to `-o <path>` or stdout. See [API.md](./API.md).
+corrected source to `-o <path>` or stdout. `stats` calls `core/graph-stats.ts`'s
+`graphStats` and prints `formatStats`'s human table or `--json`'s
+`{ input, ...GraphStats }`. See [API.md](./API.md).
 
 ---
 
@@ -252,13 +290,13 @@ corrected source to `-o <path>` or stdout. See [API.md](./API.md).
 
 ### main.ts (`electron/main.ts`)
 
-**Purpose**: create the window, register the 19 IPC handlers, own persistence and the
+**Purpose**: create the window, register the 20 IPC handlers, own persistence and the
 native menu/watcher.
 
 ```typescript
 function registerIpc(): void
 // render:svg → renderDotToSvg · render:validate → validateDiagram (incl. semantic lint)
-// export:render → exportDiagram · dot:format → formatDot
+// export:render → exportDiagram · dot:format → formatDot · dot:stats → graphStats
 // dot:vocabulary → keywords/attributes + attributeValues (dot-catalog) + colors (dot-colors)
 // fs:readText/writeText/writeBinary · dialog:openText/save/confirm
 // store:get/set/delete · shell:openExternal · app:info
@@ -293,6 +331,7 @@ function renderSvg(dot: string, engine: LayoutEngine): Promise<string>
 function validateDiagram(dot: string, engine: LayoutEngine): Promise<DiagramDiagnostics>
 function formatDot(source: string): Promise<string>
 function dotVocabulary(): Promise<DotVocabulary>
+function graphStats(source: string): Promise<GraphStats>
 function exportRender(dot, engine, format, options?): Promise<Uint8Array>
 const store: { get; set; delete }
 // + dialogs, fs, confirm, openExternal, appInfo, watch, menu, onFileChanged, onMenuAction
@@ -364,6 +403,20 @@ bar with event delegation.
   (Ctrl/Cmd+Shift+P).
 - **preferences/** — `createPreferencesDialog` (Cmd/Ctrl+,, Appearance → Theme).
 
+### stats/ (`src/stats/`)
+
+**Purpose**: the Graph Statistics modal dialog. `createStatsDialog` lazily builds a
+`<dialog class="stats-dialog">`, fetches `GraphStats` for the current tab's source over
+the `dot:stats` IPC (via the injected `graphStats` callback), and renders it as a
+`label: value` definition list (Directed/Strict/Nodes/Edges/Subgraphs/Clusters, plus
+Roots/Leaves when directed, then Isolated/Self-loops/Cyclic). Opened from the command
+palette ("Graph Statistics") and the View menu; no toolbar button.
+
+```typescript
+interface StatsDialogOptions { getSource: () => string; graphStats: (source: string) => Promise<GraphStats>; }
+function createStatsDialog(opts: StatsDialogOptions): { open(): Promise<void> }
+```
+
 ### help/ · workspace/ · window/ · utils/ · autosave/
 
 - **help/** — help dialog (shortcuts + app info).
@@ -395,6 +448,7 @@ root ──► (everything in src/) + core (type-only)
 ├── preview  ──► core (type-only), utils
 ├── toolbar  ──► core (type-only), platform, theme
 ├── tabs     ──► core (type-only)
+├── stats    ──► core (type-only)
 ├── session  ──► autosave, core (type-only), platform
 ├── theme    ──► platform
 ├── preferences ──► theme

@@ -73,4 +73,23 @@ describe('graphvizjs compiled distributable', () => {
     const out = run(['format', '-'], 'digraph G {\na->b;\n}');
     expect(out).toContain('digraph G {\n  a -> b;\n}');
   }, 30000);
+
+  it('reports stats as JSON', () => {
+    const g = join(dir, 'stats.dot');
+    writeFileSync(g, 'digraph { a -> b -> c -> a }', 'utf-8');
+    const parsed = JSON.parse(run(['stats', g, '--json']));
+    expect(parsed).toMatchObject({
+      directed: true,
+      nodeCount: 3,
+      edgeCount: 3,
+      hasCycle: true,
+    });
+    expect(parsed.input).toContain('stats.dot');
+  }, 30000);
+
+  it('reports stats as human text from stdin', () => {
+    const out = run(['stats', '-'], 'digraph { a -> b }');
+    expect(out).toContain('nodes:');
+    expect(out).toContain('cycles:');
+  }, 30000);
 });

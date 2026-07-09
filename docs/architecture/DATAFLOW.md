@@ -16,12 +16,13 @@ functions in-process. These flows show both.
 3. [Live Preview (Render) Flow](#live-preview-render-flow)
 4. [Validation / Linting Flow](#validation--linting-flow)
 5. [Format Flow](#format-flow)
-6. [Export Flow](#export-flow)
-7. [Vocabulary Bootstrap Flow](#vocabulary-bootstrap-flow)
-8. [Session Restore Flow](#session-restore-flow)
-9. [External-Change Flow](#external-change-flow)
-10. [The Oracle Path (CLI ↔ UI)](#the-oracle-path-cli--ui)
-11. [Error Handling](#error-handling)
+6. [Graph Statistics Flow](#graph-statistics-flow)
+7. [Export Flow](#export-flow)
+8. [Vocabulary Bootstrap Flow](#vocabulary-bootstrap-flow)
+9. [Session Restore Flow](#session-restore-flow)
+10. [External-Change Flow](#external-change-flow)
+11. [The Oracle Path (CLI ↔ UI)](#the-oracle-path-cli--ui)
+12. [Error Handling](#error-handling)
 
 ---
 
@@ -45,7 +46,7 @@ functions in-process. These flows show both.
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │  core/  —  renderDotToSvg / validateDiagram / exportDiagram /    │
-│            formatDot / dot vocabulary                            │
+│            formatDot / graphStats / dot vocabulary               │
 └─────────────────────────────────────────────────────────────────┘
 
   cli/  ── imports core/ directly (no IPC) ──► core/
@@ -73,11 +74,11 @@ core/render.ts          renderDotToSvg(dot, engine)  →  SVG string
 src/platform  ──►  Promise<string> to the caller
 ```
 
-The 19 channels: `render:svg`, `render:validate`, `export:render`, `dot:format`,
-`dot:vocabulary`, `fs:readText`/`writeText`/`writeBinary`, `dialog:openText`/`save`/
-`confirm`, `store:get`/`set`/`delete`, `shell:openExternal`, `app:info`,
-`menu:setRecent`/`setTheme`, `watch:setPaths` (+ `menu:action` / `file:changed` push
-channels main→renderer).
+The 20 channels: `render:svg`, `render:validate`, `export:render`, `dot:format`,
+`dot:stats`, `dot:vocabulary`, `fs:readText`/`writeText`/`writeBinary`,
+`dialog:openText`/`save`/`confirm`, `store:get`/`set`/`delete`, `shell:openExternal`,
+`app:info`, `menu:setRecent`/`setTheme`, `watch:setPaths` (+ `menu:action` /
+`file:changed` push channels main→renderer).
 
 ---
 
@@ -185,6 +186,38 @@ Shift+Alt+F  (or the Format toolbar button)
    Editor reformatted. (Keymap run() returns true synchronously;
    the reformat lands on the next tick when the IPC resolves.)
 ```
+
+---
+
+## Graph Statistics Flow
+
+```
+Command palette "Graph Statistics"  (or View menu → Show Graph Statistics)
+      │
+      ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 1. statsDialog.open()                                        │
+│    source = opts.getSource()   // active tab's DOT source    │
+└─────────────────────────────────────────────────────────────┘
+      │
+      ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 2. stats = await graphStats(source)      // dot:stats        │
+│    → core.parseGraph(source) → GraphModel (nodes/edges/      │
+│      subgraphs) → core.computeStats(model) → GraphStats      │
+│      (counts, directed/strict, roots/leaves/isolated,        │
+│      self-loops, cycle detection)                            │
+└─────────────────────────────────────────────────────────────┘
+      │
+      ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 3. RENDER                                                    │
+│    dialog.innerHTML = label/value rows; dialog.showModal()  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+The same `graphStats` core function backs `graphvizjs stats [--json]` in-process (no
+IPC) — see [The Oracle Path](#the-oracle-path-cli--ui).
 
 ---
 
@@ -332,7 +365,8 @@ troubleshooting oracle:
 
 `graphvizjs validate bug.dot --json` emits `{ input, engine, valid, syntax,
 structural[] }` for exact comparison; `graphvizjs format` vs the Format button does the
-same for formatting.
+same for formatting, and `graphvizjs stats --json` (`{ input, ...GraphStats }`) vs the
+Graph Statistics dialog does the same for structural metrics.
 
 ---
 

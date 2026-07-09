@@ -30,6 +30,7 @@ Based on [MermaidJS Desktop Client](https://github.com/skydiver/mermaidjs-deskto
 - **Command palette** – Fuzzy-search and run any command with Ctrl/Cmd+Shift+P.
 - **Theme** – System, Light, or Dark, switchable from the toolbar, the command palette, or Preferences.
 - **Preferences dialog** – Cmd/Ctrl+, opens app settings (Appearance → Theme today, built to grow).
+- **Graph statistics** – Node/edge/subgraph/cluster counts, directed/strict flags, roots/leaves/isolated nodes, self-loops, and cycle detection for the current diagram, in a dialog (command palette + View menu) or via `graphvizjs stats`.
 - **Built-in examples** – Quick-start templates for directed graphs, undirected graphs, clusters, and more.
 - **Native application menu** – Standard File/Edit/View/Help menus wired to the same actions as the toolbar and keyboard.
 - **Editor & preview zoom** – Zoom the editor font (Cmd/Ctrl+=/−/0) and the diagram (Ctrl+Scroll or toolbar controls).
@@ -70,7 +71,7 @@ GraphvizJS targets **Windows only**. The `release/` directory contains the gener
 
 ## Command-Line Interface
 
-The same headless core also ships as a `graphvizjs` CLI for scripting and CI — no desktop app or browser required. It exposes exactly what the desktop app does, over the same `core/`: rendering, validation, and formatting.
+The same headless core also ships as a `graphvizjs` CLI for scripting and CI — no desktop app or browser required. It exposes exactly what the desktop app does, over the same `core/`: rendering, validation, formatting, and graph statistics.
 
 ```bash
 # Compile the CLI to dist-cli/ (also runs automatically on `npm pack`)
@@ -89,6 +90,10 @@ graphvizjs validate diagram.dot --strict        # also fail (exit 1) on structur
 # Format (reindent) DOT
 graphvizjs format diagram.dot -o pretty.dot     # write to a file
 graphvizjs format diagram.dot                   # or print to stdout
+
+# Graph statistics — structural metrics + cycle detection
+graphvizjs stats diagram.dot                    # human output
+graphvizjs stats diagram.dot --json             # machine-readable
 
 # Read DOT from stdin (any command)
 cat diagram.dot | graphvizjs render - -o out.svg
@@ -109,7 +114,7 @@ pnpm build:cli:exe   # → dist-exe/graphvizjs.exe (no Node install required to 
 
 Bundles the CLI + core + the (inlined-WASM) Graphviz engine into a single executable via
 Node's [Single Executable Applications](https://nodejs.org/api/single-executable-applications.html).
-It covers the pure/WASM subset — **`format`, `validate`, and `render→svg`** — with no
+It covers the pure/WASM subset — **`format`, `validate`, `stats`, and `render→svg`** — with no
 dependencies. `render→png/pdf` still require the full `pnpm build:cli` install, because
 their native `.node` binaries (`@resvg/resvg-js`, `canvas`) can't be inlined into one file.
 
@@ -161,7 +166,7 @@ Coverage reports are generated in HTML and LCOV formats in the `coverage/` direc
 
 Tests mirror the source structure:
 - `test/core/` – Headless core: render/validate, PNG/PDF/SVG export, normalize-svg, scan-dot, structure-lint, format, dot-vocab, `validateDiagram`
-- `test/cli/` – CLI argument parsing, `main()` integration (render/validate/format), and a build-and-subprocess test of the compiled `dist-cli` binary
+- `test/cli/` – CLI argument parsing, `main()` integration (render/validate/format/stats), and a build-and-subprocess test of the compiled `dist-cli` binary
 - `test/editor/` – Editor extensions (language, autocomplete, linting, search, theme, zoom, dot-data)
 - `test/preview/` – Preview scheduling and zoom
 - `test/toolbar/` – Toolbar actions (file ops, export, menus, format, layout engine, theme button, …)
@@ -178,8 +183,8 @@ Tests mirror the source structure:
 
 The codebase is split into a Node-only headless core, an Electron main process, a browser renderer, and a CLI. The dependency-graph tool (see [Tooling](#tooling)) enforces the layering: `core/` is a self-contained leaf, `cli/` depends only on `core/`, and the renderer (`src/`) may reference `core/` only as the type-only `core/types` contract — it reaches Graphviz strictly over IPC.
 
-- `core/` – Node-only, DOM-free. All Graphviz work **and** pure DOT language tooling: `render.ts` (DOT→SVG + syntax validation via `@hpcc-js/wasm`), `normalize-svg.ts`, `export-png.ts`/`export-pdf.ts`/`export.ts` (SVG/PNG/PDF), `scan-dot.ts` (literal-aware scanner), `dot-vocab.ts` (keyword/attribute vocabulary), `structure-lint.ts` (structural diagnostics), `format.ts` (`formatDot`), `validate.ts` (`validateDiagram` = syntax + structural), and `types.ts`. Consumed by both the Electron main process and the CLI.
-- `cli/` – The `graphvizjs` binary: `args.ts` (argument parsing) and `index.ts` (`render`/`validate`/`format` commands). Compiled to `dist-cli/`.
+- `core/` – Node-only, DOM-free. All Graphviz work **and** pure DOT language tooling: `render.ts` (DOT→SVG + syntax validation via `@hpcc-js/wasm`), `normalize-svg.ts`, `export-png.ts`/`export-pdf.ts`/`export.ts` (SVG/PNG/PDF), `scan-dot.ts` (literal-aware scanner), `dot-vocab.ts` (keyword/attribute vocabulary), `structure-lint.ts` (structural diagnostics), `format.ts` (`formatDot`), `validate.ts` (`validateDiagram` = syntax + structural), `parse-graph.ts` (DOT source → structural `GraphModel`), `graph-stats.ts` (`graphStats` = node/edge/subgraph/cluster counts, roots/leaves/isolated, self-loops, cycle detection), and `types.ts`. Consumed by both the Electron main process and the CLI.
+- `cli/` – The `graphvizjs` binary: `args.ts` (argument parsing) and `index.ts` (`render`/`validate`/`format`/`stats` commands). Compiled to `dist-cli/`.
 - `src/` – Renderer (TypeScript/Vite); each subdirectory exports setup functions wired together by `main.ts`:
   - `platform/` – The renderer↔main IPC boundary (`contract.ts` = the `window.graphviz` API, `index.ts` = thin wrappers)
   - `editor/` – CodeMirror extensions: language/highlighting, autocomplete, linting, search, theme, font zoom
@@ -193,6 +198,7 @@ The codebase is split into a Node-only headless core, an Electron main process, 
   - `theme/` – System/Light/Dark color scheme controller
   - `palette/` – Command palette (Ctrl/Cmd+Shift+P)
   - `preferences/` – Preferences dialog
+  - `stats/` – Graph Statistics dialog (over the `dot:stats` IPC channel)
   - `help/` – Help dialog
   - `workspace/` – Resizable pane divider
   - `window/` – Window position/size persistence

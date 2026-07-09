@@ -31,6 +31,7 @@ const api: GraphvizApi = {
   validateDiagram: (dot, engine) => ipcRenderer.invoke('render:validate', dot, engine),
   formatDot: (source) => ipcRenderer.invoke('dot:format', source),
   dotVocabulary: () => ipcRenderer.invoke('dot:vocabulary'),
+  graphStats: (source) => ipcRenderer.invoke('dot:stats', source),
   exportRender: (dot, engine, format, options) =>
     ipcRenderer.invoke('export:render', dot, engine, format, options),
 };
