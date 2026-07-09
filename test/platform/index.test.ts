@@ -14,6 +14,7 @@ const api = {
   appInfo: vi.fn(),
   formatDot: vi.fn(),
   dotVocabulary: vi.fn(),
+  graphStats: vi.fn(),
 };
 
 beforeEach(() => {
@@ -99,5 +100,23 @@ describe('platform', () => {
     const result = await platform.dotVocabulary();
     expect(api.dotVocabulary).toHaveBeenCalled();
     expect(result).toEqual(vocab);
+  });
+
+  it('graphStats forwards to window.graphviz.graphStats', async () => {
+    const fake = {
+      directed: true,
+      strict: false,
+      nodeCount: 1,
+      edgeCount: 0,
+      subgraphCount: 0,
+      clusterCount: 0,
+      isolated: 1,
+      selfLoops: 0,
+      hasCycle: false,
+    };
+    api.graphStats.mockResolvedValue(fake);
+    const result = await platform.graphStats('digraph { a }');
+    expect(api.graphStats).toHaveBeenCalledWith('digraph { a }');
+    expect(result).toEqual(fake);
   });
 });

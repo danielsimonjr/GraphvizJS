@@ -9,6 +9,7 @@ import { DOT_COLORS } from '../core/dot-colors';
 import { DOT_ATTRIBUTES, DOT_KEYWORDS } from '../core/dot-vocab';
 import { exportDiagram } from '../core/export';
 import { formatDot } from '../core/format';
+import { graphStats } from '../core/graph-stats';
 import { initGraphviz, renderDotToSvg } from '../core/render';
 import type { ExportFormat, LayoutEngine, PdfExportOptions } from '../core/types';
 import { validateDiagram } from '../core/validate';
@@ -215,6 +216,7 @@ function registerIpc(): void {
     ),
     colors: [...DOT_COLORS],
   }));
+  ipcMain.handle('dot:stats', (_e, source: string) => graphStats(source));
 }
 
 app.whenReady().then(() => {

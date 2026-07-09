@@ -2,6 +2,7 @@ import type {
   DiagramDiagnostics,
   DotVocabulary,
   ExportFormat,
+  GraphStats,
   LayoutEngine,
   PdfExportOptions,
 } from '../../core/types';
@@ -42,6 +43,7 @@ export interface GraphvizApi {
   validateDiagram(dot: string, engine: LayoutEngine): Promise<DiagramDiagnostics>;
   formatDot(source: string): Promise<string>;
   dotVocabulary(): Promise<DotVocabulary>;
+  graphStats(source: string): Promise<GraphStats>;
   exportRender(
     dot: string,
     engine: LayoutEngine,

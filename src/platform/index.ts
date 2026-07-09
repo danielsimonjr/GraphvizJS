@@ -2,6 +2,7 @@ import type {
   DiagramDiagnostics,
   DotVocabulary,
   ExportFormat,
+  GraphStats,
   LayoutEngine,
   PdfExportOptions,
 } from '../../core/types';
@@ -86,6 +87,10 @@ export function formatDot(source: string): Promise<string> {
 
 export function dotVocabulary(): Promise<DotVocabulary> {
   return window.graphviz.dotVocabulary();
+}
+
+export function graphStats(source: string): Promise<GraphStats> {
+  return window.graphviz.graphStats(source);
 }
 
 export function exportRender(
