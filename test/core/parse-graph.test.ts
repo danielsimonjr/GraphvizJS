@@ -162,4 +162,9 @@ describe('parseGraph', () => {
     expect(() => parseGraph('')).not.toThrow();
     expect(() => parseGraph('not dot at all')).not.toThrow();
   });
+
+  it('does not throw on pathologically deep nesting (zero-throw invariant)', () => {
+    const deep = `digraph {${' subgraph {'.repeat(5000)}${' }'.repeat(5000)} }`;
+    expect(() => parseGraph(deep)).not.toThrow();
+  });
 });

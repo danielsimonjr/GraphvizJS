@@ -143,6 +143,12 @@ export function parseGraph(source: string): GraphModel {
   let directed = false;
   let strict = false;
   let pos = 0;
+  // Guards against RangeError (stack overflow) on pathologically deep nesting:
+  // the parseBlock/parseStatement/parseEndpoint chain is mutually recursive, one
+  // stack frame per nesting level. 500 is far beyond any realistic DOT graph but
+  // comfortably under the stack limit, so normal-depth results are unaffected.
+  const MAX_DEPTH = 500;
+  let depth = 0;
 
   const at = (k = 0): Tok | undefined => toks[pos + k];
   const isKw = (t: Tok | undefined, kw: string): boolean =>
@@ -168,19 +174,45 @@ export function parseGraph(source: string): GraphModel {
     }
   };
 
+  // Consume a block body (lbrace already consumed) without recursing, by
+  // brace-matching over the flat token stream until the balancing rbrace.
+  // Used once nesting passes MAX_DEPTH so we still terminate deterministically
+  // instead of growing the call stack further.
+  const skipBlockBody = (): void => {
+    let braceDepth = 1;
+    while (pos < toks.length && braceDepth > 0) {
+      const k = at()!.kind;
+      pos++;
+      if (k === 'lbrace') braceDepth++;
+      else if (k === 'rbrace') braceDepth--;
+    }
+  };
+
   // Parse a block body (lbrace already consumed); record the subgraph and
   // return every node id declared anywhere inside (for endpoint expansion).
+  // Beyond MAX_DEPTH nesting, skip the block iteratively instead of recursing
+  // further — its contents are simply not counted (honest degradation on
+  // pathological input, preserving the zero-throw invariant).
   const parseBlock = (name: string | undefined): string[] => {
-    subgraphs.push({
-      name,
-      isCluster: name !== undefined && name.toLowerCase().startsWith('cluster'),
-    });
-    const members: string[] = [];
-    while (pos < toks.length && at()!.kind !== 'rbrace') {
-      for (const id of parseStatement()) members.push(id);
+    if (depth >= MAX_DEPTH) {
+      skipBlockBody();
+      return [];
     }
-    if (at()?.kind === 'rbrace') pos++;
-    return members;
+    depth++;
+    try {
+      subgraphs.push({
+        name,
+        isCluster: name !== undefined && name.toLowerCase().startsWith('cluster'),
+      });
+      const members: string[] = [];
+      while (pos < toks.length && at()!.kind !== 'rbrace') {
+        for (const id of parseStatement()) members.push(id);
+      }
+      if (at()?.kind === 'rbrace') pos++;
+      return members;
+    } finally {
+      depth--;
+    }
   };
 
   // Parse an edge endpoint: `{ … }`, `subgraph [name] { … }`, or a single id.
