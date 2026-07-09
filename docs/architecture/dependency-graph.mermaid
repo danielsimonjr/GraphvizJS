@@ -13,6 +13,7 @@ graph LR
   recent["recent"]
   root["root"]
   session["session"]
+  stats["stats"]
   tabs["tabs"]
   theme["theme"]
   toolbar["toolbar"]
@@ -46,6 +47,7 @@ graph LR
   root --> preview
   root --> recent
   root --> session
+  root --> stats
   root --> tabs
   root --> theme
   root --> toolbar
@@ -55,6 +57,7 @@ graph LR
   session --> autosave
   session --> core
   session --> platform
+  stats --> core
   tabs --> core
   theme --> platform
   toolbar --> core

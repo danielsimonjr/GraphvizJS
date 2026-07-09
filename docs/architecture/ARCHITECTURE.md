@@ -41,27 +41,28 @@ produced by `tools/dependency-graph`. Regenerate with `pnpm graph`.
 
 | Metric | Value |
 |--------|-------|
-| Source files | 60 TypeScript files |
-| Lines of code | 6,346 |
-| Modules | 21 |
-| Internal edges | 110 |
-| Exports | 180 |
+| Source files | 67 TypeScript files |
+| Lines of code | 7,759 |
+| Modules | 22 |
+| Internal edges | 129 |
+| Exports | 204 |
 | Layer violations | 0 |
 | Runtime circular dependencies | 0 |
-| IPC channels (fully wired) | 19 |
+| IPC channels (fully wired) | 20 |
 
 ### Module Distribution
 
 | Module | Location | Key Exports |
 |--------|----------|-------------|
-| `core` | repo root | `renderDotToSvg`, `validateDot`, `validateDiagram`, `exportDiagram`, `formatDot`, `structuralDiagnostics`, `scanDot`, `DOT_KEYWORDS`/`DOT_ATTRIBUTES`, `normalizeSvg`, `types` |
-| `cli` | repo root | `main`, `parseArgs`, `offsetToLineCol` |
+| `core` | repo root | `renderDotToSvg`, `validateDot`, `validateDiagram`, `exportDiagram`, `formatDot`, `structuralDiagnostics`, `scanDot`, `DOT_KEYWORDS`/`DOT_ATTRIBUTES`, `normalizeSvg`, `parseGraph`, `graphStats`, `types` |
+| `cli` | repo root | `main`, `parseArgs`, `offsetToLineCol`, `formatStats` |
 | `electron` | repo root | `main.ts` (IPC handlers), `preload.ts` (`window.graphviz`), `app-menu.ts`, `file-watcher.ts` |
-| `platform` | `src/` | `GraphvizApi` contract + renderer wrappers (`renderSvg`, `validateDiagram`, `exportRender`, `formatDot`, `dotVocabulary`, `store`, dialogs, …) |
+| `platform` | `src/` | `GraphvizApi` contract + renderer wrappers (`renderSvg`, `validateDiagram`, `exportRender`, `formatDot`, `dotVocabulary`, `graphStats`, `store`, dialogs, …) |
 | `editor` | `src/` | `createDotLanguage`, `makeDotCompletionSource`/`createDotAutocomplete`, `createDotLinter`, `createSearch`, editor theme, font zoom, `dot-data` completion data |
 | `preview` | `src/` | `createPreview` (debounced render), preview zoom controller |
 | `toolbar` | `src/` | 15 action modules (new/open/save/save-as, export + menu, examples, recent, layout-engine, find, format, pdf-options, theme-button, shortcuts) + `actions` |
 | `tabs` | `src/` | `TabManager`, `TabState` |
+| `stats` | `src/` | `createStatsDialog` (Graph Statistics dialog, over `dot:stats`) |
 | `session` | `src/` | `captureSession`, `loadSession`, `persistSession` |
 | `recent` | `src/` | recent-files list core |
 | `watch` | `src/` | `watch-plan` (pure) + renderer-side reaction |
@@ -118,10 +119,12 @@ produced by `tools/dependency-graph`. Regenerate with `pnpm graph`.
 ┌───────────────────────┴─────────┐   ┌────────────┴──────────────┐
 │  Electron Main Process          │   │  cli/  (graphvizjs)       │
 │  ┌───────────────────────────┐  │   │  args.ts → index.ts       │
-│  │ registerIpc(): 19 handlers│  │   │  render / validate /format│
+│  │ registerIpc(): 20 handlers│  │   │  render/validate/format/  │
+│  │                            │  │   │  stats                    │
 │  │ render:svg · render:validate  │   └────────────┬──────────────┘
 │  │ export:render · dot:format    │                │ import (in-process)
-│  │ dot:vocabulary · fs:* · …     │                │
+│  │ dot:stats · dot:vocabulary    │                │
+│  │ fs:* · …                      │                │
 │  └─────────────┬─────────────┘  │                │
 │  preload.ts → window.graphviz   │                │
 └────────────────┼────────────────┘                │
@@ -145,7 +148,8 @@ produced by `tools/dependency-graph`. Regenerate with `pnpm graph`.
 │  │ render.ts (WASM)    │  │ scan-dot · dot-vocab             │ │
 │  │ export-png (resvg)  │  │ structure-lint · format          │ │
 │  │ export-pdf (jsPDF)  │  │ validate (validateDiagram)       │ │
-│  │ export · normalize  │  │ types                            │ │
+│  │ export · normalize  │  │ parse-graph · graph-stats        │ │
+│  │                     │  │ types                            │ │
 │  └─────────────────────┘  └──────────────────────────────────┘ │
 └────────────────────────────────┬────────────────────────────────┘
                                  │ node_modules at runtime
@@ -190,6 +194,12 @@ function structuralDiagnostics(source: string): StructuralDiagnostic[]
 
 // core/export.ts — orchestrator
 async function exportDiagram(dot: string, engine: LayoutEngine, format: ExportFormat, options?: PdfExportOptions): Promise<ExportResult>
+
+// core/parse-graph.ts — pure, Graphviz-faithful structural parser
+function parseGraph(source: string): GraphModel
+
+// core/graph-stats.ts — pure, built on parseGraph
+function graphStats(source: string): GraphStats
 ```
 
 ### Layer 2a: Electron main process (`electron/`)
@@ -198,9 +208,9 @@ async function exportDiagram(dot: string, engine: LayoutEngine, format: ExportFo
 
 ```typescript
 // electron/main.ts
-function registerIpc(): void   // 19 ipcMain.handle(...) registrations
+function registerIpc(): void   // 20 ipcMain.handle(...) registrations
 // render:svg → renderDotToSvg · render:validate → validateDiagram
-// export:render → exportDiagram · dot:format → formatDot
+// export:render → exportDiagram · dot:format → formatDot · dot:stats → graphStats
 // dot:vocabulary → {keywords, attributes} · plus fs/dialog/store/menu/watch/shell channels
 
 // electron/preload.ts — exposes the typed contract on window.graphviz
@@ -230,6 +240,7 @@ interface GraphvizApi {
   validateDiagram(dot: string, engine: LayoutEngine): Promise<DiagramDiagnostics>;
   formatDot(source: string): Promise<string>;
   dotVocabulary(): Promise<DotVocabulary>;
+  graphStats(source: string): Promise<GraphStats>;
   exportRender(dot: string, engine: LayoutEngine, format: ExportFormat, options?: PdfExportOptions): Promise<Uint8Array>;
   // + file dialogs, fs, electron-store, confirm, external links, app info,
   //   watch, menu recent/theme, and onFileChanged/onMenuAction push channels
@@ -399,8 +410,8 @@ GraphvizJS follows Electron's recommended hardening (`electron/main.ts`):
 
 | Directory | Purpose |
 |-----------|---------|
-| `test/core/` | render/validate, PNG/PDF/SVG export, normalize-svg, scan-dot, structure-lint, format, dot-vocab, `validateDiagram` |
-| `test/cli/` | arg parsing, `main()` integration, and a build-and-subprocess test of `dist-cli` |
+| `test/core/` | render/validate, PNG/PDF/SVG export, normalize-svg, scan-dot, structure-lint, format, dot-vocab, `validateDiagram`, `parseGraph`, `graphStats` |
+| `test/cli/` | arg parsing (incl. `stats`), `main()` integration, and a build-and-subprocess test of `dist-cli` |
 | `test/editor/`, `test/preview/`, `test/toolbar/` | editor extensions, preview, toolbar actions |
 | `test/tabs/`, `test/session/`, `test/recent/`, `test/watch/` | documents, session restore, recent, external-change |
 | `test/menu/`, `test/palette/`, `test/preferences/`, `test/theme/` | app shell |

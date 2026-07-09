@@ -5,10 +5,11 @@
  * Pipeline: esbuild bundles cli/ + core/ + @hpcc-js/wasm (whose WASM is inlined,
  * so it travels inside the JS) into one CJS file; the native/heavy export deps
  * (@resvg/resvg-js, canvas, jsdom, jspdf, svg2pdf.js) are left external and
- * lazy-loaded — so the exe fully supports `format`, `validate`, and `render→svg`,
- * while `render→png/pdf` need the full `pnpm build:cli` install (native .node
- * binaries can't be inlined into a single file). Node's SEA config then produces
- * a blob that postject injects into a copy of the node binary.
+ * lazy-loaded — so the exe fully supports `format`, `validate`, `stats`, and
+ * `render→svg`, while `render→png/pdf` need the full `pnpm build:cli` install
+ * (native .node binaries can't be inlined into a single file). Node's SEA
+ * config then produces a blob that postject injects into a copy of the node
+ * binary.
  */
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -69,7 +70,7 @@ async function run() {
   verify(exePath);
 
   console.log(`\n✅ standalone CLI: ${path.relative(root, exePath)}  (v${version})`);
-  console.log('   supports: format · validate · render→svg · --help/--version');
+  console.log('   supports: format · validate · stats · render→svg · --help/--version');
   console.log('   png/pdf need the native install (pnpm build:cli).');
 }
 
@@ -87,6 +88,9 @@ function verify(exe) {
 
   const validated = JSON.parse(call(['validate', '-', '--json'], 'digraph { a -> b }'));
   assert(validated.valid === true && validated.syntax === null, 'validate --json not valid:true');
+
+  const stats = JSON.parse(call(['stats', '-', '--json'], 'digraph { a -> b -> a }'));
+  assert(stats.hasCycle === true && stats.nodeCount === 2, 'stats --json wrong');
 
   const dot = path.join(outDir, '_verify.dot');
   const svg = path.join(outDir, '_verify.svg');

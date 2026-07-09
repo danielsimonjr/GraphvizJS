@@ -4,6 +4,12 @@ All notable changes to GraphvizJS will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- Graph statistics — a `stats` capability that analyses DOT structure (node/edge/subgraph/cluster counts, directed?/strict?, roots/leaves/isolated, self-loops, and cycle detection). Available as `graphvizjs stats [--json]`, over the `dot:stats` IPC channel, and as a **Graph Statistics** dialog (command palette + View menu). Built on a new pure structural DOT parser (`core/parse-graph.ts`).
+
 ## [2.7.0] - 2026-07-08
 
 ### Added

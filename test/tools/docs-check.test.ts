@@ -21,6 +21,6 @@ describe('docs freshness (real repo)', () => {
   it('checks a non-trivial number of modules and channels', () => {
     // Sanity: the guard actually ran against a populated graph, not an empty one.
     expect(result.moduleCount).toBeGreaterThan(15);
-    expect(result.channelCount).toBe(19);
+    expect(result.channelCount).toBe(20);
   });
 });
