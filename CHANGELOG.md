@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Security — undici 6.x, fast-uri, brace-expansion (2026-08-04)
+
+A second wave, and two of the three were **caused by this repo's own overrides
+pinning exact vulnerable versions** — the failure mode worth remembering.
+
+- `undici@6.27.0` (3 medium) — the copy `node-gyp@12.4.0` pins, flagged shortly
+  after the note below said it was unflagged. Fixed with a new
+  `undici@<6.28.0: ">=6.28.0"` override, since node-gyp pins rather than ranges.
+- `fast-uri` 3.1.4 -> 3.1.5 (high) — `pnpm update` could not move it because
+  `pnpm-workspace.yaml` **already pinned `fast-uri: 3.1.4` exactly**. The pin
+  itself was the blocker; bumped to 3.1.5.
+- `brace-expansion@5` pin 5.0.7 -> 5.0.9 — not flagged here yet, but 5.0.7 sits
+  inside GHSA-rgw5-rvv9-x895 (`4.0.0 - 5.0.8`). Fixed pre-emptively rather than
+  waiting for the alert.
+
+**An exact-version override is a liability the moment that version gets an
+advisory** — it defeats the very updates meant to fix it, and reads like a
+resolver problem rather than a self-inflicted pin. Prefer a range.
+
+Verified: install, typecheck, build and `pnpm test` **700 tests across 70 files**.
+
 ### Security — undici 7.28.0 -> 7.29.0 (2026-08-04)
 
 Clears both open alerts (1 high + 1 medium). Lock-only via `pnpm update -r`; no
