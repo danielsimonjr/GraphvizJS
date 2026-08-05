@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Security — undici 7.28.0 -> 7.29.0 (2026-08-04)
+
+Clears both open alerts (1 high + 1 medium). Lock-only via `pnpm update -r`; no
+manifest changed. `undici` is transitive only — nothing here declares it directly.
+
+**Left in place deliberately:** a second `undici@6.27.0` remains, pinned by
+`node-gyp@12.4.0`. That version *is* below the 6.28.0 fix line, but it is not
+currently flagged here, `node-gyp` pins it rather than ranging it so no in-range
+update reaches it, and it is build tooling that ships in nothing. Recorded rather
+than papered over; revisit if GitHub raises it.
+
+Verified: `pnpm install`, `typecheck`, `build`, `graph:check` all clean and
+`pnpm test` **700 tests across 70 files** passing.
+
+
 ## [2.8.0] - 2026-07-09
 
 ### Added
