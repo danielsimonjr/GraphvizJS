@@ -80,7 +80,7 @@ step 16 pulls the next item). Statuses: 🟢 READY · 🟡 IN PROGRESS · ✅ DO
   `pnpm build:icon`/resvg); electron-builder embeds it (win.icon), window uses it in dev. Swap the
   SVG + rerun to rebrand.
 - ✅ **Preferences UI** (v2.5.0) — Preferences dialog via Cmd/Ctrl+, (Edit ▸ Preferences… /
-  macOS app menu) + command palette. Scoped to **Appearance → Theme** per Daniel's choice; wired to
+  macOS app menu) + command palette. Scoped to **Appearance → Theme** per the user's choice; wired to
   the live color-scheme controller. New `src/preferences/preferences-dialog.ts`; structured to grow
   more sections. (Default-engine + restore-session were offered but not selected — easy to add: the
   `createNewTab` default param can read a mutable `defaultEngine`; session restore is a guarded call.)

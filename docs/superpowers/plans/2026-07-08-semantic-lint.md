@@ -1,6 +1,6 @@
 # DOT Semantic Lint — Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (Daniel's standing preference for this repo) to implement this plan task-by-task with two-stage review. Steps use checkbox (`- [ ]`) syntax.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (the standing preference for this repo) to implement this plan task-by-task with two-stage review. Steps use checkbox (`- [ ]`) syntax.
 
 **Goal:** Add a semantic-lint layer for DOT — invalid values, typo did-you-mean, invalid colors, wrong-context attributes, duplicate/undefined checks — with one-click quick-fixes, built core-first and surfaced through the existing `validateDiagram` oracle and editor linter.
 
