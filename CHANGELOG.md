@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Security — js-yaml, dompurify (2026-08-13)
+
+Two transitive advisories, both fixable only by override: `jspdf@4.2.1` and
+`electron-builder@26.15.3` are each already the latest published release, so
+there is no parent to upgrade to.
+
+- `js-yaml@4.3.0` (**high**) → `4.3.1`, reached through the electron-builder
+  tooling (`app-builder-lib` → `builder-util`), a devDependency. `app-builder-lib`
+  declares `js-yaml: ^4.1.0`, so the patched version sits inside the range it
+  already asked for — the override satisfies the declared contract rather than
+  overriding against it.
+- `dompurify@3.4.12` (medium) → `3.4.13`, reached through `jspdf` and
+  `svg2pdf.js`. This one is a **runtime** dependency on the PDF export path, not
+  build tooling, so it is the more consequential of the two.
+
+Both entries are **major-scoped** (`js-yaml@4`, `dompurify@3`) rather than bare.
+Only one major of each is in the tree today, so a bare entry would behave
+identically right now — and would silently force a *future* v3 js-yaml consumer
+up to v4, which is exactly the breaking change these overrides exist to avoid.
+Scoping costs nothing and removes that trap.
+
+Verified: both resolve to the patched versions, and typecheck, Biome (205
+files), and the full suite (70 files, 700 tests) are green.
+
 ### Security — undici 6.x, fast-uri, brace-expansion (2026-08-04)
 
 A second wave, and two of the three were **caused by this repo's own overrides

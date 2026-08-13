@@ -11,12 +11,18 @@ onlyBuiltDependencies:
 # reading the `pnpm` field there and silently ignores it, so an override placed
 # in package.json resolves to nothing and looks like "the override did not work".
 #
-# All four are PATCH bumps inside the same major, so none can pull a breaking
+# All six are PATCH bumps inside the same major, so none can pull a breaking
 # change. Range-scoped because three majors of brace-expansion are in the tree
-# at once and each needs its own patched line.
+# at once and each needs its own patched line — and because a MAJOR-less entry
+# would silently upgrade a future consumer across a major. Only js-yaml@4 and
+# dompurify@3 are in the tree today; scoping keeps it that way if a v3 js-yaml
+# consumer ever appears, since forcing it to 4.x would be the breaking change
+# this file exists to avoid.
 overrides:
   undici@<6.28.0: ">=6.28.0"
   brace-expansion@1: 1.1.16
   brace-expansion@2: 2.1.2
   brace-expansion@5: 5.0.9
   fast-uri: 3.1.5
+  js-yaml@4: 4.3.1
+  dompurify@3: 3.4.13
