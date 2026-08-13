@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.8.1] - 2026-08-13
+
+Security/dependency patch release. **No feature work** — the last feature release
+was `v2.8.0` (graph statistics). Everything below is transitive-advisory
+remediation plus a one-off history reconciliation.
+
+> **On the commit count:** a naïve `git log v2.8.0..HEAD` reports ~27 commits and
+> is misleading. This repo has **two root commits**: the GitHub remote carried the
+> original v1 Tauri app while this tree carried the v2 line (headless core, CLI,
+> Electron migration), on histories sharing **no** ancestor. `c02f45e` reconciled
+> them, and that merge is **content-neutral** — `git diff c02f45e^1 c02f45e` is
+> empty. So the v1 commits it pulled into the graph are history, not new work.
+> The real mainline delta since `v2.8.0` is **6 first-parent commits**: five
+> dependency/security patches and one docs change.
+
+Gate for this release: `typecheck` clean, `biome check` clean over 205 files,
+**700/700 unit tests** passing.
+
+> ⚠ **No signed installers are attached to this release.** Prior releases shipped
+> them, but they are built locally and code-signing needs the maintainer's
+> certificate. This tag records the security-patched source state; rebuild and
+> sign installers separately if binaries are needed.
+
 ### Security — js-yaml, dompurify (2026-08-13)
 
 Two transitive advisories, both fixable only by override: `jspdf@4.2.1` and
