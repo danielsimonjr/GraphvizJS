@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Toolchain moved from pnpm to Bun.** `packageManager` is now `bun@1.4.2`,
+  `engines.bun` requires `>=1.4.2`, and TypeScript moves to `^7.0.2`.
+  `pnpm-lock.yaml` is replaced by `bun.lock`. The `prepack` script calls
+  `bun run build:cli`. CI installs Bun with `oven-sh/setup-bun` and runs
+  `bun install --frozen-lockfile`.
+- **`svg2pdf.js` pinned to exactly `2.7.0`** (was `^2.7.0`). This is deliberate
+  and must not be relaxed to a range until upstream fixes its manifest.
+  `2.8.0` (2026-08-27) added `"type": "module"` to the package while leaving
+  `main` pointing at the UMD build (`dist/svg2pdf.umd.min.js`) and shipping no
+  `exports` map. Under ESM resolution the bare specifier therefore resolves to
+  the UMD file and yields **zero exports**, which surfaces here as
+  `TypeError: Cannot read properties of undefined (reading 'jsPDF')` in the PDF
+  export path. `2.7.0` carries no `type` field and resolves correctly.
+  Measured on a clean install: `import('svg2pdf.js')` returns an empty namespace
+  on 2.8.1; `import('svg2pdf.js/dist/svg2pdf.es.min.js')` works. That subpath is
+  *not* used as the fix, because it only resolves while the package lacks an
+  `exports` map — the upstream fix would break it. Not reported upstream as of
+  2026-09-07; revisit the pin once a release restores ESM resolution.
+
 ## [2.8.1] - 2026-08-13
 
 Security/dependency patch release. **No feature work** — the last feature release
