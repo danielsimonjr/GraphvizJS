@@ -9,29 +9,29 @@ GraphvizJS is an Electron desktop app for editing Graphviz DOT diagrams with liv
 ## Commands
 
 ```bash
-pnpm install                # Install dependencies
-pnpm dev                    # Frontend-only dev server (http://localhost:5173)
-pnpm build                  # TypeScript compile + Vite bundle
-pnpm build:cli              # Compile the headless graphvizjs CLI to dist-cli/
-pnpm build:cli:exe          # Bundle the CLI into a standalone exe via Node SEA (dist-exe/); pure/WASM subset
-pnpm build:icon             # Regenerate the app icon (scripts/render-icon.mjs)
-pnpm package                # Build distributable installer (electron-builder)
-pnpm graphvizjs -- ...      # Run the CLI from source via tsx (e.g. render g.dot -o o.svg)
-pnpm graph                  # Generate the module dependency graph (tools/dependency-graph/)
-pnpm graph:check            # Fail on dependency-graph rule violations (coverage/cycle guard)
-pnpm docs:check             # Fail if a module/IPC channel is undocumented in docs/architecture/
+bun install                # Install dependencies
+bun run dev                    # Frontend-only dev server (http://localhost:5173)
+bun run build                  # TypeScript compile + Vite bundle
+bun run build:cli              # Compile the headless graphvizjs CLI to dist-cli/
+bun run build:cli:exe          # Bundle the CLI into a standalone exe via Node SEA (dist-exe/); pure/WASM subset
+bun run build:icon             # Regenerate the app icon (scripts/render-icon.mjs)
+bun run package                # Build distributable installer (electron-builder)
+bun run graphvizjs -- ...      # Run the CLI from source via tsx (e.g. render g.dot -o o.svg)
+bun run graph                  # Generate the module dependency graph (tools/dependency-graph/)
+bun run graph:check            # Fail on dependency-graph rule violations (coverage/cycle guard)
+bun run docs:check             # Fail if a module/IPC channel is undocumented in docs/architecture/
 
-pnpm test                   # Unit tests (Vitest + happy-dom)
-pnpm test:watch             # Unit tests in watch mode
-pnpm test:coverage          # Unit tests with coverage report
-pnpm test:e2e               # E2E tests (Playwright, requires dev server)
-pnpm test:e2e:headed        # E2E tests with visible browser
-pnpm test:e2e:debug         # E2E tests in debug mode
+bun run test                   # Unit tests (Vitest + happy-dom)
+bun run test:watch             # Unit tests in watch mode
+bun run test:coverage          # Unit tests with coverage report
+bun run test:e2e               # E2E tests (Playwright, requires dev server)
+bun run test:e2e:headed        # E2E tests with visible browser
+bun run test:e2e:debug         # E2E tests in debug mode
 
-pnpm lint                   # Biome check
-pnpm lint:fix               # Biome auto-fix
-pnpm typecheck              # tsc --noEmit
-pnpm clean                  # Remove dist/
+bun run lint                   # Biome check
+bun run lint:fix               # Biome auto-fix
+bun run typecheck              # tsc --noEmit
+bun run clean                  # Remove dist/
 ```
 
 Run a single unit test file: `npx vitest run test/preview/render.test.ts`
@@ -92,11 +92,11 @@ The Vite root is `src/` (not project root). HTML entry point is `src/index.html`
 
 The CLI mirrors core: `render <in> -o <out>` (export), `validate <in> [--engine E] [--json] [--strict] [--fix] [-o <out>]` (the core oracle — exit `0` valid, `1` invalid syntax or `--strict` warnings, `2` usage; `--json` emits `{ input, engine, valid, syntax, structural[] }` where each structural finding carries `code`/`fix`; `--fix` applies every diagnostic's fix via `applyFixes` and writes the corrected source to `-o` or stdout instead of reporting), and `format <in> [-o <out>]` (stdout default). `validate`/`format` call the same `core/validate.ts`/`core/format.ts` the renderer reaches over IPC, so the CLI reproduces exactly what the UI shows.
 
-`pnpm build:cli` (`tsconfig.cli.json`) `tsc`-compiles `cli/` + `core/` to `dist-cli/` as real Node ESM — **not** bundled (bundling jsdom crashes on `__dirname`; the native `.node` binaries can't be inlined anyway). `bin.graphvizjs` → `dist-cli/cli/index.js` (shebang preserved by `tsc`), and `files: ["dist-cli"]` ships it in `npm pack`. Because the output runs under Node's own ESM loader, relative imports **within `cli/` and `core/` must carry explicit `.js` extensions** (NodeNext resolution) — these resolve identically under tsx, Vitest, and both Vite builds, so they don't affect the app. The natives/WASM/jsdom stay ordinary `dependencies`, resolved from `node_modules` at runtime (prebuilds install cross-platform). `test/cli/dist.integration.test.ts` builds and subprocess-runs the compiled binary as the durable guard.
+`bun run build:cli` (`tsconfig.cli.json`) `tsc`-compiles `cli/` + `core/` to `dist-cli/` as real Node ESM — **not** bundled (bundling jsdom crashes on `__dirname`; the native `.node` binaries can't be inlined anyway). `bin.graphvizjs` → `dist-cli/cli/index.js` (shebang preserved by `tsc`), and `files: ["dist-cli"]` ships it in `npm pack`. Because the output runs under Node's own ESM loader, relative imports **within `cli/` and `core/` must carry explicit `.js` extensions** (NodeNext resolution) — these resolve identically under tsx, Vitest, and both Vite builds, so they don't affect the app. The natives/WASM/jsdom stay ordinary `dependencies`, resolved from `node_modules` at runtime (prebuilds install cross-platform). `test/cli/dist.integration.test.ts` builds and subprocess-runs the compiled binary as the durable guard.
 
 ### Dependency Graph (`tools/dependency-graph/`)
 
-`pnpm graph` scans `src/`, `core/`, `cli/`, and `electron/` (via `tsx`), computes the module import graph, and renders JSON/Markdown/Mermaid to `docs/architecture/`. It also audits the architecture: layer violations, runtime import cycles, unused exports, and IPC channel integrity (every `render:*`/`export:render` call has a matching handler and contract entry — no orphans, no missing handlers). `pnpm graph:check` (used as a CI guard) exits non-zero on any *hard* violation (`hardViolationCount`: layer breaks, runtime cycles, broken IPC) so architectural drift fails the build. `--impact <file>` reports the transitive reverse-dependency set of a file.
+`bun run graph` scans `src/`, `core/`, `cli/`, and `electron/` (via `tsx`), computes the module import graph, and renders JSON/Markdown/Mermaid to `docs/architecture/`. It also audits the architecture: layer violations, runtime import cycles, unused exports, and IPC channel integrity (every `render:*`/`export:render` call has a matching handler and contract entry — no orphans, no missing handlers). `bun run graph:check` (used as a CI guard) exits non-zero on any *hard* violation (`hardViolationCount`: layer breaks, runtime cycles, broken IPC) so architectural drift fails the build. `--impact <file>` reports the transitive reverse-dependency set of a file.
 
 ## Testing
 
@@ -132,7 +132,7 @@ Version is maintained in `package.json` → `"version"`.
 
 **New lint rule**: Add a check to `core/semantic-lint.ts`'s `semanticDiagnostics`, emitting a `StructuralDiagnostic` with a stable `code` (and an optional `fix: DiagnosticFix` if the finding has an unambiguous correction). Unit-test it under `test/core/semantic-lint.test.ts` — the hard requirement is it never false-positives on valid DOT (favor silence over a wrong flag, as the existing wrong-context/undefined-cluster heuristics do). No other wiring is needed: `semanticDiagnostics` is already folded into `validateDiagram`, which flows to the `render:validate` IPC (editor inline diagnostics + quick-fix code actions) and the CLI's `validate --json`/`--fix` automatically.
 
-**New IPC channel**: Add the method to `GraphvizApi` in `src/platform/contract.ts`, expose it in `electron/preload.ts`, register the main-process handler, and wrap it in `src/platform/index.ts`. `pnpm graph:check` fails on any orphan handler / missing handler / missing-contract mismatch, so all four must line up. (It also fails on stale `docs/architecture/` — run `pnpm graph` and commit the regenerated files whenever the module graph changes.)
+**New IPC channel**: Add the method to `GraphvizApi` in `src/platform/contract.ts`, expose it in `electron/preload.ts`, register the main-process handler, and wrap it in `src/platform/index.ts`. `bun run graph:check` fails on any orphan handler / missing handler / missing-contract mismatch, so all four must line up. (It also fails on stale `docs/architecture/` — run `bun run graph` and commit the regenerated files whenever the module graph changes.)
 
 **New DOT capability (the core→CLI→IPC→UI workflow)**: Build it *core-first*. (1) Add the logic to a pure module in `core/` (no DOM, no Node natives if it can be pure) and unit-test it under `test/core/`. (2) Surface it as a `graphvizjs` CLI command in `cli/args.ts` + `cli/index.ts`, with a `--json` machine-readable mode (the documented convention) and meaningful exit codes — now it's headlessly testable and scriptable. (3) Expose it to the renderer over a new IPC channel (see above). (4) Wire the UI. Because the CLI and the renderer consume the *same* core function, `graphvizjs <cmd> --json` is an oracle: run the failing input through it — if the CLI reproduces the symptom the bug is in `core/`, if not it's the renderer or the IPC seam. The renderer never touches `core/` except type-only `core/types` (enforced by `graph:check`).
 

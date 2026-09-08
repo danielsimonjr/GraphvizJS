@@ -4,8 +4,8 @@ Dev tool: static import/export analysis of GraphvizJS `src/` (+ `test/`).
 
 ## Run
 
-    pnpm graph              # regenerate docs/architecture/*
-    pnpm graph --include-tests
+    bun run graph              # regenerate docs/architecture/*
+    bun run graph --include-tests
 
 ## Outputs (committed snapshot under docs/architecture/)
 

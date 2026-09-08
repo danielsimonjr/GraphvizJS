@@ -101,7 +101,7 @@ export function writeOutputs(root: string, a: Analysis): string[] {
 
 /**
  * Repo-relative paths of generated docs whose committed content differs from a
- * fresh render (or that are missing) — i.e. the snapshot is stale and `pnpm
+ * fresh render (or that are missing) — i.e. the snapshot is stale and `bun
  * graph` needs re-running. EOL-normalized so it is robust to CRLF checkouts.
  */
 export function staleDocs(root: string, a: Analysis): string[] {
@@ -142,11 +142,11 @@ function summaryLine(a: Analysis, prefix: string): string {
 export function main(argv: string[]): void {
   if (argv.includes('--help')) {
     console.log(
-      'Usage: pnpm graph [--include-tests] [--check] [--impact <file>]\n' +
+      'Usage: bun run graph [--include-tests] [--check] [--impact <file>]\n' +
         '  (default)        Write docs/architecture/{DEPENDENCY_GRAPH.md,.json,.mermaid}\n' +
         '  --check          Verify architecture invariants without writing; exit 1 on any\n' +
         '                   layer violation, runtime cycle, broken IPC channel, or a\n' +
-        '                   stale committed report (run `pnpm graph` to refresh).\n' +
+        '                   stale committed report (run `bun run graph` to refresh).\n' +
         '  --impact <file>  Print the transitive reverse-dependencies (blast radius) of a file.'
     );
     return;
@@ -179,7 +179,7 @@ export function main(argv: string[]): void {
       process.exitCode = 1;
     }
     if (stale.length > 0) {
-      console.error(`\nStale generated docs (run \`pnpm graph\`): ${stale.join(', ')}`);
+      console.error(`\nStale generated docs (run \`bun run graph\`): ${stale.join(', ')}`);
       process.exitCode = 1;
     }
     return;

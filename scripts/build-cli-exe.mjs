@@ -6,7 +6,7 @@
  * so it travels inside the JS) into one CJS file; the native/heavy export deps
  * (@resvg/resvg-js, canvas, jsdom, jspdf, svg2pdf.js) are left external and
  * lazy-loaded — so the exe fully supports `format`, `validate`, `stats`, and
- * `render→svg`, while `render→png/pdf` need the full `pnpm build:cli` install
+ * `render→svg`, while `render→png/pdf` need the full `bun run build:cli` install
  * (native .node binaries can't be inlined into a single file). Node's SEA
  * config then produces a blob that postject injects into a copy of the node
  * binary.
@@ -16,8 +16,10 @@ import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'no
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
-// Resolve build tools via the CJS resolver — robust against pnpm's isolated
-// node_modules layout, where a bare ESM `import 'esbuild'` may not resolve.
+// Resolve build tools via the CJS resolver — it resolves under any
+// node_modules layout. Written for pnpm's isolated layout, where a bare ESM
+// `import 'esbuild'` may not resolve; kept after the move to Bun because the
+// resolver is layout-agnostic and this script also runs under plain Node.
 const require = createRequire(import.meta.url);
 const { build } = require('esbuild');
 const { inject } = require('postject');
@@ -71,7 +73,7 @@ async function run() {
 
   console.log(`\n✅ standalone CLI: ${path.relative(root, exePath)}  (v${version})`);
   console.log('   supports: format · validate · stats · render→svg · --help/--version');
-  console.log('   png/pdf need the native install (pnpm build:cli).');
+  console.log('   png/pdf need the native install (bun run build:cli).');
 }
 
 function verify(exe) {

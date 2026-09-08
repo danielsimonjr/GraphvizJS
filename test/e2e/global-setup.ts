@@ -16,5 +16,9 @@ export default function globalSetup(): void {
     const built = existsSync(path.join(projectRoot, 'dist-electron', 'main.js'));
     if (built) return;
   }
-  execSync('pnpm build', { cwd: projectRoot, stdio: 'inherit' });
+  // Invoked through `bun run test:e2e`, so Bun is the package manager and
+  // script driver. This used to hardcode `pnpm build`; when the repo moved to
+  // Bun the binary was gone from CI and every e2e run died in globalSetup with
+  // "'pnpm' is not recognized" -- before a single test executed.
+  execSync('bun run build', { cwd: projectRoot, stdio: 'inherit' });
 }

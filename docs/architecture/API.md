@@ -22,8 +22,8 @@ GraphvizJS exposes three public surfaces, all backed by the same `core/`:
 
 ## CLI
 
-Binary: `graphvizjs` → `dist-cli/cli/index.js`. Build with `pnpm build:cli`; run from
-source with `pnpm graphvizjs -- <args>` (tsx). Input `-` reads from stdin.
+Binary: `graphvizjs` → `dist-cli/cli/index.js`. Build with `bun run build:cli`; run from
+source with `bun run graphvizjs -- <args>` (tsx). Input `-` reads from stdin.
 
 ```
 graphvizjs render   <input.dot|-> -o <output> [--engine E] [--format svg|png|pdf]

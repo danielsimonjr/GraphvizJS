@@ -22,10 +22,10 @@ This document outlines the implementation plan to convert the MermaidJS Desktop 
 
 ### Task 1.1: Install @hpcc-js/wasm package
 **File**: `package.json` (already done)
-**Action**: Run `pnpm install` to install the new dependency
+**Action**: Run `bun install` to install the new dependency
 **Command**:
 ```bash
-cd C:/Users/e414639/Github/GraphvizJS && pnpm install
+cd C:/Users/e414639/Github/GraphvizJS && bun install
 ```
 **Verification**: Check that `node_modules/@hpcc-js/wasm` exists
 
@@ -74,7 +74,7 @@ export default defineConfig({
   },
 });
 ```
-**Verification**: Build succeeds with `pnpm build`
+**Verification**: Build succeeds with `bun run build`
 
 ### Task 1.4: Update CSP in tauri.conf.json for WASM
 **File**: `src-tauri/tauri.conf.json`
@@ -241,7 +241,7 @@ token(stream, state) {
 ```
 
 ### Task 3.5: Test syntax highlighting
-**Action**: Run `pnpm dev` and verify:
+**Action**: Run `bun run dev` and verify:
 1. `digraph` and `graph` highlight as keywords
 2. `->` and `--` highlight as operators
 3. Strings in quotes highlight correctly
@@ -454,7 +454,7 @@ import.meta.glob('../examples/*.dot', { eager: true, query: '?raw' })
 **Verification**: No `.mmd` references remain in source
 
 ### Task 6.4: Test examples loading
-**Action**: Run `pnpm dev` and verify:
+**Action**: Run `bun run dev` and verify:
 1. Examples dropdown populates correctly
 2. Clicking each example loads the DOT content
 3. Preview renders the diagram
@@ -602,7 +602,7 @@ setupLayoutEngine(() => {
 
 ### Task 9.1: Test basic rendering
 **Action**:
-1. Run `pnpm dev`
+1. Run `bun run dev`
 2. Type a simple DOT graph
 3. Verify preview updates
 **Test cases**:
@@ -636,7 +636,7 @@ setupLayoutEngine(() => {
 ### Task 9.5: Run linter and fix issues
 **Action**:
 ```bash
-pnpm lint:fix
+bun run lint:fix
 ```
 Fix any remaining linting issues.
 
@@ -649,13 +649,13 @@ Fix any remaining linting issues.
 ### Task 10.1: Clean build artifacts
 **Command**:
 ```bash
-cd C:/Users/e414639/Github/GraphvizJS && pnpm clean
+cd C:/Users/e414639/Github/GraphvizJS && bun run clean
 ```
 
 ### Task 10.2: Run production build
 **Command**:
 ```bash
-cd C:/Users/e414639/Github/GraphvizJS && pnpm tauri build
+cd C:/Users/e414639/Github/GraphvizJS && bun run tauri build
 ```
 **Verification**: Build completes without errors
 

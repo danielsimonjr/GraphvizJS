@@ -4,14 +4,14 @@
  * The hand-authored architecture docs (docs/architecture/{OVERVIEW,ARCHITECTURE,
  * COMPONENTS,DATAFLOW,API}.md) rot silently — nothing forces them to keep pace with
  * the code. This guard reuses the dependency-graph tool's `buildAnalysis` (the same
- * source of truth as `pnpm graph:check`) and asserts two things:
+ * source of truth as `bun run graph:check`) and asserts two things:
  *
  *   1. every module in the real dependency graph is named in COMPONENTS.md, and
  *   2. every fully-wired IPC channel appears somewhere in the architecture docs.
  *
  * Those are exactly the two facts the README let rot across five releases (missing
  * modules, missing IPC channels). A net-new module or channel that nobody documented
- * fails `pnpm docs:check` (and the test/tools/docs-check.test.ts guard in CI).
+ * fails `bun run docs:check` (and the test/tools/docs-check.test.ts guard in CI).
  */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';

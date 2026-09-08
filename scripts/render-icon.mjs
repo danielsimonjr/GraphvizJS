@@ -1,6 +1,6 @@
 // Renders build/icon.svg → build/icon.png (512×512) using the app's own resvg
 // renderer. electron-builder auto-detects build/icon.png and generates the
-// Windows .ico from it. Run: node scripts/render-icon.mjs (or pnpm build:icon).
+// Windows .ico from it. Run: node scripts/render-icon.mjs (or bun run build:icon).
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

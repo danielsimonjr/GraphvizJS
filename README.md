@@ -41,7 +41,7 @@ Based on [MermaidJS Desktop Client](https://github.com/skydiver/mermaidjs-deskto
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) 18 or newer
-- [pnpm](https://pnpm.io/) (preferred package manager for this repo)
+- [bun](https://bun.io/) (preferred package manager for this repo)
 
 No Rust toolchain or platform-native SDK is required — Electron bundles its own Chromium and Node runtime.
 
@@ -49,22 +49,22 @@ No Rust toolchain or platform-native SDK is required — Electron bundles its ow
 
 ```bash
 # Install dependencies
-pnpm install
+bun install
 
 # Run the desktop app with live reload
-pnpm dev
+bun run dev
 ```
 
-`pnpm dev` starts the Vite dev server and launches Electron pointing at `http://localhost:5173`. Changes to the renderer reload automatically; changes to the main process or preload script require restarting the command.
+`bun run dev` starts the Vite dev server and launches Electron pointing at `http://localhost:5173`. Changes to the renderer reload automatically; changes to the main process or preload script require restarting the command.
 
 ## Building
 
 ```bash
 # Type-check TypeScript and bundle renderer + main + preload
-pnpm build
+bun run build
 
 # Produce the Windows NSIS installer (.exe) in release/ via electron-builder
-pnpm package
+bun run package
 ```
 
 GraphvizJS targets **Windows only**. The `release/` directory contains the generated NSIS `.exe` installer.
@@ -75,7 +75,7 @@ The same headless core also ships as a `graphvizjs` CLI for scripting and CI —
 
 ```bash
 # Compile the CLI to dist-cli/ (also runs automatically on `npm pack`)
-pnpm build:cli
+bun run build:cli
 
 # Render DOT to SVG / PNG / PDF
 graphvizjs render diagram.dot -o diagram.svg
@@ -104,31 +104,31 @@ graphvizjs --version
 
 Because `validate` and `format` call the very same `core/` functions the renderer reaches over IPC, the CLI doubles as an **oracle** for troubleshooting the desktop app: run a problematic diagram through `graphvizjs validate --json` and, if it reproduces the symptom, the bug is in `core/`; if not, it's in the renderer or the IPC layer.
 
-`bin.graphvizjs` points at the compiled `dist-cli/cli/index.js`, so `npm link` (or a global install of the packed tarball) exposes the `graphvizjs` command on any platform. To run it from source without building, use `pnpm graphvizjs -- render diagram.dot -o out.svg` (via tsx). The native rendering deps (`@resvg/resvg-js`, `canvas`) and WASM Graphviz install as normal dependencies with cross-platform prebuilds.
+`bin.graphvizjs` points at the compiled `dist-cli/cli/index.js`, so `npm link` (or a global install of the packed tarball) exposes the `graphvizjs` command on any platform. To run it from source without building, use `bun run graphvizjs -- render diagram.dot -o out.svg` (via tsx). The native rendering deps (`@resvg/resvg-js`, `canvas`) and WASM Graphviz install as normal dependencies with cross-platform prebuilds.
 
 ### Standalone executable
 
 ```bash
-pnpm build:cli:exe   # → dist-exe/graphvizjs.exe (no Node install required to run it)
+bun run build:cli:exe   # → dist-exe/graphvizjs.exe (no Node install required to run it)
 ```
 
 Bundles the CLI + core + the (inlined-WASM) Graphviz engine into a single executable via
 Node's [Single Executable Applications](https://nodejs.org/api/single-executable-applications.html).
 It covers the pure/WASM subset — **`format`, `validate`, `stats`, and `render→svg`** — with no
-dependencies. `render→png/pdf` still require the full `pnpm build:cli` install, because
+dependencies. `render→png/pdf` still require the full `bun run build:cli` install, because
 their native `.node` binaries (`@resvg/resvg-js`, `canvas`) can't be inlined into one file.
 
 ## Tooling
 
-- `pnpm clean` – Remove build artifacts (`dist/`)
-- `pnpm lint` – Run [Biome](https://biomejs.dev/) linter and formatter checks
-- `pnpm lint:fix` – Automatically apply Biome fixes
-- `pnpm typecheck` – Type-check TypeScript without emitting files
-- `pnpm graph` – Regenerate the dependency-graph report in `docs/architecture/`
-- `pnpm graph:check` – Verify architecture invariants (layer boundaries, no cycles, IPC wiring) **and** that the committed report isn't stale, without writing; exits non-zero on any violation (run in CI)
-- `pnpm graph -- --impact <file>` – Print the transitive reverse-dependencies (blast radius) of a source file
+- `bun run clean` – Remove build artifacts (`dist/`)
+- `bun run lint` – Run [Biome](https://biomejs.dev/) linter and formatter checks
+- `bun run lint:fix` – Automatically apply Biome fixes
+- `bun run typecheck` – Type-check TypeScript without emitting files
+- `bun run graph` – Regenerate the dependency-graph report in `docs/architecture/`
+- `bun run graph:check` – Verify architecture invariants (layer boundaries, no cycles, IPC wiring) **and** that the committed report isn't stale, without writing; exits non-zero on any violation (run in CI)
+- `bun run graph -- --impact <file>` – Print the transitive reverse-dependencies (blast radius) of a source file
 
-The dependency-graph tool enforces the headless-core layering: `core/` is a self-contained leaf, `cli/` depends only on `core/`, the Electron main process may reuse only the pure shared renderer modules (`menu`/`watch`/`platform`), and the renderer (`src/`) may reference `core/` only as the type-only `core/types` contract. A broken boundary — or a stale committed graph — fails `pnpm graph:check` (and CI).
+The dependency-graph tool enforces the headless-core layering: `core/` is a self-contained leaf, `cli/` depends only on `core/`, the Electron main process may reuse only the pure shared renderer modules (`menu`/`watch`/`platform`), and the renderer (`src/`) may reference `core/` only as the type-only `core/types` contract. A broken boundary — or a stale committed graph — fails `bun run graph:check` (and CI).
 
 ## Testing
 
@@ -136,22 +136,22 @@ The project uses [Vitest](https://vitest.dev/) for unit testing with [happy-dom]
 
 ```bash
 # Run unit tests
-pnpm test
+bun run test
 
 # Run unit tests in watch mode
-pnpm test:watch
+bun run test:watch
 
 # Run unit tests with coverage report
-pnpm test:coverage
+bun run test:coverage
 
-# Run E2E tests (requires pnpm build first)
-pnpm test:e2e
+# Run E2E tests (requires bun run build first)
+bun run test:e2e
 
 # Run E2E tests with visible browser
-pnpm test:e2e:headed
+bun run test:e2e:headed
 
 # Run E2E tests in debug mode
-pnpm test:e2e:debug
+bun run test:e2e:debug
 ```
 
 ### Coverage
@@ -205,7 +205,7 @@ The codebase is split into a Node-only headless core, an Electron main process, 
   - `examples/` – Built-in `.dot` templates (Vite glob import)
   - `utils/` – Shared utilities (debounce)
 - `electron/` – Electron main process (`main.ts` + IPC handlers), preload script (`preload.ts`), native menu (`app-menu.ts`), and file watcher (`file-watcher.ts`)
-- `tools/dependency-graph/` – The architecture/dependency analyzer behind `pnpm graph` / `pnpm graph:check`
+- `tools/dependency-graph/` – The architecture/dependency analyzer behind `bun run graph` / `bun run graph:check`
 
 ## Acknowledgements
 

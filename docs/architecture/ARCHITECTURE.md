@@ -37,7 +37,7 @@ GraphvizJS is an Electron desktop editor for Graphviz DOT diagrams, structured a
 ### Key Statistics (v2.6.0)
 
 Numbers are extracted from the authoritative `docs/architecture/dependency-graph.json`
-produced by `tools/dependency-graph`. Regenerate with `pnpm graph`.
+produced by `tools/dependency-graph`. Regenerate with `bun run graph`.
 
 | Metric | Value |
 |--------|-------|
@@ -314,7 +314,7 @@ one-time `dotVocabulary()` fetch at bootstrap.
 ### 4. Why a dependency-graph tool + `graph:check`?
 
 **Decision**: `tools/dependency-graph` computes the module graph and audits it; CI
-runs `pnpm graph:check`.
+runs `bun run graph:check`.
 
 **Rationale**: the layering, cycle-freedom, and IPC integrity that make the headless
 architecture work are invisible in code review. The tool makes them build-failing
@@ -424,10 +424,10 @@ Coverage thresholds: 80% lines/functions/statements, 70% branches (`src/main.ts`
 excluded). See [TEST_COVERAGE section of DEPENDENCY_GRAPH.md](./DEPENDENCY_GRAPH.md).
 
 ```bash
-pnpm test            # unit
-pnpm test:e2e        # Playwright (requires build)
-pnpm graph:check     # architecture invariants + generated-doc freshness
-pnpm docs:check      # hand-authored docs ↔ dependency graph
+bun run test            # unit
+bun run test:e2e        # Playwright (requires build)
+bun run graph:check     # architecture invariants + generated-doc freshness
+bun run docs:check      # hand-authored docs ↔ dependency graph
 ```
 
 ---

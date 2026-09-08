@@ -45,7 +45,7 @@ step 16 pulls the next item). Statuses: 🟢 READY · 🟡 IN PROGRESS · ✅ DO
 ## Headless-core / language-tooling cycle — ✅ COMPLETE
 
 - ✅ **CLI `validate` + `format`** (v2.6.0) — the core oracle exposed headlessly; `validate --json`/`--strict`, `format` to stdout/`-o`; `dot:format`/`dot:vocabulary` IPC.
-- ✅ **Semantic lint + quick fixes & standalone exe** (v2.7.0) — 5 rule families (invalid value/color with did-you-mean, wrong-context, duplicate-attribute, undefined-cluster), editor code actions, `validate --fix`; `pnpm build:cli:exe` SEA binary (format/validate/render→svg).
+- ✅ **Semantic lint + quick fixes & standalone exe** (v2.7.0) — 5 rule families (invalid value/color with did-you-mean, wrong-context, duplicate-attribute, undefined-cluster), editor code actions, `validate --fix`; `bun run build:cli:exe` SEA binary (format/validate/render→svg).
 - ✅ **Graph statistics** (v2.8.0) — first Tier-4 graph-intelligence feature. Pure structural DOT parser (`core/parse-graph.ts`) + metrics/cycle-detection (`core/graph-stats.ts`); `graphvizjs stats [--json]`, `dot:stats` IPC (20th channel), Graph Statistics dialog (palette + View menu), E2E, exe coverage. Zero-throw invariant enforced (depth-guarded parser). Executed subagent-driven; final whole-branch review MERGE-READY YES.
 
 ## Polish debts (from v2.8.0 final review — acceptable-as-is, low priority)
@@ -77,7 +77,7 @@ step 16 pulls the next item). Statuses: 🟢 READY · 🟡 IN PROGRESS · ✅ DO
   new IPC). New `src/palette/command-palette.ts` (pure `fuzzyScore`/`filterCommands` + overlay
   controller). Command list built from the shared `menuHandlers`.
 - ✅ **App icon** (v2.4.0) — on-brand directed-graph mark (`build/icon.svg` → `build/icon.png` via
-  `pnpm build:icon`/resvg); electron-builder embeds it (win.icon), window uses it in dev. Swap the
+  `bun run build:icon`/resvg); electron-builder embeds it (win.icon), window uses it in dev. Swap the
   SVG + rerun to rebrand.
 - ✅ **Preferences UI** (v2.5.0) — Preferences dialog via Cmd/Ctrl+, (Edit ▸ Preferences… /
   macOS app menu) + command palette. Scoped to **Appearance → Theme** per the user's choice; wired to

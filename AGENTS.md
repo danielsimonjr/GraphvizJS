@@ -5,19 +5,19 @@ This file provides guidance to AI coding agents working in this repository. For 
 ## Quick Reference
 
 ```bash
-pnpm install                # Install dependencies
-pnpm dev                    # Frontend dev server (localhost:5173)
-pnpm build                  # TypeScript compile + Vite bundle
-pnpm package                # Build distributable (electron-builder)
+bun install                # Install dependencies
+bun run dev                    # Frontend dev server (localhost:5173)
+bun run build                  # TypeScript compile + Vite bundle
+bun run package                # Build distributable (electron-builder)
 
-pnpm test                   # Unit tests (Vitest + happy-dom)
-pnpm test:watch             # Watch mode
-pnpm test:coverage          # With coverage report
-pnpm test:e2e               # Playwright E2E (requires dev server running)
+bun run test                   # Unit tests (Vitest + happy-dom)
+bun run test:watch             # Watch mode
+bun run test:coverage          # With coverage report
+bun run test:e2e               # Playwright E2E (requires dev server running)
 
-pnpm lint                   # Biome linter/formatter check
-pnpm lint:fix               # Auto-fix
-pnpm typecheck              # tsc --noEmit
+bun run lint                   # Biome linter/formatter check
+bun run lint:fix               # Auto-fix
+bun run typecheck              # tsc --noEmit
 ```
 
 Single test file: `npx vitest run test/toolbar/actions.test.ts`
@@ -74,7 +74,7 @@ Root is `src/` (not project root). Entry point is `src/index.html`. `@hpcc-js/wa
 ## Git
 
 - Main branch: `master`
-- Run `pnpm lint:fix` before committing
+- Run `bun run lint:fix` before committing
 
 ## Version Sync
 

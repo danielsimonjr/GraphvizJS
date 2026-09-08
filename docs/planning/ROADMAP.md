@@ -41,8 +41,8 @@ dependency-graph tool). Delivered so far:
 - `core/` owns all Graphviz work and pure DOT language tooling (scanner, vocabulary, structural lint, formatter, validator)
 - `graphvizjs` CLI: `render` (SVG/PNG/PDF), `validate` (syntax + structural, `--json`, `--strict`), `format`, `stats` (structural metrics + cycle detection, `--json`)
 - The CLI is an oracle for the desktop app — same core, reachable headlessly
-- Standalone executable (`pnpm build:cli:exe`, Node SEA): a single `graphvizjs.exe` an advanced user runs with no Node install. Covers the pure/WASM subset (`format`, `validate`, `stats`, `render→svg`); `render→png/pdf` still need the native install (`pnpm build:cli`), since native `.node` binaries can't be inlined into one file
-- Dependency-graph tool (`pnpm graph` / `graph:check`) that guards layering, cycles, and IPC wiring in CI
+- Standalone executable (`bun run build:cli:exe`, Node SEA): a single `graphvizjs.exe` an advanced user runs with no Node install. Covers the pure/WASM subset (`format`, `validate`, `stats`, `render→svg`); `render→png/pdf` still need the native install (`bun run build:cli`), since native `.node` binaries can't be inlined into one file
+- Dependency-graph tool (`bun run graph` / `graph:check`) that guards layering, cycles, and IPC wiring in CI
 
 ### Platform
 - Migrated from Tauri to Electron (v2.0); renderer purity hardened so no Graphviz leaks into the renderer bundle

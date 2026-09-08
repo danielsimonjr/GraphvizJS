@@ -19,7 +19,7 @@
 ## Overview
 
 GraphvizJS is a layered Electron app with a headless core. File counts per module
-(from `docs/architecture/dependency-graph.json`, regenerate with `pnpm graph`):
+(from `docs/architecture/dependency-graph.json`, regenerate with `bun run graph`):
 
 ```
 ┌───────────────────────────────────────────────────────────────┐
@@ -437,7 +437,7 @@ persistence.
 
 ## Component Dependencies
 
-Module-level dependency edges (from `pnpm graph`; the renderer never imports `core/`
+Module-level dependency edges (from `bun run graph`; the renderer never imports `core/`
 at runtime — its `core/types` reference is type-only):
 
 ```

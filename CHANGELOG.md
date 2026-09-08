@@ -6,6 +6,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **E2E suite could not run after the Bun move.** `test/e2e/global-setup.ts`
+  hardcoded `execSync('pnpm build')`. With pnpm gone from CI, every e2e run died
+  in `globalSetup` with `'pnpm' is not recognized` before a single test executed.
+  It now calls `bun run build`. The first migration commit swept manifests and
+  workflows but not source, so this was missed; the local unit suite never
+  invokes e2e and could not have caught it.
+- Remaining `pnpm` invocations in README, AGENTS.md, `.claude/CLAUDE.md`,
+  `docs/architecture/`, `todo.md`, and the CLI/tooling help strings now name
+  Bun. Generated dependency-graph docs regenerated to match the new header.
+  Historical records (`docs/planning/*.json`, `docs/superpowers/`, earlier
+  CHANGELOG entries) are left as written -- they record what was true then.
+
+### Security
+
+- **`pnpm-workspace.yaml` removed and replaced by an audit gate.** It carried
+  seven transitive security overrides that Bun does not read, so they were
+  silently unenforced after the move. Bun's own resolution already lands at or
+  above every floor those overrides set (undici 6.28.1/7.29.1, brace-expansion
+  1.1.18/2.1.4/5.0.9, fast-uri 3.1.7, js-yaml 4.3.2, dompurify 3.4.15), and
+  `bun audit` reports no vulnerabilities across 554 packages.
+  The overrides are **not** ported to npm-style `overrides`: three majors of
+  `brace-expansion` coexist in the tree and a flat override would downgrade two
+  of them, and an exact-version pin becomes the blocker the moment that version
+  gets its own advisory. Instead `bun run audit` is a CI step, so a regression
+  **fails** rather than going unnoticed.
+- `trustedDependencies` (`esbuild`, `electron-winstaller`) ports pnpm's
+  `onlyBuiltDependencies`; Bun blocks postinstall scripts by default.
+  `core-js`'s postinstall stays blocked -- it only prints a donation banner.
+
 ### Changed
 
 - **Toolchain moved from pnpm to Bun.** `packageManager` is now `bun@1.4.2`,
