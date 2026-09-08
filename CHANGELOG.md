@@ -33,9 +33,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   of them, and an exact-version pin becomes the blocker the moment that version
   gets its own advisory. Instead `bun run audit` is a CI step, so a regression
   **fails** rather than going unnoticed.
-- `trustedDependencies` (`esbuild`, `electron-winstaller`) ports pnpm's
-  `onlyBuiltDependencies`; Bun blocks postinstall scripts by default.
-  `core-js`'s postinstall stays blocked -- it only prints a donation banner.
+- `trustedDependencies` (`canvas`, `esbuild`, `electron-winstaller`) ports
+  pnpm's build allow-list; Bun blocks install scripts by default. `canvas` is
+  the load-bearing one: it is a direct production dependency whose `install`
+  script builds the native binding the PDF export path needs. Omitting it made
+  three tests fail on a clean CI install with
+  `Cannot find module '../build/Release/canvas.node'` while passing locally,
+  because the local tree still held a binding built during the pnpm era.
+  `core-js`'s install script stays blocked -- it only prints a donation banner.
 
 ### Changed
 
