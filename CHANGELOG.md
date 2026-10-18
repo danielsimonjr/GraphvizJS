@@ -26,10 +26,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   now resolves `dompurify` 3.4.16 (two low advisories), `fast-uri` 3.1.8 (one
   moderate), `http-cache-semantics` 4.3.0 (one high) and `source-map-js` 1.2.2
   (one high). Every declared range
-  already admits these versions, so no `package.json` change is needed. On a
-  clean install, `bun audit` reads 15 findings before this change and 10 after.
-  This change leaves the `brace-expansion` findings and the `sprintf-js` finding
-  open. `sprintf-js` has no fixed release.
+  already admits these versions, so no declared range needs to change. On a
+  clean install, `bun audit` reads 15 findings on `master` and none with all
+  the security entries of this section.
+- **`global-agent` pinned to `^4.1.3` with an `overrides` entry.** The last
+  open finding was `sprintf-js` (GHSA-hp3w-g68c-fv3c). It has no fixed release,
+  because 1.1.3 is the latest and is inside the affected range. The only path
+  to it in the dev tree was `electron-builder` > `app-builder-lib` >
+  `@electron/get` 3.1.0 > `global-agent` 3.0.0 > `roarr` > `sprintf-js`.
+  `global-agent` 4.x does not depend on `roarr`, so the override removes
+  `roarr`, `sprintf-js` and five other packages from the lockfile.
+  `@electron/get` loads `global-agent` only inside `initializeProxy()`, which
+  runs when `ELECTRON_GET_USE_PROXY` is set or when a caller invokes it, and it
+  reads only `bootstrap()`. `global-agent` 4.1.3 exports `bootstrap()` and
+  needs Node 10 or later. The packaged app does not change. Remove the override
+  when `electron-builder` moves to `@electron/get` 5, which drops `global-agent`.
 - **`pnpm-workspace.yaml` removed and replaced by an audit gate.** It carried
   seven transitive security overrides that Bun does not read, so they were
   silently unenforced after the move. Bun's own resolution already lands at or

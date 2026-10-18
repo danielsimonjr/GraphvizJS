@@ -80,6 +80,9 @@
   "engines": {
     "bun": ">=1.4.2"
   },
+  "overrides": {
+    "global-agent": "^4.1.3"
+  },
   "trustedDependencies": [
     "canvas",
     "esbuild",
