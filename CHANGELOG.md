@@ -41,6 +41,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `Cannot find module '../build/Release/canvas.node'` while passing locally,
   because the local tree still held a binding built during the pnpm era.
   `core-js`'s install script stays blocked -- it only prints a donation banner.
+- **`brace-expansion` lockfile entries raised to the latest release of each
+  line** (5.0.9 to 5.0.12, 2.1.4 to 2.1.7, 1.1.18 to 1.1.21). Three
+  denial-of-service advisories (GHSA-6j4f-fj2g-mc7p, GHSA-qhr7-859c-m2p7 and
+  GHSA-q2hr-2g5m-vwhr) cover the earlier versions. No copy is reachable from
+  the runtime `dependencies`, so the packaged app does not change. Only
+  `bun.lock` changes.
 
 ### Changed
 
