@@ -28,6 +28,7 @@ test('a tab opened after a zoom starts at the current editor zoom', async () => 
   await expect(activeScroller(page)).toHaveCSS('font-size', '19px');
 
   await page.locator('.tab-new').click();
+  await expect(page.locator('[role="tab"]')).toHaveCount(2);
 
   await expect(activeScroller(page)).toHaveCSS('font-size', '19px');
 });

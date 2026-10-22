@@ -74,10 +74,7 @@ export function createEditorZoomController(
 
   function attach(view: EditorView): void {
     views.add(view);
-    // The extension of a new editor starts at the default level
-    if (zoomLevel !== ZOOM_DEFAULT) {
-      applyTo(view);
-    }
+    applyTo(view);
   }
 
   function detach(view: EditorView): void {

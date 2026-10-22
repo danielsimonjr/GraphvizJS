@@ -233,6 +233,23 @@ describe('editor/zoom', () => {
       second.destroy();
     });
 
+    it('an editor that is attached again catches up with the current level', () => {
+      const { compartment, newView } = setup();
+      const controller = createEditorZoomController(compartment);
+      const view = newView();
+      controller.attach(view);
+      controller.zoomIn();
+      controller.detach(view);
+      controller.reset();
+      expect(scrollerFontSizes(view)).toEqual([18]);
+
+      controller.attach(view);
+
+      expect(scrollerFontSizes(view)).toEqual([16]);
+
+      view.destroy();
+    });
+
     it('a detached editor no longer follows the level', () => {
       const { compartment, newView } = setup();
       const controller = createEditorZoomController(compartment);

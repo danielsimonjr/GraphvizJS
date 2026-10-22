@@ -203,9 +203,7 @@ async function bootstrap(): Promise<void> {
   const { extension: zoomExtension, compartment: zoomCompartment } = createEditorZoomExtension();
   const editorZoom = createEditorZoomController(
     zoomCompartment,
-    (level) => {
-      saveEditorZoom(level);
-    },
+    (level) => void saveEditorZoom(level),
     (await loadEditorZoom()) ?? undefined
   );
 
