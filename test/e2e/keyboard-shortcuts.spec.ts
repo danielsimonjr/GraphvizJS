@@ -2,7 +2,14 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { type ElectronApplication, expect, type Page, test } from '@playwright/test';
-import { getEditorContent, launchApp, selectors, waitForAppReady } from './helpers';
+import {
+  activeEditorContent,
+  activeEditorScroller,
+  getEditorContent,
+  launchApp,
+  selectors,
+  waitForAppReady,
+} from './helpers';
 
 const FIXTURE_CONTENT = 'digraph Fixture { A -> B }';
 
@@ -73,14 +80,21 @@ test.describe('Keyboard Shortcuts', () => {
   });
 
   test('Ctrl+? opens help dialog', async () => {
-    // Press Ctrl+? (Ctrl+Shift+/)
-    await page.keyboard.press('Control+Shift+/');
-    await page.waitForTimeout(300);
+    // Press Ctrl+?. The key is '?', because 'Control+Shift+/' sends the key '/' and the app
+    // binds the key '?'.
+    await page.keyboard.press('Control+?');
 
-    // Help dialog may vary by platform; tolerate either outcome.
-    const helpDialog = page.locator(selectors.helpDialog);
-    const isVisible = await helpDialog.isVisible().catch(() => false);
-    expect(isVisible || true).toBe(true);
+    await expect(page.locator(selectors.helpDialog)).toBeVisible();
+  });
+
+  test('a bare ? typed in the editor does not open the help dialog', async () => {
+    const before = await getEditorContent(page);
+    await activeEditorContent(page).click();
+    await page.keyboard.type('?');
+
+    // The key reached the editor, and the help dialog stayed closed.
+    await expect.poll(() => getEditorContent(page)).not.toBe(before);
+    await expect(page.locator(selectors.helpDialog)).not.toBeVisible();
   });
 });
 
@@ -89,43 +103,40 @@ test.describe('Editor Zoom Shortcuts', () => {
     const editor = page.locator(selectors.editor);
     await editor.click();
     await page.keyboard.press('Control+=');
-    await page.waitForTimeout(200);
 
-    await expect(editor).toBeVisible();
+    // One zoom step is 10% of the 16px base font, which rounds to 18px.
+    await expect(activeEditorScroller(page)).toHaveCSS('font-size', '18px');
   });
 
   test('Ctrl+- zooms out editor', async () => {
     const editor = page.locator(selectors.editor);
     await editor.click();
     await page.keyboard.press('Control+-');
-    await page.waitForTimeout(200);
 
-    await expect(editor).toBeVisible();
+    // One step down is 90% of 16px, which rounds to 14px.
+    await expect(activeEditorScroller(page)).toHaveCSS('font-size', '14px');
   });
 
   test('Ctrl+0 resets editor zoom', async () => {
     const editor = page.locator(selectors.editor);
     await editor.click();
     await page.keyboard.press('Control+=');
-    await page.waitForTimeout(100);
+    await expect(activeEditorScroller(page)).toHaveCSS('font-size', '18px');
 
     await page.keyboard.press('Control+0');
-    await page.waitForTimeout(200);
-
-    await expect(editor).toBeVisible();
+    await expect(activeEditorScroller(page)).toHaveCSS('font-size', '16px');
   });
 });
 
 test.describe('Menu Keyboard Navigation', () => {
-  test('Tab navigates through toolbar buttons', async () => {
-    const firstBtn = page.locator('.toolbar button').first();
-    await firstBtn.focus();
+  test('Tab moves focus from the New button to Open and then to Save', async () => {
+    await page.locator(selectors.newBtn).focus();
+    await expect(page.locator(selectors.newBtn)).toBeFocused();
 
     await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
+    await expect(page.locator(selectors.openBtn)).toBeFocused();
 
-    const focusedBtn = page.locator('.toolbar button:focus');
-    const hasFocus = await focusedBtn.count();
-    expect(hasFocus >= 0).toBe(true);
+    await page.keyboard.press('Tab');
+    await expect(page.locator(selectors.saveBtn)).toBeFocused();
   });
 });

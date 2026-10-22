@@ -1,12 +1,7 @@
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import {
-  type ElectronApplication,
-  _electron as electron,
-  expect,
-  type Page,
-} from '@playwright/test';
+import { type ElectronApplication, _electron as electron, type Page } from '@playwright/test';
 
 /**
  * Launch the real Electron app via Playwright's Electron runner.
@@ -70,6 +65,14 @@ export function activeEditorContent(page: Page) {
   return page.locator('.cm-editor:not([style*="none"]) .cm-content').first();
 }
 
+/**
+ * Locator for the scroller of the active tab's editor. The editor font size is set on
+ * the scroller, so a zoom test reads its `font-size`.
+ */
+export function activeEditorScroller(page: Page) {
+  return page.locator('.cm-editor:not([style*="none"]) .cm-scroller').first();
+}
+
 export async function getEditorContent(page: Page): Promise<string> {
   return (await activeEditorContent(page).textContent()) ?? '';
 }
@@ -82,7 +85,12 @@ export async function setEditorContent(page: Page, content: string): Promise<voi
   await editor.click();
   // Select all and replace
   await page.keyboard.press('ControlOrMeta+a');
-  await page.keyboard.type(content);
+  // keyboard.type('') types nothing, so empty content needs an explicit delete.
+  if (content === '') {
+    await page.keyboard.press('Delete');
+  } else {
+    await page.keyboard.type(content);
+  }
 }
 
 /**
@@ -111,34 +119,6 @@ export async function getPreviewError(page: Page): Promise<string | null> {
     return errorElement.textContent();
   }
   return null;
-}
-
-/**
- * Click a toolbar button by its data-action or aria-label.
- */
-export async function clickToolbarButton(page: Page, identifier: string): Promise<void> {
-  const button = page.locator(
-    `.toolbar button[data-action="${identifier}"], .toolbar button[aria-label="${identifier}"]`
-  );
-  await button.click();
-}
-
-/**
- * Open the examples menu and select an example by its visible label.
- */
-export async function selectExample(page: Page, exampleName: string): Promise<void> {
-  await page.click(selectors.examplesBtn);
-  await page.waitForSelector(selectors.examplesMenu, { state: 'visible' });
-  await page.click(`${selectors.examplesMenu} .toolbar-menu-item:has-text("${exampleName}")`);
-  await waitForPreviewUpdate(page);
-}
-
-/**
- * Open the export menu.
- */
-export async function openExportMenu(page: Page): Promise<void> {
-  await page.click(selectors.exportBtn);
-  await page.waitForSelector(selectors.exportMenu, { state: 'visible' });
 }
 
 /**

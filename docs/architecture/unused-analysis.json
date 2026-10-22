@@ -7,34 +7,14 @@
     "`unreferencedAnywhereNotes`'s dynamic-import check (`_dynamic_import_referrers`) only sees `import(...)` calls with a LITERAL string specifier. A dynamic import built from a variable or template literal (e.g. `import(`./cmds/${name}.js`)`, a command-dispatcher pattern) is invisible to it -- 'found none' in a note means no LITERAL match was found, NOT that nothing imports the file."
   ],
   "summary": {
-    "unusedExportCount": 47,
-    "unreferencedAnywhereCount": 5,
+    "unusedExportCount": 42,
+    "unreferencedAnywhereCount": 0,
     "referencedInModuleCount": 42,
     "unclassifiedExportCount": 0,
     "noImporterFileCount": 2
   },
-  "unreferencedAnywhere": {
-    "test/e2e/helpers.ts": [
-      "clickToolbarButton",
-      "getPreviewError",
-      "openExportMenu",
-      "selectExample"
-    ],
-    "test/mocks/graphviz.ts": [
-      "configureMockSvg"
-    ]
-  },
-  "unreferencedAnywhereNotes": {
-    "test/e2e/helpers.ts": {
-      "clickToolbarButton": "Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/e2e/helpers.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'clickToolbarButton' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting.",
-      "getPreviewError": "Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/e2e/helpers.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'getPreviewError' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting.",
-      "openExportMenu": "Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/e2e/helpers.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'openExportMenu' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting.",
-      "selectExample": "Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/e2e/helpers.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'selectExample' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting."
-    },
-    "test/mocks/graphviz.ts": {
-      "configureMockSvg": "Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/mocks/graphviz.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'configureMockSvg' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting."
-    }
-  },
+  "unreferencedAnywhere": {},
+  "unreferencedAnywhereNotes": {},
   "referencedInModule": {
     "cli/args.ts": [
       "ParseError",

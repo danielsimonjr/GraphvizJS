@@ -106,6 +106,8 @@ The shared mock for Graphviz WASM is `test/mocks/graphviz.ts`. A test that needs
 
 E2E tests use **Playwright** and are excluded from the Vitest run (`test/e2e/` directory).
 
+A guard test, `test/architecture/no-vacuous-assertions.test.ts`, fails when a `*.test.ts` or `*.spec.ts` file holds an always-true assertion, such as `expect(x || true).toBe(true)` or `expect(count >= 0).toBe(true)`. It scans the unit tests and the E2E tests.
+
 Coverage thresholds: 80% lines/functions/statements, 70% branches. `src/main.ts` is excluded from coverage.
 
 ## Code Style

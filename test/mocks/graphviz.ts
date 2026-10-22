@@ -38,15 +38,6 @@ export function configureMockError(error: Error): void {
   });
 }
 
-// Configure mock to return specific SVG
-export function configureMockSvg(svg: string): void {
-  mockGraphviz.load.mockImplementation(async () => {
-    currentInstance = createMockGraphvizInstance();
-    currentInstance.layout.mockReturnValue(svg);
-    return currentInstance;
-  });
-}
-
 // Reset mock to default behavior
 export function resetMockGraphviz(): void {
   mockGraphviz.load.mockClear();

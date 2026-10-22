@@ -45,49 +45,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- **Two weak tests now assert what their names say.** `test/editor/language.test.ts` only checked
-  that a document contained the text that the test had put in; it never read the highlighting. It
-  now reads the syntax tree and asserts the token type of each keyword, attribute name, string,
-  comment, operator and number, with a control that builds no tokens when the language is missing,
-  and a test that the vocabulary drives the keywords and attribute names. The old HTML-label input
-  (`label=<table>...`) was not valid DOT; the test now uses `label=<<table>...</table>>`.
-  `test/toolbar/actions.test.ts` passed null for the save-as, find, format and recent elements, so
-  it never ran those four setups. It now clicks each of the four buttons and asserts the effect.
-  No source file changed. The generated dependency graph lists one new test import, and the
-  line count in three architecture documents follows the new test lines.
-- **The README is in Simplified Technical English, and CI checks it.** `repo-tools ste` reported
-  10 long sentences in the README. They are now short sentences with the same facts. The file list
-  of `core/` is a nested list. The `docs` job runs `repo-tools ste docs/architecture README.md`,
-  so a new long sentence in the README fails the job.
-- **`bun run typecheck` checks `test/` too.** `tsconfig.json` listed `src`, `electron`, `tools`,
-  `core` and `cli`, so a test fixture could drift from the type it stands for and no gate failed
-  (Vitest strips types and checks none). With `test/` in the list, the typecheck found 40 errors in
-  7 test files; all are fixed at their cause. A fixture now builds its data from the real function
-  or the real type (`buildDotVocabulary()`, `SessionTab`, `ToolbarActionsOptions`), a stale option
-  that the code no longer reads (`schedulePreviewRender`) is gone from the toolbar actions test,
-  and the CI `typecheck` step covers the tests.
-- **The dependency-graph generator marks its reports as having no verifiable claim.**
-  `tools/dependency-graph` writes `<!-- repo-map:no-verification -->` after the do-not-edit
-  banner of `DEPENDENCY_GRAPH.md`, so `repo-tools check` skips the generated report by design.
-  A test covers the marker.
-- **The architecture documents follow ASD-STE100.** The 19 problems that `repo-tools ste`
-  reported in four documents are fixed. The documents no longer carry version, date or
-  maintainer lines, because the CHANGELOG records them.
-- **Size counts name their scope.** `tools/dependency-graph` counts `src/`, `core/`, `cli/` and
-  `electron/` (67 files, 8,351 lines of code, 22 modules, 204 exports). `repo-tools map` counts
-  every source file of the repository (173 files, 18,850 lines of code, 4 modules, 279
-  exports). The line count of `tools/dependency-graph` grew because of the new doc comments.
-- **The `dot:vocabulary` payload carries the color-typed attribute names.** `core/dot-vocab.ts`
-  exports `buildDotVocabulary()`, and the IPC handler returns its result. The new field
-  `colorAttributes` comes from `DOT_COLOR_ATTRIBUTES` in `core/dot-colors.ts`, the list that the
-  color lint reads. The completion source no longer keeps a list of its own. The architecture
-  documents describe the whole payload; they named only two of its fields before.
-- **`createEditorZoomController` holds one level for many editors.** The function takes the
-  compartment, the optional callback and the optional initial level, and returns a controller with
-  `attach` and `detach` next to the zoom actions. It no longer takes an editor.
-  `TabState.editorZoomLevel` is removed: the field was always 0 and no code read it.
-
-### Fixed
+- **Eight end-to-end tests assert what their names say, and a guard test keeps always-true assertions out.**
+  Four assertions could not fail: `expect(svgVisible || hasError || true)` in the empty-editor test,
+  `expect(isVisible || true)` in the Ctrl+? test, and `expect(hasFocus >= 0)` in the Tab test and in the
+  export-menu arrow-key test. Four more were weak: the invalid-DOT test checked the CSS class and never
+  read the message, and the three editor-zoom shortcut tests checked only that the editor is visible.
+  Each test now asserts the behavior in its name:
+  the empty editor shows the `preview-empty` message and no SVG, also after an error (the old test never
+  emptied the editor, because `keyboard.type('')` types nothing, so `setEditorContent` now presses Delete
+  for empty content); the invalid-DOT test reads the heading and the Graphviz syntax-error message;
+  Ctrl+? opens the help dialog (the old test pressed `Control+Shift+/`, which sends the key `/`, not
+  `?`) and a new test shows that a bare `?` typed in the editor does not; Tab moves focus from New to
+  Open to Save; ArrowDown on the export button opens the menu and focuses its first item (the menu has
+  no arrow-key movement between its items, so the old name described a feature that does not exist);
+  and Ctrl+=, Ctrl+- and Ctrl+0 set the editor font size to 18px, 14px and 16px.
+  The new `test/architecture/no-vacuous-assertions.test.ts` fails when a `*.test.ts` or `*.spec.ts` file
+  holds `expect(x || true)`, `expect(count >= 0).toBe(true)`, `expect(n).toBeGreaterThanOrEqual(0)` or
+  `expect(true).toBe(true)`, also when the call spans lines. Three unused e2e helpers
+  (`clickToolbarButton`, `openExportMenu`, `selectExample`), the unused `configureMockSvg` and an unused
+  import are deleted, and `activeEditorScroller` moves into `test/e2e/helpers.ts` for the two specs that
+  read the font size. The `unused-analysis` report now lists 0 exports as unreferenced anywhere. No
+  source file changed.
 
 - **A strict graph counted its repeated edges.** Graphviz draws one edge for one pair of nodes in
   a `strict` graph: a later edge statement for the same pair names the edge again. `parseGraph`

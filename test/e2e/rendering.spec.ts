@@ -1,5 +1,6 @@
 import { type ElectronApplication, expect, type Page, test } from '@playwright/test';
 import {
+  getPreviewError,
   hasPreviewError,
   launchApp,
   selectors,
@@ -40,19 +41,24 @@ test.describe('Diagram Rendering', () => {
     await waitForPreviewUpdate(page);
 
     await expect.poll(async () => hasPreviewError(page), { timeout: 5000 }).toBe(true);
+
+    // The preview shows a heading and, in a <pre>, the message that Graphviz gave.
+    expect(await getPreviewError(page)).toContain('Graphviz could not render this diagram.');
+    await expect(page.locator(`${selectors.previewError} pre`)).toContainText(/syntax error/i);
   });
 
-  test('empty editor shows empty state or clears preview', async () => {
+  test('empty editor shows the empty-state message and no diagram', async () => {
+    // Start from the error state, so the test shows that an empty editor also clears the error.
+    await setEditorContent(page, 'this is not valid DOT syntax {{{');
+    await expect.poll(async () => hasPreviewError(page), { timeout: 5000 }).toBe(true);
+
     await setEditorContent(page, '');
-    await waitForPreviewUpdate(page);
 
-    // Either no SVG or an error/empty state
-    const svg = page.locator(selectors.previewSvg);
-    const svgVisible = await svg.isVisible().catch(() => false);
-    const hasError = await hasPreviewError(page);
-
-    // One of these should be true
-    expect(svgVisible || hasError || true).toBe(true);
+    await expect(page.locator(`${selectors.preview}.preview-empty`)).toContainText(
+      'Add DOT markup to see the preview.'
+    );
+    await expect(page.locator(selectors.previewSvg)).toHaveCount(0);
+    await expect(page.locator(selectors.previewError)).toHaveCount(0);
   });
 
   test('complex diagram renders correctly', async () => {
