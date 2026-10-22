@@ -67,7 +67,8 @@ describe('buildDotVocabulary', () => {
     const vocab = buildDotVocabulary();
     vocab.keywords.push('extra');
     vocab.colorAttributes.push('extra');
-    expect(buildDotVocabulary().keywords).not.toContain('extra');
-    expect(buildDotVocabulary().colorAttributes).not.toContain('extra');
+    const fresh = buildDotVocabulary();
+    expect(fresh.keywords).not.toContain('extra');
+    expect(fresh.colorAttributes).not.toContain('extra');
   });
 });

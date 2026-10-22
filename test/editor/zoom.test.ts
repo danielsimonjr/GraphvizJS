@@ -151,69 +151,28 @@ describe('editor/zoom', () => {
     });
 
     describe('initial level', () => {
-      function createEditor() {
+      it.each([
+        [undefined, 1, 16],
+        [2, 2, 32],
+        [0, 0.5, 8],
+        [5, 3, 48],
+        [Number.NaN, 1, 16],
+        [Number.POSITIVE_INFINITY, 1, 16],
+      ])('an initial level of %s gives level %s and a %spx font', (initial, level, fontPx) => {
         const { extension, compartment } = createEditorZoomExtension();
         const view = new EditorView({
           state: EditorState.create({ extensions: [extension] }),
           parent: container,
         });
-        return { view, compartment };
-      }
-
-      it('keeps level 1 and the default font when no level is given', () => {
-        const { view, compartment } = createEditor();
-        const controller = createEditorZoomController(view, compartment);
-
-        expect(controller.getLevel()).toBe(1);
-        expect(scrollerFontSizes(view)).toEqual([16]);
-
-        view.destroy();
-      });
-
-      it('applies a level inside the limits to the font without calling onZoomChange', () => {
-        const { view, compartment } = createEditor();
         const onZoomChange = vi.fn();
-        const controller = createEditorZoomController(view, compartment, onZoomChange, 2);
+        const controller = createEditorZoomController(view, compartment, onZoomChange, initial);
 
-        expect(controller.getLevel()).toBe(2);
-        expect(scrollerFontSizes(view)).toEqual([32]);
+        expect(controller.getLevel()).toBe(level);
+        expect(scrollerFontSizes(view)).toEqual([fontPx]);
         expect(onZoomChange).not.toHaveBeenCalled();
 
         view.destroy();
       });
-
-      it('raises a level below the minimum to 0.5 and applies it to the font', () => {
-        const { view, compartment } = createEditor();
-        const controller = createEditorZoomController(view, compartment, undefined, 0);
-
-        expect(controller.getLevel()).toBe(0.5);
-        expect(scrollerFontSizes(view)).toEqual([8]);
-
-        view.destroy();
-      });
-
-      it('lowers a level above the maximum to 3 and applies it to the font', () => {
-        const { view, compartment } = createEditor();
-        const controller = createEditorZoomController(view, compartment, undefined, 5);
-
-        expect(controller.getLevel()).toBe(3);
-        expect(scrollerFontSizes(view)).toEqual([48]);
-
-        view.destroy();
-      });
-
-      it.each([Number.NaN, Number.POSITIVE_INFINITY])(
-        'uses level 1 and the default font for the level %s',
-        (level) => {
-          const { view, compartment } = createEditor();
-          const controller = createEditorZoomController(view, compartment, undefined, level);
-
-          expect(controller.getLevel()).toBe(1);
-          expect(scrollerFontSizes(view)).toEqual([16]);
-
-          view.destroy();
-        }
-      );
     });
   });
 
