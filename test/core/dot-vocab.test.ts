@@ -48,6 +48,19 @@ describe('buildDotVocabulary', () => {
     );
   });
 
+  it('names the six attributes that the Graphviz attributes table types as color', () => {
+    // https://graphviz.org/doc/info/attrs.html lists these six and no other color attribute.
+    const { colorAttributes } = buildDotVocabulary();
+    expect([...colorAttributes].sort()).toEqual([
+      'bgcolor',
+      'color',
+      'fillcolor',
+      'fontcolor',
+      'labelfontcolor',
+      'pencolor',
+    ]);
+  });
+
   it('names exactly the catalog attributes of type color', () => {
     const fromCatalog = DOT_ATTRIBUTE_CATALOG.filter((spec) => spec.type === 'color').map(
       (spec) => spec.name

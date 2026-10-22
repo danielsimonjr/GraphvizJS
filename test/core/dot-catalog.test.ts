@@ -27,6 +27,9 @@ describe('dot-catalog', () => {
     expect(findAttribute('rankdir')?.values).toEqual(['TB', 'LR', 'BT', 'RL']);
     expect(findAttribute('dir')?.contexts).toContain('edge');
   });
+  it('types labelfontcolor as a color that only edges use', () => {
+    expect(findAttribute('labelfontcolor')).toMatchObject({ type: 'color', contexts: ['edge'] });
+  });
 
   describe('closed-domain completeness (residual invalid-value/invalid-color FP fix)', () => {
     // These enum domains must stay COMPLETE against the canonical Graphviz tables: an

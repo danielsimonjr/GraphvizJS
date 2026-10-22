@@ -179,6 +179,7 @@ export const DOT_ATTRIBUTE_CATALOG: readonly DotAttributeSpec[] = [
   { name: 'fillcolor', contexts: ['node', 'edge', 'cluster'], type: 'color' },
   { name: 'bgcolor', contexts: ['graph', 'cluster'], type: 'color' },
   { name: 'fontcolor', contexts: ['graph', 'node', 'edge', 'cluster'], type: 'color' },
+  { name: 'labelfontcolor', contexts: ['edge'], type: 'color' },
   { name: 'pencolor', contexts: ['cluster'], type: 'color' },
 
   // --- Common non-enum attributes ---

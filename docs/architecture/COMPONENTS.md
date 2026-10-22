@@ -41,7 +41,7 @@ GraphvizJS is a layered Electron app with a headless core. File counts per modul
 
 **Total** (`src/`, `core/`, `cli/` and `electron/`): 67 TypeScript files · 8,351 LOC · 22 modules · 204 exports · 20 IPC channels.
 
-The whole repository, including tests, scripts and tools, holds 174 source files, 19,185 lines of code, 4 modules and 281 exports (`repo-tools map`). The Verification table at the end of this document records these values.
+The whole repository, including tests, scripts and tools, holds 174 source files, 19,222 lines of code, 4 modules and 281 exports (`repo-tools map`). The Verification table at the end of this document records these values.
 
 ---
 
@@ -156,7 +156,7 @@ same list.
 
 ```typescript
 const DOT_COLORS: readonly string[]
-const DOT_COLOR_ATTRIBUTES: readonly string[]   // color, bgcolor, fillcolor, fontcolor, pencolor
+const DOT_COLOR_ATTRIBUTES: readonly string[]   // color, bgcolor, fillcolor, fontcolor, labelfontcolor, pencolor
 function isColorAttribute(attr: string): boolean
 ```
 
@@ -510,6 +510,6 @@ The values cover every source file of the repository. The counts of `tools/depen
 | Claim | Value | Source |
 |---|---|---|
 | totalSourceFiles | 174 | repo-tools map: dependency-graph.json |
-| totalLinesOfCode | 19185 | repo-tools map: dependency-graph.json |
+| totalLinesOfCode | 19222 | repo-tools map: dependency-graph.json |
 | totalModules | 4 | repo-tools map: dependency-graph.json |
 | totalExports | 281 | repo-tools map: dependency-graph.json |
