@@ -124,6 +124,39 @@ describe('render', () => {
       expect(onRenderSuccess).toHaveBeenCalledTimes(1);
     });
 
+    it('ignores the failure of a render that a newer call superseded', async () => {
+      const { createPreview } = await import('../../src/preview/render');
+      const onRenderError = vi.fn();
+      const onRenderSuccess = vi.fn();
+      const newSvg = '<svg data-test="new"></svg>';
+      let rejectOld!: (error: Error) => void;
+      const render = vi
+        .fn()
+        .mockImplementationOnce(
+          () =>
+            new Promise<string>((_resolve, reject) => {
+              rejectOld = reject;
+            })
+        )
+        .mockResolvedValueOnce(newSvg);
+      const scheduler = createPreview(previewEl, 0, {
+        render,
+        callbacks: { onRenderError, onRenderSuccess },
+      });
+
+      scheduler('digraph { old }');
+      await vi.advanceTimersByTimeAsync(0); // the old render starts and stays pending
+      scheduler('digraph { new }');
+      await vi.advanceTimersByTimeAsync(0); // the new render succeeds
+      rejectOld(new Error('old render failed'));
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(onRenderError).not.toHaveBeenCalled();
+      expect(onRenderSuccess).toHaveBeenCalledTimes(1);
+      expect(previewEl.classList.contains('preview-error')).toBe(false);
+      expect(previewEl.innerHTML).toBe(newSvg);
+    });
+
     it('calls the injected render function with the trimmed doc and engine', async () => {
       const { createPreview } = await import('../../src/preview/render');
       const renderSpy = createRenderSpy();
