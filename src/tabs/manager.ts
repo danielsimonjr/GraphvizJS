@@ -18,8 +18,6 @@ export interface TabState {
   lastSavedAt: Date | null;
   /** CodeMirror editor instance for this tab */
   editorView: EditorView | null;
-  /** Editor zoom level for this tab */
-  editorZoomLevel: number;
   /** Layout engine used to render this tab's diagram. */
   layoutEngine: LayoutEngine;
 }
@@ -66,7 +64,6 @@ export class TabManager {
       lastCommittedDoc: content,
       lastSavedAt: null,
       editorView: options.editorView ?? null,
-      editorZoomLevel: 0,
       layoutEngine: options.layoutEngine ?? 'dot',
     };
 

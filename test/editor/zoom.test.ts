@@ -42,7 +42,8 @@ describe('editor/zoom', () => {
         parent: container,
       });
 
-      const controller = createEditorZoomController(view, compartment);
+      const controller = createEditorZoomController(compartment);
+      controller.attach(view);
       expect(controller.zoomIn).toBeDefined();
       expect(controller.zoomOut).toBeDefined();
       expect(controller.reset).toBeDefined();
@@ -58,7 +59,8 @@ describe('editor/zoom', () => {
         parent: container,
       });
 
-      const controller = createEditorZoomController(view, compartment);
+      const controller = createEditorZoomController(compartment);
+      controller.attach(view);
       const initialLevel = controller.getLevel();
       controller.zoomIn();
       expect(controller.getLevel()).toBeGreaterThan(initialLevel);
@@ -73,7 +75,8 @@ describe('editor/zoom', () => {
         parent: container,
       });
 
-      const controller = createEditorZoomController(view, compartment);
+      const controller = createEditorZoomController(compartment);
+      controller.attach(view);
       controller.zoomIn(); // First increase to have room to decrease
       const level = controller.getLevel();
       controller.zoomOut();
@@ -89,7 +92,8 @@ describe('editor/zoom', () => {
         parent: container,
       });
 
-      const controller = createEditorZoomController(view, compartment);
+      const controller = createEditorZoomController(compartment);
+      controller.attach(view);
       controller.zoomIn();
       controller.zoomIn();
       controller.reset();
@@ -105,7 +109,8 @@ describe('editor/zoom', () => {
         parent: container,
       });
 
-      const controller = createEditorZoomController(view, compartment);
+      const controller = createEditorZoomController(compartment);
+      controller.attach(view);
 
       // Zoom out many times - should stop at min (0.5)
       for (let i = 0; i < 20; i++) {
@@ -129,7 +134,8 @@ describe('editor/zoom', () => {
         parent: container,
       });
 
-      const controller = createEditorZoomController(view, compartment);
+      const controller = createEditorZoomController(compartment);
+      controller.attach(view);
       expect(controller.getLevel()).toBe(1);
 
       view.destroy();
@@ -143,7 +149,8 @@ describe('editor/zoom', () => {
       });
 
       const onZoomChange = vi.fn();
-      const controller = createEditorZoomController(view, compartment, onZoomChange);
+      const controller = createEditorZoomController(compartment, onZoomChange);
+      controller.attach(view);
       controller.zoomIn();
       expect(onZoomChange).toHaveBeenCalled();
 
@@ -165,7 +172,8 @@ describe('editor/zoom', () => {
           parent: container,
         });
         const onZoomChange = vi.fn();
-        const controller = createEditorZoomController(view, compartment, onZoomChange, initial);
+        const controller = createEditorZoomController(compartment, onZoomChange, initial);
+        controller.attach(view);
 
         expect(controller.getLevel()).toBe(level);
         expect(scrollerFontSizes(view)).toEqual([fontPx]);
@@ -173,6 +181,125 @@ describe('editor/zoom', () => {
 
         view.destroy();
       });
+    });
+  });
+
+  describe('one level for every attached editor', () => {
+    function setup() {
+      const { extension, compartment } = createEditorZoomExtension();
+      const newView = () =>
+        new EditorView({
+          state: EditorState.create({ extensions: [extension] }),
+          parent: container,
+        });
+      return { compartment, newView };
+    }
+
+    it('an editor attached after a zoom starts at the current level', () => {
+      const { compartment, newView } = setup();
+      const controller = createEditorZoomController(compartment);
+      const first = newView();
+      controller.attach(first);
+      controller.zoomIn();
+      controller.zoomIn();
+
+      const second = newView();
+      controller.attach(second);
+
+      expect(controller.getLevel()).toBe(1.2);
+      expect(scrollerFontSizes(second)).toEqual([19]);
+
+      first.destroy();
+      second.destroy();
+    });
+
+    it('a zoom change applies to every attached editor', () => {
+      const { compartment, newView } = setup();
+      const controller = createEditorZoomController(compartment);
+      const first = newView();
+      const second = newView();
+      controller.attach(first);
+      controller.attach(second);
+
+      controller.zoomIn();
+      expect(scrollerFontSizes(first)).toEqual([18]);
+      expect(scrollerFontSizes(second)).toEqual([18]);
+
+      controller.reset();
+      expect(scrollerFontSizes(first)).toEqual([16]);
+      expect(scrollerFontSizes(second)).toEqual([16]);
+
+      first.destroy();
+      second.destroy();
+    });
+
+    it('an editor that is attached again catches up with the current level', () => {
+      const { compartment, newView } = setup();
+      const controller = createEditorZoomController(compartment);
+      const view = newView();
+      controller.attach(view);
+      controller.zoomIn();
+      controller.detach(view);
+      controller.reset();
+      expect(scrollerFontSizes(view)).toEqual([18]);
+
+      controller.attach(view);
+
+      expect(scrollerFontSizes(view)).toEqual([16]);
+
+      view.destroy();
+    });
+
+    it('a detached editor no longer follows the level', () => {
+      const { compartment, newView } = setup();
+      const controller = createEditorZoomController(compartment);
+      const kept = newView();
+      const detached = newView();
+      controller.attach(kept);
+      controller.attach(detached);
+      controller.detach(detached);
+
+      controller.zoomIn();
+
+      expect(scrollerFontSizes(kept)).toEqual([18]);
+      expect(scrollerFontSizes(detached)).toEqual([16]);
+
+      kept.destroy();
+      detached.destroy();
+    });
+
+    it('onZoomChange runs once for each change, however many editors are attached', () => {
+      const { compartment, newView } = setup();
+      const onZoomChange = vi.fn();
+      const controller = createEditorZoomController(compartment, onZoomChange);
+      const first = newView();
+      const second = newView();
+      controller.attach(first);
+      controller.attach(second);
+      expect(onZoomChange).not.toHaveBeenCalled();
+
+      controller.zoomIn();
+
+      expect(onZoomChange).toHaveBeenCalledTimes(1);
+      expect(onZoomChange).toHaveBeenCalledWith(1.1);
+
+      first.destroy();
+      second.destroy();
+    });
+
+    it('the initial level applies to every attached editor', () => {
+      const { compartment, newView } = setup();
+      const controller = createEditorZoomController(compartment, undefined, 2);
+      const first = newView();
+      const second = newView();
+      controller.attach(first);
+      controller.attach(second);
+
+      expect(scrollerFontSizes(first)).toEqual([32]);
+      expect(scrollerFontSizes(second)).toEqual([32]);
+
+      first.destroy();
+      second.destroy();
     });
   });
 
@@ -184,7 +311,8 @@ describe('editor/zoom', () => {
         parent: container,
       });
 
-      const controller = createEditorZoomController(view, compartment);
+      const controller = createEditorZoomController(compartment);
+      controller.attach(view);
       const keymapExtension = createEditorZoomKeymap(controller);
       expect(keymapExtension).toBeDefined();
 
