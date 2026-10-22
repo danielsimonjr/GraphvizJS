@@ -217,6 +217,9 @@ node ids, edges, and subgraphs or clusters. It handles these forms:
 - subgraph endpoints
 - nested subgraphs, up to a depth of 500 (the parser skips a deeper block)
 - `cluster`-prefixed subgraph names
+- the `strict` header: a repeated pair of nodes merges into its first edge
+
+In a strict graph, as in Graphviz, one pair of nodes has one edge. The pair is ordered in a digraph and unordered in a graph. A self-loop stays allowed.
 
 The parser never throws and degrades gracefully on malformed input. `parseGraph` is the
 structural foundation for `graph-stats.ts`.
@@ -236,7 +239,7 @@ function parseGraph(source: string): GraphModel
 - cycle detection
 
 Cycle detection uses an iterative 3-color DFS for directed graphs and union-find for
-undirected graphs. Both treat a self-loop as a cycle. Union-find also treats a parallel edge as a cycle. Directed graphs also
+undirected graphs. Both treat a self-loop as a cycle. Union-find also treats a parallel edge as a cycle. A strict graph has no parallel edge, because the parser merged them. Directed graphs also
 report `roots` (in-degree 0) and `leaves` (out-degree 0). Undirected graphs omit both.
 
 ```typescript

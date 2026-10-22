@@ -96,6 +96,47 @@ describe('parseGraph', () => {
     expect(parseGraph('graph { }')).toMatchObject({ directed: false, strict: false });
   });
 
+  it('keeps a repeated edge of a graph that is not strict', () => {
+    expect(parseGraph('digraph { a -> b; a -> b }').edges).toEqual([
+      { from: 'a', to: 'b' },
+      { from: 'a', to: 'b' },
+    ]);
+    expect(parseGraph('graph { a -- b; b -- a }').edges).toHaveLength(2);
+  });
+
+  it('merges a repeated edge of a strict digraph into one', () => {
+    expect(parseGraph('strict digraph { a -> b; a -> b }').edges).toEqual([{ from: 'a', to: 'b' }]);
+  });
+
+  it('merges the same pair of a strict undirected graph in either order, keeping the first', () => {
+    expect(parseGraph('strict graph { a -- b; b -- a }').edges).toEqual([{ from: 'a', to: 'b' }]);
+    expect(parseGraph('strict graph { b -- a; a -- b }').edges).toEqual([{ from: 'b', to: 'a' }]);
+  });
+
+  it('keeps the opposite directions of a strict digraph apart', () => {
+    expect(parseGraph('strict digraph { a -> b; b -> a }').edges).toEqual([
+      { from: 'a', to: 'b' },
+      { from: 'b', to: 'a' },
+    ]);
+  });
+
+  it('allows a self-loop in a strict graph, and merges a repeated one', () => {
+    expect(parseGraph('strict digraph { a -> a }').edges).toEqual([{ from: 'a', to: 'a' }]);
+    expect(parseGraph('strict digraph { a -> a; a -> a }').edges).toEqual([{ from: 'a', to: 'a' }]);
+    expect(parseGraph('strict graph { a -- a; a -- a }').edges).toEqual([{ from: 'a', to: 'a' }]);
+  });
+
+  it('merges the repeats that a chain or a group of endpoints makes in a strict graph', () => {
+    expect(parseGraph('strict digraph { a -> b -> c; a -> b }').edges).toEqual([
+      { from: 'a', to: 'b' },
+      { from: 'b', to: 'c' },
+    ]);
+    expect(parseGraph('strict digraph { {a b} -> c; a -> c }').edges).toEqual([
+      { from: 'a', to: 'c' },
+      { from: 'b', to: 'c' },
+    ]);
+  });
+
   it('collects distinct nodes in first-seen order (implicit on edges)', () => {
     const m = parseGraph('digraph { a -> b -> c; a }');
     expect(m.nodes).toEqual(['a', 'b', 'c']);

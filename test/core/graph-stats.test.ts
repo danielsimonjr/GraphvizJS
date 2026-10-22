@@ -47,6 +47,36 @@ describe('graphStats', () => {
     expect(graphStats('graph { a -- b; a -- b }').hasCycle).toBe(true);
   });
 
+  it('counts a repeated edge of a graph that is not strict each time', () => {
+    expect(graphStats('digraph { a -> b; a -> b }').edgeCount).toBe(2);
+  });
+
+  it('counts a repeated edge of a strict digraph once', () => {
+    const s = graphStats('strict digraph { a -> b; a -> b }');
+    expect(s.edgeCount).toBe(1);
+    expect(s.roots).toBe(1);
+    expect(s.leaves).toBe(1);
+  });
+
+  it('counts the same pair of a strict undirected graph once, and finds no cycle', () => {
+    const s = graphStats('strict graph { a -- b; b -- a }');
+    expect(s.edgeCount).toBe(1);
+    expect(s.hasCycle).toBe(false);
+  });
+
+  it('keeps the opposite directions of a strict digraph, and finds the cycle', () => {
+    const s = graphStats('strict digraph { a -> b; b -> a }');
+    expect(s.edgeCount).toBe(2);
+    expect(s.hasCycle).toBe(true);
+  });
+
+  it('counts a repeated self-loop of a strict digraph once', () => {
+    const s = graphStats('strict digraph { a -> a; a -> a }');
+    expect(s.edgeCount).toBe(1);
+    expect(s.selfLoops).toBe(1);
+    expect(s.hasCycle).toBe(true);
+  });
+
   it('handles empty/malformed input without throwing', () => {
     expect(graphStats('').nodeCount).toBe(0);
     expect(() => graphStats('digraph { a ->')).not.toThrow();

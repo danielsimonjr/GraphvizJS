@@ -141,8 +141,29 @@ export function tokenizeDot(source: string): Tok[] {
 }
 
 /**
+ * Merge the repeated edges of a strict graph, as Graphviz does.
+ * A strict graph has at most one edge for one pair of nodes: a later edge statement for
+ * the same pair names the edge again. The pair is ordered in a directed graph and unordered
+ * in an undirected one. A self-loop is one pair like any other. The first edge stays.
+ *
+ * @param edges - The edges in the order of the source.
+ * @param directed - True when the graph is a digraph.
+ * @returns The edges without a repeated pair.
+ */
+function mergeRepeatedEdges(edges: GraphEdge[], directed: boolean): GraphEdge[] {
+  const seen = new Set<string>();
+  return edges.filter(({ from, to }) => {
+    const key = JSON.stringify(directed || from <= to ? [from, to] : [to, from]);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+/**
  * Parse DOT source into its nodes, edges, and subgraphs.
  * The parser records no attribute values, and never throws on malformed input.
+ * A strict graph has no repeated edge in the result.
  *
  * @param source - The DOT source text to parse.
  * @returns The directed and strict flags, the node ids, the edges, and the subgraphs.
@@ -330,5 +351,11 @@ export function parseGraph(source: string): GraphModel {
     while (pos < toks.length && at()!.kind !== 'rbrace') parseStatement();
   }
 
-  return { directed, strict, nodes: nodeOrder, edges, subgraphs };
+  return {
+    directed,
+    strict,
+    nodes: nodeOrder,
+    edges: strict ? mergeRepeatedEdges(edges, directed) : edges,
+    subgraphs,
+  };
 }
