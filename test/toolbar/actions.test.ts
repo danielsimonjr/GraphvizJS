@@ -1,6 +1,7 @@
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { ToolbarActionsOptions } from '../../src/toolbar/actions';
 import '../mocks/graphviz';
 import { resetMockGraphviz } from '../mocks/graphviz';
 
@@ -66,28 +67,43 @@ describe('toolbar/actions', () => {
     editor.destroy();
   });
 
+  /**
+   * The full options for setupToolbarActions. The seven core elements are set, and the save-as,
+   * recent, find and format elements are null. The callbacks that tests assert on are mocks.
+   */
+  const makeOptions = (overrides: Partial<ToolbarActionsOptions> = {}): ToolbarActionsOptions => ({
+    getEditor: () => editor,
+    newDiagramButton,
+    openButton,
+    saveButton,
+    saveAsButton: null,
+    exportButton,
+    exportMenu,
+    examplesButton,
+    examplesMenu,
+    recentButton: null,
+    recentMenu: null,
+    findButton: null,
+    formatButton: null,
+    commitDocument: vi.fn(),
+    onNew: vi.fn(),
+    onOpen: vi.fn(),
+    onLoadExample: vi.fn(),
+    onPathChange: vi.fn(),
+    onFormat: vi.fn(),
+    getPath: () => null,
+    getRecent: () => [],
+    onPickRecent: vi.fn(),
+    getEngine: () => 'dot',
+    ...overrides,
+  });
+
   describe('setupToolbarActions()', () => {
     it('sets up all toolbar actions without errors', async () => {
       const { setupToolbarActions } = await import('../../src/toolbar/actions');
 
       expect(() => {
-        setupToolbarActions({
-          getEditor: () => editor,
-
-          newDiagramButton,
-          openButton,
-          saveButton,
-          exportButton,
-          exportMenu,
-          examplesButton,
-          examplesMenu,
-          commitDocument: vi.fn(),
-          onNew: vi.fn(),
-          onOpen: vi.fn(),
-          onLoadExample: vi.fn(),
-          onPathChange: vi.fn(),
-          getPath: () => null,
-        });
+        setupToolbarActions(makeOptions());
       }).not.toThrow();
     });
 
@@ -95,23 +111,17 @@ describe('toolbar/actions', () => {
       const { setupToolbarActions } = await import('../../src/toolbar/actions');
 
       expect(() => {
-        setupToolbarActions({
-          getEditor: () => editor,
-
-          newDiagramButton: null,
-          openButton: null,
-          saveButton: null,
-          exportButton: null,
-          exportMenu: null,
-          examplesButton: null,
-          examplesMenu: null,
-          commitDocument: vi.fn(),
-          onNew: vi.fn(),
-          onOpen: vi.fn(),
-          onLoadExample: vi.fn(),
-          onPathChange: vi.fn(),
-          getPath: () => null,
-        });
+        setupToolbarActions(
+          makeOptions({
+            newDiagramButton: null,
+            openButton: null,
+            saveButton: null,
+            exportButton: null,
+            exportMenu: null,
+            examplesButton: null,
+            examplesMenu: null,
+          })
+        );
       }).not.toThrow();
     });
   });
@@ -121,22 +131,7 @@ describe('toolbar/actions', () => {
       const { setupToolbarActions } = await import('../../src/toolbar/actions');
       const onNew = vi.fn();
 
-      setupToolbarActions({
-        getEditor: () => editor,
-        schedulePreviewRender: vi.fn(),
-        newDiagramButton,
-        openButton,
-        saveButton,
-        exportButton,
-        exportMenu,
-        examplesButton,
-        examplesMenu,
-        commitDocument: vi.fn(),
-        onNew,
-        onOpen: vi.fn(),
-        onPathChange: vi.fn(),
-        getPath: () => null,
-      });
+      setupToolbarActions(makeOptions({ onNew }));
 
       newDiagramButton.click();
       await new Promise((r) => setTimeout(r, 50));
@@ -151,22 +146,7 @@ describe('toolbar/actions', () => {
 
       const { setupToolbarActions } = await import('../../src/toolbar/actions');
 
-      setupToolbarActions({
-        getEditor: () => editor,
-        schedulePreviewRender: vi.fn(),
-        newDiagramButton,
-        openButton,
-        saveButton,
-        exportButton,
-        exportMenu,
-        examplesButton,
-        examplesMenu,
-        commitDocument: vi.fn(),
-        onNew: vi.fn(),
-        onOpen: vi.fn(),
-        onPathChange: vi.fn(),
-        getPath: () => null,
-      });
+      setupToolbarActions(makeOptions());
 
       openButton.click();
       await vi.waitFor(() => expect(mockOpenTextFile).toHaveBeenCalled());
@@ -181,23 +161,7 @@ describe('toolbar/actions', () => {
       const commitDocument = vi.fn();
       const onPathChange = vi.fn();
 
-      setupToolbarActions({
-        getEditor: () => editor,
-        schedulePreviewRender: vi.fn(),
-        newDiagramButton,
-        openButton,
-        saveButton,
-        exportButton,
-        exportMenu,
-        examplesButton,
-        examplesMenu,
-        commitDocument,
-        onNew: vi.fn(),
-        onOpen: vi.fn(),
-        onLoadExample: vi.fn(),
-        onPathChange,
-        getPath: () => null,
-      });
+      setupToolbarActions(makeOptions({ commitDocument, onPathChange }));
 
       saveButton.click();
       await vi.waitFor(() => expect(mockPickSavePath).toHaveBeenCalled());
@@ -208,22 +172,7 @@ describe('toolbar/actions', () => {
     it('sets up export menu click handler', async () => {
       const { setupToolbarActions } = await import('../../src/toolbar/actions');
 
-      setupToolbarActions({
-        getEditor: () => editor,
-        schedulePreviewRender: vi.fn(),
-        newDiagramButton,
-        openButton,
-        saveButton,
-        exportButton,
-        exportMenu,
-        examplesButton,
-        examplesMenu,
-        commitDocument: vi.fn(),
-        onNew: vi.fn(),
-        onOpen: vi.fn(),
-        onPathChange: vi.fn(),
-        getPath: () => null,
-      });
+      setupToolbarActions(makeOptions());
 
       exportButton.click();
       await new Promise((r) => setTimeout(r, 50));

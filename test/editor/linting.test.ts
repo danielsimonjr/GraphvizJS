@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   DiagramDiagnostics,
   DotValidationError,
+  LayoutEngine,
   StructuralDiagnostic,
 } from '../../core/types';
 import { createDotLinter, lintGutter } from '../../src/editor/linting';
@@ -21,7 +22,7 @@ interface CapturedDiagnostic {
 
 describe('editor/linting', () => {
   let container: HTMLElement;
-  let mockGetEngine: ReturnType<typeof vi.fn>;
+  let mockGetEngine: ReturnType<typeof vi.fn<() => LayoutEngine>>;
   let mockValidate: ReturnType<
     typeof vi.fn<(dot: string, engine: string) => Promise<DiagramDiagnostics>>
   >;
@@ -29,7 +30,7 @@ describe('editor/linting', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockValidate = vi.fn().mockResolvedValue({ syntax: null, structural: [] });
-    mockGetEngine = vi.fn().mockReturnValue('dot');
+    mockGetEngine = vi.fn<() => LayoutEngine>().mockReturnValue('dot');
 
     container = document.createElement('div');
     document.body.appendChild(container);

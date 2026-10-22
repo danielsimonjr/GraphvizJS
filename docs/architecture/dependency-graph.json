@@ -241,10 +241,6 @@
       },
       {
         "file": "src/session/session.ts",
-        "name": "SessionTab"
-      },
-      {
-        "file": "src/session/session.ts",
         "name": "CapturableTab"
       },
       {
@@ -274,10 +270,6 @@
       {
         "file": "src/theme/color-scheme.ts",
         "name": "ColorSchemeDeps"
-      },
-      {
-        "file": "src/toolbar/actions.ts",
-        "name": "ToolbarActionsOptions"
       },
       {
         "file": "src/toolbar/examples-menu.ts",
@@ -755,6 +747,7 @@
       "file": "core/types.ts",
       "testFiles": [
         "test/editor/linting.test.ts",
+        "test/session/session.test.ts",
         "test/tabs/manager.test.ts"
       ]
     },

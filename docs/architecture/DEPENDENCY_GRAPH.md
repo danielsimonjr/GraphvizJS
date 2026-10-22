@@ -196,7 +196,6 @@ None. ✅
 - `PreviewOptions` in `src/preview/render.ts`
 - `PreviewScheduler` in `src/preview/render.ts`
 - `ZoomController` in `src/preview/zoom.ts`
-- `SessionTab` in `src/session/session.ts`
 - `CapturableTab` in `src/session/session.ts`
 - `StatsDialogOptions` in `src/stats/stats-dialog.ts`
 - `StatsDialog` in `src/stats/stats-dialog.ts`
@@ -205,7 +204,6 @@ None. ✅
 - `TabBarOptions` in `src/tabs/tab-bar.ts`
 - `COLOR_SCHEME_KEY` in `src/theme/color-scheme.ts`
 - `ColorSchemeDeps` in `src/theme/color-scheme.ts`
-- `ToolbarActionsOptions` in `src/toolbar/actions.ts`
 - `ExamplesMenuOptions` in `src/toolbar/examples-menu.ts`
 - `ExportMenuOptions` in `src/toolbar/export-menu.ts`
 - `FindActionOptions` in `src/toolbar/find.ts`
@@ -295,7 +293,7 @@ None. ✅
 | `core/scan-dot.ts` | `test/core/scan-dot.test.ts` |
 | `core/semantic-lint.ts` | `test/core/semantic-lint.test.ts` |
 | `core/structure-lint.ts` | `test/core/structure-lint.test.ts` |
-| `core/types.ts` | `test/editor/linting.test.ts`, `test/tabs/manager.test.ts` |
+| `core/types.ts` | `test/editor/linting.test.ts`, `test/session/session.test.ts`, `test/tabs/manager.test.ts` |
 | `core/validate.ts` | `test/core/validate-diagram.test.ts` |
 | `cli/args.ts` | `test/cli/args.test.ts` |
 | `cli/index.ts` | `test/cli/cli.integration.test.ts`, `test/cli/offset.test.ts` |

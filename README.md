@@ -124,7 +124,7 @@ their native `.node` binaries (`@resvg/resvg-js`, `canvas`) can't be inlined int
 - `bun run clean` – Remove build artifacts (`dist/`)
 - `bun run lint` – Run [Biome](https://biomejs.dev/) linter and formatter checks
 - `bun run lint:fix` – Automatically apply Biome fixes
-- `bun run typecheck` – Type-check TypeScript without emitting files
+- `bun run typecheck` – Type-check the source and the tests without emitting files
 - `bun run graph` – Regenerate the dependency-graph report in `docs/architecture/`
 - `bun run graph:check` – Verify architecture invariants (layer boundaries, no cycles, IPC wiring) **and** that the committed report isn't stale, without writing; exits non-zero on any violation (run in CI)
 - `bun run graph -- --impact <file>` – Print the transitive reverse-dependencies (blast radius) of a source file
