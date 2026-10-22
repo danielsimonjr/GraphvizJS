@@ -49,7 +49,7 @@ The app bootstraps on `DOMContentLoaded` via a single `bootstrap()` function tha
 5. Silently restores the previously open session (`loadSession` — tabs, unsaved edits, and per-tab layout engine) instead of prompting for crash recovery
 6. Wires up the tab bar, toolbar actions, keyboard shortcuts, the layout-engine selector, the command palette + preferences dialog, and session persistence
 
-The main process (not the renderer) initializes Graphviz. State is managed via a `TabManager` instance in `bootstrap()`. Each tab holds its own `TabState` (id, file path, dirty flag, last-committed and saved-content baselines, editor instance, editor zoom, and layout engine). The `commitDocument()` function delegates to the active tab. Only the active tab's editor is visible (others hidden via `display:none`).
+The main process (not the renderer) initializes Graphviz. State is managed via a `TabManager` instance in `bootstrap()`. Each tab holds its own `TabState` (id, file path, dirty flag, last-committed and saved-content baselines, editor instance, and layout engine). The editor zoom is not per tab: one `createEditorZoomController` holds the level for all editors. The `commitDocument()` function delegates to the active tab. Only the active tab's editor is visible (others hidden via `display:none`).
 
 ### Module Boundaries
 

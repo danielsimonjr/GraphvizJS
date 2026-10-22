@@ -31,7 +31,7 @@ Electron desktop app for editing Graphviz DOT diagrams with live preview. TypeSc
 
 ### State Management
 
-State is managed via a `TabManager` instance in `bootstrap()` (`src/main.ts`). Each tab holds its own `TabState` (filePath, isDirty, lastCommittedDoc, lastSavedAt, editorView, editorZoomLevel). There is no global store or event bus. The `commitDocument()` function delegates to the active tab. Only the active tab's editor is visible (others hidden via `display:none`).
+State is managed via a `TabManager` instance in `bootstrap()` (`src/main.ts`). Each tab holds its own `TabState` (filePath, isDirty, lastCommittedDoc, lastSavedAt, editorView, layoutEngine). There is no global store or event bus. The `commitDocument()` function delegates to the active tab. Only the active tab's editor is visible (others hidden via `display:none`).
 
 ### Module Pattern
 
