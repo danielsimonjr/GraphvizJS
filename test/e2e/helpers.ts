@@ -1,7 +1,12 @@
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { type ElectronApplication, _electron as electron, expect, Page } from '@playwright/test';
+import {
+  type ElectronApplication,
+  _electron as electron,
+  expect,
+  type Page,
+} from '@playwright/test';
 
 /**
  * Launch the real Electron app via Playwright's Electron runner.

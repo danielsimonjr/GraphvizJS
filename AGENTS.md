@@ -17,7 +17,7 @@ bun run test:e2e               # Playwright E2E (requires dev server running)
 
 bun run lint                   # Biome linter/formatter check
 bun run lint:fix               # Auto-fix
-bun run typecheck              # tsc --noEmit
+bun run typecheck              # tsc --noEmit (src, electron, tools, core, cli and test)
 ```
 
 Single test file: `npx vitest run test/toolbar/actions.test.ts`

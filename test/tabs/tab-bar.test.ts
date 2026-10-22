@@ -9,6 +9,7 @@ function makeTab(overrides: Partial<TabState> & { id: string }): TabState {
     lastCommittedDoc: '',
     lastSavedAt: null,
     editorView: null,
+    layoutEngine: 'dot',
     ...overrides,
   };
 }
