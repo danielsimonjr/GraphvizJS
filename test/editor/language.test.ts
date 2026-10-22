@@ -1,5 +1,5 @@
 import { ensureSyntaxTree } from '@codemirror/language';
-import { type Extension, EditorState } from '@codemirror/state';
+import { EditorState, type Extension } from '@codemirror/state';
 import { describe, expect, it } from 'vitest';
 import { buildDotVocabulary } from '../../core/dot-vocab';
 import type { DotVocabulary } from '../../core/types';
