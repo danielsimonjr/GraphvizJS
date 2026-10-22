@@ -27,6 +27,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Two weak tests now assert what their names say.** `test/editor/language.test.ts` only checked
+  that a document contained the text that the test had put in; it never read the highlighting. It
+  now reads the syntax tree and asserts the token type of each keyword, attribute name, string,
+  comment, operator and number, with a control that builds no tokens when the language is missing,
+  and a test that the vocabulary drives the keywords and attribute names. The old HTML-label input
+  (`label=<table>...`) was not valid DOT; the test now uses `label=<<table>...</table>>`.
+  `test/toolbar/actions.test.ts` passed null for the save-as, find, format and recent elements, so
+  it never ran those four setups. It now clicks each of the four buttons and asserts the effect.
+  No source file changed. The generated dependency graph lists one new test import, and the
+  line count in three architecture documents follows the new test lines.
 - **The README is in Simplified Technical English, and CI checks it.** `repo-tools ste` reported
   10 long sentences in the README. They are now short sentences with the same facts. The file list
   of `core/` is a nested list. The `docs` job runs `repo-tools ste docs/architecture README.md`,

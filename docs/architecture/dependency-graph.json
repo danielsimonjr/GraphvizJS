@@ -746,6 +746,7 @@
     {
       "file": "core/types.ts",
       "testFiles": [
+        "test/editor/language.test.ts",
         "test/editor/linting.test.ts",
         "test/session/session.test.ts",
         "test/tabs/manager.test.ts"

@@ -293,7 +293,7 @@ None. ✅
 | `core/scan-dot.ts` | `test/core/scan-dot.test.ts` |
 | `core/semantic-lint.ts` | `test/core/semantic-lint.test.ts` |
 | `core/structure-lint.ts` | `test/core/structure-lint.test.ts` |
-| `core/types.ts` | `test/editor/linting.test.ts`, `test/session/session.test.ts`, `test/tabs/manager.test.ts` |
+| `core/types.ts` | `test/editor/language.test.ts`, `test/editor/linting.test.ts`, `test/session/session.test.ts`, `test/tabs/manager.test.ts` |
 | `core/validate.ts` | `test/core/validate-diagram.test.ts` |
 | `cli/args.ts` | `test/cli/args.test.ts` |
 | `cli/index.ts` | `test/cli/cli.integration.test.ts`, `test/cli/offset.test.ts` |
