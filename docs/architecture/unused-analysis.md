@@ -10,8 +10,8 @@
 - **Dormant files**: 4
   - **Orphaned (reachable from nothing)**: 2
   - **Test-only (only a test reaches them)**: 2
-- **Potentially unused exports**: 47
-  - **Unreferenced anywhere**: 5
+- **Potentially unused exports**: 42
+  - **Unreferenced anywhere**: 0
   - **Referenced in their own module**: 42
   - **Not classified**: 0
 
@@ -48,16 +48,7 @@ No file of this repository imports these files. Do not use the list as a deletio
 
 No other file imports these names, and their own module does not use them.
 
-- `test/e2e/helpers.ts`: `clickToolbarButton`, `getPreviewError`, `openExportMenu`, `selectExample`
-- `test/mocks/graphviz.ts`: `configureMockSvg`
-
-### Notes
-
-- `test/e2e/helpers.ts` `clickToolbarButton`: Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/e2e/helpers.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'clickToolbarButton' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting.
-- `test/e2e/helpers.ts` `getPreviewError`: Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/e2e/helpers.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'getPreviewError' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting.
-- `test/e2e/helpers.ts` `openExportMenu`: Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/e2e/helpers.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'openExportMenu' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting.
-- `test/e2e/helpers.ts` `selectExample`: Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/e2e/helpers.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'selectExample' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting.
-- `test/mocks/graphviz.ts` `configureMockSvg`: Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/mocks/graphviz.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'configureMockSvg' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting.
+_None._
 
 ## Exports referenced in their own module
 

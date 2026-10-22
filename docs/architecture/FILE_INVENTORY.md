@@ -8,7 +8,7 @@ This report lists each source file that the map census finds, with a disposition
 
 **Language**: typescript
 
-**Total files**: 173
+**Total files**: 174
 
 ## Disposition counts
 
@@ -18,12 +18,12 @@ This report lists each source file that the map census finds, with a disposition
 | `build-entry` | 25 | A `src`-area file that is an entry root. |
 | `test-only` | 2 | A `src`-area file that only a test reaches. |
 | `orphan` | 2 | A `src`-area file that nothing reaches. Delete it, or wire it to a root. |
-| `test` | 85 | A file in a `tests/` folder, or a `*.test.ts` or `*.spec.ts` file. |
+| `test` | 86 | A file in a `tests/` folder, or a `*.test.ts` or `*.spec.ts` file. |
 | `tool` | 12 | A file in a `tools/` or `scripts/` folder outside `src/`. |
 | `config` | 3 | A `*.config.*` file of TypeScript or JavaScript. |
 | `example` | 0 | A file in `examples/` or `docs/`. |
 | `bench` | 0 | A file in `bench/` or `benchmarks/`, or a `*.bench.*` file. |
-| **Total** | **173** | |
+| **Total** | **174** | |
 
 ## Per-area counts
 
@@ -31,14 +31,14 @@ This report lists each source file that the map census finds, with a disposition
 | --- | --: |
 | `config` | 3 |
 | `src` | 73 |
-| `tests` | 85 |
+| `tests` | 86 |
 | `tools` | 12 |
 
 ## Per-package counts
 
 | Package | Files |
 | --- | --: |
-| `(root)` | 128 |
+| `(root)` | 129 |
 | `graphvizjs-desktop-client` | 45 |
 
 ## All files
@@ -118,6 +118,7 @@ This report lists each source file that the map census finds, with a disposition
 | `src/watch/watch-plan.ts` | graphvizjs-desktop-client | src | reachable | 37 |
 | `src/window/state.ts` | graphvizjs-desktop-client | src | reachable | 33 |
 | `src/workspace/resize.ts` | graphvizjs-desktop-client | src | reachable | 67 |
+| `test/architecture/no-vacuous-assertions.test.ts` | (root) | tests | test | 114 |
 | `test/architecture/renderer-purity.test.ts` | (root) | tests | test | 74 |
 | `test/cli/args.test.ts` | (root) | tests | test | 133 |
 | `test/cli/cli.integration.test.ts` | (root) | tests | test | 147 |
@@ -144,17 +145,17 @@ This report lists each source file that the map census finds, with a disposition
 | `test/e2e/app-menu.spec.ts` | (root) | tests | test | 27 |
 | `test/e2e/app.spec.ts` | (root) | tests | test | 79 |
 | `test/e2e/editor-authoring.spec.ts` | (root) | tests | test | 56 |
-| `test/e2e/editor-zoom.spec.ts` | (root) | tests | test | 52 |
+| `test/e2e/editor-zoom.spec.ts` | (root) | tests | test | 44 |
 | `test/e2e/examples.spec.ts` | (root) | tests | test | 121 |
-| `test/e2e/export.spec.ts` | (root) | tests | test | 162 |
+| `test/e2e/export.spec.ts` | (root) | tests | test | 158 |
 | `test/e2e/external-change.spec.ts` | (root) | tests | test | 47 |
 | `test/e2e/file-operations.spec.ts` | (root) | tests | test | 101 |
 | `test/e2e/global-setup.ts` | (root) | src | build-entry | 24 |
-| `test/e2e/helpers.ts` | (root) | src | test-only | 168 |
-| `test/e2e/keyboard-shortcuts.spec.ts` | (root) | tests | test | 131 |
+| `test/e2e/helpers.ts` | (root) | src | test-only | 148 |
+| `test/e2e/keyboard-shortcuts.spec.ts` | (root) | tests | test | 142 |
 | `test/e2e/per-doc-engine.spec.ts` | (root) | tests | test | 46 |
 | `test/e2e/recent-files.spec.ts` | (root) | tests | test | 22 |
-| `test/e2e/rendering.spec.ts` | (root) | tests | test | 125 |
+| `test/e2e/rendering.spec.ts` | (root) | tests | test | 131 |
 | `test/e2e/save-as.spec.ts` | (root) | tests | test | 42 |
 | `test/e2e/session-restore.spec.ts` | (root) | tests | test | 55 |
 | `test/e2e/stats.spec.ts` | (root) | tests | test | 35 |
@@ -167,7 +168,7 @@ This report lists each source file that the map census finds, with a disposition
 | `test/help/dialog.test.ts` | (root) | tests | test | 185 |
 | `test/menu/commands.test.ts` | (root) | tests | test | 66 |
 | `test/menu/menu-template.test.ts` | (root) | tests | test | 138 |
-| `test/mocks/graphviz.ts` | (root) | src | test-only | 65 |
+| `test/mocks/graphviz.ts` | (root) | src | test-only | 56 |
 | `test/palette/command-palette.test.ts` | (root) | tests | test | 121 |
 | `test/platform/index.test.ts` | (root) | tests | test | 123 |
 | `test/preferences/preferences-dialog.test.ts` | (root) | tests | test | 55 |

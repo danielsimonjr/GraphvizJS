@@ -146,17 +146,13 @@ test.describe('Export Menu Keyboard Navigation', () => {
     await expect(exportMenu).not.toBeVisible();
   });
 
-  test('arrow keys navigate menu options', async () => {
-    await page.locator(selectors.exportBtn).click();
+  test('ArrowDown on the export button opens the menu and focuses its first item', async () => {
+    await page.locator(selectors.exportBtn).focus();
+    await expect(page.locator(selectors.exportMenu)).not.toBeVisible();
+
+    await page.keyboard.press('ArrowDown');
+
     await expect(page.locator(selectors.exportMenu)).toBeVisible();
-
-    // Press down arrow to move through options
-    await page.keyboard.press('ArrowDown');
-    await page.keyboard.press('ArrowDown');
-
-    // Focus may or may not move; just assert the menu is still usable.
-    const focusedElement = page.locator(`${selectors.exportMenu} .toolbar-menu-item:focus`);
-    const hasFocus = await focusedElement.count();
-    expect(hasFocus >= 0).toBe(true);
+    await expect(page.locator(selectors.exportMenuItem).first()).toBeFocused();
   });
 });

@@ -48,7 +48,7 @@ Regenerate with `bun run graph`.
 | Runtime circular dependencies | 0 |
 | IPC channels (fully wired) | 20 |
 
-`repo-tools map` counts a wider scope: every source file of the repository (TypeScript and JavaScript), including tests, scripts, tools and configuration. The wider scope gives 173 source files, 19,371 lines of code, 4 modules and 278 exports. The Verification table at the end of this document records these values.
+`repo-tools map` counts a wider scope: every source file of the repository (TypeScript and JavaScript), including tests, scripts, tools and configuration. The wider scope gives 174 source files, 19,461 lines of code, 4 modules and 275 exports. The Verification table at the end of this document records these values.
 
 ### Module Distribution
 
@@ -425,7 +425,7 @@ GraphvizJS follows Electron's recommended hardening (`electron/main.ts`):
 | `test/tabs/`, `test/session/`, `test/recent/`, `test/watch/` | documents, session restore, recent, external-change |
 | `test/menu/`, `test/palette/`, `test/preferences/`, `test/theme/` | app shell |
 | `test/platform/` | IPC wrapper delegation |
-| `test/architecture/` | renderer-purity guard |
+| `test/architecture/` | renderer-purity guard; no always-true assertion in a test |
 | `test/tools/` | dependency-graph tool (IPC wiring, layering) |
 | `test/e2e/` | Playwright end-to-end |
 
@@ -459,8 +459,8 @@ The values cover every source file of the repository. The counts of `tools/depen
 
 | Claim | Value | Source |
 |---|---|---|
-| totalSourceFiles | 173 | repo-tools map: dependency-graph.json |
-| totalLinesOfCode | 19371 | repo-tools map: dependency-graph.json |
+| totalSourceFiles | 174 | repo-tools map: dependency-graph.json |
+| totalLinesOfCode | 19461 | repo-tools map: dependency-graph.json |
 | totalModules | 4 | repo-tools map: dependency-graph.json |
-| totalExports | 278 | repo-tools map: dependency-graph.json |
+| totalExports | 275 | repo-tools map: dependency-graph.json |
 | runtimeCircularDeps | 0 | repo-tools map: dependency-graph.json |

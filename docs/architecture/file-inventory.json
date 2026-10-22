@@ -1,11 +1,11 @@
 {
-  "totalFiles": 173,
+  "totalFiles": 174,
   "byDisposition": {
     "reachable": 44,
     "build-entry": 25,
     "test-only": 2,
     "orphan": 2,
-    "test": 85,
+    "test": 86,
     "tool": 12,
     "config": 3,
     "bench": 0,
@@ -15,10 +15,10 @@
     "src": 73,
     "config": 3,
     "tools": 12,
-    "tests": 85
+    "tests": 86
   },
   "byPackage": {
-    "(root)": 128,
+    "(root)": 129,
     "graphvizjs-desktop-client": 45
   },
   "files": [
@@ -534,6 +534,13 @@
       "loc": 67
     },
     {
+      "file": "test/architecture/no-vacuous-assertions.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 114
+    },
+    {
       "file": "test/architecture/renderer-purity.test.ts",
       "package": "(root)",
       "area": "tests",
@@ -720,7 +727,7 @@
       "package": "(root)",
       "area": "tests",
       "disposition": "test",
-      "loc": 52
+      "loc": 44
     },
     {
       "file": "test/e2e/examples.spec.ts",
@@ -734,7 +741,7 @@
       "package": "(root)",
       "area": "tests",
       "disposition": "test",
-      "loc": 162
+      "loc": 158
     },
     {
       "file": "test/e2e/external-change.spec.ts",
@@ -762,14 +769,14 @@
       "package": "(root)",
       "area": "src",
       "disposition": "test-only",
-      "loc": 168
+      "loc": 148
     },
     {
       "file": "test/e2e/keyboard-shortcuts.spec.ts",
       "package": "(root)",
       "area": "tests",
       "disposition": "test",
-      "loc": 131
+      "loc": 142
     },
     {
       "file": "test/e2e/per-doc-engine.spec.ts",
@@ -790,7 +797,7 @@
       "package": "(root)",
       "area": "tests",
       "disposition": "test",
-      "loc": 125
+      "loc": 131
     },
     {
       "file": "test/e2e/save-as.spec.ts",
@@ -881,7 +888,7 @@
       "package": "(root)",
       "area": "src",
       "disposition": "test-only",
-      "loc": 65
+      "loc": 56
     },
     {
       "file": "test/palette/command-palette.test.ts",

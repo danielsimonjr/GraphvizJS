@@ -45,6 +45,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Eight end-to-end tests assert what their names say, and a guard test keeps always-true assertions out.**
+  Four assertions could not fail: `expect(svgVisible || hasError || true)` in the empty-editor test,
+  `expect(isVisible || true)` in the Ctrl+? test, and `expect(hasFocus >= 0)` in the Tab test and in the
+  export-menu arrow-key test. Four more were weak: the invalid-DOT test checked the CSS class and never
+  read the message, and the three editor-zoom shortcut tests checked only that the editor is visible.
+  Each test now asserts the behavior in its name:
+  the empty editor shows the `preview-empty` message and no SVG, also after an error (the old test never
+  emptied the editor, because `keyboard.type('')` types nothing, so `setEditorContent` now presses Delete
+  for empty content); the invalid-DOT test reads the heading and the Graphviz syntax-error message;
+  Ctrl+? opens the help dialog (the old test pressed `Control+Shift+/`, which sends the key `/`, not
+  `?`) and a new test shows that a bare `?` typed in the editor does not; Tab moves focus from New to
+  Open to Save; ArrowDown on the export button opens the menu and focuses its first item (the menu has
+  no arrow-key movement between its items, so the old name described a feature that does not exist);
+  and Ctrl+=, Ctrl+- and Ctrl+0 set the editor font size to 18px, 14px and 16px.
+  The new `test/architecture/no-vacuous-assertions.test.ts` fails when a `*.test.ts` or `*.spec.ts` file
+  holds `expect(x || true)`, `expect(count >= 0).toBe(true)`, `expect(n).toBeGreaterThanOrEqual(0)` or
+  `expect(true).toBe(true)`, also when the call spans lines. Three unused e2e helpers
+  (`clickToolbarButton`, `openExportMenu`, `selectExample`), the unused `configureMockSvg` and an unused
+  import are deleted, and `activeEditorScroller` moves into `test/e2e/helpers.ts` for the two specs that
+  read the font size. The `unused-analysis` report now lists 0 exports as unreferenced anywhere. No
+  source file changed.
 - **Two weak tests now assert what their names say.** `test/editor/language.test.ts` only checked
   that a document contained the text that the test had put in; it never read the highlighting. It
   now reads the syntax tree and asserts the token type of each keyword, attribute name, string,

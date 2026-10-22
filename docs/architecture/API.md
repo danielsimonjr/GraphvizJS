@@ -6,7 +6,7 @@ GraphvizJS exposes three public surfaces, all backed by the same `core/`:
 2. The **`GraphvizApi` IPC contract** — `window.graphviz` in the renderer.
 3. The **`core/` module functions** — consumed by the CLI and the Electron main process.
 
-The symbol counts come from `repo-tools map`. The scope is every source file of the repository, including tests and tools. The tool counts 278 exports. The tool also counts 69 interfaces, 165 functions, 19 constants and 1 class. The Verification table at the end of this document records them.
+The symbol counts come from `repo-tools map`. The scope is every source file of the repository, including tests and tools. The tool counts 275 exports. The tool also counts 69 interfaces, 162 functions, 19 constants and 1 class. The Verification table at the end of this document records them.
 
 ---
 
@@ -255,8 +255,8 @@ The values cover every source file of the repository. Write the output of `repo-
 
 | Claim | Value | Source |
 |---|---|---|
-| totalExports | 278 | repo-tools map: dependency-graph.json |
+| totalExports | 275 | repo-tools map: dependency-graph.json |
 | totalInterfaces | 69 | repo-tools map: dependency-graph.json |
-| totalFunctions | 165 | repo-tools map: dependency-graph.json |
+| totalFunctions | 162 | repo-tools map: dependency-graph.json |
 | totalConstants | 19 | repo-tools map: dependency-graph.json |
 | totalClasses | 1 | repo-tools map: dependency-graph.json |
