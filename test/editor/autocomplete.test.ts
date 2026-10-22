@@ -1,22 +1,10 @@
 import { CompletionContext } from '@codemirror/autocomplete';
 import { EditorState } from '@codemirror/state';
 import { describe, expect, it } from 'vitest';
-import { DOT_ATTRIBUTE_CATALOG } from '../../core/dot-catalog';
-import { DOT_COLORS } from '../../core/dot-colors';
-import { DOT_ATTRIBUTES, DOT_KEYWORDS } from '../../core/dot-vocab';
+import { buildDotVocabulary } from '../../core/dot-vocab';
 import { makeDotCompletionSource } from '../../src/editor/autocomplete';
 
-const dotCompletionSource = makeDotCompletionSource({
-  keywords: [...DOT_KEYWORDS],
-  attributes: [...DOT_ATTRIBUTES],
-  attributeValues: Object.fromEntries(
-    DOT_ATTRIBUTE_CATALOG.filter((s) => s.type === 'enum' && s.values).map((s) => [
-      s.name,
-      [...s.values!],
-    ])
-  ),
-  colors: [...DOT_COLORS],
-});
+const dotCompletionSource = makeDotCompletionSource(buildDotVocabulary());
 
 /** Build a completion context at the end of `doc` (caret at |, or end if absent). */
 function contextAt(doc: string): CompletionContext {
@@ -47,6 +35,19 @@ describe('dotCompletionSource', () => {
 
   it('offers colors after fillcolor=', () => {
     expect(labels('a [fillcolor=')).toEqual(expect.arrayContaining(['red', 'blue']));
+  });
+
+  it('offers colors after pencolor=', () => {
+    expect(labels('a [pencolor=')).toEqual(expect.arrayContaining(['red', 'blue']));
+  });
+
+  it('takes the color attributes from the vocabulary it is given', () => {
+    const vocab = buildDotVocabulary();
+    const source = makeDotCompletionSource({ ...vocab, colorAttributes: ['foo'] });
+    const offered = (doc: string) => source(contextAt(doc))?.options.map((o) => o.label) ?? [];
+
+    expect(offered('a [foo=')).toEqual(expect.arrayContaining(['red', 'blue']));
+    expect(offered('a [color=')).not.toContain('red');
   });
 
   it('returns null in the middle of a plain identifier', () => {

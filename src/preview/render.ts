@@ -28,6 +28,7 @@ export interface PreviewOptions {
 /**
  * Create a scheduler that renders DOT source into the preview element once input pauses.
  * Each call runs onRenderStart immediately, before the delay ends.
+ * A render that a newer call replaces shows no result and reports no error.
  *
  * @param previewEl - The element that shows the SVG or a message.
  * @param delay - Milliseconds to wait after the last call before rendering.
@@ -61,6 +62,7 @@ export function createPreview(
       previewEl.innerHTML = svg;
       callbacks.onRenderSuccess?.();
     } catch (error) {
+      if (token !== latestToken) return;
       console.error('Graphviz render failed', error);
       const details = error instanceof Error ? error.message : String(error ?? 'Unknown error');
       showPreviewError(previewEl, 'Graphviz could not render this diagram.', details);

@@ -94,6 +94,7 @@ describe('platform', () => {
       keywords: ['digraph'],
       attributes: ['color'],
       attributeValues: { shape: ['box', 'ellipse'] },
+      colorAttributes: ['color', 'pencolor'],
       colors: ['red', 'blue'],
     };
     api.dotVocabulary.mockResolvedValue(vocab);

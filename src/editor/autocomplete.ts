@@ -8,10 +8,6 @@ import {
 import type { Extension } from '@codemirror/state';
 import type { DotVocabulary } from '../../core/types';
 
-/** Attribute names whose values are colors — a renderer-UI concern kept local
- * (the value domain itself, `vocab.colors`, comes from core over IPC). */
-const COLOR_ATTRS = new Set(['color', 'bgcolor', 'fillcolor', 'fontcolor']);
-
 const SNIPPETS: Completion[] = [
   snippetCompletion('subgraph cluster_${1:name} {\n\t${2}\n}', {
     label: 'subgraph cluster',
@@ -30,15 +26,16 @@ function valueOptions(values: readonly string[]): Completion[] {
 
 /**
  * Build the DOT completion source over a given vocabulary — keywords, attribute
- * names, value domains, and colors all come from core over the dot:vocabulary IPC;
- * only which attributes are color-typed (`COLOR_ATTRS`, for picking `vocab.colors`
- * vs. `vocab.attributeValues`) is renderer-local completion logic.
+ * names, value domains, the color-typed attribute names (`vocab.colorAttributes`, for
+ * picking `vocab.colors` vs. `vocab.attributeValues`), and colors all come from core over
+ * the dot:vocabulary IPC, so the renderer keeps no list of its own.
  */
 export function makeDotCompletionSource(
   vocab: DotVocabulary
 ): (ctx: CompletionContext) => CompletionResult | null {
   const keywordOptions: Completion[] = vocab.keywords.map((label) => ({ label, type: 'keyword' }));
   const attrOptions: Completion[] = vocab.attributes.map((label) => ({ label, type: 'property' }));
+  const colorAttrs = new Set(vocab.colorAttributes);
 
   return (ctx: CompletionContext): CompletionResult | null => {
     const line = ctx.state.doc.lineAt(ctx.pos);
@@ -62,7 +59,7 @@ export function makeDotCompletionSource(
         // known, otherwise nothing — but NEVER the attribute-name list (that
         // would spam names while the user types a value).
         const attr = entry.slice(0, eq).trim().toLowerCase();
-        const values = COLOR_ATTRS.has(attr) ? vocab.colors : vocab.attributeValues[attr];
+        const values = colorAttrs.has(attr) ? vocab.colors : vocab.attributeValues[attr];
         if (!values) return null;
         const word = ctx.matchBefore(/[\w.#-]*$/);
         return {

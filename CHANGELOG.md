@@ -35,9 +35,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `electron/` (67 files, 8,351 lines of code, 22 modules, 204 exports). `repo-tools map` counts
   every source file of the repository (173 files, 18,850 lines of code, 4 modules, 279
   exports). The line count of `tools/dependency-graph` grew because of the new doc comments.
+- **The `dot:vocabulary` payload carries the color-typed attribute names.** `core/dot-vocab.ts`
+  exports `buildDotVocabulary()`, and the IPC handler returns its result. The new field
+  `colorAttributes` comes from `DOT_COLOR_ATTRIBUTES` in `core/dot-colors.ts`, the list that the
+  color lint reads. The completion source no longer keeps a list of its own. The architecture
+  documents describe the whole payload; they named only two of its fields before.
 
 ### Fixed
 
+- **A superseded preview render could replace the new diagram with an error.** `createPreview`
+  checked the stale token on success but not in its `catch` block. A slow render that failed after
+  a newer render had succeeded showed its error and called `onRenderError`. A failure of a
+  superseded render is now dropped.
+- **The editor zoom level and the font size could disagree at start.** An initial level of 0 was
+  kept as the level, but a truthiness test skipped the font change, so `getLevel()` returned 0
+  while the font kept its default size. A level above the limits, or one that is not a number,
+  reached the font size unchecked. The initial level now moves into the limits of 0.5 and 3 (a
+  value that is not a finite number gives 1), and the font changes whenever the level is not 1.
+- **`pencolor=` got no value completions.** The completion source kept its own list of color
+  attributes, and the list left out `pencolor`. The list now comes from core (see Changed), and a
+  test checks that it equals the attributes that the attribute catalog marks as color.
 - **OVERVIEW claimed the app is cross-platform.** The desktop app ships for Windows only:
   `electron-builder.yml` builds an NSIS installer and nothing else. The document now says so.
 - **Five statements in the architecture documents did not match the code.** The documents said that

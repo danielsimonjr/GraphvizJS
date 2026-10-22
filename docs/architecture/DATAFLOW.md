@@ -271,8 +271,9 @@ bootstrap()  (src/main.ts)
       ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ vocab = await dotVocabulary()          // dot:vocabulary     │
-│    → main returns { keywords: [...DOT_KEYWORDS],             │
-│                     attributes: [...DOT_ATTRIBUTES] }        │
+│    → main returns buildDotVocabulary():                      │
+│         keywords, attributes, attributeValues,               │
+│         colorAttributes, colors                              │
 └─────────────────────────────────────────────────────────────┘
       │
       ▼

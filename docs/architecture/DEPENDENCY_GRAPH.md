@@ -10,9 +10,9 @@
 | --- | --- |
 | Files | 67 |
 | Modules | 22 |
-| Lines of code | 8351 |
-| Internal edges | 129 |
-| Exports | 204 |
+| Lines of code | 8382 |
+| Internal edges | 130 |
+| Exports | 206 |
 
 ## Modules
 
@@ -279,8 +279,8 @@ None. ✅
 | `src/window/state.ts` | `test/window/state.test.ts` |
 | `src/workspace/resize.ts` | `test/workspace/resize.test.ts` |
 | `core/apply-fixes.ts` | `test/core/apply-fixes.test.ts` |
-| `core/dot-catalog.ts` | `test/core/dot-catalog.test.ts`, `test/editor/autocomplete.test.ts` |
-| `core/dot-colors.ts` | `test/core/dot-colors.test.ts`, `test/editor/autocomplete.test.ts` |
+| `core/dot-catalog.ts` | `test/core/dot-catalog.test.ts`, `test/core/dot-vocab.test.ts` |
+| `core/dot-colors.ts` | `test/core/dot-colors.test.ts`, `test/core/dot-vocab.test.ts` |
 | `core/dot-vocab.ts` | `test/core/dot-catalog.test.ts`, `test/core/dot-vocab.test.ts`, `test/editor/autocomplete.test.ts`, `test/editor/language.test.ts` |
 | `core/edit-distance.ts` | `test/core/edit-distance.test.ts` |
 | `core/export-pdf.ts` | `test/core/export-pdf.test.ts` |

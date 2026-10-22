@@ -48,7 +48,7 @@ Regenerate with `bun run graph`.
 | Runtime circular dependencies | 0 |
 | IPC channels (fully wired) | 20 |
 
-`repo-tools map` counts a wider scope: every source file of the repository (TypeScript and JavaScript), including tests, scripts, tools and configuration. The wider scope gives 173 source files, 18,850 lines of code, 4 modules and 279 exports. The Verification table at the end of this document records these values.
+`repo-tools map` counts a wider scope: every source file of the repository (TypeScript and JavaScript), including tests, scripts, tools and configuration. The wider scope gives 173 source files, 19,001 lines of code, 4 modules and 281 exports. The Verification table at the end of this document records these values.
 
 ### Module Distribution
 
@@ -211,7 +211,7 @@ function graphStats(source: string): GraphStats
 function registerIpc(): void   // 20 ipcMain.handle(...) registrations
 // render:svg → renderDotToSvg · render:validate → validateDiagram
 // export:render → exportDiagram · dot:format → formatDot · dot:stats → graphStats
-// dot:vocabulary → {keywords, attributes} · plus fs/dialog/store/menu/watch/shell channels
+// dot:vocabulary → buildDotVocabulary() · plus fs/dialog/store/menu/watch/shell channels
 
 // electron/preload.ts — exposes the typed contract on window.graphviz
 contextBridge.exposeInMainWorld('graphviz', api /*: GraphvizApi */)
@@ -459,7 +459,7 @@ The values cover every source file of the repository. The counts of `tools/depen
 | Claim | Value | Source |
 |---|---|---|
 | totalSourceFiles | 173 | repo-tools map: dependency-graph.json |
-| totalLinesOfCode | 18850 | repo-tools map: dependency-graph.json |
+| totalLinesOfCode | 19001 | repo-tools map: dependency-graph.json |
 | totalModules | 4 | repo-tools map: dependency-graph.json |
-| totalExports | 279 | repo-tools map: dependency-graph.json |
+| totalExports | 281 | repo-tools map: dependency-graph.json |
 | runtimeCircularDeps | 0 | repo-tools map: dependency-graph.json |

@@ -157,7 +157,19 @@ export const DOT_COLORS = [
   'yellowgreen',
 ] as const;
 
-const COLOR_ATTRIBUTES = new Set(['color', 'bgcolor', 'fillcolor', 'fontcolor', 'pencolor']);
+/**
+ * The attribute names that take a color value. The color check and the vocabulary IPC both
+ * read this list, so the editor offers colors for exactly the attributes that the lint checks.
+ */
+export const DOT_COLOR_ATTRIBUTES = [
+  'color',
+  'bgcolor',
+  'fillcolor',
+  'fontcolor',
+  'pencolor',
+] as const;
+
+const COLOR_ATTRIBUTES = new Set<string>(DOT_COLOR_ATTRIBUTES);
 
 /**
  * Check whether an attribute takes a color value, ignoring letter case.

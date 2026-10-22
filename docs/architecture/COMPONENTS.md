@@ -41,7 +41,7 @@ GraphvizJS is a layered Electron app with a headless core. File counts per modul
 
 **Total** (`src/`, `core/`, `cli/` and `electron/`): 67 TypeScript files · 8,351 LOC · 22 modules · 204 exports · 20 IPC channels.
 
-The whole repository, including tests, scripts and tools, holds 173 source files, 18,850 lines of code, 4 modules and 279 exports (`repo-tools map`). The Verification table at the end of this document records these values.
+The whole repository, including tests, scripts and tools, holds 173 source files, 19,001 lines of code, 4 modules and 281 exports (`repo-tools map`). The Verification table at the end of this document records these values.
 
 ---
 
@@ -113,11 +113,14 @@ autocomplete (via the `dot:vocabulary` IPC), and the structural unknown-attribut
 ```typescript
 const DOT_KEYWORDS: readonly string[]     // graph, digraph, subgraph, node, edge, strict
 const DOT_ATTRIBUTES: readonly string[]   // shape, label, color, rankdir, …
+function buildDotVocabulary(): DotVocabulary
 ```
 
-The `dot:vocabulary` IPC handler pairs these with `dot-catalog.ts`'s enum value
-domains (`attributeValues`) and `dot-colors.ts`'s `DOT_COLORS` (`colors`), so
-autocomplete can offer value-aware completions.
+The `dot:vocabulary` IPC handler returns `buildDotVocabulary()`. The function pairs these
+lists with the enum value domains of `dot-catalog.ts` (`attributeValues`), the
+`DOT_COLOR_ATTRIBUTES` of `dot-colors.ts` (`colorAttributes`) and its `DOT_COLORS`
+(`colors`). Autocomplete uses the payload to offer value-aware completions and keeps no
+list of its own.
 
 ### format.ts (`core/format.ts`)
 
@@ -147,11 +150,13 @@ function findAttribute(name: string): DotAttributeSpec | undefined
 
 ### dot-colors.ts (`core/dot-colors.ts`)
 
-**Purpose**: the named-color domain accepted by color-valued attributes, plus the set
-of attributes that are color-typed.
+**Purpose**: the named-color domain accepted by color-valued attributes, plus the list
+of attributes that are color-typed. The color check and the vocabulary IPC read the
+same list.
 
 ```typescript
 const DOT_COLORS: readonly string[]
+const DOT_COLOR_ATTRIBUTES: readonly string[]   // color, bgcolor, fillcolor, fontcolor, pencolor
 function isColorAttribute(attr: string): boolean
 ```
 
@@ -318,7 +323,7 @@ native menu/watcher.
 function registerIpc(): void
 // render:svg → renderDotToSvg · render:validate → validateDiagram (incl. semantic lint)
 // export:render → exportDiagram · dot:format → formatDot · dot:stats → graphStats
-// dot:vocabulary → keywords/attributes + attributeValues (dot-catalog) + colors (dot-colors)
+// dot:vocabulary → buildDotVocabulary (keywords, attributes, attributeValues, colorAttributes, colors)
 // fs:readText/writeText/writeBinary · dialog:openText/save/confirm
 // store:get/set/delete · shell:openExternal · app:info
 // menu:setRecent/setTheme · watch:setPaths
@@ -505,6 +510,6 @@ The values cover every source file of the repository. The counts of `tools/depen
 | Claim | Value | Source |
 |---|---|---|
 | totalSourceFiles | 173 | repo-tools map: dependency-graph.json |
-| totalLinesOfCode | 18850 | repo-tools map: dependency-graph.json |
+| totalLinesOfCode | 19001 | repo-tools map: dependency-graph.json |
 | totalModules | 4 | repo-tools map: dependency-graph.json |
-| totalExports | 279 | repo-tools map: dependency-graph.json |
+| totalExports | 281 | repo-tools map: dependency-graph.json |

@@ -7,6 +7,17 @@ import {
   createEditorZoomKeymap,
 } from '../../src/editor/zoom';
 
+/** The font sizes, in px, that the themes of an editor set on its scroller. */
+function scrollerFontSizes(view: EditorView): number[] {
+  const rules = view.state
+    .facet(EditorView.styleModule)
+    .map((module) => module.getRules())
+    .join('\n');
+  return [...rules.matchAll(/\.cm-scroller\s*\{[^}]*?font-size:\s*(\d+)px/g)].map((match) =>
+    Number(match[1])
+  );
+}
+
 describe('editor/zoom', () => {
   let container: HTMLElement;
 
@@ -137,6 +148,31 @@ describe('editor/zoom', () => {
       expect(onZoomChange).toHaveBeenCalled();
 
       view.destroy();
+    });
+
+    describe('initial level', () => {
+      it.each([
+        [undefined, 1, 16],
+        [2, 2, 32],
+        [0, 0.5, 8],
+        [5, 3, 48],
+        [Number.NaN, 1, 16],
+        [Number.POSITIVE_INFINITY, 1, 16],
+      ])('an initial level of %s gives level %s and a %spx font', (initial, level, fontPx) => {
+        const { extension, compartment } = createEditorZoomExtension();
+        const view = new EditorView({
+          state: EditorState.create({ extensions: [extension] }),
+          parent: container,
+        });
+        const onZoomChange = vi.fn();
+        const controller = createEditorZoomController(view, compartment, onZoomChange, initial);
+
+        expect(controller.getLevel()).toBe(level);
+        expect(scrollerFontSizes(view)).toEqual([fontPx]);
+        expect(onZoomChange).not.toHaveBeenCalled();
+
+        view.destroy();
+      });
     });
   });
 
