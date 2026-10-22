@@ -1,0 +1,147 @@
+{
+  "caveats": [
+    "A literal relative `import(...)` is a graph edge. A runtime call is a namespace use (`*`), so the exports of that file count as used. A type-position `import(...).Name` counts only `Name`, and `typeof import(...)` counts none. A dynamic import built from a variable or a template, and other runtime loads (e.g. `new Worker(path)`), are still invisible -- a file or export reached ONLY through one of those is reported as no-importer/unreferenced even though it may be live.",
+    "`noImporterFiles` is NOT a deletion-candidate list. A file with zero in-repo importers is expected, not suspicious, for: a standalone script invoked directly (e.g. a smoketest run via `node script.mjs`, never `import`ed by anything), or a build/lint config file loaded by its own tool rather than by source code (e.g. `eslint.config.mjs`, read by eslint itself). Cross-check against package.json scripts / tool configs before treating any entry here as dead.",
+    "Only NAMED exports are analysed (`FileNode.exports` carries named exports only) -- `export default` usage is not checked here.",
+    "The split of exports into `referencedInModule` and `unreferencedAnywhere` is a TEXT-LEVEL heuristic. The analysis counts whole-identifier occurrences in the source of the defining file, minus the declaration site itself. The count is not an AST reference count. The analysis can over-count a name that also appears in a string literal or comment. When the source text cannot be read (no `RepoGraph.root_path`, or the file is missing), the export lands in `unclassifiedExports`. The analysis does not guess a bucket for it.",
+    "`unreferencedAnywhereNotes`'s dynamic-import check (`_dynamic_import_referrers`) only sees `import(...)` calls with a LITERAL string specifier. A dynamic import built from a variable or template literal (e.g. `import(`./cmds/${name}.js`)`, a command-dispatcher pattern) is invisible to it -- 'found none' in a note means no LITERAL match was found, NOT that nothing imports the file."
+  ],
+  "summary": {
+    "unusedExportCount": 47,
+    "unreferencedAnywhereCount": 5,
+    "referencedInModuleCount": 42,
+    "unclassifiedExportCount": 0,
+    "noImporterFileCount": 2
+  },
+  "unreferencedAnywhere": {
+    "test/e2e/helpers.ts": [
+      "clickToolbarButton",
+      "getPreviewError",
+      "openExportMenu",
+      "selectExample"
+    ],
+    "test/mocks/graphviz.ts": [
+      "configureMockSvg"
+    ]
+  },
+  "unreferencedAnywhereNotes": {
+    "test/e2e/helpers.ts": {
+      "clickToolbarButton": "Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/e2e/helpers.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'clickToolbarButton' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting.",
+      "getPreviewError": "Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/e2e/helpers.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'getPreviewError' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting.",
+      "openExportMenu": "Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/e2e/helpers.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'openExportMenu' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting.",
+      "selectExample": "Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/e2e/helpers.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'selectExample' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting."
+    },
+    "test/mocks/graphviz.ts": {
+      "configureMockSvg": "Checked for a dynamic import() call with a LITERAL string specifier resolving to 'test/mocks/graphviz.ts' across the whole repo and found none. This scan can only see import() calls with a literal string specifier -- a dynamic import built from a variable or template literal (e.g. import(`./cmds/${name}.js`)) is invisible to it, so 'found none' means no LITERAL match was found, NOT that nothing imports this. 'configureMockSvg' may still be consumed via such a call. Also verify against consumption this scan cannot see at all (docs examples, published API surface, a runtime-built path/`new Worker(...)`) before deleting."
+    }
+  },
+  "referencedInModule": {
+    "cli/args.ts": [
+      "ParseError",
+      "ParsedArgs"
+    ],
+    "cli/index.ts": [
+      "formatStats"
+    ],
+    "core/dot-catalog.ts": [
+      "AttrType",
+      "DotAttributeSpec"
+    ],
+    "core/export-pdf.ts": [
+      "PageGeometry"
+    ],
+    "core/format.ts": [
+      "FormatOptions"
+    ],
+    "core/graph-stats.ts": [
+      "computeStats"
+    ],
+    "core/normalize-svg.ts": [
+      "NormalizedSvg"
+    ],
+    "core/parse-graph.ts": [
+      "Tok",
+      "TokKind"
+    ],
+    "core/scan-dot.ts": [
+      "BalanceResult",
+      "SpanKind"
+    ],
+    "core/types.ts": [
+      "PdfPageMode",
+      "PdfPageSize"
+    ],
+    "electron/app-menu.ts": [
+      "rebuildAppMenu"
+    ],
+    "src/editor/linting.ts": [
+      "DotLinterOptions"
+    ],
+    "src/editor/zoom.ts": [
+      "EditorZoomController"
+    ],
+    "src/preferences/preferences-dialog.ts": [
+      "PreferencesDialog",
+      "PreferencesDialogOptions"
+    ],
+    "src/preview/zoom.ts": [
+      "ZoomController"
+    ],
+    "src/session/session.ts": [
+      "CapturableTab"
+    ],
+    "src/stats/stats-dialog.ts": [
+      "StatsDialog",
+      "StatsDialogOptions"
+    ],
+    "src/tabs/manager.ts": [
+      "CreateTabOptions"
+    ],
+    "src/tabs/tab-bar.ts": [
+      "TabBarCallbacks",
+      "TabBarOptions"
+    ],
+    "src/theme/color-scheme.ts": [
+      "COLOR_SCHEME_KEY",
+      "ColorSchemeDeps"
+    ],
+    "src/toolbar/examples-menu.ts": [
+      "ExamplesMenuOptions"
+    ],
+    "src/toolbar/export-menu.ts": [
+      "ExportMenuOptions"
+    ],
+    "src/toolbar/find.ts": [
+      "FindActionOptions"
+    ],
+    "src/toolbar/format.ts": [
+      "FormatActionOptions"
+    ],
+    "src/toolbar/recent-menu.ts": [
+      "RecentMenuOptions"
+    ],
+    "src/toolbar/save-as.ts": [
+      "SaveAsOptions"
+    ],
+    "src/toolbar/shortcuts.ts": [
+      "ToolbarShortcutsOptions"
+    ],
+    "src/toolbar/theme-button.ts": [
+      "ThemeButtonOptions"
+    ],
+    "src/watch/file-watch.ts": [
+      "FileWatchOptions"
+    ],
+    "test/mocks/graphviz.ts": [
+      "DEFAULT_SVG",
+      "MockGraphvizInstance",
+      "createMockGraphvizInstance",
+      "mockGraphviz"
+    ]
+  },
+  "unclassifiedExports": {},
+  "noImporterFiles": [
+    "src/platform/global.d.ts",
+    "src/vite-env.d.ts"
+  ]
+}

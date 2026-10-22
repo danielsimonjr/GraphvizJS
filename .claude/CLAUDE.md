@@ -102,7 +102,7 @@ The CLI mirrors core: `render <in> -o <out>` (export), `validate <in> [--engine 
 
 Unit tests use **Vitest** with **happy-dom** for DOM simulation. Test files mirror the source structure under `test/`. Global test setup (`test/setup.ts`) mocks browser APIs not available in happy-dom: `matchMedia`, `ResizeObserver`, `IntersectionObserver`, `requestAnimationFrame`, and `HTMLCanvasElement` context methods.
 
-Shared mocks for Electron APIs and Graphviz WASM live in `test/mocks/`.
+The shared mock for Graphviz WASM is `test/mocks/graphviz.ts`. A test that needs the platform layer mocks `src/platform` in the test file.
 
 E2E tests use **Playwright** and are excluded from the Vitest run (`test/e2e/` directory).
 
