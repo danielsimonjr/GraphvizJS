@@ -76,7 +76,7 @@ jobs:
       # The version is exact. A new release of repo-tools can change how it counts, or what it
       # accepts as plain text, and turn this job red with no change to the code. Raise the pin on
       # purpose, after a local run of the commands below.
-      REPO_TOOLS_VERSION: 2.2.6
+      REPO_TOOLS_VERSION: 2.2.7
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -107,17 +107,10 @@ jobs:
           done
           exit "$status"
 
-      # The check covers the five hand-written documents and the README. The generated reports
-      # hold text that the tool writes, such as its own warnings, so they are not in the list.
-      # The tool skips a path that does not exist and still exits 0 when one other file is valid,
-      # so the step first fails when a listed file is missing.
-      - name: Hand-written documents and the README are in Simplified Technical English
-        run: |
-          files="README.md docs/architecture/OVERVIEW.md docs/architecture/ARCHITECTURE.md docs/architecture/COMPONENTS.md docs/architecture/DATAFLOW.md docs/architecture/API.md"
-          for f in $files; do
-            test -f "$f" || { echo "missing document: $f"; exit 1; }
-          done
-          repo-tools ste $files
+      # The check covers every document in docs/architecture, the generated reports included,
+      # and the README. The tool exits 2 when a path does not exist, so a renamed folder fails here.
+      - name: Architecture documents and the README are in Simplified Technical English
+        run: repo-tools ste docs/architecture README.md
 
       # An exported symbol with no doc comment fails here, not in review. The loop checks all
       # four folders, so one run reports every folder that fails.

@@ -7,12 +7,12 @@
 ## Summary
 
 - **Files with no in-repo importer**: 2
-- **Dormant files**: 4
+- **Dormant files**: 2
   - **Orphaned (reachable from nothing)**: 2
-  - **Test-only (only a test reaches them)**: 2
-- **Potentially unused exports**: 42
+  - **Test-only (only a test reaches them)**: 0
+- **Potentially unused exports**: 38
   - **Unreferenced anywhere**: 0
-  - **Referenced in their own module**: 42
+  - **Referenced in their own module**: 38
   - **Not classified**: 0
 
 ## Caveats
@@ -34,8 +34,7 @@ Source files that no root and no test reaches. Verify each one before you delete
 
 Source files that only a test reaches. They ship nothing, but a test uses them.
 
-- `test/e2e/helpers.ts`
-- `test/mocks/graphviz.ts`
+_None._
 
 ## Files with no in-repo importer
 
@@ -83,7 +82,6 @@ No other file imports these names, but their own module uses them.
 - `src/toolbar/shortcuts.ts`: `ToolbarShortcutsOptions`
 - `src/toolbar/theme-button.ts`: `ThemeButtonOptions`
 - `src/watch/file-watch.ts`: `FileWatchOptions`
-- `test/mocks/graphviz.ts`: `DEFAULT_SVG`, `MockGraphvizInstance`, `createMockGraphvizInstance`, `mockGraphviz`
 
 ## Exports not classified
 

@@ -10,21 +10,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Three generated reports in `docs/architecture/`, and a CI check that they are fresh.**
   `FILE_INVENTORY.md`, `unused-analysis.md` and `duplicate-symbols.md`, with the `.json` file of
-  each, come from `repo-tools map` 2.2.6. That version reads the entry files from the `tsc -p`
+  each, come from `repo-tools map` 2.2.7. That version reads the entry files from the `tsc -p`
   scripts of `package.json`, the tsconfig files, the entry, input, setupFiles and globalSetup keys
   of the root configs, and the module scripts of `index.html`, so `src/main.ts`, `electron/main.ts`,
-  `electron/preload.ts` and the CLI count as entry files (44 reachable, 25 build entries, 2 test-only,
+  `electron/preload.ts` and the CLI count as entry files (44 reachable, 23 build entries,
   2 orphan files; the two orphans are the ambient `.d.ts` files). `duplicate-allowlist.json` lists
   the four renderer wrappers in `src/platform/index.ts` that share a name with a function in
-  `core/` (three) or `electron/` (one); without it the report calls them true duplicates. The `docs` job now pins repo-tools 2.2.6,
+  `core/` (three) or `electron/` (one); without it the report calls them true duplicates. The `docs` job now pins repo-tools 2.2.7,
   writes a fresh map outside the repository, and fails when a committed report differs. The
-  Simplified Technical English check covers the five hand-written documents and the README, and it
-  replaces the `repo-tools ste docs/architecture README.md` step that the entries below name: the
-  generated reports hold text that the tool writes. That text is generic. The notes at the top of
-  `duplicate-symbols.md` name `mathTyped` and AssemblyScript, which this repository does not use, and
-  `FILE_INVENTORY.md` gives the area `src` to four files in `test/`. The tables carry the measured
-  facts. `TEST_COVERAGE.md` is not committed: it links a policy document that does not exist and it
-  suggests test paths under `tests/unit/`, while the tests of this repository are in `test/`.
+  Simplified Technical English check runs `repo-tools ste docs/architecture README.md`, so it also
+  reads the generated reports: since 2.2.7 their text is short enough to pass, and the tool exits 2
+  when a path does not exist. The notes at the top of `duplicate-symbols.md` still name `mathTyped`,
+  which this repository does not use; the tables carry the measured facts. `TEST_COVERAGE.md` is
+  not committed. Its heading says "Source Files Without Test Coverage" over the six files that it lists. No unit
+  test imports them, and the end-to-end specs cover them (`app-menu.spec.ts` the app menu,
+  `external-change.spec.ts` the file watcher, and every spec runs `electron/main.ts`,
+  `electron/preload.ts` and `src/main.ts`), so the heading misstates the coverage of this
+  repository.
 
 - **The two doc gates run in CI.** A new `docs` job in `.github/workflows/test.yml` runs
   `repo-tools check . --docs=docs/architecture`, `repo-tools ste docs/architecture` and
