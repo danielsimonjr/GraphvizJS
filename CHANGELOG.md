@@ -27,6 +27,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **The README is in Simplified Technical English, and CI checks it.** `repo-tools ste` reported
+  10 long sentences in the README. They are now short sentences with the same facts. The file list
+  of `core/` is a nested list. The `docs` job runs `repo-tools ste docs/architecture README.md`,
+  so a new long sentence in the README fails the job.
 - **`bun run typecheck` checks `test/` too.** `tsconfig.json` listed `src`, `electron`, `tools`,
   `core` and `cli`, so a test fixture could drift from the type it stands for and no gate failed
   (Vitest strips types and checks none). With `test/` in the list, the typecheck found 40 errors in

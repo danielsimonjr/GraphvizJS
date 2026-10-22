@@ -94,8 +94,8 @@ jobs:
       - name: Architecture claims match the source
         run: repo-tools check . --docs=docs/architecture
 
-      - name: Architecture documents are in Simplified Technical English
-        run: repo-tools ste docs/architecture
+      - name: Architecture documents and the README are in Simplified Technical English
+        run: repo-tools ste docs/architecture README.md
 
       # An exported symbol with no doc comment fails here, not in review. The loop checks all
       # four folders, so one run reports every folder that fails.
