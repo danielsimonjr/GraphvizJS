@@ -22,6 +22,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Security
 
+- **Lockfile raised for new advisories; two declared ranges raised with it.** `bun audit` read
+  17 findings on `master` (1 critical, 3 high, 10 moderate, 3 low), and the CI `test` job stopped at
+  its Audit dependencies step before it ran a single test. `bun.lock` now resolves `electron`
+  43.7.6 (one moderate), `vite` 7.3.7 and 8.2.4 (dev-server findings and `launch-editor`
+  findings, two of them high), `dompurify` 3.4.17 (a critical, a high and a low, reached
+  through `jspdf`) and `vitest` with its `@vitest` packages 4.1.12 (two moderate against
+  `@vitest/mocker`). `bun audit` now reads no vulnerabilities. The ranges of `vitest` and
+  `@vitest/coverage-v8` rose to `^4.1.12`. `vitest` pins its `@vitest/mocker` to its own
+  version, so a range that admits 4.1.8 to 4.1.11 can resolve the vulnerable tree again on a fresh
+  lockfile, and `@vitest/coverage-v8` must match the `vitest` version. The other ranges already
+  admit the fixed versions.
 - **Lockfile raised for four packages that have fixed advisories.** `bun.lock`
   now resolves `dompurify` 3.4.16 (two low advisories), `fast-uri` 3.1.8 (one
   moderate), `http-cache-semantics` 4.3.0 (one high) and `source-map-js` 1.2.2
