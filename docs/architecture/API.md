@@ -6,7 +6,7 @@ GraphvizJS exposes three public surfaces, all backed by the same `core/`:
 2. The **`GraphvizApi` IPC contract** — `window.graphviz` in the renderer.
 3. The **`core/` module functions** — consumed by the CLI and the Electron main process.
 
-The symbol counts come from `repo-tools map`. The scope is every source file of the repository, including tests and tools. The tool counts 279 exports. The tool also counts 69 interfaces, 166 functions, 19 constants and 1 class. The Verification table at the end of this document records them.
+The symbol counts come from `repo-tools map`. The scope is every source file of the repository, including tests and tools. The tool counts 281 exports. The tool also counts 69 interfaces, 167 functions, 20 constants and 1 class. The Verification table at the end of this document records them.
 
 ---
 
@@ -227,7 +227,7 @@ type PdfOrientation = 'auto' | 'portrait' | 'landscape';
 interface DotValidationError { message: string; line?: number; column?: number; }
 interface StructuralDiagnostic { from: number; to: number; severity: 'error' | 'warning'; message: string; }
 interface DiagramDiagnostics { syntax: DotValidationError | null; structural: StructuralDiagnostic[]; }
-interface DotVocabulary { keywords: string[]; attributes: string[]; }
+interface DotVocabulary { keywords: string[]; attributes: string[]; attributeValues: Record<string, string[]>; colorAttributes: string[]; colors: string[]; }
 interface PdfExportOptions { mode: PdfPageMode; pageSize: PdfPageSize; orientation: PdfOrientation; }
 interface ExportResult { bytes: Uint8Array; ext: string; mime: string; }
 
@@ -255,8 +255,8 @@ The values cover every source file of the repository. Write the output of `repo-
 
 | Claim | Value | Source |
 |---|---|---|
-| totalExports | 279 | repo-tools map: dependency-graph.json |
+| totalExports | 281 | repo-tools map: dependency-graph.json |
 | totalInterfaces | 69 | repo-tools map: dependency-graph.json |
-| totalFunctions | 166 | repo-tools map: dependency-graph.json |
-| totalConstants | 19 | repo-tools map: dependency-graph.json |
+| totalFunctions | 167 | repo-tools map: dependency-graph.json |
+| totalConstants | 20 | repo-tools map: dependency-graph.json |
 | totalClasses | 1 | repo-tools map: dependency-graph.json |

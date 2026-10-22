@@ -2,9 +2,9 @@
   "stats": {
     "fileCount": 67,
     "moduleCount": 22,
-    "totalLoc": 8351,
-    "edgeCount": 129,
-    "exportCount": 204
+    "totalLoc": 8382,
+    "edgeCount": 130,
+    "exportCount": 206
   },
   "modules": {
     "autosave": [
@@ -649,14 +649,14 @@
       "file": "core/dot-catalog.ts",
       "testFiles": [
         "test/core/dot-catalog.test.ts",
-        "test/editor/autocomplete.test.ts"
+        "test/core/dot-vocab.test.ts"
       ]
     },
     {
       "file": "core/dot-colors.ts",
       "testFiles": [
         "test/core/dot-colors.test.ts",
-        "test/editor/autocomplete.test.ts"
+        "test/core/dot-vocab.test.ts"
       ]
     },
     {
@@ -949,7 +949,7 @@
     },
     {
       "path": "src/editor/autocomplete.ts",
-      "loc": 105,
+      "loc": 102,
       "exports": [
         "makeDotCompletionSource",
         "createDotAutocomplete"
@@ -987,7 +987,7 @@
     },
     {
       "path": "src/editor/zoom.ts",
-      "loc": 137,
+      "loc": 141,
       "exports": [
         "createEditorZoomExtension",
         "createEditorZoomController",
@@ -1085,7 +1085,7 @@
     },
     {
       "path": "src/preview/render.ts",
-      "loc": 102,
+      "loc": 104,
       "exports": [
         "createPreview",
         "PreviewStatusCallbacks",
@@ -1354,18 +1354,20 @@
     },
     {
       "path": "core/dot-colors.ts",
-      "loc": 171,
+      "loc": 183,
       "exports": [
         "DOT_COLORS",
+        "DOT_COLOR_ATTRIBUTES",
         "isColorAttribute"
       ]
     },
     {
       "path": "core/dot-vocab.ts",
-      "loc": 177,
+      "loc": 203,
       "exports": [
         "DOT_KEYWORDS",
-        "DOT_ATTRIBUTES"
+        "DOT_ATTRIBUTES",
+        "buildDotVocabulary"
       ]
     },
     {
@@ -1470,7 +1472,7 @@
     },
     {
       "path": "core/types.ts",
-      "loc": 132,
+      "loc": 134,
       "exports": [
         "DotValidationError",
         "PdfExportOptions",
@@ -1534,7 +1536,7 @@
     },
     {
       "path": "electron/main.ts",
-      "loc": 240,
+      "loc": 228,
       "exports": []
     },
     {
