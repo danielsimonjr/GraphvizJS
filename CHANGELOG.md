@@ -21,6 +21,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   documents against the code.
 - **A "Documentation" section in the README** that links the six architecture documents and names
   the commands that check them.
+- **An end-to-end test for the shared editor zoom** (`test/e2e/editor-zoom.spec.ts`). It checks
+  that a tab opened after a zoom starts at the current level, and that a zoom or a reset in one
+  tab applies to every tab.
 
 ### Changed
 
@@ -47,9 +50,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `colorAttributes` comes from `DOT_COLOR_ATTRIBUTES` in `core/dot-colors.ts`, the list that the
   color lint reads. The completion source no longer keeps a list of its own. The architecture
   documents describe the whole payload; they named only two of its fields before.
+- **`createEditorZoomController` holds one level for many editors.** The function takes the
+  compartment, the optional callback and the optional initial level, and returns a controller with
+  `attach` and `detach` next to the zoom actions. It no longer takes an editor.
+  `TabState.editorZoomLevel` is removed: the field was always 0 and no code read it.
 
 ### Fixed
 
+- **A new tab started at the zoom of the app start, and each tab kept its own editor zoom.**
+  `main.ts` read the saved level once and gave it to the controller of every tab that opened
+  later, and each controller kept a level of its own. After a zoom in one tab, a new tab and the
+  other tabs showed a different font size. One controller now holds the level for all editors. An
+  editor follows the level from the moment it is attached, and a change applies to every attached
+  editor.
 - **A superseded preview render could replace the new diagram with an error.** `createPreview`
   checked the stale token on success but not in its `catch` block. A slow render that failed after
   a newer render had succeeded showed its error and called `onRenderError`. A failure of a

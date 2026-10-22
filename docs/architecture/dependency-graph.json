@@ -2,7 +2,7 @@
   "stats": {
     "fileCount": 67,
     "moduleCount": 22,
-    "totalLoc": 8382,
+    "totalLoc": 8388,
     "edgeCount": 130,
     "exportCount": 206
   },
@@ -212,6 +212,10 @@
         "name": "DotLinterOptions"
       },
       {
+        "file": "src/editor/zoom.ts",
+        "name": "EditorZoomController"
+      },
+      {
         "file": "src/preferences/preferences-dialog.ts",
         "name": "PreferencesDialogOptions"
       },
@@ -234,10 +238,6 @@
       {
         "file": "src/preview/zoom.ts",
         "name": "ZoomController"
-      },
-      {
-        "file": "src/session/session.ts",
-        "name": "SessionTab"
       },
       {
         "file": "src/session/session.ts",
@@ -270,10 +270,6 @@
       {
         "file": "src/theme/color-scheme.ts",
         "name": "ColorSchemeDeps"
-      },
-      {
-        "file": "src/toolbar/actions.ts",
-        "name": "ToolbarActionsOptions"
       },
       {
         "file": "src/toolbar/examples-menu.ts",
@@ -751,6 +747,7 @@
       "file": "core/types.ts",
       "testFiles": [
         "test/editor/linting.test.ts",
+        "test/session/session.test.ts",
         "test/tabs/manager.test.ts"
       ]
     },
@@ -987,7 +984,7 @@
     },
     {
       "path": "src/editor/zoom.ts",
-      "loc": 141,
+      "loc": 155,
       "exports": [
         "createEditorZoomExtension",
         "createEditorZoomController",
@@ -1004,7 +1001,7 @@
     },
     {
       "path": "src/main.ts",
-      "loc": 919,
+      "loc": 914,
       "exports": []
     },
     {
@@ -1142,7 +1139,7 @@
     },
     {
       "path": "src/tabs/manager.ts",
-      "loc": 166,
+      "loc": 163,
       "exports": [
         "MAX_TABS",
         "TabManager",

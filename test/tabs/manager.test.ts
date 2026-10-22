@@ -22,7 +22,6 @@ describe('tabs/manager', () => {
         expect(tab!.lastCommittedDoc).toBe('');
         expect(tab!.lastSavedAt).toBeNull();
         expect(tab!.editorView).toBeNull();
-        expect(tab!.editorZoomLevel).toBe(0);
       });
 
       it('creates a tab with content', () => {
