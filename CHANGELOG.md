@@ -57,6 +57,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **`labelfontcolor` was not treated as a color attribute.** The Graphviz attributes table types
+  it as a color that only edges use. The color list and the attribute catalog left it out, so the
+  invalid-color lint skipped it and the editor offered no color completions for it. It is now in
+  both. A test checks the color list against the six color attributes of the Graphviz table. A
+  `labelfontcolor` on a node or a graph now gets a wrong-context warning, as the other edge
+  attributes do.
 - **A new tab started at the zoom of the app start, and each tab kept its own editor zoom.**
   `main.ts` read the saved level once and gave it to the controller of every tab that opened
   later, and each controller kept a level of its own. After a zoom in one tab, a new tab and the

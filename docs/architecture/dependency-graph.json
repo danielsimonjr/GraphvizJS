@@ -2,7 +2,7 @@
   "stats": {
     "fileCount": 67,
     "moduleCount": 22,
-    "totalLoc": 8388,
+    "totalLoc": 8390,
     "edgeCount": 130,
     "exportCount": 206
   },
@@ -1340,7 +1340,7 @@
     },
     {
       "path": "core/dot-catalog.ts",
-      "loc": 231,
+      "loc": 232,
       "exports": [
         "DOT_ATTRIBUTE_CATALOG",
         "findAttribute",
@@ -1351,7 +1351,7 @@
     },
     {
       "path": "core/dot-colors.ts",
-      "loc": 183,
+      "loc": 184,
       "exports": [
         "DOT_COLORS",
         "DOT_COLOR_ATTRIBUTES",
