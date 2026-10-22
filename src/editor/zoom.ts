@@ -40,7 +40,8 @@ export function createEditorZoomExtension(): {
  * @param onZoomChange - The optional callback that runs after each level change or reset.
  *   The callback does not run for initialLevel.
  * @param initialLevel - The starting level, where 1 is 100 percent. The default is 1.
- *   The value is not clamped to the limits.
+ *   A value outside the limits moves to the nearest limit.
+ *   A value that is not a finite number gives the default.
  * @returns The controller that zooms the editor.
  */
 export function createEditorZoomController(
@@ -49,10 +50,13 @@ export function createEditorZoomController(
   onZoomChange?: (level: number) => void,
   initialLevel?: number
 ): EditorZoomController {
-  let zoomLevel = initialLevel ?? ZOOM_DEFAULT;
+  const requestedLevel = initialLevel ?? ZOOM_DEFAULT;
+  let zoomLevel = Number.isFinite(requestedLevel)
+    ? Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, requestedLevel))
+    : ZOOM_DEFAULT;
 
   // Apply initial zoom if different from default
-  if (initialLevel && initialLevel !== ZOOM_DEFAULT) {
+  if (zoomLevel !== ZOOM_DEFAULT) {
     view.dispatch({
       effects: compartment.reconfigure(createFontSizeTheme(zoomLevel)),
     });
