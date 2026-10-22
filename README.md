@@ -237,7 +237,7 @@ Three commands keep the documents and the doc comments true. All three run in th
 ```bash
 npm install --global @danielsimonjr/repo-tools
 repo-tools check . --docs=docs/architecture   # each Verification table matches the source
-repo-tools ste README.md docs/architecture/OVERVIEW.md docs/architecture/ARCHITECTURE.md docs/architecture/COMPONENTS.md docs/architecture/DATAFLOW.md docs/architecture/API.md   # the hand-written documents and this README follow Simplified Technical English
+repo-tools ste docs/architecture README.md    # every document in docs/architecture, the generated reports included, and this README follow Simplified Technical English
 repo-tools docs check src                     # each exported symbol has a doc comment (also: core, cli, electron)
 ```
 

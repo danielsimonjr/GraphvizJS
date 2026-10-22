@@ -15,10 +15,10 @@ This report lists each source file that the map census finds, with a disposition
 | Disposition | Count | Meaning |
 | --- | --: | --- |
 | `reachable` | 44 | A `src`-area file that an entry root reaches. |
-| `build-entry` | 25 | A `src`-area file that is an entry root. |
-| `test-only` | 2 | A `src`-area file that only a test reaches. |
+| `build-entry` | 23 | A `src`-area file that is an entry root. |
+| `test-only` | 0 | A `src`-area file that only a test reaches. |
 | `orphan` | 2 | A `src`-area file that nothing reaches. Delete it, or wire it to a root. |
-| `test` | 86 | A file in a `tests/` folder, or a `*.test.ts` or `*.spec.ts` file. |
+| `test` | 90 | A file in a `test/` or `tests/` folder, or a `*.test.ts` or `*.spec.ts` file. |
 | `tool` | 12 | A file in a `tools/` or `scripts/` folder outside `src/`. |
 | `config` | 3 | A `*.config.*` file of TypeScript or JavaScript. |
 | `example` | 0 | A file in `examples/` or `docs/`. |
@@ -30,8 +30,8 @@ This report lists each source file that the map census finds, with a disposition
 | Area | Files |
 | --- | --: |
 | `config` | 3 |
-| `src` | 73 |
-| `tests` | 86 |
+| `src` | 69 |
+| `tests` | 90 |
 | `tools` | 12 |
 
 ## Per-package counts
@@ -150,8 +150,8 @@ This report lists each source file that the map census finds, with a disposition
 | `test/e2e/export.spec.ts` | (root) | tests | test | 158 |
 | `test/e2e/external-change.spec.ts` | (root) | tests | test | 47 |
 | `test/e2e/file-operations.spec.ts` | (root) | tests | test | 101 |
-| `test/e2e/global-setup.ts` | (root) | src | build-entry | 24 |
-| `test/e2e/helpers.ts` | (root) | src | test-only | 148 |
+| `test/e2e/global-setup.ts` | (root) | tests | test | 24 |
+| `test/e2e/helpers.ts` | (root) | tests | test | 148 |
 | `test/e2e/keyboard-shortcuts.spec.ts` | (root) | tests | test | 142 |
 | `test/e2e/per-doc-engine.spec.ts` | (root) | tests | test | 46 |
 | `test/e2e/recent-files.spec.ts` | (root) | tests | test | 22 |
@@ -168,7 +168,7 @@ This report lists each source file that the map census finds, with a disposition
 | `test/help/dialog.test.ts` | (root) | tests | test | 185 |
 | `test/menu/commands.test.ts` | (root) | tests | test | 66 |
 | `test/menu/menu-template.test.ts` | (root) | tests | test | 138 |
-| `test/mocks/graphviz.ts` | (root) | src | test-only | 56 |
+| `test/mocks/graphviz.ts` | (root) | tests | test | 56 |
 | `test/palette/command-palette.test.ts` | (root) | tests | test | 121 |
 | `test/platform/index.test.ts` | (root) | tests | test | 123 |
 | `test/preferences/preferences-dialog.test.ts` | (root) | tests | test | 55 |
@@ -176,7 +176,7 @@ This report lists each source file that the map census finds, with a disposition
 | `test/preview/zoom.test.ts` | (root) | tests | test | 150 |
 | `test/recent/recent-files.test.ts` | (root) | tests | test | 60 |
 | `test/session/session.test.ts` | (root) | tests | test | 125 |
-| `test/setup.ts` | (root) | src | build-entry | 97 |
+| `test/setup.ts` | (root) | tests | test | 97 |
 | `test/stats/stats-dialog.test.ts` | (root) | tests | test | 44 |
 | `test/tabs/manager.test.ts` | (root) | tests | test | 302 |
 | `test/tabs/tab-bar.test.ts` | (root) | tests | test | 192 |
@@ -228,5 +228,5 @@ _None._
 
 ## Warnings
 
-- package.json entry 'dist-electron/main.js' did not resolve to a known source file -- ignored; if no other declared entry resolves either, the entry-point root falls back to a conventional src/index.* file instead
-- package.json entry 'dist-cli/cli/index.js' did not resolve to a known source file -- ignored; if no other declared entry resolves either, the entry-point root falls back to a conventional src/index.* file instead
+- package.json entry 'dist-electron/main.js' did not resolve to a known source file. The entry is ignored.
+- package.json entry 'dist-cli/cli/index.js' did not resolve to a known source file. The entry is ignored.

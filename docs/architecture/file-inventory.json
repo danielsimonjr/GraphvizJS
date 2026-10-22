@@ -2,20 +2,20 @@
   "totalFiles": 174,
   "byDisposition": {
     "reachable": 44,
-    "build-entry": 25,
-    "test-only": 2,
+    "build-entry": 23,
+    "test-only": 0,
     "orphan": 2,
-    "test": 86,
+    "test": 90,
     "tool": 12,
     "config": 3,
     "bench": 0,
     "example": 0
   },
   "byArea": {
-    "src": 73,
+    "src": 69,
     "config": 3,
     "tools": 12,
-    "tests": 86
+    "tests": 90
   },
   "byPackage": {
     "(root)": 129,
@@ -760,15 +760,15 @@
     {
       "file": "test/e2e/global-setup.ts",
       "package": "(root)",
-      "area": "src",
-      "disposition": "build-entry",
+      "area": "tests",
+      "disposition": "test",
       "loc": 24
     },
     {
       "file": "test/e2e/helpers.ts",
       "package": "(root)",
-      "area": "src",
-      "disposition": "test-only",
+      "area": "tests",
+      "disposition": "test",
       "loc": 148
     },
     {
@@ -886,8 +886,8 @@
     {
       "file": "test/mocks/graphviz.ts",
       "package": "(root)",
-      "area": "src",
-      "disposition": "test-only",
+      "area": "tests",
+      "disposition": "test",
       "loc": 56
     },
     {
@@ -942,8 +942,8 @@
     {
       "file": "test/setup.ts",
       "package": "(root)",
-      "area": "src",
-      "disposition": "build-entry",
+      "area": "tests",
+      "disposition": "test",
       "loc": 97
     },
     {
@@ -1243,7 +1243,7 @@
   ],
   "skippedLinks": [],
   "warnings": [
-    "package.json entry 'dist-electron/main.js' did not resolve to a known source file -- ignored; if no other declared entry resolves either, the entry-point root falls back to a conventional src/index.* file instead",
-    "package.json entry 'dist-cli/cli/index.js' did not resolve to a known source file -- ignored; if no other declared entry resolves either, the entry-point root falls back to a conventional src/index.* file instead"
+    "package.json entry 'dist-electron/main.js' did not resolve to a known source file. The entry is ignored.",
+    "package.json entry 'dist-cli/cli/index.js' did not resolve to a known source file. The entry is ignored."
   ]
 }
