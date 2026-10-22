@@ -12,6 +12,9 @@ describe('dot-colors', () => {
   it('identifies pencolor as a color-valued attribute', () => {
     expect(isColorAttribute('pencolor')).toBe(true);
   });
+  it('identifies labelfontcolor as a color-valued attribute', () => {
+    expect(isColorAttribute('labelfontcolor')).toBe(true);
+  });
 
   describe('canonical SVG/CSS named-color set (residual invalid-color FP fix)', () => {
     // Root cause of the residual FP: an incomplete color list lets nearest() misflag a

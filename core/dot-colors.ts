@@ -166,6 +166,7 @@ export const DOT_COLOR_ATTRIBUTES = [
   'bgcolor',
   'fillcolor',
   'fontcolor',
+  'labelfontcolor',
   'pencolor',
 ] as const;
 
@@ -173,7 +174,7 @@ const COLOR_ATTRIBUTES = new Set<string>(DOT_COLOR_ATTRIBUTES);
 
 /**
  * Check whether an attribute takes a color value, ignoring letter case.
- * The color attributes are color, bgcolor, fillcolor, fontcolor, and pencolor.
+ * The color attributes are color, bgcolor, fillcolor, fontcolor, labelfontcolor, and pencolor.
  *
  * @param attr - The attribute name to check.
  * @returns True when the attribute takes a color value.

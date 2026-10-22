@@ -36,6 +36,22 @@ describe('semanticDiagnostics', () => {
     expect(diags[0].fix?.label).toMatch(/red/);
   });
 
+  it('flags an invalid color of labelfontcolor on an edge', () => {
+    const diags = semanticDiagnostics('a -> b [labelfontcolor=rd];');
+    expect(diags).toHaveLength(1);
+    expect(diags[0].code).toBe('invalid-color');
+    expect(diags[0].fix?.text).toBe('red');
+  });
+
+  it('does not flag a valid labelfontcolor on an edge', () => {
+    expect(semanticDiagnostics('a -> b [labelfontcolor=red];')).toEqual([]);
+  });
+
+  it('flags labelfontcolor on a node as a wrong-context attribute', () => {
+    const diags = semanticDiagnostics('a [labelfontcolor=red];');
+    expect(diags.map((d) => d.code)).toEqual(['wrong-context']);
+  });
+
   it('does not flag a valid named color', () => {
     expect(semanticDiagnostics('a [color=red];')).toEqual([]);
   });
