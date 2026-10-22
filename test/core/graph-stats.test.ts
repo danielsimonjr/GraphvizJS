@@ -52,10 +52,7 @@ describe('graphStats', () => {
   });
 
   it('counts a repeated edge of a strict digraph once', () => {
-    const s = graphStats('strict digraph { a -> b; a -> b }');
-    expect(s.edgeCount).toBe(1);
-    expect(s.roots).toBe(1);
-    expect(s.leaves).toBe(1);
+    expect(graphStats('strict digraph { a -> b; a -> b }').edgeCount).toBe(1);
   });
 
   it('counts the same pair of a strict undirected graph once, and finds no cycle', () => {

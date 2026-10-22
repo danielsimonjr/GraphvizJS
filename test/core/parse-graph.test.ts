@@ -137,6 +137,36 @@ describe('parseGraph', () => {
     ]);
   });
 
+  it('does not merge two edges whose joined ids look the same in a strict graph', () => {
+    expect(parseGraph('strict digraph { ab -> c; a -> bc }').edges).toEqual([
+      { from: 'ab', to: 'c' },
+      { from: 'a', to: 'bc' },
+    ]);
+  });
+
+  it('ignores the ports of the endpoints when it merges a strict graph', () => {
+    expect(parseGraph('strict digraph { a:p -> b:q; a -> b }').edges).toEqual([
+      { from: 'a', to: 'b' },
+    ]);
+  });
+
+  it('merges an edge that a subgraph repeats in a strict graph', () => {
+    expect(parseGraph('strict digraph { a -> b; subgraph s { a -> b } }').edges).toEqual([
+      { from: 'a', to: 'b' },
+    ]);
+    expect(parseGraph('strict digraph { { { a -> b } } a -> b }').edges).toEqual([
+      { from: 'a', to: 'b' },
+    ]);
+  });
+
+  it('compares ids by their text, with the case, when it merges a strict graph', () => {
+    expect(parseGraph('strict graph { B -- a; a -- B }').edges).toEqual([{ from: 'B', to: 'a' }]);
+    expect(parseGraph('strict digraph { "a" -> b; a -> "b" }').edges).toEqual([
+      { from: 'a', to: 'b' },
+    ]);
+    expect(parseGraph('strict digraph { a -> b; A -> b }').edges).toHaveLength(2);
+  });
+
   it('collects distinct nodes in first-seen order (implicit on edges)', () => {
     const m = parseGraph('digraph { a -> b -> c; a }');
     expect(m.nodes).toEqual(['a', 'b', 'c']);
