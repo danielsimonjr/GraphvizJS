@@ -76,7 +76,7 @@ jobs:
       # The version is exact. A new release of repo-tools can change how it counts, or what it
       # accepts as plain text, and turn this job red with no change to the code. Raise the pin on
       # purpose, after a local run of the commands below.
-      REPO_TOOLS_VERSION: 2.2.5
+      REPO_TOOLS_VERSION: 2.2.6
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -94,8 +94,30 @@ jobs:
       - name: Architecture claims match the source
         run: repo-tools check . --docs=docs/architecture
 
-      - name: Architecture documents and the README are in Simplified Technical English
-        run: repo-tools ste docs/architecture README.md
+      # The check above never opens the generated reports, so a stale report would pass it. This
+      # step writes a fresh map outside the repository and compares each committed report with it.
+      # `bun run graph` writes DEPENDENCY_GRAPH.md and dependency-graph.json, so they are not in
+      # the list.
+      - name: Generated reports match a fresh map
+        run: |
+          repo-tools map . --out=../map-check
+          status=0
+          for name in FILE_INVENTORY.md file-inventory.json unused-analysis.md unused-analysis.json duplicate-symbols.md duplicate-symbols.json; do
+            diff -u "docs/architecture/$name" "../map-check/$name" || status=1
+          done
+          exit "$status"
+
+      # The check covers the five hand-written documents and the README. The generated reports
+      # hold text that the tool writes, such as its own warnings, so they are not in the list.
+      # The tool skips a path that does not exist and still exits 0 when one other file is valid,
+      # so the step first fails when a listed file is missing.
+      - name: Hand-written documents and the README are in Simplified Technical English
+        run: |
+          files="README.md docs/architecture/OVERVIEW.md docs/architecture/ARCHITECTURE.md docs/architecture/COMPONENTS.md docs/architecture/DATAFLOW.md docs/architecture/API.md"
+          for f in $files; do
+            test -f "$f" || { echo "missing document: $f"; exit 1; }
+          done
+          repo-tools ste $files
 
       # An exported symbol with no doc comment fails here, not in review. The loop checks all
       # four folders, so one run reports every folder that fails.

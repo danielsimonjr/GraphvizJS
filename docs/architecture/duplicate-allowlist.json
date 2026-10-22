@@ -1,0 +1,10 @@
+{
+  "description": "Names that two files define on purpose. repo-tools map reads this file and tags each match ALLOWLISTED in duplicate-symbols.md.",
+  "entries": [
+    {
+      "names": ["formatDot", "graphStats", "validateDiagram", "setMenuTheme"],
+      "filesGlob": ["src/platform/index.ts"],
+      "reason": "Each name is a renderer wrapper in src/platform/index.ts. The wrapper calls an IPC channel of the main process. A function of the same name sits on the other side of that channel, in core/ or in electron/. The renderer imports no runtime module of core, only the types in core/types. The two definitions are the two sides of the IPC boundary, not a copy."
+    }
+  ]
+}

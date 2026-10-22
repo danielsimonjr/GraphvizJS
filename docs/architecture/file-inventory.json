@@ -1,0 +1,1242 @@
+{
+  "totalFiles": 173,
+  "byDisposition": {
+    "reachable": 44,
+    "build-entry": 25,
+    "test-only": 2,
+    "orphan": 2,
+    "test": 85,
+    "tool": 12,
+    "config": 3,
+    "bench": 0,
+    "example": 0
+  },
+  "byArea": {
+    "src": 73,
+    "config": 3,
+    "tools": 12,
+    "tests": 85
+  },
+  "byPackage": {
+    "(root)": 128,
+    "graphvizjs-desktop-client": 45
+  },
+  "files": [
+    {
+      "file": "cli/args.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 294
+    },
+    {
+      "file": "cli/index.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 208
+    },
+    {
+      "file": "core/apply-fixes.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 33
+    },
+    {
+      "file": "core/dot-catalog.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 232
+    },
+    {
+      "file": "core/dot-colors.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 184
+    },
+    {
+      "file": "core/dot-vocab.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 203
+    },
+    {
+      "file": "core/edit-distance.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 57
+    },
+    {
+      "file": "core/export-pdf.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 225
+    },
+    {
+      "file": "core/export-png.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 43
+    },
+    {
+      "file": "core/export.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 47
+    },
+    {
+      "file": "core/format.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 161
+    },
+    {
+      "file": "core/graph-stats.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 119
+    },
+    {
+      "file": "core/normalize-svg.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 92
+    },
+    {
+      "file": "core/parse-graph.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 361
+    },
+    {
+      "file": "core/render.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 129
+    },
+    {
+      "file": "core/scan-dot.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 159
+    },
+    {
+      "file": "core/semantic-lint.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 374
+    },
+    {
+      "file": "core/structure-lint.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 99
+    },
+    {
+      "file": "core/types.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 137
+    },
+    {
+      "file": "core/validate.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 21
+    },
+    {
+      "file": "electron/app-menu.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 59
+    },
+    {
+      "file": "electron/file-watcher.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 52
+    },
+    {
+      "file": "electron/main.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 228
+    },
+    {
+      "file": "electron/preload.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 39
+    },
+    {
+      "file": "playwright.config.ts",
+      "package": "(root)",
+      "area": "config",
+      "disposition": "config",
+      "loc": 28
+    },
+    {
+      "file": "scripts/build-cli-exe.mjs",
+      "package": "(root)",
+      "area": "tools",
+      "disposition": "tool",
+      "loc": 109
+    },
+    {
+      "file": "scripts/exe-entry.mjs",
+      "package": "(root)",
+      "area": "tools",
+      "disposition": "tool",
+      "loc": 10
+    },
+    {
+      "file": "scripts/render-icon.mjs",
+      "package": "(root)",
+      "area": "tools",
+      "disposition": "tool",
+      "loc": 13
+    },
+    {
+      "file": "src/autosave/constants.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 9
+    },
+    {
+      "file": "src/editor/autocomplete.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 102
+    },
+    {
+      "file": "src/editor/language.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 119
+    },
+    {
+      "file": "src/editor/linting.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 207
+    },
+    {
+      "file": "src/editor/search.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 7
+    },
+    {
+      "file": "src/editor/theme.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 32
+    },
+    {
+      "file": "src/editor/zoom.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 155
+    },
+    {
+      "file": "src/help/dialog.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 141
+    },
+    {
+      "file": "src/main.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 914
+    },
+    {
+      "file": "src/menu/commands.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 91
+    },
+    {
+      "file": "src/menu/menu-template.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 336
+    },
+    {
+      "file": "src/palette/command-palette.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 173
+    },
+    {
+      "file": "src/platform/contract.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 71
+    },
+    {
+      "file": "src/platform/global.d.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "orphan",
+      "loc": 7
+    },
+    {
+      "file": "src/platform/index.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 256
+    },
+    {
+      "file": "src/preferences/preferences-dialog.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 118
+    },
+    {
+      "file": "src/preview/render.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 104
+    },
+    {
+      "file": "src/preview/zoom.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 149
+    },
+    {
+      "file": "src/recent/recent-files.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 31
+    },
+    {
+      "file": "src/session/session.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 109
+    },
+    {
+      "file": "src/stats/stats-dialog.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 83
+    },
+    {
+      "file": "src/tabs/manager.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 163
+    },
+    {
+      "file": "src/tabs/tab-bar.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 115
+    },
+    {
+      "file": "src/theme/color-scheme.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 100
+    },
+    {
+      "file": "src/toolbar/actions.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 177
+    },
+    {
+      "file": "src/toolbar/examples-menu.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 132
+    },
+    {
+      "file": "src/toolbar/export-diagram.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 74
+    },
+    {
+      "file": "src/toolbar/export-menu.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 108
+    },
+    {
+      "file": "src/toolbar/find.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 26
+    },
+    {
+      "file": "src/toolbar/format.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 59
+    },
+    {
+      "file": "src/toolbar/layout-engine.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 61
+    },
+    {
+      "file": "src/toolbar/new-diagram.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 19
+    },
+    {
+      "file": "src/toolbar/open-diagram.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 31
+    },
+    {
+      "file": "src/toolbar/pdf-options-dialog.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 84
+    },
+    {
+      "file": "src/toolbar/recent-menu.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 86
+    },
+    {
+      "file": "src/toolbar/save-as.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 56
+    },
+    {
+      "file": "src/toolbar/save-diagram.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 44
+    },
+    {
+      "file": "src/toolbar/shortcuts.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 101
+    },
+    {
+      "file": "src/toolbar/theme-button.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 40
+    },
+    {
+      "file": "src/utils/debounce.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 20
+    },
+    {
+      "file": "src/vite-env.d.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "orphan",
+      "loc": 1
+    },
+    {
+      "file": "src/watch/file-watch.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 24
+    },
+    {
+      "file": "src/watch/watch-plan.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 37
+    },
+    {
+      "file": "src/window/state.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 33
+    },
+    {
+      "file": "src/workspace/resize.ts",
+      "package": "graphvizjs-desktop-client",
+      "area": "src",
+      "disposition": "reachable",
+      "loc": 67
+    },
+    {
+      "file": "test/architecture/renderer-purity.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 74
+    },
+    {
+      "file": "test/cli/args.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 133
+    },
+    {
+      "file": "test/cli/cli.integration.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 147
+    },
+    {
+      "file": "test/cli/dist.integration.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 95
+    },
+    {
+      "file": "test/cli/offset.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 22
+    },
+    {
+      "file": "test/core/apply-fixes.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 37
+    },
+    {
+      "file": "test/core/dot-catalog.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 89
+    },
+    {
+      "file": "test/core/dot-colors.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 42
+    },
+    {
+      "file": "test/core/dot-vocab.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 87
+    },
+    {
+      "file": "test/core/edit-distance.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 59
+    },
+    {
+      "file": "test/core/export-pdf.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 41
+    },
+    {
+      "file": "test/core/export-png.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 25
+    },
+    {
+      "file": "test/core/export.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 33
+    },
+    {
+      "file": "test/core/format.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 83
+    },
+    {
+      "file": "test/core/graph-stats.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 81
+    },
+    {
+      "file": "test/core/normalize-svg.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 47
+    },
+    {
+      "file": "test/core/parse-graph.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 241
+    },
+    {
+      "file": "test/core/render.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 16
+    },
+    {
+      "file": "test/core/scan-dot.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 60
+    },
+    {
+      "file": "test/core/semantic-lint.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 380
+    },
+    {
+      "file": "test/core/structure-lint.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 53
+    },
+    {
+      "file": "test/core/validate-diagram.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 45
+    },
+    {
+      "file": "test/core/validate.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 343
+    },
+    {
+      "file": "test/e2e/app-menu.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 27
+    },
+    {
+      "file": "test/e2e/app.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 79
+    },
+    {
+      "file": "test/e2e/editor-authoring.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 56
+    },
+    {
+      "file": "test/e2e/editor-zoom.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 52
+    },
+    {
+      "file": "test/e2e/examples.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 121
+    },
+    {
+      "file": "test/e2e/export.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 162
+    },
+    {
+      "file": "test/e2e/external-change.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 47
+    },
+    {
+      "file": "test/e2e/file-operations.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 101
+    },
+    {
+      "file": "test/e2e/global-setup.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 24
+    },
+    {
+      "file": "test/e2e/helpers.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "test-only",
+      "loc": 168
+    },
+    {
+      "file": "test/e2e/keyboard-shortcuts.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 131
+    },
+    {
+      "file": "test/e2e/per-doc-engine.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 46
+    },
+    {
+      "file": "test/e2e/recent-files.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 22
+    },
+    {
+      "file": "test/e2e/rendering.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 125
+    },
+    {
+      "file": "test/e2e/save-as.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 42
+    },
+    {
+      "file": "test/e2e/session-restore.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 55
+    },
+    {
+      "file": "test/e2e/stats.spec.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 35
+    },
+    {
+      "file": "test/editor/autocomplete.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 76
+    },
+    {
+      "file": "test/editor/language.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 197
+    },
+    {
+      "file": "test/editor/linting.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 433
+    },
+    {
+      "file": "test/editor/search.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 9
+    },
+    {
+      "file": "test/editor/theme.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 39
+    },
+    {
+      "file": "test/editor/zoom.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 322
+    },
+    {
+      "file": "test/help/dialog.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 185
+    },
+    {
+      "file": "test/menu/commands.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 66
+    },
+    {
+      "file": "test/menu/menu-template.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 138
+    },
+    {
+      "file": "test/mocks/graphviz.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "test-only",
+      "loc": 65
+    },
+    {
+      "file": "test/palette/command-palette.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 121
+    },
+    {
+      "file": "test/platform/index.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 123
+    },
+    {
+      "file": "test/preferences/preferences-dialog.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 55
+    },
+    {
+      "file": "test/preview/render.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 277
+    },
+    {
+      "file": "test/preview/zoom.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 150
+    },
+    {
+      "file": "test/recent/recent-files.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 60
+    },
+    {
+      "file": "test/session/session.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 125
+    },
+    {
+      "file": "test/setup.ts",
+      "package": "(root)",
+      "area": "src",
+      "disposition": "build-entry",
+      "loc": 97
+    },
+    {
+      "file": "test/stats/stats-dialog.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 44
+    },
+    {
+      "file": "test/tabs/manager.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 302
+    },
+    {
+      "file": "test/tabs/tab-bar.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 192
+    },
+    {
+      "file": "test/theme/color-scheme.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 127
+    },
+    {
+      "file": "test/toolbar/actions.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 285
+    },
+    {
+      "file": "test/toolbar/examples-menu.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 227
+    },
+    {
+      "file": "test/toolbar/export-diagram.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 237
+    },
+    {
+      "file": "test/toolbar/export-menu.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 205
+    },
+    {
+      "file": "test/toolbar/find.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 37
+    },
+    {
+      "file": "test/toolbar/format.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 153
+    },
+    {
+      "file": "test/toolbar/layout-engine.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 109
+    },
+    {
+      "file": "test/toolbar/new-diagram.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 56
+    },
+    {
+      "file": "test/toolbar/open-diagram.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 36
+    },
+    {
+      "file": "test/toolbar/pdf-options-dialog.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 58
+    },
+    {
+      "file": "test/toolbar/recent-menu.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 56
+    },
+    {
+      "file": "test/toolbar/save-as.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 41
+    },
+    {
+      "file": "test/toolbar/save-diagram.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 50
+    },
+    {
+      "file": "test/toolbar/shortcuts.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 131
+    },
+    {
+      "file": "test/toolbar/theme-button.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 30
+    },
+    {
+      "file": "test/tools/analyze.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 173
+    },
+    {
+      "file": "test/tools/categorize.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 54
+    },
+    {
+      "file": "test/tools/docs-check.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 26
+    },
+    {
+      "file": "test/tools/index.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 73
+    },
+    {
+      "file": "test/tools/ipc.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 117
+    },
+    {
+      "file": "test/tools/render.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 114
+    },
+    {
+      "file": "test/tools/rules.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 96
+    },
+    {
+      "file": "test/tools/scan.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 156
+    },
+    {
+      "file": "test/utils/debounce.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 84
+    },
+    {
+      "file": "test/watch/watch-plan.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 30
+    },
+    {
+      "file": "test/window/state.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 36
+    },
+    {
+      "file": "test/workspace/resize.test.ts",
+      "package": "(root)",
+      "area": "tests",
+      "disposition": "test",
+      "loc": 80
+    },
+    {
+      "file": "tools/dependency-graph/analyze.ts",
+      "package": "(root)",
+      "area": "tools",
+      "disposition": "tool",
+      "loc": 199
+    },
+    {
+      "file": "tools/dependency-graph/categorize.ts",
+      "package": "(root)",
+      "area": "tools",
+      "disposition": "tool",
+      "loc": 47
+    },
+    {
+      "file": "tools/dependency-graph/index.ts",
+      "package": "(root)",
+      "area": "tools",
+      "disposition": "tool",
+      "loc": 202
+    },
+    {
+      "file": "tools/dependency-graph/ipc.ts",
+      "package": "(root)",
+      "area": "tools",
+      "disposition": "tool",
+      "loc": 103
+    },
+    {
+      "file": "tools/dependency-graph/render.ts",
+      "package": "(root)",
+      "area": "tools",
+      "disposition": "tool",
+      "loc": 159
+    },
+    {
+      "file": "tools/dependency-graph/rules.ts",
+      "package": "(root)",
+      "area": "tools",
+      "disposition": "tool",
+      "loc": 90
+    },
+    {
+      "file": "tools/dependency-graph/scan.ts",
+      "package": "(root)",
+      "area": "tools",
+      "disposition": "tool",
+      "loc": 193
+    },
+    {
+      "file": "tools/dependency-graph/types.ts",
+      "package": "(root)",
+      "area": "tools",
+      "disposition": "tool",
+      "loc": 118
+    },
+    {
+      "file": "tools/docs-check/index.ts",
+      "package": "(root)",
+      "area": "tools",
+      "disposition": "tool",
+      "loc": 102
+    },
+    {
+      "file": "vite.config.ts",
+      "package": "(root)",
+      "area": "config",
+      "disposition": "config",
+      "loc": 64
+    },
+    {
+      "file": "vitest.config.ts",
+      "package": "(root)",
+      "area": "config",
+      "disposition": "config",
+      "loc": 27
+    }
+  ],
+  "skippedLinks": [],
+  "warnings": [
+    "package.json entry 'dist-electron/main.js' did not resolve to a known source file -- ignored; if no other declared entry resolves either, the entry-point root falls back to a conventional src/index.* file instead",
+    "package.json entry 'dist-cli/cli/index.js' did not resolve to a known source file -- ignored; if no other declared entry resolves either, the entry-point root falls back to a conventional src/index.* file instead"
+  ]
+}
