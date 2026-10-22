@@ -1,3 +1,4 @@
+import { searchPanelOpen } from '@codemirror/search';
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -10,11 +11,13 @@ import { resetMockGraphviz } from '../mocks/graphviz';
 const mockOpenTextFile = vi.fn();
 const mockPickSavePath = vi.fn();
 const mockWriteTextFile = vi.fn();
+const mockFormatDot = vi.fn();
 
 vi.mock('../../src/platform', () => ({
   openTextFile: mockOpenTextFile,
   pickSavePath: mockPickSavePath,
   writeTextFile: mockWriteTextFile,
+  formatDot: mockFormatDot,
   writeBinaryFile: vi.fn(),
   store: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
   confirm: vi.fn().mockResolvedValue(false),
@@ -32,6 +35,11 @@ describe('toolbar/actions', () => {
   let exportMenu: HTMLDivElement;
   let examplesButton: HTMLButtonElement;
   let examplesMenu: HTMLDivElement;
+  let saveAsButton: HTMLButtonElement;
+  let recentButton: HTMLButtonElement;
+  let recentMenu: HTMLDivElement;
+  let findButton: HTMLButtonElement;
+  let formatButton: HTMLButtonElement;
 
   beforeEach(() => {
     vi.resetModules();
@@ -53,8 +61,14 @@ describe('toolbar/actions', () => {
     saveButton = document.createElement('button');
     exportButton = document.createElement('button');
     exportMenu = document.createElement('div');
+    exportMenu.hidden = true;
     examplesButton = document.createElement('button');
     examplesMenu = document.createElement('div');
+    saveAsButton = document.createElement('button');
+    recentButton = document.createElement('button');
+    recentMenu = document.createElement('div');
+    findButton = document.createElement('button');
+    formatButton = document.createElement('button');
 
     // Setup export menu items
     const pngItem = document.createElement('button');
@@ -99,7 +113,7 @@ describe('toolbar/actions', () => {
   });
 
   describe('setupToolbarActions()', () => {
-    it('sets up all toolbar actions without errors', async () => {
+    it('sets up the core toolbar actions without errors', async () => {
       const { setupToolbarActions } = await import('../../src/toolbar/actions');
 
       expect(() => {
@@ -165,6 +179,93 @@ describe('toolbar/actions', () => {
 
       saveButton.click();
       await vi.waitFor(() => expect(mockPickSavePath).toHaveBeenCalled());
+    });
+  });
+
+  describe('Save as action', () => {
+    it('asks for a new path, writes the document there and commits it as saved', async () => {
+      mockPickSavePath.mockResolvedValue('/path/to/copy.dot');
+      mockWriteTextFile.mockResolvedValue(undefined);
+
+      const { setupToolbarActions } = await import('../../src/toolbar/actions');
+      const commitDocument = vi.fn();
+      const onPathChange = vi.fn();
+
+      setupToolbarActions(
+        makeOptions({ saveAsButton, commitDocument, onPathChange, getPath: () => '/work/old.dot' })
+      );
+
+      saveAsButton.click();
+      await vi.waitFor(() => expect(commitDocument).toHaveBeenCalled());
+
+      expect(mockPickSavePath).toHaveBeenCalledWith(
+        expect.objectContaining({ defaultPath: 'old.dot' })
+      );
+      expect(mockWriteTextFile).toHaveBeenCalledTimes(1);
+      expect(mockWriteTextFile).toHaveBeenCalledWith('/path/to/copy.dot', 'digraph { a -> b }');
+      expect(onPathChange).toHaveBeenCalledWith('/path/to/copy.dot');
+      expect(commitDocument).toHaveBeenCalledWith('digraph { a -> b }', { saved: true });
+    });
+  });
+
+  describe('Find action', () => {
+    it('opens the search panel of the editor when the find button is clicked', async () => {
+      const { setupToolbarActions } = await import('../../src/toolbar/actions');
+
+      setupToolbarActions(makeOptions({ findButton }));
+      expect(searchPanelOpen(editor.state)).toBe(false);
+
+      findButton.click();
+
+      expect(searchPanelOpen(editor.state)).toBe(true);
+    });
+  });
+
+  describe('Format action', () => {
+    it('formats the editor document and reports the new text', async () => {
+      const formatted = 'digraph {\n  a -> b\n}\n';
+      mockFormatDot.mockResolvedValue(formatted);
+
+      const { setupToolbarActions } = await import('../../src/toolbar/actions');
+      const onFormat = vi.fn();
+
+      setupToolbarActions(makeOptions({ formatButton, onFormat }));
+
+      formatButton.click();
+      await vi.waitFor(() => expect(onFormat).toHaveBeenCalledWith(formatted));
+
+      expect(mockFormatDot).toHaveBeenCalledWith('digraph { a -> b }');
+      expect(editor.state.doc.toString()).toBe(formatted);
+    });
+  });
+
+  describe('Recent menu', () => {
+    it('lists the recent paths and passes the chosen path on', async () => {
+      const { setupToolbarActions } = await import('../../src/toolbar/actions');
+      const onPickRecent = vi.fn();
+
+      setupToolbarActions(
+        makeOptions({
+          recentButton,
+          recentMenu,
+          getRecent: () => ['/work/one.dot', 'C:\\work\\two.dot'],
+          onPickRecent,
+        })
+      );
+
+      recentMenu.hidden = true;
+      recentButton.click();
+      const items = [...recentMenu.querySelectorAll<HTMLButtonElement>('.toolbar-menu-item')];
+
+      expect(recentMenu.hidden).toBe(false);
+      expect(recentButton.getAttribute('aria-expanded')).toBe('true');
+      expect(items.map((item) => item.textContent)).toEqual(['one.dot', 'two.dot']);
+
+      items[1]?.click();
+
+      expect(onPickRecent).toHaveBeenCalledWith('C:\\work\\two.dot');
+      expect(recentMenu.hidden).toBe(true);
+      expect(recentButton.getAttribute('aria-expanded')).toBe('false');
     });
   });
 
