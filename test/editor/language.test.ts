@@ -1,7 +1,7 @@
 import { syntaxTree } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
 import { describe, expect, it } from 'vitest';
-import { buildDotVocabulary, DOT_KEYWORDS } from '../../core/dot-vocab';
+import { buildDotVocabulary } from '../../core/dot-vocab';
 import { createDotLanguage } from '../../src/editor/language';
 
 const VOCAB = buildDotVocabulary();

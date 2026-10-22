@@ -67,7 +67,10 @@ describe('toolbar/actions', () => {
     editor.destroy();
   });
 
-  /** The full options for setupToolbarActions: every element is set and every callback is a mock. */
+  /**
+   * The full options for setupToolbarActions. The seven core elements are set, and the save-as,
+   * recent, find and format elements are null. The callbacks that tests assert on are mocks.
+   */
   const makeOptions = (overrides: Partial<ToolbarActionsOptions> = {}): ToolbarActionsOptions => ({
     getEditor: () => editor,
     newDiagramButton,
