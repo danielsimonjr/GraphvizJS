@@ -63,6 +63,8 @@ export interface DotVocabulary {
   attributes: string[];
   /** Enum attribute name -> its value domain (from the attribute catalog). */
   attributeValues: Record<string, string[]>;
+  /** Names of the attributes that take a color value, as the lint checks them. */
+  colorAttributes: string[];
   /** Named colors accepted by color-valued attributes. */
   colors: string[];
 }

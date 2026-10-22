@@ -1,5 +1,9 @@
 /** Canonical DOT vocabulary — single source of truth for highlighting, autocomplete, linting. */
 
+import { DOT_ATTRIBUTE_CATALOG } from './dot-catalog.js';
+import { DOT_COLOR_ATTRIBUTES, DOT_COLORS } from './dot-colors.js';
+import type { DotVocabulary } from './types.js';
+
 /** The reserved DOT keywords. */
 export const DOT_KEYWORDS = ['graph', 'digraph', 'subgraph', 'node', 'edge', 'strict'] as const;
 
@@ -175,3 +179,25 @@ export const DOT_ATTRIBUTES = [
   'xlp',
   'z',
 ] as const;
+
+/**
+ * Build the vocabulary that the editor uses for highlighting and completion.
+ * Every list is a copy, so a caller can change it without changing the constants.
+ *
+ * @returns The keywords, the attribute names, the value domains of the enum attributes,
+ *   the names of the color attributes, and the named colors.
+ */
+export function buildDotVocabulary(): DotVocabulary {
+  return {
+    keywords: [...DOT_KEYWORDS],
+    attributes: [...DOT_ATTRIBUTES],
+    attributeValues: Object.fromEntries(
+      DOT_ATTRIBUTE_CATALOG.filter((s) => s.type === 'enum' && s.values).map((s) => [
+        s.name,
+        [...s.values!],
+      ])
+    ),
+    colorAttributes: [...DOT_COLOR_ATTRIBUTES],
+    colors: [...DOT_COLORS],
+  };
+}
