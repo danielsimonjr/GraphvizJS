@@ -1,10 +1,10 @@
 import { syntaxTree } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
 import { describe, expect, it } from 'vitest';
-import { DOT_ATTRIBUTES, DOT_KEYWORDS } from '../../core/dot-vocab';
+import { buildDotVocabulary, DOT_KEYWORDS } from '../../core/dot-vocab';
 import { createDotLanguage } from '../../src/editor/language';
 
-const VOCAB = { keywords: [...DOT_KEYWORDS], attributes: [...DOT_ATTRIBUTES] };
+const VOCAB = buildDotVocabulary();
 
 describe('language', () => {
   describe('createDotLanguage(VOCAB)', () => {

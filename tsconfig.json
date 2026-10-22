@@ -18,6 +18,7 @@
     "electron/**/*.ts",
     "tools/**/*.ts",
     "core/**/*.ts",
-    "cli/**/*.ts"
+    "cli/**/*.ts",
+    "test/**/*.ts"
   ]
 }

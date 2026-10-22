@@ -10,6 +10,7 @@ function makeTab(overrides: Partial<TabState> & { id: string }): TabState {
     lastSavedAt: null,
     editorView: null,
     editorZoomLevel: 0,
+    layoutEngine: 'dot',
     ...overrides,
   };
 }

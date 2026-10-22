@@ -1,5 +1,6 @@
 // test/session/session.test.ts
 import { describe, expect, it, vi } from 'vitest';
+import type { LayoutEngine } from '../../core/types';
 import { TAB_DRAFTS_KEY } from '../../src/autosave/constants';
 import {
   captureSession,
@@ -8,10 +9,15 @@ import {
   migrateLegacyDrafts,
   persistSession,
   SESSION_KEY,
+  type SessionTab,
 } from '../../src/session/session';
 
-const tab = (filePath: string | null, content: string, savedContent: string, engine = 'dot') =>
-  ({ filePath, content, savedContent, engine }) as const;
+const tab = (
+  filePath: string | null,
+  content: string,
+  savedContent: string,
+  engine: LayoutEngine = 'dot'
+): SessionTab => ({ filePath, content, savedContent, engine });
 
 describe('captureSession', () => {
   it('assembles tabs and clamps activeIndex into range', () => {
@@ -86,11 +92,12 @@ describe('migrateLegacyDrafts', () => {
 });
 
 describe('loadSession / persistSession', () => {
-  const store = (map: Record<string, unknown>) => ({
-    get: vi.fn(async (k: string) => map[k]),
-    set: vi.fn(),
-    delete: vi.fn(),
-  });
+  const store = (map: Record<string, unknown>) => {
+    async function get<T>(k: string): Promise<T | undefined> {
+      return map[k] as T | undefined;
+    }
+    return { get, set: vi.fn(), delete: vi.fn() };
+  };
   it('prefers a stored session', async () => {
     const s = { tabs: [tab(null, 'a', 'a')], activeIndex: 0 };
     expect(await loadSession(store({ [SESSION_KEY]: s }))).toEqual(s);

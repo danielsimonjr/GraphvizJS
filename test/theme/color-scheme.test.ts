@@ -15,14 +15,16 @@ import {
 
 /** A controllable stand-in for a `matchMedia('(prefers-color-scheme: dark)')` result. */
 function fakeMedia(matches: boolean) {
-  const listeners: Array<(e: { matches: boolean }) => void> = [];
+  const listeners: Array<(e: MediaQueryListEvent) => void> = [];
   const media = {
     matches,
-    addEventListener: (_: string, cb: (e: { matches: boolean }) => void) => listeners.push(cb),
+    addEventListener: (_: string, cb: EventListenerOrEventListenerObject) => {
+      listeners.push(cb as (e: MediaQueryListEvent) => void);
+    },
     removeEventListener: vi.fn(),
     emitOsChange(next: boolean) {
       media.matches = next;
-      for (const cb of listeners) cb({ matches: next });
+      for (const cb of listeners) cb({ matches: next } as MediaQueryListEvent);
     },
   };
   return media;
