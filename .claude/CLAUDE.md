@@ -30,7 +30,7 @@ bun run test:e2e:debug         # E2E tests in debug mode
 
 bun run lint                   # Biome check
 bun run lint:fix               # Biome auto-fix
-bun run typecheck              # tsc --noEmit
+bun run typecheck              # tsc --noEmit (src, electron, tools, core, cli and test)
 bun run clean                  # Remove dist/
 ```
 

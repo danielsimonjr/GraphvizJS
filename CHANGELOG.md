@@ -24,6 +24,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **`bun run typecheck` checks `test/` too.** `tsconfig.json` listed `src`, `electron`, `tools`,
+  `core` and `cli`, so a test fixture could drift from the type it stands for and no gate failed
+  (Vitest strips types and checks none). With `test/` in the list, the typecheck found 40 errors in
+  7 test files; all are fixed at their cause. A fixture now builds its data from the real function
+  or the real type (`buildDotVocabulary()`, `SessionTab`, `ToolbarActionsOptions`), a stale option
+  that the code no longer reads (`schedulePreviewRender`) is gone from the toolbar actions test,
+  and the CI `typecheck` step covers the tests.
 - **The dependency-graph generator marks its reports as having no verifiable claim.**
   `tools/dependency-graph` writes `<!-- repo-map:no-verification -->` after the do-not-edit
   banner of `DEPENDENCY_GRAPH.md`, so `repo-tools check` skips the generated report by design.
