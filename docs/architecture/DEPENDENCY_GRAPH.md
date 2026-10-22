@@ -10,7 +10,7 @@
 | --- | --- |
 | Files | 67 |
 | Modules | 22 |
-| Lines of code | 8382 |
+| Lines of code | 8384 |
 | Internal edges | 130 |
 | Exports | 206 |
 

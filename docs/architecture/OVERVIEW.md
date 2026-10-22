@@ -114,7 +114,7 @@ interface ExportResult { bytes: Uint8Array; ext: string; mime: string; }
 Two tools count the code. Each tool has its own scope.
 
 - `tools/dependency-graph` counts `src/`, `core/`, `cli/` and `electron/`: 67 files, 8,351 lines of code, 22 modules and 204 exports. Regenerate the counts with `bun run graph`.
-- `repo-tools map` counts every source file of the repository, in TypeScript and JavaScript. The scope includes tests, scripts, tools and configuration. The count is 173 files, 19,001 lines of code, 4 modules (the tool names them `src`, `config`, `tools` and `tests`) and 281 exports. The Verification table at the end of this document records these values.
+- `repo-tools map` counts every source file of the repository, in TypeScript and JavaScript. The scope includes tests, scripts, tools and configuration. The count is 173 files, 19,038 lines of code, 4 modules (the tool names them `src`, `config`, `tools` and `tests`) and 281 exports. The Verification table at the end of this document records these values.
 
 ## Directory structure
 
@@ -214,7 +214,7 @@ The values cover every source file of the repository. The counts of `tools/depen
 | Claim | Value | Source |
 |---|---|---|
 | totalSourceFiles | 173 | repo-tools map: dependency-graph.json |
-| totalLinesOfCode | 19001 | repo-tools map: dependency-graph.json |
+| totalLinesOfCode | 19038 | repo-tools map: dependency-graph.json |
 | totalModules | 4 | repo-tools map: dependency-graph.json |
 | totalExports | 281 | repo-tools map: dependency-graph.json |
 | runtimeCircularDeps | 0 | repo-tools map: dependency-graph.json |

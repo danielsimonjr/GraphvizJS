@@ -43,6 +43,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **`labelfontcolor` was not treated as a color attribute.** The Graphviz attributes table types
+  it as a color that only edges use. The color list and the attribute catalog left it out, so the
+  invalid-color lint skipped it and the editor offered no color completions for it. It is now in
+  both. A test checks the color list against the six color attributes of the Graphviz table. A
+  `labelfontcolor` on a node or a graph now gets a wrong-context warning, as the other edge
+  attributes do.
 - **A superseded preview render could replace the new diagram with an error.** `createPreview`
   checked the stale token on success but not in its `catch` block. A slow render that failed after
   a newer render had succeeded showed its error and called `onRenderError`. A failure of a

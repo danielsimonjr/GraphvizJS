@@ -48,7 +48,7 @@ Regenerate with `bun run graph`.
 | Runtime circular dependencies | 0 |
 | IPC channels (fully wired) | 20 |
 
-`repo-tools map` counts a wider scope: every source file of the repository (TypeScript and JavaScript), including tests, scripts, tools and configuration. The wider scope gives 173 source files, 19,001 lines of code, 4 modules and 281 exports. The Verification table at the end of this document records these values.
+`repo-tools map` counts a wider scope: every source file of the repository (TypeScript and JavaScript), including tests, scripts, tools and configuration. The wider scope gives 173 source files, 19,038 lines of code, 4 modules and 281 exports. The Verification table at the end of this document records these values.
 
 ### Module Distribution
 
@@ -459,7 +459,7 @@ The values cover every source file of the repository. The counts of `tools/depen
 | Claim | Value | Source |
 |---|---|---|
 | totalSourceFiles | 173 | repo-tools map: dependency-graph.json |
-| totalLinesOfCode | 19001 | repo-tools map: dependency-graph.json |
+| totalLinesOfCode | 19038 | repo-tools map: dependency-graph.json |
 | totalModules | 4 | repo-tools map: dependency-graph.json |
 | totalExports | 281 | repo-tools map: dependency-graph.json |
 | runtimeCircularDeps | 0 | repo-tools map: dependency-graph.json |
