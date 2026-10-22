@@ -1,3 +1,6 @@
+/**
+ * Describes one example diagram that the examples menu lists.
+ */
 export interface ExampleItem {
   id: string;
   label: string;
@@ -5,6 +8,9 @@ export interface ExampleItem {
   order: number;
 }
 
+/**
+ * Describes the button, menu, items and select callback that setupExamplesMenu uses.
+ */
 export interface ExamplesMenuOptions {
   button: HTMLButtonElement | null;
   menu: HTMLDivElement | null;
@@ -12,6 +18,16 @@ export interface ExamplesMenuOptions {
   onSelect?: (content: string, item: ExampleItem) => void | Promise<void>;
 }
 
+/**
+ * Fill the examples menu with the items and handle clicks on them.
+ * The menu is filled once, when this function runs, and is not updated later.
+ *
+ * @param button - The button that toggles the menu. A null button or menu does nothing.
+ * @param menu - The container for the item buttons. Its content is replaced.
+ * @param items - The example diagrams in display order. An empty list does nothing.
+ * @param onSelect - Optional callback that receives the content and the item of a click.
+ * @returns Nothing.
+ */
 export function setupExamplesMenu({ button, menu, items, onSelect }: ExamplesMenuOptions): void {
   if (!button || !menu || items.length === 0) {
     return;

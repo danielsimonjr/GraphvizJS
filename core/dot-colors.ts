@@ -159,6 +159,13 @@ export const DOT_COLORS = [
 
 const COLOR_ATTRIBUTES = new Set(['color', 'bgcolor', 'fillcolor', 'fontcolor', 'pencolor']);
 
+/**
+ * Check whether an attribute takes a color value, ignoring letter case.
+ * The color attributes are color, bgcolor, fillcolor, fontcolor, and pencolor.
+ *
+ * @param attr - The attribute name to check.
+ * @returns True when the attribute takes a color value.
+ */
 export function isColorAttribute(attr: string): boolean {
   return COLOR_ATTRIBUTES.has(attr.toLowerCase());
 }

@@ -7,6 +7,9 @@ const ZOOM_STEP = 0.1;
 const ZOOM_DEFAULT = 1;
 const BASE_FONT_SIZE = 16;
 
+/**
+ * The zoom actions and the current level for one editor.
+ */
 export interface EditorZoomController {
   zoomIn: () => boolean;
   zoomOut: () => boolean;
@@ -14,6 +17,11 @@ export interface EditorZoomController {
   getLevel: () => number;
 }
 
+/**
+ * Create the font-size extension for an editor, with a compartment that can change its size.
+ * The extension starts at level 1.
+ * @returns The extension to add to an editor, and the compartment that holds it.
+ */
 export function createEditorZoomExtension(): {
   extension: ReturnType<Compartment['of']>;
   compartment: Compartment;
@@ -23,6 +31,18 @@ export function createEditorZoomExtension(): {
   return { extension, compartment };
 }
 
+/**
+ * Create a controller that changes the font size of one editor in steps.
+ * Each step changes the level by 0.1, within the limits of 0.5 and 3.
+ *
+ * @param view - The editor to zoom.
+ * @param compartment - The compartment from createEditorZoomExtension that holds the font size.
+ * @param onZoomChange - The optional callback that runs after each level change or reset.
+ *   The callback does not run for initialLevel.
+ * @param initialLevel - The starting level, where 1 is 100 percent. The default is 1.
+ *   The value is not clamped to the limits.
+ * @returns The controller that zooms the editor.
+ */
 export function createEditorZoomController(
   view: EditorView,
   compartment: Compartment,
@@ -79,6 +99,13 @@ export function createEditorZoomController(
   };
 }
 
+/**
+ * Create a keymap that binds Mod-= and Mod-+ to zoom in, Mod-- to zoom out,
+ * and Mod-0 to reset. Mod is Cmd on macOS and Ctrl on other systems.
+ *
+ * @param controller - The zoom controller that the keys call.
+ * @returns A keymap extension for the zoom keys.
+ */
 export function createEditorZoomKeymap(controller: EditorZoomController) {
   return keymap.of([
     {

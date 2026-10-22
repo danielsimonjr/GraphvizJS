@@ -1,6 +1,7 @@
 import { onMenuAction } from '../platform';
 import type { MenuActionId } from './menu-template';
 
+/** The callbacks that run each native menu action in the renderer. */
 export interface MenuCommandHandlers {
   new: () => void;
   newTab: () => void;

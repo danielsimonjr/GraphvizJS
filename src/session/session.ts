@@ -18,6 +18,7 @@ const ENGINES: ReadonlySet<string> = new Set<LayoutEngine>([
   'patchwork',
 ]);
 
+/** The saved state of one tab in a session. */
 export interface SessionTab {
   filePath: string | null;
   content: string;
@@ -25,6 +26,7 @@ export interface SessionTab {
   engine: LayoutEngine;
 }
 
+/** The saved state of a session: its open tabs and the index of the active tab. */
 export interface SessionData {
   tabs: SessionTab[];
   activeIndex: number;

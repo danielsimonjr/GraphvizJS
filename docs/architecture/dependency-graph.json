@@ -2,7 +2,7 @@
   "stats": {
     "fileCount": 67,
     "moduleCount": 22,
-    "totalLoc": 7791,
+    "totalLoc": 8351,
     "edgeCount": 129,
     "exportCount": 204
   },
@@ -949,7 +949,7 @@
     },
     {
       "path": "src/editor/autocomplete.ts",
-      "loc": 98,
+      "loc": 105,
       "exports": [
         "makeDotCompletionSource",
         "createDotAutocomplete"
@@ -957,7 +957,7 @@
     },
     {
       "path": "src/editor/language.ts",
-      "loc": 111,
+      "loc": 119,
       "exports": [
         "createDotLanguage"
       ]
@@ -980,14 +980,14 @@
     },
     {
       "path": "src/editor/theme.ts",
-      "loc": 27,
+      "loc": 32,
       "exports": [
         "createEditorTheme"
       ]
     },
     {
       "path": "src/editor/zoom.ts",
-      "loc": 110,
+      "loc": 137,
       "exports": [
         "createEditorZoomExtension",
         "createEditorZoomController",
@@ -997,7 +997,7 @@
     },
     {
       "path": "src/help/dialog.ts",
-      "loc": 131,
+      "loc": 141,
       "exports": [
         "setupHelpDialog"
       ]
@@ -1009,7 +1009,7 @@
     },
     {
       "path": "src/menu/commands.ts",
-      "loc": 90,
+      "loc": 91,
       "exports": [
         "dispatchMenuAction",
         "setupMenuCommands",
@@ -1018,7 +1018,7 @@
     },
     {
       "path": "src/menu/menu-template.ts",
-      "loc": 323,
+      "loc": 336,
       "exports": [
         "LAYOUT_ENGINES",
         "buildMenuTemplate",
@@ -1028,7 +1028,7 @@
     },
     {
       "path": "src/palette/command-palette.ts",
-      "loc": 172,
+      "loc": 173,
       "exports": [
         "fuzzyScore",
         "filterCommands",
@@ -1039,7 +1039,7 @@
     },
     {
       "path": "src/platform/contract.ts",
-      "loc": 53,
+      "loc": 71,
       "exports": [
         "DiagramFilter",
         "OpenedFile",
@@ -1049,7 +1049,7 @@
     },
     {
       "path": "src/platform/index.ts",
-      "loc": 103,
+      "loc": 256,
       "exports": [
         "store",
         "openTextFile",
@@ -1076,7 +1076,7 @@
     },
     {
       "path": "src/preferences/preferences-dialog.ts",
-      "loc": 116,
+      "loc": 118,
       "exports": [
         "createPreferencesDialog",
         "PreferencesDialogOptions",
@@ -1085,7 +1085,7 @@
     },
     {
       "path": "src/preview/render.ts",
-      "loc": 84,
+      "loc": 102,
       "exports": [
         "createPreview",
         "PreviewStatusCallbacks",
@@ -1095,7 +1095,7 @@
     },
     {
       "path": "src/preview/zoom.ts",
-      "loc": 109,
+      "loc": 149,
       "exports": [
         "createZoomController",
         "setupZoomControls",
@@ -1118,7 +1118,7 @@
     },
     {
       "path": "src/session/session.ts",
-      "loc": 107,
+      "loc": 109,
       "exports": [
         "SESSION_KEY",
         "captureSession",
@@ -1133,7 +1133,7 @@
     },
     {
       "path": "src/stats/stats-dialog.ts",
-      "loc": 72,
+      "loc": 83,
       "exports": [
         "createStatsDialog",
         "StatsDialogOptions",
@@ -1162,7 +1162,7 @@
     },
     {
       "path": "src/theme/color-scheme.ts",
-      "loc": 96,
+      "loc": 100,
       "exports": [
         "COLOR_SCHEMES",
         "COLOR_SCHEME_KEY",
@@ -1179,7 +1179,7 @@
     },
     {
       "path": "src/toolbar/actions.ts",
-      "loc": 167,
+      "loc": 177,
       "exports": [
         "setupToolbarActions",
         "ToolbarActionsOptions"
@@ -1187,7 +1187,7 @@
     },
     {
       "path": "src/toolbar/examples-menu.ts",
-      "loc": 116,
+      "loc": 132,
       "exports": [
         "setupExamplesMenu",
         "ExampleItem",
@@ -1196,14 +1196,14 @@
     },
     {
       "path": "src/toolbar/export-diagram.ts",
-      "loc": 65,
+      "loc": 74,
       "exports": [
         "createExportHandler"
       ]
     },
     {
       "path": "src/toolbar/export-menu.ts",
-      "loc": 96,
+      "loc": 108,
       "exports": [
         "setupExportMenu",
         "ExportMenuOptions"
@@ -1211,7 +1211,7 @@
     },
     {
       "path": "src/toolbar/find.ts",
-      "loc": 16,
+      "loc": 26,
       "exports": [
         "setupFind",
         "FindActionOptions"
@@ -1219,7 +1219,7 @@
     },
     {
       "path": "src/toolbar/format.ts",
-      "loc": 47,
+      "loc": 59,
       "exports": [
         "formatView",
         "setupFormat",
@@ -1237,14 +1237,14 @@
     },
     {
       "path": "src/toolbar/new-diagram.ts",
-      "loc": 13,
+      "loc": 19,
       "exports": [
         "setupNewDiagramAction"
       ]
     },
     {
       "path": "src/toolbar/open-diagram.ts",
-      "loc": 24,
+      "loc": 31,
       "exports": [
         "setupOpenDiagramAction"
       ]
@@ -1258,7 +1258,7 @@
     },
     {
       "path": "src/toolbar/recent-menu.ts",
-      "loc": 73,
+      "loc": 86,
       "exports": [
         "setupRecentMenu",
         "RecentMenuOptions"
@@ -1266,7 +1266,7 @@
     },
     {
       "path": "src/toolbar/save-as.ts",
-      "loc": 46,
+      "loc": 56,
       "exports": [
         "performSaveAs",
         "setupSaveAsAction",
@@ -1275,14 +1275,14 @@
     },
     {
       "path": "src/toolbar/save-diagram.ts",
-      "loc": 37,
+      "loc": 44,
       "exports": [
         "setupSaveDiagramAction"
       ]
     },
     {
       "path": "src/toolbar/shortcuts.ts",
-      "loc": 91,
+      "loc": 101,
       "exports": [
         "setupToolbarShortcuts",
         "ToolbarShortcutsOptions"
@@ -1290,7 +1290,7 @@
     },
     {
       "path": "src/toolbar/theme-button.ts",
-      "loc": 37,
+      "loc": 40,
       "exports": [
         "setupThemeButton",
         "ThemeButtonOptions"
@@ -1298,14 +1298,14 @@
     },
     {
       "path": "src/utils/debounce.ts",
-      "loc": 12,
+      "loc": 20,
       "exports": [
         "debounce"
       ]
     },
     {
       "path": "src/watch/file-watch.ts",
-      "loc": 21,
+      "loc": 24,
       "exports": [
         "setupFileWatch",
         "FileWatchOptions"
@@ -1321,7 +1321,7 @@
     },
     {
       "path": "src/window/state.ts",
-      "loc": 21,
+      "loc": 33,
       "exports": [
         "loadEditorZoom",
         "saveEditorZoom"
@@ -1329,7 +1329,7 @@
     },
     {
       "path": "src/workspace/resize.ts",
-      "loc": 57,
+      "loc": 67,
       "exports": [
         "initHorizontalResize"
       ]
@@ -1343,7 +1343,7 @@
     },
     {
       "path": "core/dot-catalog.ts",
-      "loc": 215,
+      "loc": 231,
       "exports": [
         "DOT_ATTRIBUTE_CATALOG",
         "findAttribute",
@@ -1354,7 +1354,7 @@
     },
     {
       "path": "core/dot-colors.ts",
-      "loc": 164,
+      "loc": 171,
       "exports": [
         "DOT_COLORS",
         "isColorAttribute"
@@ -1362,7 +1362,7 @@
     },
     {
       "path": "core/dot-vocab.ts",
-      "loc": 172,
+      "loc": 177,
       "exports": [
         "DOT_KEYWORDS",
         "DOT_ATTRIBUTES"
@@ -1378,7 +1378,7 @@
     },
     {
       "path": "core/export-pdf.ts",
-      "loc": 222,
+      "loc": 225,
       "exports": [
         "computePageGeometry",
         "svgToPdfBytes",
@@ -1394,14 +1394,14 @@
     },
     {
       "path": "core/export.ts",
-      "loc": 36,
+      "loc": 47,
       "exports": [
         "exportDiagram"
       ]
     },
     {
       "path": "core/format.ts",
-      "loc": 158,
+      "loc": 161,
       "exports": [
         "formatDot",
         "FormatOptions"
@@ -1409,7 +1409,7 @@
     },
     {
       "path": "core/graph-stats.ts",
-      "loc": 105,
+      "loc": 119,
       "exports": [
         "computeStats",
         "graphStats"
@@ -1425,7 +1425,7 @@
     },
     {
       "path": "core/parse-graph.ts",
-      "loc": 321,
+      "loc": 334,
       "exports": [
         "tokenizeDot",
         "parseGraph",
@@ -1445,7 +1445,7 @@
     },
     {
       "path": "core/scan-dot.ts",
-      "loc": 149,
+      "loc": 159,
       "exports": [
         "scanDot",
         "checkBalance",

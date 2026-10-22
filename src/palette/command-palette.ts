@@ -40,6 +40,7 @@ export function filterCommands(commands: Command[], query: string): Command[] {
     .map((entry) => entry.command);
 }
 
+/** The controller that opens and closes the command palette. */
 export interface CommandPalette {
   open(): void;
   close(): void;

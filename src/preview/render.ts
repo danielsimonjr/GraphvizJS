@@ -1,8 +1,14 @@
 import type { LayoutEngine } from '../../core/types';
 import { debounce } from '../utils/debounce';
 
+/**
+ * A function that schedules a preview render of DOT source.
+ */
 export type PreviewScheduler = (doc: string) => void;
 
+/**
+ * The callbacks that report each stage of a preview render.
+ */
 export interface PreviewStatusCallbacks {
   onRenderStart?: () => void;
   onRenderSuccess?: () => void;
@@ -10,12 +16,24 @@ export interface PreviewStatusCallbacks {
   onRenderError?: (details: string) => void;
 }
 
+/**
+ * The options for createPreview, where the layout engine defaults to dot.
+ */
 export interface PreviewOptions {
   callbacks?: PreviewStatusCallbacks;
   getEngine?: () => LayoutEngine;
   render: (dot: string, engine: LayoutEngine) => Promise<string>;
 }
 
+/**
+ * Create a scheduler that renders DOT source into the preview element once input pauses.
+ * Each call runs onRenderStart immediately, before the delay ends.
+ *
+ * @param previewEl - The element that shows the SVG or a message.
+ * @param delay - Milliseconds to wait after the last call before rendering.
+ * @param options - The render function, plus the optional engine getter and status callbacks.
+ * @returns A function that takes DOT source and schedules its render.
+ */
 export function createPreview(
   previewEl: HTMLElement,
   delay: number,

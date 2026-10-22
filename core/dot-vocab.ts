@@ -1,7 +1,12 @@
 /** Canonical DOT vocabulary — single source of truth for highlighting, autocomplete, linting. */
 
+/** The reserved DOT keywords. */
 export const DOT_KEYWORDS = ['graph', 'digraph', 'subgraph', 'node', 'edge', 'strict'] as const;
 
+/**
+ * The DOT attribute names. The structural lint checks names against this list, and the
+ * vocabulary IPC serves the list to the editor.
+ */
 export const DOT_ATTRIBUTES = [
   'area',
   'arrowhead',

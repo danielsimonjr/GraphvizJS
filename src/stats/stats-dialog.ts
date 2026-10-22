@@ -1,10 +1,12 @@
 import type { GraphStats } from '../../core/types';
 
+/** The callbacks that read the diagram source and compute its statistics. */
 export interface StatsDialogOptions {
   getSource: () => string;
   graphStats: (source: string) => Promise<GraphStats>;
 }
 
+/** A dialog that shows the statistics of a diagram. */
 export interface StatsDialog {
   open(): Promise<void>;
 }
@@ -30,6 +32,15 @@ function rows(stats: GraphStats): [string, string][] {
   return out;
 }
 
+/**
+ * Create a dialog that shows the statistics of a diagram.
+ *
+ * The open method reads the source, computes the statistics, and shows them in a modal dialog.
+ * When the computation fails, the open call rejects and the dialog stays closed.
+ *
+ * @param opts - The callbacks that read the diagram source and compute its statistics.
+ * @returns The dialog controller, with its open method.
+ */
 export function createStatsDialog(opts: StatsDialogOptions): StatsDialog {
   let el: HTMLDialogElement | null = null;
 

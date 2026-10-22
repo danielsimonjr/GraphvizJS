@@ -9,6 +9,13 @@ interface SaveDiagramOptions {
   onSave?: (doc: string, path: string) => void;
 }
 
+/**
+ * Save the document to its file path when the save button is clicked.
+ * A document with no file path asks for one, and a cancelled dialog stops the save.
+ *
+ * @param options - The save button, the getEditor and getPath functions, and the callbacks.
+ * @returns Nothing.
+ */
 export function setupSaveDiagramAction(options: SaveDiagramOptions): void {
   const { getEditor, button, getPath, onPathChange, onSave } = options;
   if (!button) return;

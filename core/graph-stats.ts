@@ -62,6 +62,13 @@ function hasUndirectedCycle(nodes: string[], edges: GraphEdge[]): boolean {
   return false;
 }
 
+/**
+ * Measure a parsed graph and return its counts and flags.
+ * The result has roots and leaves only for directed graphs.
+ *
+ * @param model - The parsed graph to measure, from parseGraph.
+ * @returns The counts and flags for the graph.
+ */
 export function computeStats(model: GraphModel): GraphStats {
   const { directed, strict, nodes, edges, subgraphs } = model;
   const outAdj = new Map<string, string[]>();
@@ -100,6 +107,13 @@ export function computeStats(model: GraphModel): GraphStats {
   return stats;
 }
 
+/**
+ * Parse DOT source and measure the graph it describes.
+ * The function does not throw on malformed source.
+ *
+ * @param source - The DOT source text to measure.
+ * @returns The counts and flags for the graph.
+ */
 export function graphStats(source: string): GraphStats {
   return computeStats(parseGraph(source));
 }

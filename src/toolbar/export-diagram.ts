@@ -17,6 +17,15 @@ const FILTERS: Record<ExportFormat, { name: string; ext: string; suffix?: string
   pdf: { name: 'PDF Document', ext: 'pdf' },
 };
 
+/**
+ * Create a function that exports the diagram in a given format.
+ * An empty diagram is not exported, and errors are logged rather than thrown.
+ *
+ * @param getEditor - The function that returns the editor with the diagram.
+ * @param getPath - The function that returns the file path, or null when unsaved.
+ * @param getEngine - The function that returns the layout engine, such as dot.
+ * @returns An async function that takes an export format and resolves when the export ends.
+ */
 export function createExportHandler({ getEditor, getPath, getEngine }: ExportDiagramOptions) {
   return async (format: ExportFormat) => {
     const dot = getEditor().state.doc.toString().trim();

@@ -10,6 +10,17 @@ const DEFAULT_PDF_OPTIONS: PdfExportOptions = {
   orientation: 'auto',
 };
 
+/**
+ * Render DOT source and convert the result to one export format.
+ * Every format starts from the normalized SVG, not from the raw Graphviz output.
+ *
+ * @param dot - The DOT source to export.
+ * @param engine - The Graphviz layout engine, such as dot.
+ * @param format - The output format: svg, png, pngx2 (PNG at twice the png scale), or pdf.
+ * @param options - The PDF page settings, which apply only to pdf.
+ *   By default, the page matches the diagram size.
+ * @returns The export bytes, with the file extension and the MIME type.
+ */
 export async function exportDiagram(
   dot: string,
   engine: LayoutEngine,

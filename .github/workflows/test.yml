@@ -65,3 +65,44 @@ jobs:
           name: e2e-results
           path: test-results/
           retention-days: 14
+
+  docs:
+    name: architecture documents and doc comments match the code
+    # The checks only read files, so any runner works. Linux starts faster than Windows.
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      # The version is exact. A new release of repo-tools can change how it counts, or what it
+      # accepts as plain text, and turn this job red with no change to the code. Raise the pin on
+      # purpose, after a local run of the commands below.
+      REPO_TOOLS_VERSION: 2.2.5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install repo-tools
+        run: npm install --global --ignore-scripts "@danielsimonjr/repo-tools@${REPO_TOOLS_VERSION}"
+
+      # The hand-written documents end in a Verification table of counts. The check parses the
+      # source again and fails when a document claims a count that the parse does not give.
+      - name: Architecture claims match the source
+        run: repo-tools check . --docs=docs/architecture
+
+      - name: Architecture documents are in Simplified Technical English
+        run: repo-tools ste docs/architecture
+
+      # An exported symbol with no doc comment fails here, not in review. The loop checks all
+      # four folders, so one run reports every folder that fails.
+      - name: Exported symbols have doc comments
+        run: |
+          status=0
+          for dir in src core cli electron; do
+            repo-tools docs check "$dir" || status=1
+          done
+          exit "$status"

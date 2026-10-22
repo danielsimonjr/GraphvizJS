@@ -13,6 +13,9 @@ import { setupSaveDiagramAction } from './save-diagram';
 
 const EXAMPLES = loadExamples();
 
+/**
+ * Describes the toolbar elements and callbacks that setupToolbarActions uses.
+ */
 export interface ToolbarActionsOptions {
   getEditor: () => EditorView;
   newDiagramButton: HTMLButtonElement | null;
@@ -39,6 +42,13 @@ export interface ToolbarActionsOptions {
   getEngine: () => LayoutEngine;
 }
 
+/**
+ * Connect the toolbar buttons and menus to their actions.
+ * The examples menu is set up only when at least one example file exists.
+ *
+ * @param options - The toolbar elements and callbacks. A null element skips its action.
+ * @returns Nothing.
+ */
 export function setupToolbarActions(options: ToolbarActionsOptions): void {
   const {
     getEditor,

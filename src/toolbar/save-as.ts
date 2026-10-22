@@ -1,6 +1,9 @@
 import type { EditorView } from 'codemirror';
 import { pickSavePath, writeTextFile } from '../platform';
 
+/**
+ * Describes the getEditor and getPath functions and the callbacks for a save-as action.
+ */
 export interface SaveAsOptions {
   getEditor: () => EditorView;
   getPath: () => string | null;
@@ -35,6 +38,13 @@ export async function performSaveAs(opts: SaveAsOptions): Promise<void> {
   }
 }
 
+/**
+ * Run the save-as action when the save-as button is clicked.
+ * The action always asks for a new path, even when the document already has one.
+ *
+ * @param opts - The save-as button and the performSaveAs options. A null button does nothing.
+ * @returns Nothing.
+ */
 export function setupSaveAsAction(
   opts: SaveAsOptions & { button: HTMLButtonElement | null }
 ): void {

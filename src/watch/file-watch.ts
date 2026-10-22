@@ -1,5 +1,8 @@
 import { onFileChanged, setWatchedPaths } from '../platform';
 
+/**
+ * Describes the getOpenPaths function and the callback for external file changes.
+ */
 export interface FileWatchOptions {
   getOpenPaths: () => string[];
   onExternalChange: (path: string) => void | Promise<void>;

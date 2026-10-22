@@ -12,6 +12,9 @@ const THEME_LABEL: Record<ColorScheme, string> = {
   dark: 'Dark',
 };
 
+/**
+ * Describes the theme button and the callback that setupThemeButton uses.
+ */
 export interface ThemeButtonOptions {
   button: HTMLButtonElement;
   /** Called on click to advance the scheme. */

@@ -2,6 +2,9 @@ interface NavigatorUAData {
   platform: string;
 }
 
+/**
+ * Describes the buttons and tab callbacks that setupToolbarShortcuts uses.
+ */
 export interface ToolbarShortcutsOptions {
   newButton?: HTMLButtonElement | null;
   openButton?: HTMLButtonElement | null;
@@ -13,6 +16,13 @@ export interface ToolbarShortcutsOptions {
   onPreviousTab?: () => void;
 }
 
+/**
+ * Register the toolbar and tab keyboard shortcuts on the window.
+ * The listener uses the capture phase and skips an event that is already prevented.
+ *
+ * @param options - The buttons and tab callbacks. A missing or disabled entry ignores its key.
+ * @returns A function that removes the keydown listener.
+ */
 export function setupToolbarShortcuts(options: ToolbarShortcutsOptions): () => void {
   const userAgentData = (navigator as Navigator & { userAgentData?: NavigatorUAData })
     .userAgentData;

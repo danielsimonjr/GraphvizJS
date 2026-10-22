@@ -93,6 +93,13 @@ export function makeDotCompletionSource(
   };
 }
 
+/**
+ * Create the CodeMirror autocompletion extension for DOT source.
+ * The DOT completion replaces all other completion sources, and opens on typing.
+ *
+ * @param vocab - The keywords, attribute names, enum value lists, and colors to offer.
+ * @returns The extension that adds DOT completion to an editor.
+ */
 export function createDotAutocomplete(vocab: DotVocabulary): Extension {
   return autocompletion({ override: [makeDotCompletionSource(vocab)], activateOnTyping: true });
 }
