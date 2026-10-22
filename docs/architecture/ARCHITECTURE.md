@@ -72,7 +72,7 @@ Regenerate with `bun run graph`.
 | `preferences` | `src/` | `createPreferencesDialog` |
 | `help` | `src/` | help dialog |
 | `workspace` | `src/` | resizable pane divider |
-| `window` | `src/` | window state persistence |
+| `window` | `src/` | editor zoom persistence |
 | `utils` | `src/` | `debounce` |
 | `autosave` | `src/` | legacy constants (superseded by `session`) |
 | `root` | `src/` | `main.ts` bootstrap |

@@ -42,14 +42,14 @@ Run a single E2E test: `npx playwright test test/e2e/rendering.spec.ts`
 ### Bootstrap Flow (`src/main.ts`)
 
 The app bootstraps on `DOMContentLoaded` via a single `bootstrap()` function that:
-1. Loads persisted window state and settings from electron-store
-2. Applies the persisted color scheme early (before the heavy editor/tab init) to avoid a wrong-theme flash
-3. Creates zoom controllers (preview + editor)
-4. Creates the `TabManager` and initial tab with a CodeMirror editor
-5. Silently restores the previously open session (`loadSession` — tabs, unsaved edits, and per-tab layout engine) instead of prompting for crash recovery
-6. Wires up the tab bar, toolbar actions, keyboard shortcuts, the layout-engine selector, the command palette + preferences dialog, and session persistence
+1. Applies the persisted color scheme first (before the heavy editor/tab init) to avoid a wrong-theme flash, then creates the preferences dialog and the preview zoom controller
+2. Creates the `TabManager` and the preview, and loads the recent-files list
+3. Loads the saved editor zoom into the one shared `createEditorZoomController`, and fetches the DOT vocabulary once over the `dot:vocabulary` IPC
+4. Sets up the tab bar and creates the initial tab with a CodeMirror editor
+5. Silently restores the previously open session into that tab (`loadSession` — tabs, unsaved edits, and per-tab layout engine) instead of prompting for crash recovery
+6. Wires up the external-file watch, the toolbar actions, the layout-engine selector, the session persistence timer, the native-menu handlers, and the command palette with its shortcut
 
-The main process (not the renderer) initializes Graphviz. State is managed via a `TabManager` instance in `bootstrap()`. Each tab holds its own `TabState` (id, file path, dirty flag, last-committed and saved-content baselines, editor instance, and layout engine). The editor zoom is not per tab: one `createEditorZoomController` holds the level for all editors. The `commitDocument()` function delegates to the active tab. Only the active tab's editor is visible (others hidden via `display:none`).
+The main process (not the renderer) initializes Graphviz, and it saves and restores the window position, size and maximized state (store key `windowState`). State is managed via a `TabManager` instance in `bootstrap()`. Each tab holds its own `TabState` (id, file path, dirty flag, last-committed and saved-content baselines, editor instance, and layout engine). The editor zoom is not per tab: one `createEditorZoomController` holds the level for all editors. The `commitDocument()` function delegates to the active tab. Only the active tab's editor is visible (others hidden via `display:none`).
 
 ### Module Boundaries
 
@@ -67,7 +67,7 @@ Within `src/` (the renderer), each subdirectory exports setup functions that rec
 - **watch/** — external-change detection (`watch-plan.ts` pure core; renderer side reacts to the `file:changed` push and reloads clean tabs / prompts dirty ones)
 - **menu/** — native application menu: `menu-template.ts` (pure `buildMenuTemplate`) and `commands.ts` (dispatch for `menu:action`)
 - **workspace/** — horizontal resizable pane divider
-- **window/** — window position/size persistence via electron-store
+- **window/** — editor zoom persistence (`loadEditorZoom`, `saveEditorZoom`) via electron-store; the main process owns the window bounds
 - **theme/** — color scheme (`color-scheme.ts`): `createColorSchemeController` owns the live `system`/`light`/`dark` preference (set/get/cycle, reacts to OS changes) atop pure helpers (`resolveDark`, `nextScheme`, `applyScheme` — toggles the `dark` body class that drives every dark CSS variable), persisted under the `colorScheme` store key. Set up first in `bootstrap()` to minimize a wrong-theme flash
 - **palette/** — command palette (`command-palette.ts`, Ctrl/Cmd+Shift+P): a registry of `Command`s filtered by a subsequence `fuzzyScore`
 - **preferences/** — preferences dialog (`preferences-dialog.ts`, Appearance → Theme)
