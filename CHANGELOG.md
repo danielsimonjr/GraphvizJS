@@ -63,6 +63,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   both. A test checks the color list against the six color attributes of the Graphviz table. A
   `labelfontcolor` on a node or a graph now gets a wrong-context warning, as the other edge
   attributes do.
+- **The notes about `bootstrap()` and `src/window/` were wrong.** `src/window/state.ts` holds only
+  the load and save of the editor zoom; the main process saves and restores the window bounds and
+  the maximized state (store key `windowState`). `.claude/CLAUDE.md`, `AGENTS.md`, `README.md` and
+  the architecture documents said that the window module saves the window state, and the
+  bootstrap list in `.claude/CLAUDE.md` put the steps in the wrong order. They now match
+  `src/main.ts` and `electron/main.ts`.
 - **A new tab started at the zoom of the app start, and each tab kept its own editor zoom.**
   `main.ts` read the saved level once and gave it to the controller of every tab that opened
   later, and each controller kept a level of its own. After a zoom in one tab, a new tab and the

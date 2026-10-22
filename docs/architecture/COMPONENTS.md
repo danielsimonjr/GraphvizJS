@@ -316,8 +316,8 @@ corrected source to `-o <path>` or stdout. `stats` calls `core/graph-stats.ts`'s
 
 ### main.ts (`electron/main.ts`)
 
-**Purpose**: create the window, register the 20 IPC handlers, own persistence and the
-native menu/watcher.
+**Purpose**: create the window, save and restore its bounds and its maximized state, register
+the 20 IPC handlers, own persistence and the native menu/watcher.
 
 ```typescript
 function registerIpc(): void
@@ -449,7 +449,7 @@ function createStatsDialog(opts: StatsDialogOptions): { open(): Promise<void> }
 
 - **help/** — help dialog (shortcuts + app info).
 - **workspace/** — horizontal resizable pane divider.
-- **window/** — window position/size persistence via `electron-store`.
+- **window/** — editor zoom persistence via `electron-store`. The main process owns the window bounds.
 - **utils/** — `debounce`.
 - **autosave/** — legacy constants only; superseded by `session/`.
 

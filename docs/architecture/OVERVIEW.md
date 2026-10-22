@@ -151,7 +151,7 @@ src/             # renderer (Vite) — setup functions wired by main.ts
 ├── tabs/            # TabManager + tab bar
 ├── session/  recent/  watch/       # session restore, recent files, watch reactions
 ├── menu/  theme/  palette/  preferences/  help/  stats/   # app shell (stats = Graph Statistics dialog)
-├── workspace/  window/  utils/  examples/         # panes, window state, debounce, templates
+├── workspace/  window/  utils/  examples/         # panes, editor zoom store, debounce, templates
 └── main.ts          # bootstrap()
 
 tools/dependency-graph/   # the architecture analyzer (bun run graph / graph:check)

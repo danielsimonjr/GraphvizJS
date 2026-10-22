@@ -42,7 +42,7 @@ Each `src/` subdirectory exports setup functions that receive DOM elements and c
 - **toolbar/** — One module per action (`new-diagram.ts`, `open-diagram.ts`, `save-diagram.ts`, `export-diagram.ts`, `export-menu.ts`, `examples-menu.ts`, `layout-engine.ts`, `shortcuts.ts`), orchestrated by `actions.ts`
 - **autosave/** — Periodic draft saving (`manager.ts`) and crash recovery (`recovery.ts`) via electron-store
 - **workspace/** — Resizable pane divider
-- **window/** — Window state persistence via electron-store
+- **window/** — Editor zoom persistence via electron-store (the main process owns the window bounds)
 - **examples/** — `.dot` template files, loaded via Vite `import.meta.glob` with `?raw` query
 
 ### Rendering Pipeline

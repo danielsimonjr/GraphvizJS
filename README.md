@@ -174,7 +174,7 @@ Tests mirror the source structure:
 - `test/tabs/`, `test/session/`, `test/recent/`, `test/watch/` – Multi-tab, session restore, recent files, external-change handling
 - `test/menu/`, `test/palette/`, `test/preferences/`, `test/theme/` – Native menu, command palette, preferences, color scheme
 - `test/platform/` – Renderer↔main IPC wrapper delegation
-- `test/workspace/`, `test/window/`, `test/help/`, `test/utils/` – Pane resize, window state, help dialog, debounce
+- `test/workspace/`, `test/window/`, `test/help/`, `test/utils/` – Pane resize, editor zoom store, help dialog, debounce
 - `test/architecture/` – Renderer-purity guard (no Graphviz runtime imports leak into `src/`)
 - `test/tools/` – Dependency-graph tool (IPC wiring, layering)
 - `test/mocks/` – Shared mocks for Electron APIs and Graphviz WASM
