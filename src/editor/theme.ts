@@ -1,6 +1,11 @@
 import type { Extension } from '@codemirror/state';
 import { EditorView } from 'codemirror';
 
+/**
+ * Create the CodeMirror theme for the editor frame, the text font, and the gutters.
+ * The border, background, caret, and gutter text colors come from --editor CSS variables.
+ * @returns An editor extension that applies the theme.
+ */
 export function createEditorTheme(): Extension {
   return EditorView.theme({
     '&': {

@@ -14,7 +14,8 @@ Based on [MermaidJS Desktop Client](https://github.com/skydiver/mermaidjs-deskto
 6. [Tooling](#tooling)
 7. [Testing](#testing)
 8. [Project Structure](#project-structure)
-9. [Acknowledgements](#acknowledgements)
+9. [Documentation](#documentation)
+10. [Acknowledgements](#acknowledgements)
 
 ## Features
 
@@ -206,6 +207,28 @@ The codebase is split into a Node-only headless core, an Electron main process, 
   - `utils/` – Shared utilities (debounce)
 - `electron/` – Electron main process (`main.ts` + IPC handlers), preload script (`preload.ts`), native menu (`app-menu.ts`), and file watcher (`file-watcher.ts`)
 - `tools/dependency-graph/` – The architecture/dependency analyzer behind `bun run graph` / `bun run graph:check`
+
+## Documentation
+
+The `docs/architecture/` directory holds the architecture documents:
+
+- [OVERVIEW.md](docs/architecture/OVERVIEW.md) – what the project is, how it is laid out, and the key numbers
+- [ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) – the principles, the context, and the key design decisions
+- [COMPONENTS.md](docs/architecture/COMPONENTS.md) – each module, with its signatures
+- [DATAFLOW.md](docs/architecture/DATAFLOW.md) – how a request travels from the UI to Graphviz and back
+- [API.md](docs/architecture/API.md) – the CLI, the IPC contract, and the public surface of `core/`
+- [DEPENDENCY_GRAPH.md](docs/architecture/DEPENDENCY_GRAPH.md) – the generated import graph (`bun run graph` writes it; do not edit it by hand)
+
+Three commands keep the documents and the doc comments true. All three run in the `docs` job of CI. Install [`repo-tools`](https://www.npmjs.com/package/@danielsimonjr/repo-tools) (it needs Node.js 20 or newer) to run them on your machine. Use the version that `REPO_TOOLS_VERSION` names in `.github/workflows/test.yml`.
+
+```bash
+npm install --global @danielsimonjr/repo-tools
+repo-tools check . --docs=docs/architecture   # each Verification table matches the source
+repo-tools ste docs/architecture              # the documents follow Simplified Technical English
+repo-tools docs check src                     # each exported symbol has a doc comment (also: core, cli, electron)
+```
+
+Each hand-written document ends with a `## Verification` table. `repo-tools map . --out=<dir>` measures the numbers in the tables. The `docs:check` script is a separate guard: it fails when a module or an IPC channel has no entry in the documents.
 
 ## Acknowledgements
 

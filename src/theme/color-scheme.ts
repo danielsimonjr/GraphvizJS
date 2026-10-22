@@ -3,7 +3,9 @@ import { store } from '../platform';
 /** The user's color-scheme preference. `system` follows the OS. */
 export type ColorScheme = 'system' | 'light' | 'dark';
 
+/** The color schemes, in the order in which nextScheme cycles through them. */
 export const COLOR_SCHEMES: readonly ColorScheme[] = ['system', 'light', 'dark'];
+/** The store key that holds the saved color scheme. */
 export const COLOR_SCHEME_KEY = 'colorScheme';
 
 /** Whether dark styling should apply, given a scheme and the OS dark preference. */
@@ -44,6 +46,7 @@ export async function saveColorScheme(scheme: ColorScheme): Promise<void> {
   }
 }
 
+/** The controller that reads, sets and cycles the color scheme. */
 export interface ColorSchemeController {
   get(): ColorScheme;
   /** Set, apply, persist, and notify. */
@@ -52,6 +55,7 @@ export interface ColorSchemeController {
   cycle(): Promise<void>;
 }
 
+/** The inputs of createColorSchemeController. Only initial and media are required. */
 export interface ColorSchemeDeps {
   initial: ColorScheme;
   /** Result of `matchMedia('(prefers-color-scheme: dark)')`. */

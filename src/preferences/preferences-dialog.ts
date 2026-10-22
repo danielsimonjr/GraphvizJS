@@ -6,6 +6,7 @@ const THEME_LABEL: Record<ColorScheme, string> = {
   dark: 'Dark',
 };
 
+/** The choices and callbacks of the Preferences dialog. */
 export interface PreferencesDialogOptions {
   /** Selectable schemes, in display order. */
   schemes: readonly ColorScheme[];
@@ -15,6 +16,7 @@ export interface PreferencesDialogOptions {
   onTheme: (scheme: ColorScheme) => void;
 }
 
+/** The controller that opens and closes the Preferences dialog. */
 export interface PreferencesDialog {
   open(): void;
   close(): void;

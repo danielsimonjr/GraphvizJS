@@ -5,6 +5,14 @@ import type { DotVocabulary } from '../../core/types';
 
 const ARROW_TOKENS = ['->', '--'];
 
+/**
+ * Create a CodeMirror stream language that highlights DOT source.
+ * The language reads one line at a time, so a comment or string that spans lines
+ * is colored only on its first line.
+ *
+ * @param vocab - The keywords and attribute names to highlight, from core.
+ * @returns The language extension for an editor.
+ */
 export function createDotLanguage(vocab: DotVocabulary): Extension {
   const keywordSet = new Set(vocab.keywords.map((word) => word.toLowerCase()));
   const attributeSet = new Set(vocab.attributes.map((attr) => attr.toLowerCase()));

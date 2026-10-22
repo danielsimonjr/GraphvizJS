@@ -3,12 +3,24 @@ export type { ExportFormat } from '../../core/types';
 
 import type { ExportFormat } from '../../core/types';
 
+/**
+ * Describes the button, the menu and the selection callback that setupExportMenu uses.
+ */
 export interface ExportMenuOptions {
   button: HTMLButtonElement | null;
   menu: HTMLDivElement | null;
   onSelect?: (format: ExportFormat) => void | Promise<void>;
 }
 
+/**
+ * Show and hide the export menu, and report the chosen export format.
+ * The menu closes before the callback runs, and the button receives focus.
+ *
+ * @param button - The button that toggles the menu. A null button or menu does nothing.
+ * @param menu - The menu of export items. Each item names its format in data-export.
+ * @param onSelect - Optional callback that receives the format of the clicked item.
+ * @returns Nothing.
+ */
 export function setupExportMenu({ button, menu, onSelect }: ExportMenuOptions): void {
   if (!button || !menu) {
     return;

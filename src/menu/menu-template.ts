@@ -3,6 +3,7 @@ import type { MenuItemConstructorOptions } from 'electron';
 // main-process menu build (this template is built in the main process).
 import type { ColorScheme } from '../theme/color-scheme';
 
+/** The ids of the actions that native menu items send to the renderer. */
 export type MenuActionId =
   | 'new'
   | 'new-tab'
@@ -26,6 +27,7 @@ export type MenuActionId =
   | 'zoom-reset'
   | 'help';
 
+/** The options that buildMenuTemplate uses to build the native menu. */
 export interface MenuBuildOptions {
   isMac: boolean;
   isDev: boolean;
@@ -44,6 +46,7 @@ const THEME_ITEMS: { readonly scheme: ColorScheme; readonly label: string }[] = 
   { scheme: 'dark', label: 'Dark' },
 ];
 
+/** The names of the Graphviz layout engines that the application menu and the palette offer. */
 export const LAYOUT_ENGINES: readonly string[] = [
   'dot',
   'neato',
@@ -307,6 +310,16 @@ function buildHelpMenu(opts: MenuBuildOptions): MenuItemConstructorOptions {
   return { label: 'Help', submenu };
 }
 
+/**
+ * Build the template of the native application menu.
+ * The function does not install the menu.
+ *
+ * On macOS, the first menu is the application menu. When opts.isDev is true, the View menu
+ * also adds reload and developer tools.
+ *
+ * @param opts - The platform flags, recent files, current theme and action callbacks.
+ * @returns The top-level menu items, in display order.
+ */
 export function buildMenuTemplate(opts: MenuBuildOptions): MenuItemConstructorOptions[] {
   const template: MenuItemConstructorOptions[] = [
     buildFileMenu(opts),

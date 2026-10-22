@@ -1,8 +1,5 @@
 # GraphvizJS — Component Reference
 
-**Version**: 2.6.0
-**Last Updated**: 2026-07-08
-
 ---
 
 ## Table of Contents
@@ -42,7 +39,9 @@ GraphvizJS is a layered Electron app with a headless core. File counts per modul
 └───────────────────────────────────────────────────────────────┘
 ```
 
-**Total:** 67 TypeScript files · 7,759 LOC · 22 modules · 204 exports · 20 IPC channels.
+**Total** (`src/`, `core/`, `cli/` and `electron/`): 67 TypeScript files · 8,351 LOC · 22 modules · 204 exports · 20 IPC channels.
+
+The whole repository, including tests, scripts and tools, holds 173 source files, 18,850 lines of code, 4 modules and 279 exports (`repo-tools map`). The Verification table at the end of this document records these values.
 
 ---
 
@@ -122,9 +121,10 @@ autocomplete can offer value-aware completions.
 
 ### format.ts (`core/format.ts`)
 
-**Purpose**: pure DOT reformatter — reindent by brace depth and normalize `->`/`--`
-spacing in code regions; literals preserved verbatim; idempotent; fails safe (returns
-input unchanged on unbalanced delimiters).
+**Purpose**: pure DOT reformatter. The reformatter re-indents by brace depth and normalizes
+`->` and `--` spacing in code regions. The reformatter keeps literals verbatim and is
+idempotent. The reformatter fails safe: when the delimiters are unbalanced, the reformatter
+returns the input unchanged.
 
 ```typescript
 interface FormatOptions { indent?: string; }
@@ -133,10 +133,10 @@ function formatDot(source: string, opts?: FormatOptions): string
 
 ### dot-catalog.ts (`core/dot-catalog.ts`)
 
-**Purpose**: the DOT attribute catalog — per-attribute statement contexts (`graph` /
-`node` / `edge` / `cluster` / `subgraph`), value type, and (for `enum` attributes) the
-value domain, transcribed from the canonical Graphviz attrs table. Shared foundation
-for semantic lint and the `dot:vocabulary` IPC's `attributeValues`.
+**Purpose**: the DOT attribute catalog. It holds the statement contexts of each attribute
+(`graph`, `node`, `edge`, `cluster`, `subgraph`) and the value type. For `enum` attributes
+it also holds the value domain. The data comes from the canonical Graphviz attrs table.
+Semantic lint and the `attributeValues` of the `dot:vocabulary` IPC share this foundation.
 
 ```typescript
 type AttrContext = 'graph' | 'node' | 'edge' | 'cluster' | 'subgraph';
@@ -167,11 +167,18 @@ function nearest(word: string, candidates: readonly string[], maxDistance?: numb
 
 ### semantic-lint.ts (`core/semantic-lint.ts`)
 
-**Purpose**: semantic diagnostics over an attribute list's `name=value` entries —
-invalid enum values, invalid colors, wrong-context attributes, duplicate attributes
-within one list, and `lhead`/`ltail` references to an undefined cluster/subgraph.
-Scans only `code` spans (via `scanDot`), so quoted-string/HTML-label values are
-naturally exempt — a safe false-negative, never a false-positive on valid DOT.
+**Purpose**: semantic diagnostics over the `name=value` entries of an attribute list.
+The checks find these defects:
+
+- invalid enum values
+- invalid colors
+- wrong-context attributes
+- duplicate attributes within one list
+- `lhead` or `ltail` references to an undefined cluster or subgraph
+
+The scan reads only `code` spans (via `scanDot`). Quoted-string values and HTML-label values
+are therefore exempt. The result is a safe false negative and never a false positive on
+valid DOT.
 
 ```typescript
 function semanticDiagnostics(source: string): StructuralDiagnostic[]
@@ -181,10 +188,11 @@ Folded into `validate.ts`'s `validateDiagram` alongside `structuralDiagnostics`.
 
 ### apply-fixes.ts (`core/apply-fixes.ts`)
 
-**Purpose**: applies the `fix` attached to a set of diagnostics to source text —
-overlapping fixes are dropped (earliest-starting wins), accepted fixes applied
-right-to-left so earlier offsets stay valid. Backs the editor's quick-fix code
-actions and the CLI's `validate --fix`.
+**Purpose**: applies the `fix` of each diagnostic in a set to source text. `applyFixes`
+drops overlapping fixes; the earliest-starting fix wins. `applyFixes` applies the accepted
+fixes from right to left, so earlier offsets stay valid. `validate --fix` of the CLI uses
+`applyFixes`. The quick-fix code action of the editor applies the single `fix` of its
+diagnostic itself (`src/editor/linting.ts`).
 
 ```typescript
 function applyFixes(source: string, diagnostics: StructuralDiagnostic[]): string
@@ -192,13 +200,21 @@ function applyFixes(source: string, diagnostics: StructuralDiagnostic[]): string
 
 ### parse-graph.ts (`core/parse-graph.ts`)
 
-**Purpose**: a pure, Graphviz-faithful structural parser — tokenizes DOT (literal-aware,
-via `scanDot`) and walks the token stream into a `GraphModel`: distinct node ids, edges,
-and subgraphs/clusters. Handles quoted/HTML ids, ports (`node:port`), string
-concatenation (`+`), the `id = id` default-attribute form, attribute lists (skipped for
-structure), subgraph endpoints, arbitrary nesting, and `cluster`-prefixed subgraph names —
-and never throws, degrading gracefully on malformed input. The structural foundation for
-`graph-stats.ts`.
+**Purpose**: a pure, Graphviz-faithful structural parser. It tokenizes DOT
+(literal-aware, via `scanDot`). It walks the token stream into a `GraphModel` of distinct
+node ids, edges, and subgraphs or clusters. It handles these forms:
+
+- quoted ids and HTML ids
+- ports (`node:port`)
+- string concatenation (`+`)
+- the `id = id` default-attribute form
+- attribute lists (skipped for structure)
+- subgraph endpoints
+- nested subgraphs, up to a depth of 500 (the parser skips a deeper block)
+- `cluster`-prefixed subgraph names
+
+The parser never throws and degrades gracefully on malformed input. `parseGraph` is the
+structural foundation for `graph-stats.ts`.
 
 ```typescript
 function tokenizeDot(source: string): Tok[]
@@ -207,20 +223,25 @@ function parseGraph(source: string): GraphModel
 
 ### graph-stats.ts (`core/graph-stats.ts`)
 
-**Purpose**: computes `GraphStats` structural metrics from a `GraphModel` — node/edge/
-subgraph/cluster counts, directed/strict flags, isolated-node count, self-loop count,
-and cycle detection (iterative 3-color DFS for directed graphs, union-find for
-undirected — both treat a self-loop or parallel edge as a cycle). Directed graphs also
-report `roots` (in-degree 0) and `leaves` (out-degree 0), omitted for undirected graphs.
+**Purpose**: computes `GraphStats` structural metrics from a `GraphModel`. The metrics are:
+
+- node, edge, subgraph, and cluster counts
+- the directed flag and the strict flag
+- the isolated-node count and the self-loop count
+- cycle detection
+
+Cycle detection uses an iterative 3-color DFS for directed graphs and union-find for
+undirected graphs. Both treat a self-loop as a cycle. Union-find also treats a parallel edge as a cycle. Directed graphs also
+report `roots` (in-degree 0) and `leaves` (out-degree 0). Undirected graphs omit both.
 
 ```typescript
 function computeStats(model: GraphModel): GraphStats
 function graphStats(source: string): GraphStats   // parseGraph(source) → computeStats
 ```
 
-`graphStats` is the single entry point consumed by the CLI `stats` command, the
-`dot:stats` IPC handler, and (via the IPC wrapper) the renderer's Graph Statistics
-dialog.
+`graphStats` is the single entry point for the statistics. The CLI `stats` command uses it.
+The `dot:stats` IPC handler uses it. The Graph Statistics dialog of the renderer uses it
+through the IPC wrapper.
 
 ### export.ts / export-png.ts / export-pdf.ts / normalize-svg.ts
 
@@ -361,7 +382,8 @@ consumes for `validate --fix`.
 **Purpose**: debounced live preview + preview zoom.
 
 ```typescript
-function createPreview(opts): { schedulePreviewRender(doc: string): void }  // render.ts
+type PreviewScheduler = (doc: string) => void
+function createPreview(previewEl: HTMLElement, delay: number, options: PreviewOptions): PreviewScheduler  // render.ts
 // sends DOT + active-tab engine over render:svg; stale-token check cancels superseded renders
 // zoom.ts — createZoomController + wheel/control zoom
 ```
@@ -406,11 +428,12 @@ bar with event delegation.
 ### stats/ (`src/stats/`)
 
 **Purpose**: the Graph Statistics modal dialog. `createStatsDialog` lazily builds a
-`<dialog class="stats-dialog">`, fetches `GraphStats` for the current tab's source over
-the `dot:stats` IPC (via the injected `graphStats` callback), and renders it as a
-`label: value` definition list (Directed/Strict/Nodes/Edges/Subgraphs/Clusters, plus
-Roots/Leaves when directed, then Isolated/Self-loops/Cyclic). Opened from the command
-palette ("Graph Statistics") and the View menu; no toolbar button.
+`<dialog class="stats-dialog">`. It fetches `GraphStats` for the source of the current tab
+over the `dot:stats` IPC (via the injected `graphStats` callback). It renders the result as
+a `label: value` definition list in this order: Directed, Strict, Nodes, Edges, Subgraphs,
+and Clusters. Roots and Leaves follow when the graph is directed. Isolated, Self-loops, and
+Cyclic come last. The command palette ("Show Graph Statistics") and the View menu
+("Graph Statistics…") open the dialog. The dialog has no toolbar button.
 
 ```typescript
 interface StatsDialogOptions { getSource: () => string; graphStats: (source: string) => Promise<GraphStats>; }
@@ -427,11 +450,18 @@ function createStatsDialog(opts: StatsDialogOptions): { open(): Promise<void> }
 
 ### root — `src/main.ts`
 
-**Purpose**: `bootstrap()` — the single composition root. Loads window state +
-settings, applies the color scheme early, fetches the DOT vocabulary once, builds the
-`TabManager` + editors, restores the previous session, and wires the tab bar, toolbar,
-shortcuts, layout-engine selector, command palette, preferences, and session
-persistence.
+**Purpose**: `bootstrap()` is the single composition root. `bootstrap()` does these main tasks
+in order:
+
+1. Create the color scheme controller from the saved scheme. The early start avoids a flash of
+   the wrong theme.
+2. Create the preferences dialog and the preview zoom controller.
+3. Create the `TabManager`.
+4. Load the saved editor zoom, and fetch the DOT vocabulary once.
+5. Wire the tab bar, and restore the previous session.
+6. Wire the external-file watch, the toolbar actions, the shortcuts, and the layout-engine
+   selector.
+7. Start the session persistence timer, and create the command palette.
 
 ---
 
@@ -465,6 +495,16 @@ cli      ──► core
 - The Electron main process may reuse only the pure shared renderer modules
   (`menu`, `watch`, `platform`) at runtime.
 
----
+## Verification
 
-**Document Version**: 2.6.0 · **Last Updated**: 2026-07-08 · **Maintained By**: Daniel Simon Jr.
+Generated by `repo-tools map`.
+Regenerate: `repo-tools map <repo> --out=<dir>` · Check: `repo-tools check <repo> --docs=docs/architecture`
+
+The values cover every source file of the repository. The counts of `tools/dependency-graph` in the text cover `src/`, `core/`, `cli/` and `electron/` only. Write the output of `repo-tools map` outside `docs/architecture/`. `tools/dependency-graph` already writes a `dependency-graph.json` of its own in that folder.
+
+| Claim | Value | Source |
+|---|---|---|
+| totalSourceFiles | 173 | repo-tools map: dependency-graph.json |
+| totalLinesOfCode | 18850 | repo-tools map: dependency-graph.json |
+| totalModules | 4 | repo-tools map: dependency-graph.json |
+| totalExports | 279 | repo-tools map: dependency-graph.json |

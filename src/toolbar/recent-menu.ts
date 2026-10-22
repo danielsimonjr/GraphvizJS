@@ -1,3 +1,6 @@
+/**
+ * Describes the button, menu, getRecent function and pick callback of setupRecentMenu.
+ */
 export interface RecentMenuOptions {
   button: HTMLButtonElement | null;
   menu: HTMLDivElement | null;
@@ -11,6 +14,16 @@ function basename(p: string): string {
   return i >= 0 ? n.slice(i + 1) : n;
 }
 
+/**
+ * Fill the recent-files menu, and call onPick with the path that the user chooses.
+ * The menu rebuilds its items on each open, and shows a message when the list is empty.
+ *
+ * @param button - The button that toggles the menu. A null button or menu does nothing.
+ * @param menu - The container for the path items. Its content is replaced on each open.
+ * @param getRecent - The function that returns the recent paths, most recent first.
+ * @param onPick - The callback that receives the chosen path. The menu closes before it runs.
+ * @returns Nothing.
+ */
 export function setupRecentMenu({ button, menu, getRecent, onPick }: RecentMenuOptions): void {
   if (!button || !menu) return;
   let isOpen = false;

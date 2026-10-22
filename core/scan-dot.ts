@@ -1,5 +1,12 @@
+/**
+ * The kinds of source region that scanDot reports.
+ */
 export type SpanKind = 'code' | 'string' | 'html' | 'comment';
 
+/**
+ * A region of DOT source that scanDot reports. The closed flag is false for an
+ * unterminated region.
+ */
 export interface Span {
   kind: SpanKind;
   from: number;
@@ -112,6 +119,9 @@ export function scanDot(source: string): Span[] {
   return spans;
 }
 
+/**
+ * The result of checkBalance, with an error when the source does not balance.
+ */
 export interface BalanceResult {
   balanced: boolean;
   error?: { pos: number; message: string };

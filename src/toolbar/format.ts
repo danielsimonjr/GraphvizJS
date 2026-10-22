@@ -14,12 +14,24 @@ export async function formatView(view: EditorView): Promise<boolean> {
   return true;
 }
 
+/**
+ * Describes the button, the getEditor function and the format callback that setupFormat uses.
+ */
 export interface FormatActionOptions {
   button: HTMLButtonElement | null;
   getEditor: () => EditorView;
   onFormat: (doc: string) => void;
 }
 
+/**
+ * Format the document of the editor when the button is clicked.
+ * The onFormat callback runs only when the formatting changed the document.
+ *
+ * @param button - The format button. A null button registers no listener.
+ * @param getEditor - The function that returns the editor, called on each click.
+ * @param onFormat - The callback that receives the new document text.
+ * @returns Nothing.
+ */
 export function setupFormat({ button, getEditor, onFormat }: FormatActionOptions): void {
   if (!button) return;
   button.addEventListener('click', async () => {

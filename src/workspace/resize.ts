@@ -2,6 +2,16 @@ const DEFAULT_EDITOR_RATIO = 0.5;
 const MIN_RATIO = 0.2;
 const MAX_RATIO = 0.8;
 
+/**
+ * Set up a draggable divider between the editor and preview panes when all elements exist.
+ * The split ratio stays between 0.2 and 0.8, and a double-click resets it to 0.5.
+ *
+ * @param container - The element that holds both panes. Its width scales each drag.
+ * @param editorPane - The editor pane. Its flex value is set to the split ratio.
+ * @param previewPane - The preview pane. Its flex value is set to one minus the split ratio.
+ * @param divider - The divider element. The CSS class dragging is added during a drag.
+ * @returns Nothing.
+ */
 export function initHorizontalResize(
   container: HTMLElement | null,
   editorPane: HTMLElement | null,

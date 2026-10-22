@@ -6,8 +6,14 @@
  * Attributes not present here simply get no value/context checks. */
 
 export type AttrContext = 'graph' | 'node' | 'edge' | 'cluster' | 'subgraph';
+/**
+ * The kind of value that a DOT attribute accepts.
+ */
 export type AttrType = 'enum' | 'color' | 'int' | 'double' | 'bool' | 'string' | 'point' | 'other';
 
+/**
+ * The specification of one DOT attribute: its name, its contexts, and its value type.
+ */
 export interface DotAttributeSpec {
   name: string;
   contexts: AttrContext[];
@@ -117,6 +123,10 @@ const ARROW_VALUES = [
   'vee',
 ];
 
+/**
+ * The catalog of DOT attributes. Each entry gives the contexts that accept the attribute and
+ * its value type. An enum entry also lists its allowed values.
+ */
 export const DOT_ATTRIBUTE_CATALOG: readonly DotAttributeSpec[] = [
   // --- Enum attributes (value domains served to the renderer over the dot:vocabulary IPC) ---
   { name: 'shape', contexts: ['node'], type: 'enum', values: SHAPE_VALUES },
@@ -209,6 +219,12 @@ export const DOT_ATTRIBUTE_CATALOG: readonly DotAttributeSpec[] = [
   { name: 'xlabel', contexts: ['edge', 'node'], type: 'string' },
 ];
 
+/**
+ * Find the catalog entry for an attribute name, ignoring letter case.
+ *
+ * @param name - The attribute name to look up, such as shape or URL.
+ * @returns The matching entry, or undefined when the catalog has no such attribute.
+ */
 export function findAttribute(name: string): DotAttributeSpec | undefined {
   const lower = name.toLowerCase();
   return DOT_ATTRIBUTE_CATALOG.find((s) => s.name.toLowerCase() === lower);

@@ -54,6 +54,16 @@ describe('renderMarkdown', () => {
     expect(md).toContain('src/preview/render.ts');
   });
 
+  it('carries the do-not-edit banner and the repo-map no-verification marker', () => {
+    const md = renderMarkdown(analysis());
+    const marker = '<!-- repo-map:no-verification -->';
+    expect(md).toContain('Do not edit by hand');
+    expect(md.split('\n')).toContain(marker);
+    // The marker follows the banner and precedes the first section.
+    expect(md.indexOf('Do not edit by hand')).toBeLessThan(md.indexOf(marker));
+    expect(md.indexOf(marker)).toBeLessThan(md.indexOf('## Summary'));
+  });
+
   it('marks an uncovered src file', () => {
     const a = analysis();
     a.coverage = [{ file: 'src/lonely.ts', testFiles: [] }];

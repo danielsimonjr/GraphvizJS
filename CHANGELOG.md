@@ -6,8 +6,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **The two doc gates run in CI.** A new `docs` job in `.github/workflows/test.yml` runs
+  `repo-tools check . --docs=docs/architecture`, `repo-tools ste docs/architecture` and
+  `repo-tools docs check` for `src`, `core`, `cli` and `electron`. The job installs a pinned
+  `@danielsimonjr/repo-tools` version.
+- **Doc comments for 104 exported symbols.** All 189 exported symbols that the gate counts, and
+  all 15 exported constants, in `src`, `core`, `cli` and `electron` now carry a doc comment. The gate
+  does not count constants. `repo-tools docs check` passes for the four folders. The change adds
+  comments only. No code line changed.
+- **A `## Verification` block in each hand-written architecture document** (OVERVIEW,
+  ARCHITECTURE, COMPONENTS, API, DATAFLOW). `repo-tools check` now verifies 20 claims in 5
+  documents against the code.
+- **A "Documentation" section in the README** that links the six architecture documents and names
+  the commands that check them.
+
+### Changed
+
+- **The dependency-graph generator marks its reports as having no verifiable claim.**
+  `tools/dependency-graph` writes `<!-- repo-map:no-verification -->` after the do-not-edit
+  banner of `DEPENDENCY_GRAPH.md`, so `repo-tools check` skips the generated report by design.
+  A test covers the marker.
+- **The architecture documents follow ASD-STE100.** The 19 problems that `repo-tools ste`
+  reported in four documents are fixed. The documents no longer carry version, date or
+  maintainer lines, because the CHANGELOG records them.
+- **Size counts name their scope.** `tools/dependency-graph` counts `src/`, `core/`, `cli/` and
+  `electron/` (67 files, 8,351 lines of code, 22 modules, 204 exports). `repo-tools map` counts
+  every source file of the repository (173 files, 18,850 lines of code, 4 modules, 279
+  exports). The line count of `tools/dependency-graph` grew because of the new doc comments.
+
 ### Fixed
 
+- **OVERVIEW claimed the app is cross-platform.** The desktop app ships for Windows only:
+  `electron-builder.yml` builds an NSIS installer and nothing else. The document now says so.
+- **Five statements in the architecture documents did not match the code.** The documents said that
+  the editor quick-fix uses `applyFixes` (only the CLI does), that a parallel directed edge is a
+  cycle (only the undirected check says so), that the parser handles arbitrary nesting (it skips
+  blocks deeper than 500 levels), that the command palette entry is "Graph Statistics" (it is "Show
+  Graph Statistics"), and they listed a `bootstrap()` sequence that differs from `src/main.ts`.
+  Each statement now matches the code.
+- **COMPONENTS and DATAFLOW described `createPreview` as returning an object.** It returns a
+  function, `schedulePreviewRender(doc)`. Both documents now show the real signature.
 - **E2E suite could not run after the Bun move.** `test/e2e/global-setup.ts`
   hardcoded `execSync('pnpm build')`. With pnpm gone from CI, every e2e run died
   in `globalSetup` with `'pnpm' is not recognized` before a single test executed.

@@ -21,6 +21,9 @@ const PAGE_PT: Record<'letter' | 'a4', { short: number; long: number }> = {
   a4: { short: 595.28, long: 841.89 },
 };
 
+/**
+ * The page size, orientation, and diagram rectangle for a PDF page, in points.
+ */
 export interface PageGeometry {
   pageWidth: number;
   pageHeight: number;

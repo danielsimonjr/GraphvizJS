@@ -7,21 +7,39 @@ import type {
   PdfExportOptions,
 } from '../../core/types';
 
+/**
+ * A file type filter for a native open or save dialog.
+ *
+ * The extensions have no leading dot. The entry * matches all files.
+ */
 export interface DiagramFilter {
   name: string;
   extensions: string[];
 }
 
+/** A text file that the user opened, with its path and its content. */
 export interface OpenedFile {
   path: string;
   content: string;
 }
 
+/**
+ * The options for a native confirm dialog.
+ *
+ * A missing title defaults to Confirm. A missing kind defaults to a question dialog.
+ */
 export interface ConfirmOptions {
   title?: string;
   kind?: 'info' | 'warning' | 'error';
 }
 
+/**
+ * The API that the preload script exposes as window.graphviz.
+ *
+ * Each method, except onFileChanged and onMenuAction, calls one inter-process
+ * communication (IPC) channel in the main process. Those two methods listen to
+ * messages from the main process instead.
+ */
 export interface GraphvizApi {
   openTextFile(filters: DiagramFilter[]): Promise<OpenedFile | null>;
   pickSavePath(opts: { defaultPath: string; filters: DiagramFilter[] }): Promise<string | null>;

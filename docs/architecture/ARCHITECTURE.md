@@ -1,8 +1,5 @@
 # GraphvizJS — System Architecture
 
-**Version**: 2.6.0 (CLI `validate`/`format` + pure DOT language tooling relocated into the shared `core/`)
-**Last Updated**: 2026-07-08
-
 ---
 
 ## Table of Contents
@@ -34,21 +31,24 @@ GraphvizJS is an Electron desktop editor for Graphviz DOT diagrams, structured a
 - **Renderer (`src/`)** — the CodeMirror-based UI; contains zero Graphviz and reaches
   `core/` only over IPC.
 
-### Key Statistics (v2.6.0)
+### Key Statistics
 
-Numbers are extracted from the authoritative `docs/architecture/dependency-graph.json`
-produced by `tools/dependency-graph`. Regenerate with `bun run graph`.
+These numbers come from `docs/architecture/dependency-graph.json`, which
+`tools/dependency-graph` writes. The scope is `src/`, `core/`, `cli/` and `electron/`.
+Regenerate with `bun run graph`.
 
 | Metric | Value |
 |--------|-------|
 | Source files | 67 TypeScript files |
-| Lines of code | 7,759 |
+| Lines of code | 8,351 |
 | Modules | 22 |
 | Internal edges | 129 |
 | Exports | 204 |
 | Layer violations | 0 |
 | Runtime circular dependencies | 0 |
 | IPC channels (fully wired) | 20 |
+
+`repo-tools map` counts a wider scope: every source file of the repository (TypeScript and JavaScript), including tests, scripts, tools and configuration. The wider scope gives 173 source files, 18,850 lines of code, 4 modules and 279 exports. The Verification table at the end of this document records these values.
 
 ### Module Distribution
 
@@ -247,11 +247,19 @@ interface GraphvizApi {
 }
 ```
 
-`main.ts` `bootstrap()` composes the app: load window state + settings → apply color
-scheme early → fetch the DOT vocabulary once (`dotVocabulary()`) → create the
-`TabManager` and editors → restore the previous session → wire the tab bar, toolbar,
-shortcuts, layout-engine selector, command palette, preferences, and session
-persistence. See [COMPONENTS.md](./COMPONENTS.md).
+`bootstrap()` in `main.ts` composes the app in this order:
+
+1. Create the color scheme controller from the saved scheme. The early start avoids a flash of
+   the wrong theme.
+2. Create the preferences dialog and the preview zoom controller.
+3. Create the `TabManager`.
+4. Load the saved editor zoom, and fetch the DOT vocabulary once.
+5. Wire the tab bar, and restore the previous session.
+6. Wire the external-file watch, the toolbar actions, the shortcuts, and the layout-engine
+   selector.
+7. Start the session persistence timer, and create the command palette.
+
+See [COMPONENTS.md](./COMPONENTS.md).
 
 ---
 
@@ -263,8 +271,8 @@ See [OVERVIEW.md](./OVERVIEW.md#data-model) for the full type listing. In brief:
   dirty flag, committed baseline, editor instance, zoom, and per-tab layout engine.
 - **`core/types.ts`** — the render/export value types shared across the IPC boundary:
   `LayoutEngine`, `ExportFormat`, `DotValidationError`, `StructuralDiagnostic`,
-  `DiagramDiagnostics`, `DotVocabulary`, `PdfExportOptions`, `ExportResult`. This is
-  the **only** `core/` module the renderer may (type-only) import.
+  `DiagramDiagnostics`, `DotVocabulary`, `PdfExportOptions`, `ExportResult`.
+  `core/types.ts` is the **only** `core/` module that the renderer can import, and only as types.
 
 There is no persistent database; documents live on disk as `.dot`/`.gv` files, and
 session state persists via `electron-store` under the `session` key.
@@ -297,18 +305,18 @@ renderer uses over IPC.
 it's in the renderer or the IPC seam. Also proves `core/` is free of DOM/Electron
 coupling (it runs under plain Node).
 
-### 3. Why relocate DOT language tooling into `core/` (v2.6.0)?
+### 3. Why relocate DOT language tooling into `core/`?
 
 **Decision**: the scanner, vocabulary, structural lint, and formatter moved from
 `src/editor/` into `core/`.
 
-**Rationale**: the CLI and renderer were about to need two copies. The layer rule
-forbids the renderer importing `core/` at runtime *and* forbids `core/` importing the
-renderer — so a single shared copy can only live in `core/`, consumed by the renderer
-over IPC (`render:validate` returns combined `{ syntax, structural }`; `dot:format`
-and `dot:vocabulary` back the Format action and highlighting).
+**Rationale**: the CLI and the renderer would otherwise need two copies. The layer rule
+forbids the renderer to import `core/` at runtime. The layer rule also forbids `core/` to
+import the renderer. A single shared copy can therefore live only in `core/`. The renderer
+reaches that copy over IPC. `render:validate` returns the combined `{ syntax, structural }`
+result. `dot:format` and `dot:vocabulary` back the Format action and the highlighting.
 
-**Trade-offs**: live linting became asynchronous/IPC; editor construction now awaits a
+**Trade-offs**: live linting is asynchronous and runs over IPC. Editor construction awaits a
 one-time `dotVocabulary()` fetch at bootstrap.
 
 ### 4. Why a dependency-graph tool + `graph:check`?
@@ -441,4 +449,17 @@ GraphvizJS prioritizes:
 - **Testability** — headless core, injected renderer dependencies, subprocess CLI tests.
 - **Security** — a sandboxed renderer that holds zero Graphviz.
 
-**Document Version**: 2.6.0 · **Last Updated**: 2026-07-08 · **Maintained By**: Daniel Simon Jr.
+## Verification
+
+Generated by `repo-tools map`.
+Regenerate: `repo-tools map <repo> --out=<dir>` · Check: `repo-tools check <repo> --docs=docs/architecture`
+
+The values cover every source file of the repository. The counts of `tools/dependency-graph` in the text cover `src/`, `core/`, `cli/` and `electron/` only. Write the output of `repo-tools map` outside `docs/architecture/`. `tools/dependency-graph` already writes a `dependency-graph.json` of its own in that folder.
+
+| Claim | Value | Source |
+|---|---|---|
+| totalSourceFiles | 173 | repo-tools map: dependency-graph.json |
+| totalLinesOfCode | 18850 | repo-tools map: dependency-graph.json |
+| totalModules | 4 | repo-tools map: dependency-graph.json |
+| totalExports | 279 | repo-tools map: dependency-graph.json |
+| runtimeCircularDeps | 0 | repo-tools map: dependency-graph.json |

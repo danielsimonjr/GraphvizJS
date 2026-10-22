@@ -1,5 +1,15 @@
 import { appInfo, openExternal } from '../platform';
 
+/**
+ * Attach the help dialog to a button and to the F1 key.
+ *
+ * The function builds the dialog on the first open. Later opens reuse the dialog.
+ * The keys Ctrl+? and Cmd+? also open the dialog.
+ * When button is null, the function attaches no listener, not even for F1.
+ *
+ * @param button - The button that opens the dialog, or null when there is none.
+ * @returns Nothing. The function attaches the listeners.
+ */
 export function setupHelpDialog(button: HTMLButtonElement | null): void {
   if (!button) return;
 

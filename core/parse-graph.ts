@@ -1,6 +1,9 @@
 import { scanDot } from './scan-dot.js';
 import type { GraphEdge, GraphModel, GraphSubgraph } from './types.js';
 
+/**
+ * The kinds of token that tokenizeDot returns.
+ */
 export type TokKind =
   | 'id'
   | 'edgeop'
@@ -12,6 +15,9 @@ export type TokKind =
   | 'comma'
   | 'eq';
 
+/**
+ * One token from tokenizeDot, with its kind and its value.
+ */
 export interface Tok {
   kind: TokKind;
   value: string;
@@ -134,6 +140,13 @@ export function tokenizeDot(source: string): Tok[] {
   return out;
 }
 
+/**
+ * Parse DOT source into its nodes, edges, and subgraphs.
+ * The parser records no attribute values, and never throws on malformed input.
+ *
+ * @param source - The DOT source text to parse.
+ * @returns The directed and strict flags, the node ids, the edges, and the subgraphs.
+ */
 export function parseGraph(source: string): GraphModel {
   const toks = tokenizeDot(source);
   const nodesSet = new Set<string>();

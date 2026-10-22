@@ -1,6 +1,9 @@
 import type { Span } from './scan-dot.js';
 import { checkBalance, scanDot } from './scan-dot.js';
 
+/**
+ * Options for formatDot, with an indent that defaults to two spaces.
+ */
 export interface FormatOptions {
   indent?: string;
 }
