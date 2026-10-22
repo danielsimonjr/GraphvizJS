@@ -48,7 +48,7 @@ Regenerate with `bun run graph`.
 | Runtime circular dependencies | 0 |
 | IPC channels (fully wired) | 20 |
 
-`repo-tools map` counts a wider scope: every source file of the repository (TypeScript and JavaScript), including tests, scripts, tools and configuration. The wider scope gives 173 source files, 19,038 lines of code, 4 modules and 281 exports. The Verification table at the end of this document records these values.
+`repo-tools map` counts a wider scope: every source file of the repository (TypeScript and JavaScript), including tests, scripts, tools and configuration. The wider scope gives 174 source files, 19,222 lines of code, 4 modules and 281 exports. The Verification table at the end of this document records these values.
 
 ### Module Distribution
 
@@ -268,7 +268,8 @@ See [COMPONENTS.md](./COMPONENTS.md).
 See [OVERVIEW.md](./OVERVIEW.md#data-model) for the full type listing. In brief:
 
 - **`TabState`** (`src/tabs/manager.ts`) — the in-memory document unit: id, file path,
-  dirty flag, committed baseline, editor instance, zoom, and per-tab layout engine.
+  dirty flag, committed baseline, editor instance, and per-tab layout engine. The editor
+  zoom level is not part of `TabState`: one controller holds it for all editors.
 - **`core/types.ts`** — the render/export value types shared across the IPC boundary:
   `LayoutEngine`, `ExportFormat`, `DotValidationError`, `StructuralDiagnostic`,
   `DiagramDiagnostics`, `DotVocabulary`, `PdfExportOptions`, `ExportResult`.
@@ -458,8 +459,8 @@ The values cover every source file of the repository. The counts of `tools/depen
 
 | Claim | Value | Source |
 |---|---|---|
-| totalSourceFiles | 173 | repo-tools map: dependency-graph.json |
-| totalLinesOfCode | 19038 | repo-tools map: dependency-graph.json |
+| totalSourceFiles | 174 | repo-tools map: dependency-graph.json |
+| totalLinesOfCode | 19222 | repo-tools map: dependency-graph.json |
 | totalModules | 4 | repo-tools map: dependency-graph.json |
 | totalExports | 281 | repo-tools map: dependency-graph.json |
 | runtimeCircularDeps | 0 | repo-tools map: dependency-graph.json |

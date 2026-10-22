@@ -17,7 +17,7 @@ project is based on
 | Live preview | Debounced (300 ms) DOT→SVG render over the `render:svg` IPC, with stale-token cancellation |
 | Inline linting | One lint pass combining Graphviz **syntax** errors and **structural** warnings (delimiter balance, unknown attributes) via `render:validate` |
 | Layout engines | All Graphviz engines — `dot`, `neato`, `fdp`, `sfdp`, `circo`, `twopi`, `osage`, `patchwork` — selectable per tab |
-| Multi-tab | Independent tabs; each holds its own file, dirty state, editor, zoom, and layout engine (`TabManager` / `TabState`) |
+| Multi-tab | Independent tabs; each holds its own file, dirty state, editor, and layout engine (`TabManager` / `TabState`); all editors share one zoom level |
 | Session restore | Silent capture/restore of tabs, unsaved edits, and per-tab settings across launches (no crash-recovery prompt) |
 | File workflow | New / open / save / save-as via native dialogs; recent-files menu; external-change detection (reload clean, prompt dirty) |
 | Export | SVG, PNG (1× / 2×), and vector PDF (fit-to-page or Letter/A4, orientation) — `exportDiagram` orchestrator |
@@ -90,7 +90,6 @@ interface TabState {
   lastCommittedDoc: string;   // last saved/opened baseline
   lastSavedAt: Date | null;
   editorView: EditorView | null;  // CodeMirror instance (only active tab visible)
-  editorZoomLevel: number;
   layoutEngine: LayoutEngine;     // per-tab Graphviz engine
 }
 ```
@@ -114,7 +113,7 @@ interface ExportResult { bytes: Uint8Array; ext: string; mime: string; }
 Two tools count the code. Each tool has its own scope.
 
 - `tools/dependency-graph` counts `src/`, `core/`, `cli/` and `electron/`: 67 files, 8,351 lines of code, 22 modules and 204 exports. Regenerate the counts with `bun run graph`.
-- `repo-tools map` counts every source file of the repository, in TypeScript and JavaScript. The scope includes tests, scripts, tools and configuration. The count is 173 files, 19,038 lines of code, 4 modules (the tool names them `src`, `config`, `tools` and `tests`) and 281 exports. The Verification table at the end of this document records these values.
+- `repo-tools map` counts every source file of the repository, in TypeScript and JavaScript. The scope includes tests, scripts, tools and configuration. The count is 174 files, 19,222 lines of code, 4 modules (the tool names them `src`, `config`, `tools` and `tests`) and 281 exports. The Verification table at the end of this document records these values.
 
 ## Directory structure
 
@@ -213,8 +212,8 @@ The values cover every source file of the repository. The counts of `tools/depen
 
 | Claim | Value | Source |
 |---|---|---|
-| totalSourceFiles | 173 | repo-tools map: dependency-graph.json |
-| totalLinesOfCode | 19038 | repo-tools map: dependency-graph.json |
+| totalSourceFiles | 174 | repo-tools map: dependency-graph.json |
+| totalLinesOfCode | 19222 | repo-tools map: dependency-graph.json |
 | totalModules | 4 | repo-tools map: dependency-graph.json |
 | totalExports | 281 | repo-tools map: dependency-graph.json |
 | runtimeCircularDeps | 0 | repo-tools map: dependency-graph.json |

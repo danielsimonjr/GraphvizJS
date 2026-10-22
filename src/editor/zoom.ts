@@ -8,13 +8,17 @@ const ZOOM_DEFAULT = 1;
 const BASE_FONT_SIZE = 16;
 
 /**
- * The zoom actions and the current level for one editor.
+ * The zoom actions and the current level, shared by every editor that is attached.
  */
 export interface EditorZoomController {
   zoomIn: () => boolean;
   zoomOut: () => boolean;
   reset: () => boolean;
   getLevel: () => number;
+  /** Apply the current level to an editor, and apply each later change to it. */
+  attach: (view: EditorView) => void;
+  /** Stop applying level changes to an editor. Call this before the editor is destroyed. */
+  detach: (view: EditorView) => void;
 }
 
 /**
@@ -32,20 +36,19 @@ export function createEditorZoomExtension(): {
 }
 
 /**
- * Create a controller that changes the font size of one editor in steps.
+ * Create one controller that holds the zoom level for every editor.
  * Each step changes the level by 0.1, within the limits of 0.5 and 3.
+ * An editor follows the level from the moment it is attached.
  *
- * @param view - The editor to zoom.
  * @param compartment - The compartment from createEditorZoomExtension that holds the font size.
- * @param onZoomChange - The optional callback that runs after each level change or reset.
- *   The callback does not run for initialLevel.
+ * @param onZoomChange - The optional callback that runs once after each level change or reset,
+ *   however many editors are attached. The callback does not run for initialLevel or for attach.
  * @param initialLevel - The starting level, where 1 is 100 percent. The default is 1.
  *   A value outside the limits moves to the nearest limit.
  *   A value that is not a finite number gives the default.
- * @returns The controller that zooms the editor.
+ * @returns The controller that zooms all attached editors.
  */
 export function createEditorZoomController(
-  view: EditorView,
   compartment: Compartment,
   onZoomChange?: (level: number) => void,
   initialLevel?: number
@@ -54,19 +57,28 @@ export function createEditorZoomController(
   let zoomLevel = Number.isFinite(requestedLevel)
     ? Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, requestedLevel))
     : ZOOM_DEFAULT;
+  const views = new Set<EditorView>();
 
-  // Apply initial zoom if different from default
-  if (zoomLevel !== ZOOM_DEFAULT) {
+  function applyTo(view: EditorView): void {
     view.dispatch({
       effects: compartment.reconfigure(createFontSizeTheme(zoomLevel)),
     });
   }
 
   function applyZoom(): void {
-    view.dispatch({
-      effects: compartment.reconfigure(createFontSizeTheme(zoomLevel)),
-    });
+    for (const view of views) {
+      applyTo(view);
+    }
     onZoomChange?.(zoomLevel);
+  }
+
+  function attach(view: EditorView): void {
+    views.add(view);
+    applyTo(view);
+  }
+
+  function detach(view: EditorView): void {
+    views.delete(view);
   }
 
   function zoomIn(): boolean {
@@ -100,6 +112,8 @@ export function createEditorZoomController(
     zoomOut,
     reset,
     getLevel,
+    attach,
+    detach,
   };
 }
 

@@ -10,7 +10,7 @@
 | --- | --- |
 | Files | 67 |
 | Modules | 22 |
-| Lines of code | 8384 |
+| Lines of code | 8390 |
 | Internal edges | 130 |
 | Exports | 206 |
 
@@ -189,6 +189,7 @@ None. ✅
 
 **Unused exports:**
 - `DotLinterOptions` in `src/editor/linting.ts`
+- `EditorZoomController` in `src/editor/zoom.ts`
 - `PreferencesDialogOptions` in `src/preferences/preferences-dialog.ts`
 - `PreferencesDialog` in `src/preferences/preferences-dialog.ts`
 - `PreviewStatusCallbacks` in `src/preview/render.ts`
