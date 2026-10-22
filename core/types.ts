@@ -107,7 +107,10 @@ export interface GraphSubgraph {
   isCluster: boolean;
 }
 
-/** A structural model of a DOT source: distinct nodes, edges, subgraphs, kind. */
+/**
+ * A structural model of a DOT source: distinct nodes, edges, subgraphs, kind.
+ * A strict graph has no repeated edge.
+ */
 export interface GraphModel {
   directed: boolean;
   strict: boolean;

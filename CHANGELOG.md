@@ -57,6 +57,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **A strict graph counted its repeated edges.** Graphviz draws one edge for one pair of nodes in
+  a `strict` graph: a later edge statement for the same pair names the edge again. `parseGraph`
+  kept every statement, so the statistics (the Stats dialog and `graphvizjs stats`) counted too
+  many edges, and `strict graph { a -- b; b -- a }` reported a cycle. A strict graph now merges
+  a repeated pair into its first edge: the pair is ordered in a digraph and unordered in a
+  graph. A self-loop stays allowed. A graph that is not strict keeps every edge, as before.
 - **`labelfontcolor` was not treated as a color attribute.** The Graphviz attributes table types
   it as a color that only edges use. The color list and the attribute catalog left it out, so the
   invalid-color lint skipped it and the editor offered no color completions for it. It is now in

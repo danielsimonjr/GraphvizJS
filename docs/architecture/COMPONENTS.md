@@ -39,9 +39,9 @@ GraphvizJS is a layered Electron app with a headless core. File counts per modul
 └───────────────────────────────────────────────────────────────┘
 ```
 
-**Total** (`src/`, `core/`, `cli/` and `electron/`): 67 TypeScript files · 8,390 LOC · 22 modules · 206 exports · 20 IPC channels.
+**Total** (`src/`, `core/`, `cli/` and `electron/`): 67 TypeScript files · 8,420 LOC · 22 modules · 206 exports · 20 IPC channels.
 
-The whole repository, including tests, scripts and tools, holds 174 source files, 19,187 lines of code, 4 modules and 281 exports (`repo-tools map`). The Verification table at the end of this document records these values.
+The whole repository, including tests, scripts and tools, holds 174 source files, 19,315 lines of code, 4 modules and 281 exports (`repo-tools map`). The Verification table at the end of this document records these values.
 
 ---
 
@@ -217,6 +217,9 @@ node ids, edges, and subgraphs or clusters. It handles these forms:
 - subgraph endpoints
 - nested subgraphs, up to a depth of 500 (the parser skips a deeper block)
 - `cluster`-prefixed subgraph names
+- the `strict` header: a repeated pair of nodes merges into its first edge
+
+In a strict graph, as in Graphviz, one pair of nodes has one edge. The pair is ordered in a digraph and unordered in a graph. A self-loop stays allowed.
 
 The parser never throws and degrades gracefully on malformed input. `parseGraph` is the
 structural foundation for `graph-stats.ts`.
@@ -236,7 +239,7 @@ function parseGraph(source: string): GraphModel
 - cycle detection
 
 Cycle detection uses an iterative 3-color DFS for directed graphs and union-find for
-undirected graphs. Both treat a self-loop as a cycle. Union-find also treats a parallel edge as a cycle. Directed graphs also
+undirected graphs. Both treat a self-loop as a cycle. Union-find also treats a parallel edge as a cycle. A strict graph has no parallel edge, because the parser merged them. Directed graphs also
 report `roots` (in-degree 0) and `leaves` (out-degree 0). Undirected graphs omit both.
 
 ```typescript
@@ -510,6 +513,6 @@ The values cover every source file of the repository. The counts of `tools/depen
 | Claim | Value | Source |
 |---|---|---|
 | totalSourceFiles | 174 | repo-tools map: dependency-graph.json |
-| totalLinesOfCode | 19187 | repo-tools map: dependency-graph.json |
+| totalLinesOfCode | 19315 | repo-tools map: dependency-graph.json |
 | totalModules | 4 | repo-tools map: dependency-graph.json |
 | totalExports | 281 | repo-tools map: dependency-graph.json |
