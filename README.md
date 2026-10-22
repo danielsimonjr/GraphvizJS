@@ -1,6 +1,6 @@
 # GraphvizJS Desktop Client
 
-GraphvizJS is a desktop editor for [Graphviz](https://graphviz.org/) DOT diagrams with real-time preview, syntax highlighting, and SVG/PNG/PDF export. Built with Electron, it pairs a multi-tab, CodeMirror-based authoring experience with a live preview powered by Graphviz WebAssembly, a light/dark theme, a command palette, and zoom controls for both editor and preview. All Graphviz work (render, validation, and export) runs headlessly in a Node-only core in the main process; the same core also ships as a `graphvizjs` CLI.
+GraphvizJS is a desktop editor for [Graphviz](https://graphviz.org/) DOT diagrams with real-time preview, syntax highlighting, and SVG/PNG/PDF export. The app is built with Electron. The editor has multi-tab editing in CodeMirror and a live preview powered by Graphviz WebAssembly. The app also has a light/dark theme, a command palette, and zoom controls for the editor and the preview. All Graphviz work (render, validation, and export) runs headlessly in a Node-only core in the main process. The same core also ships as a `graphvizjs` CLI.
 
 Based on [MermaidJS Desktop Client](https://github.com/skydiver/mermaidjs-desktop-client) by Martín M.
 
@@ -25,13 +25,13 @@ Based on [MermaidJS Desktop Client](https://github.com/skydiver/mermaidjs-deskto
 - **Multiple layout engines** – All Graphviz engines (dot, neato, fdp, sfdp, circo, twopi, osage, patchwork), selectable per tab.
 - **Multiple tabs** – Edit several diagrams at once; each tab keeps its own file, unsaved state, and layout engine.
 - **Session restore** – Open tabs, unsaved edits, and per-tab settings are silently restored on the next launch — no crash-recovery prompt.
-- **File workflow** – New, open, save, and save-as via native dialogs; a recent-files menu; and external-change detection that reloads clean tabs (and prompts for dirty ones) when a file changes on disk.
+- **File workflow** – New, open, save, and save-as use native dialogs. A recent-files menu lists earlier files. External-change detection reloads clean tabs and prompts for dirty ones when a file changes on disk.
 - **Smart exports** – Save diagrams as PNG (1× and 2× scale), SVG, or vector PDF (fit-to-page or Letter/A4, with orientation), all with built-in padding and scaling.
 - **Format document** – One-shot reindent and spacing cleanup of DOT source (Shift+Alt+F).
 - **Command palette** – Fuzzy-search and run any command with Ctrl/Cmd+Shift+P.
 - **Theme** – System, Light, or Dark, switchable from the toolbar, the command palette, or Preferences.
 - **Preferences dialog** – Cmd/Ctrl+, opens app settings (Appearance → Theme today, built to grow).
-- **Graph statistics** – Node/edge/subgraph/cluster counts, directed/strict flags, roots/leaves/isolated nodes, self-loops, and cycle detection for the current diagram, in a dialog (command palette + View menu) or via `graphvizjs stats`.
+- **Graph statistics** – A dialog shows node, edge, subgraph and cluster counts, the directed and strict flags, roots, leaves, isolated nodes, self-loops and cycle detection. Open it from the command palette or the View menu. The command `graphvizjs stats` gives the same data.
 - **Built-in examples** – Quick-start templates for directed graphs, undirected graphs, clusters, and more.
 - **Native application menu** – Standard File/Edit/View/Help menus wired to the same actions as the toolbar and keyboard.
 - **Editor & preview zoom** – Zoom the editor font (Cmd/Ctrl+=/−/0) and the diagram (Ctrl+Scroll or toolbar controls).
@@ -103,7 +103,7 @@ graphvizjs --help
 graphvizjs --version
 ```
 
-Because `validate` and `format` call the very same `core/` functions the renderer reaches over IPC, the CLI doubles as an **oracle** for troubleshooting the desktop app: run a problematic diagram through `graphvizjs validate --json` and, if it reproduces the symptom, the bug is in `core/`; if not, it's in the renderer or the IPC layer.
+The `validate` and `format` commands call the same `core/` functions that the renderer reaches over IPC. So the CLI is an **oracle** for troubleshooting the desktop app. Run a problematic diagram through `graphvizjs validate --json`. If it shows the symptom, the bug is in `core/`. If not, the bug is in the renderer or the IPC layer.
 
 `bin.graphvizjs` points at the compiled `dist-cli/cli/index.js`, so `npm link` (or a global install of the packed tarball) exposes the `graphvizjs` command on any platform. To run it from source without building, use `bun run graphvizjs -- render diagram.dot -o out.svg` (via tsx). The native rendering deps (`@resvg/resvg-js`, `canvas`) and WASM Graphviz install as normal dependencies with cross-platform prebuilds.
 
@@ -126,14 +126,14 @@ their native `.node` binaries (`@resvg/resvg-js`, `canvas`) can't be inlined int
 - `bun run lint:fix` – Automatically apply Biome fixes
 - `bun run typecheck` – Type-check the source and the tests without emitting files
 - `bun run graph` – Regenerate the dependency-graph report in `docs/architecture/`
-- `bun run graph:check` – Verify architecture invariants (layer boundaries, no cycles, IPC wiring) **and** that the committed report isn't stale, without writing; exits non-zero on any violation (run in CI)
+- `bun run graph:check` – Verify the architecture invariants (layer boundaries, no cycles, IPC wiring) and that the committed report is not stale. It writes nothing, and it exits non-zero on any violation (run in CI)
 - `bun run graph -- --impact <file>` – Print the transitive reverse-dependencies (blast radius) of a source file
 
-The dependency-graph tool enforces the headless-core layering: `core/` is a self-contained leaf, `cli/` depends only on `core/`, the Electron main process may reuse only the pure shared renderer modules (`menu`/`watch`/`platform`), and the renderer (`src/`) may reference `core/` only as the type-only `core/types` contract. A broken boundary — or a stale committed graph — fails `bun run graph:check` (and CI).
+The dependency-graph tool enforces the headless-core layering. `core/` is a self-contained leaf. `cli/` depends only on `core/`. The Electron main process may reuse only the pure shared renderer modules (`menu`/`watch`/`platform`). The renderer (`src/`) may reference `core/` only as the type-only `core/types` contract. A broken boundary, or a stale committed graph, fails `bun run graph:check` (and CI).
 
 ## Testing
 
-The project uses [Vitest](https://vitest.dev/) for unit testing with [happy-dom](https://github.com/nicholasribeiro/happy-dom) for DOM simulation, and [Playwright](https://playwright.dev/) for E2E tests that run against the production `file://` build inside a real Electron window.
+The project uses [Vitest](https://vitest.dev/) for unit tests, with [happy-dom](https://github.com/nicholasribeiro/happy-dom) to simulate the DOM. It uses [Playwright](https://playwright.dev/) for E2E tests. The E2E tests run against the production `file://` build inside a real Electron window.
 
 ```bash
 # Run unit tests
@@ -182,9 +182,19 @@ Tests mirror the source structure:
 
 ## Project Structure
 
-The codebase is split into a Node-only headless core, an Electron main process, a browser renderer, and a CLI. The dependency-graph tool (see [Tooling](#tooling)) enforces the layering: `core/` is a self-contained leaf, `cli/` depends only on `core/`, and the renderer (`src/`) may reference `core/` only as the type-only `core/types` contract — it reaches Graphviz strictly over IPC.
+The codebase is split into a Node-only headless core, an Electron main process, a browser renderer, and a CLI. The dependency-graph tool (see [Tooling](#tooling)) enforces the layering. `core/` is a self-contained leaf. `cli/` depends only on `core/`. The renderer (`src/`) may reference `core/` only as the type-only `core/types` contract, and it reaches Graphviz strictly over IPC.
 
-- `core/` – Node-only, DOM-free. All Graphviz work **and** pure DOT language tooling: `render.ts` (DOT→SVG + syntax validation via `@hpcc-js/wasm`), `normalize-svg.ts`, `export-png.ts`/`export-pdf.ts`/`export.ts` (SVG/PNG/PDF), `scan-dot.ts` (literal-aware scanner), `dot-vocab.ts` (keyword/attribute vocabulary), `structure-lint.ts` (structural diagnostics), `format.ts` (`formatDot`), `validate.ts` (`validateDiagram` = syntax + structural), `parse-graph.ts` (DOT source → structural `GraphModel`), `graph-stats.ts` (`graphStats` = node/edge/subgraph/cluster counts, roots/leaves/isolated, self-loops, cycle detection), and `types.ts`. Consumed by both the Electron main process and the CLI.
+- `core/` – Node-only and DOM-free. It holds all Graphviz work and the pure DOT language tooling. The Electron main process and the CLI both use it. Its files:
+  - `render.ts` – DOT to SVG, and syntax validation, through `@hpcc-js/wasm`
+  - `normalize-svg.ts`, `export-png.ts`, `export-pdf.ts`, `export.ts` – SVG, PNG and PDF export
+  - `scan-dot.ts` – the literal-aware scanner
+  - `dot-vocab.ts` – the keyword and attribute vocabulary
+  - `structure-lint.ts` – structural diagnostics
+  - `format.ts` – `formatDot`
+  - `validate.ts` – `validateDiagram` (syntax plus structure)
+  - `parse-graph.ts` – DOT source to a structural `GraphModel`
+  - `graph-stats.ts` – `graphStats`: node, edge, subgraph and cluster counts, roots, leaves, isolated nodes, self-loops and cycle detection
+  - `types.ts` – the shared types
 - `cli/` – The `graphvizjs` binary: `args.ts` (argument parsing) and `index.ts` (`render`/`validate`/`format`/`stats` commands). Compiled to `dist-cli/`.
 - `src/` – Renderer (TypeScript/Vite); each subdirectory exports setup functions wired together by `main.ts`:
   - `platform/` – The renderer↔main IPC boundary (`contract.ts` = the `window.graphviz` API, `index.ts` = thin wrappers)
@@ -224,7 +234,7 @@ Three commands keep the documents and the doc comments true. All three run in th
 ```bash
 npm install --global @danielsimonjr/repo-tools
 repo-tools check . --docs=docs/architecture   # each Verification table matches the source
-repo-tools ste docs/architecture              # the documents follow Simplified Technical English
+repo-tools ste docs/architecture README.md    # the documents and this README follow Simplified Technical English
 repo-tools docs check src                     # each exported symbol has a doc comment (also: core, cli, electron)
 ```
 
