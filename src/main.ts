@@ -15,7 +15,6 @@ import {
   createEditorZoomController,
   createEditorZoomExtension,
   createEditorZoomKeymap,
-  type EditorZoomController,
 } from './editor/zoom';
 import { setupHelpDialog } from './help/dialog';
 import { type MenuCommandHandlers, setupMenuCommands } from './menu/commands';
@@ -164,7 +163,6 @@ async function bootstrap(): Promise<void> {
   // Declared before createPreview() so the getEngine closure below can
   // reference it (invoked lazily at render time, after this is assigned).
   const tabManager = new TabManager();
-  const editorZoomByTab = new Map<string, EditorZoomController>();
 
   // Declared here (before session restore, which calls createNewTab) and assigned
   // after restore completes. createNewTab/closeTab call `fileWatch?.sync()`; using
@@ -201,8 +199,15 @@ async function bootstrap(): Promise<void> {
     void setMenuRecent(recentFiles);
   }
 
+  // One zoom level for every editor: a tab that opens later starts at the current level.
   const { extension: zoomExtension, compartment: zoomCompartment } = createEditorZoomExtension();
-  const savedEditorZoom = await loadEditorZoom();
+  const editorZoom = createEditorZoomController(
+    zoomCompartment,
+    (level) => {
+      saveEditorZoom(level);
+    },
+    (await loadEditorZoom()) ?? undefined
+  );
 
   // DOT language vocabulary (keywords/attributes) is owned by core and fetched
   // once over IPC; highlighting and autocomplete are built from it.
@@ -322,18 +327,10 @@ async function bootstrap(): Promise<void> {
     }
 
     // Set up editor zoom for the new editor
-    const editorZoom = createEditorZoomController(
-      editorView,
-      zoomCompartment,
-      (level) => {
-        saveEditorZoom(level);
-      },
-      savedEditorZoom ?? undefined
-    );
+    editorZoom.attach(editorView);
     editorView.dispatch({
       effects: StateEffect.appendConfig.of(createEditorZoomKeymap(editorZoom)),
     });
-    editorZoomByTab.set(tab.id, editorZoom);
 
     tab.lastCommittedDoc = savedContent;
     tab.isDirty = content !== savedContent;
@@ -392,11 +389,11 @@ async function bootstrap(): Promise<void> {
 
     // Destroy the editor DOM
     if (tab.editorView) {
+      editorZoom.detach(tab.editorView);
       tab.editorView.destroy();
     }
 
     const newActiveTab = tabManager.closeTab(tabId);
-    editorZoomByTab.delete(tabId);
     if (newActiveTab?.editorView) {
       newActiveTab.editorView.dom.style.display = '';
       newActiveTab.editorView.focus();
@@ -695,9 +692,9 @@ async function bootstrap(): Promise<void> {
     setTheme: (scheme) => void colorScheme?.set(scheme as ColorScheme),
     commandPalette: () => palette?.open(),
     preferences: () => preferencesDialog.open(),
-    zoomIn: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.zoomIn(),
-    zoomOut: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.zoomOut(),
-    zoomReset: () => editorZoomByTab.get(tabManager.getActiveTabId() ?? '')?.reset(),
+    zoomIn: () => editorZoom.zoomIn(),
+    zoomOut: () => editorZoom.zoomOut(),
+    zoomReset: () => editorZoom.reset(),
     help: () => helpButton?.click(),
     stats: () => void statsDialog.open(),
   };
