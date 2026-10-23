@@ -1,7 +1,49 @@
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { type ElectronApplication, _electron as electron, type Page } from '@playwright/test';
+
+const EXAMPLES_DIR = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../../src/examples'
+);
+
+/**
+ * One example diagram of the examples menu, as its source file holds it.
+ */
+export interface ExampleSource {
+  /** The first line of the file, without the comment marker. Nothing else shows this text. */
+  title: string;
+  /** The whole file. */
+  source: string;
+  /** The plain `label="..."` texts. A label with an escape such as `\n` is left out. */
+  labels: string[];
+}
+
+/**
+ * Read the example diagrams from `src/examples`, in the order of the examples menu.
+ * The file names start with a number, so the sorted names are the menu order.
+ */
+export function readExamples(): ExampleSource[] {
+  return readdirSync(EXAMPLES_DIR)
+    .filter((name) => name.endsWith('.dot'))
+    .sort()
+    .map((name) => {
+      const source = readFileSync(path.join(EXAMPLES_DIR, name), 'utf-8');
+      const title = source.split(/\r?\n/)[0].replace(/^\/\/\s*/, '');
+      const labels = [...source.matchAll(/label="([^"\\]+)"/g)].map((match) => match[1]);
+      return { title, source, labels };
+    });
+}
+
+/**
+ * Remove all white space. CodeMirror's `textContent` joins the lines with no line end,
+ * so a comparison with a source file must ignore white space.
+ */
+export function withoutWhiteSpace(text: string): string {
+  return text.replace(/\s+/g, '');
+}
 
 /**
  * Launch the real Electron app via Playwright's Electron runner.
@@ -140,6 +182,7 @@ export const selectors = {
   zoomIn: '[data-action="zoom-in"]',
   zoomOut: '[data-action="zoom-out"]',
   zoomReset: '[data-action="zoom-reset"]',
+  zoomLevel: '[data-zoom-level]',
   helpDialog: 'dialog.help-dialog',
   exportMenu: '[data-dropdown="export"] .toolbar-menu',
   examplesMenu: '[data-dropdown="examples"] .toolbar-menu',

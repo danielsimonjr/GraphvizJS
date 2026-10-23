@@ -14,17 +14,6 @@ describe('preview/zoom', () => {
     previewEl.innerHTML = '<svg width="100" height="100"></svg>';
   });
 
-  describe('createZoomController()', () => {
-    it('returns controller object', () => {
-      const controller = createZoomController(previewEl);
-      expect(controller.zoomIn).toBeDefined();
-      expect(controller.zoomOut).toBeDefined();
-      expect(controller.reset).toBeDefined();
-      expect(controller.getLevel).toBeDefined();
-      expect(controller.applyZoom).toBeDefined();
-    });
-  });
-
   describe('Controller', () => {
     it('zoomIn() increases level', () => {
       const controller = createZoomController(previewEl);

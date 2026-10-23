@@ -79,16 +79,21 @@ test.describe('Export Functionality', () => {
     await expect(exportMenu).not.toBeVisible();
   });
 
-  test('export works with valid diagram', async () => {
-    // Ensure we have a valid diagram
-    await setEditorContent(page, 'digraph G { A -> B }');
-    await waitForPreviewUpdate(page);
+  test('SVG export writes the diagram that the editor holds', async () => {
+    await setEditorContent(page, 'digraph G { Alpha -> Beta }');
 
     await page.locator(selectors.exportBtn).click();
+    await page.locator(`${selectors.exportMenu} [data-export="svg"]`).click();
 
-    // SVG export option should be enabled
-    const svgOption = page.locator(`${selectors.exportMenu} [data-export="svg"]`);
-    await expect(svgOption).toBeEnabled();
+    // The main process writes the bytes to the stubbed save path. Poll the content, because the
+    // file exists, empty, before the write ends.
+    const savedSvg = () => (existsSync(savePath) ? readFileSync(savePath, 'utf-8') : '');
+    await expect.poll(savedSvg, { timeout: 10000 }).toContain('>Beta</text>');
+    const svg = savedSvg();
+    expect(svg).toContain('<svg');
+    expect(svg).toContain('>Alpha</text>');
+    // The start text of the editor is a different diagram. Its nodes must not be in the file.
+    expect(svg).not.toContain('Decision');
   });
 });
 

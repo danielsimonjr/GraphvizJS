@@ -27,31 +27,20 @@ describe('editor/zoom', () => {
   });
 
   describe('createEditorZoomExtension()', () => {
-    it('returns Compartment and extension', () => {
-      const result = createEditorZoomExtension();
-      expect(result.extension).toBeDefined();
-      expect(result.compartment).toBeDefined();
-    });
-  });
-
-  describe('createEditorZoomController()', () => {
-    it('returns controller object', () => {
-      const { extension, compartment } = createEditorZoomExtension();
+    it('starts an editor at the 16px base font size', () => {
+      const { extension } = createEditorZoomExtension();
       const view = new EditorView({
         state: EditorState.create({ extensions: [extension] }),
         parent: container,
       });
 
-      const controller = createEditorZoomController(compartment);
-      controller.attach(view);
-      expect(controller.zoomIn).toBeDefined();
-      expect(controller.zoomOut).toBeDefined();
-      expect(controller.reset).toBeDefined();
-      expect(controller.getLevel).toBeDefined();
+      expect(scrollerFontSizes(view)).toEqual([16]);
 
       view.destroy();
     });
+  });
 
+  describe('createEditorZoomController()', () => {
     it('zoomIn() increases level', () => {
       const { extension, compartment } = createEditorZoomExtension();
       const view = new EditorView({
@@ -304,17 +293,37 @@ describe('editor/zoom', () => {
   });
 
   describe('createEditorZoomKeymap()', () => {
-    it('returns keymap array', () => {
+    /** Press a key together with the Mod key of the platform in the content of an editor. */
+    function pressMod(view: EditorView, key: string, init: KeyboardEventInit = {}): void {
+      const mod = /Mac/.test(navigator.platform) ? { metaKey: true } : { ctrlKey: true };
+      view.contentDOM.dispatchEvent(
+        new KeyboardEvent('keydown', { key, ...mod, ...init, bubbles: true, cancelable: true })
+      );
+    }
+
+    it('binds Mod-= and Mod-+ to zoom in, Mod-- to zoom out and Mod-0 to reset', () => {
       const { extension, compartment } = createEditorZoomExtension();
+      const controller = createEditorZoomController(compartment);
       const view = new EditorView({
-        state: EditorState.create({ extensions: [extension] }),
+        state: EditorState.create({ extensions: [extension, createEditorZoomKeymap(controller)] }),
         parent: container,
       });
-
-      const controller = createEditorZoomController(compartment);
       controller.attach(view);
-      const keymapExtension = createEditorZoomKeymap(controller);
-      expect(keymapExtension).toBeDefined();
+
+      pressMod(view, '=');
+      expect(controller.getLevel()).toBe(1.1);
+
+      pressMod(view, '+', { shiftKey: true });
+      expect(controller.getLevel()).toBe(1.2);
+      expect(scrollerFontSizes(view)).toEqual([19]);
+
+      pressMod(view, '-');
+      expect(controller.getLevel()).toBe(1.1);
+      expect(scrollerFontSizes(view)).toEqual([18]);
+
+      pressMod(view, '0');
+      expect(controller.getLevel()).toBe(1);
+      expect(scrollerFontSizes(view)).toEqual([16]);
 
       view.destroy();
     });

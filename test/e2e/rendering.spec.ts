@@ -91,27 +91,32 @@ test.describe('Diagram Rendering', () => {
     await expect(clusters).toHaveCount(2);
   });
 
-  test('preview zoom controls work', async () => {
-    const preview = page.locator(selectors.preview);
-    await expect(preview).toBeVisible();
+  test('preview zoom buttons scale the diagram and show the level', async () => {
+    const svg = page.locator(selectors.previewSvg);
+    const level = page.locator(selectors.zoomLevel);
+    const transform = () => svg.evaluate((element) => (element as SVGElement).style.transform);
 
-    const zoomIn = page.locator(selectors.zoomIn);
-    if (await zoomIn.isVisible()) {
-      await zoomIn.click();
-      await page.waitForTimeout(200);
-    }
+    await expect(level).toHaveText('100%');
 
-    const zoomOut = page.locator(selectors.zoomOut);
-    if (await zoomOut.isVisible()) {
-      await zoomOut.click();
-      await page.waitForTimeout(200);
-    }
+    await page.locator(selectors.zoomIn).click();
+    await expect(level).toHaveText('125%');
+    await expect.poll(transform).toBe('scale(1.25)');
 
-    const zoomReset = page.locator(selectors.zoomReset);
-    if (await zoomReset.isVisible()) {
-      await zoomReset.click();
-      await page.waitForTimeout(200);
-    }
+    await page.locator(selectors.zoomIn).click();
+    await expect(level).toHaveText('150%');
+    await expect.poll(transform).toBe('scale(1.5)');
+
+    await page.locator(selectors.zoomOut).click();
+    await expect(level).toHaveText('125%');
+    await expect.poll(transform).toBe('scale(1.25)');
+
+    await page.locator(selectors.zoomReset).click();
+    await expect(level).toHaveText('100%');
+    await expect.poll(transform).toBe('scale(1)');
+
+    await page.locator(selectors.zoomOut).click();
+    await expect(level).toHaveText('75%');
+    await expect.poll(transform).toBe('scale(0.75)');
   });
 
   test('different layout engines render', async () => {

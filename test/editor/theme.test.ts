@@ -3,37 +3,37 @@ import { EditorView } from '@codemirror/view';
 import { describe, expect, it } from 'vitest';
 import { createEditorTheme } from '../../src/editor/theme';
 
+/** The CSS text that the theme adds to an editor. */
+function themeRules(): string {
+  return EditorState.create({ extensions: [createEditorTheme()] })
+    .facet(EditorView.styleModule)
+    .map((module) => module.getRules())
+    .join('\n');
+}
+
 describe('editor/theme', () => {
   describe('createEditorTheme()', () => {
-    it('returns Extension', () => {
-      const theme = createEditorTheme();
-      expect(theme).toBeDefined();
+    it('frames the editor with a border and a background from the --editor variables', () => {
+      const rules = themeRules();
+
+      expect(rules).toMatch(/border-radius:\s*8px/);
+      expect(rules).toMatch(/border:\s*1px solid var\(--editor-border\)/);
+      expect(rules).toMatch(/background-color:\s*var\(--editor-bg\)/);
     });
 
-    it('includes syntax highlighting colors', () => {
-      const theme = createEditorTheme();
-      // Theme is an extension, verify it can be used
-      const state = EditorState.create({
-        doc: 'test content',
-        extensions: [theme],
-      });
-      expect(state).toBeDefined();
+    it('sets a monospace font and a line height on the scroller', () => {
+      const rules = themeRules();
+
+      // The generic family must be its own entry in the list: `ui-monospace` is a different name.
+      expect(rules).toMatch(/\.cm-scroller\s*\{[^}]*font-family:[^;}]*,\s*monospace\s*[;}]/);
+      expect(rules).toMatch(/\.cm-scroller\s*\{[^}]*line-height:\s*1\.5/);
     });
 
-    it('includes editor styling', () => {
-      const theme = createEditorTheme();
-      const container = document.createElement('div');
-      const view = new EditorView({
-        state: EditorState.create({
-          doc: 'test content',
-          extensions: [theme],
-        }),
-        parent: container,
-      });
+    it('colors the caret and the gutter text from the --editor variables', () => {
+      const rules = themeRules();
 
-      // Verify the view was created with the theme
-      expect(view.dom).toBeDefined();
-      view.destroy();
+      expect(rules).toMatch(/\.cm-content\s*\{[^}]*caret-color:\s*var\(--editor-caret\)/);
+      expect(rules).toMatch(/\.cm-gutters\s*\{[^}]*[{;\s]color:\s*var\(--editor-gutter\)/);
     });
   });
 });
