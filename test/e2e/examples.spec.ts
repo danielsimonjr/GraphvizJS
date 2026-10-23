@@ -2,9 +2,10 @@ import { type ElectronApplication, expect, type Page, test } from '@playwright/t
 import {
   getEditorContent,
   launchApp,
+  readExamples,
   selectors,
   waitForAppReady,
-  waitForPreviewUpdate,
+  withoutWhiteSpace,
 } from './helpers';
 
 let app: ElectronApplication;
@@ -39,36 +40,35 @@ test.describe('Examples Menu', () => {
     expect(count).toBeGreaterThan(1);
   });
 
-  test('example selection loads content into editor', async () => {
-    // Get initial content
-    const _initialContent = await getEditorContent(page);
+  test('example selection loads the example text into the editor', async () => {
+    const [first] = readExamples();
+    // The start text is not the example, so a match after the click comes from the click.
+    expect(await getEditorContent(page)).not.toContain(first.title);
 
-    // Open examples menu
     await page.locator(selectors.examplesBtn).click();
     await expect(page.locator(selectors.examplesMenu)).toBeVisible();
-
-    // Click first example
     await page.locator(selectors.examplesMenuItem).first().click();
 
-    await waitForPreviewUpdate(page);
-
-    // Content should be non-empty valid DOT
-    const newContent = await getEditorContent(page);
-    expect(newContent.length).toBeGreaterThan(0);
+    await expect
+      .poll(async () => withoutWhiteSpace(await getEditorContent(page)))
+      .toBe(withoutWhiteSpace(first.source));
   });
 
   test('example renders in preview', async () => {
-    // Open examples menu
-    await page.locator(selectors.examplesBtn).click();
+    const [first] = readExamples();
+    const svg = page.locator(selectors.previewSvg);
+    // The labels of the example that the first render does not show. The first render holds the
+    // start text, so these can appear only after the example has rendered.
+    const before = (await svg.textContent()) ?? '';
+    const newLabels = first.labels.filter((label) => !before.includes(label));
+    expect(newLabels.length).toBeGreaterThan(0);
 
-    // Click an example
+    await page.locator(selectors.examplesBtn).click();
     await page.locator(selectors.examplesMenuItem).first().click();
 
-    await waitForPreviewUpdate(page);
-
-    // Preview should have SVG
-    const svg = page.locator(selectors.previewSvg);
-    await expect(svg).toBeVisible();
+    for (const label of newLabels) {
+      await expect(svg).toContainText(label);
+    }
   });
 
   test('examples menu closes after selection', async () => {
@@ -84,26 +84,34 @@ test.describe('Examples Menu', () => {
     await expect(examplesMenu).not.toBeVisible();
   });
 
-  test('multiple examples can be loaded sequentially', async () => {
+  test('a second example opens in its own tab and the preview follows it', async () => {
+    const [first, second] = readExamples();
     const examplesBtn = page.locator(selectors.examplesBtn);
+    const tabs = page.locator('[role="tab"]');
+    const svg = page.locator(selectors.previewSvg);
+    await expect(tabs).toHaveCount(1);
 
-    // Load first example
     await examplesBtn.click();
     await page.locator(selectors.examplesMenuItem).first().click();
-    await waitForPreviewUpdate(page);
+    await expect(tabs).toHaveCount(2);
+    await expect.poll(() => getEditorContent(page)).toContain(first.title);
+    for (const label of first.labels) {
+      await expect(svg).toContainText(label);
+    }
 
-    const _firstContent = await getEditorContent(page);
-
-    // Load second example
     await examplesBtn.click();
     await page.locator(selectors.examplesMenuItem).nth(1).click();
-    await waitForPreviewUpdate(page);
 
-    const _secondContent = await getEditorContent(page);
-
-    // At minimum, both should render without error
-    const svg = page.locator(selectors.previewSvg);
-    await expect(svg).toBeVisible();
+    await expect(tabs).toHaveCount(3);
+    await expect.poll(() => getEditorContent(page)).toContain(second.title);
+    expect(await getEditorContent(page)).not.toContain(first.title);
+    for (const label of second.labels) {
+      await expect(svg).toContainText(label);
+    }
+    // A label that only the first example has must be gone from the preview.
+    const gone = first.labels.find((label) => !second.labels.includes(label));
+    expect(gone).toBeDefined();
+    await expect(svg).not.toContainText(gone as string);
   });
 });
 

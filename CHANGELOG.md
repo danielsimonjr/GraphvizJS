@@ -47,6 +47,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Five end-to-end tests and seven unit tests assert what their names say, and the guard test also
+  flags a step that a missing element skips.** The preview zoom test clicked each button only
+  `if (await x.isVisible())` and asserted nothing about the zoom. It now clicks zoom in twice, zoom
+  out, reset and zoom out, and after each click it asserts the percent text (125%, 150%, 125%, 100%,
+  75%) and the `scale()` transform of the SVG. The example tests asserted `length > 0` before the click
+  and waited for an SVG that the first render had already put on the page, so the example did not
+  matter. They now read the `.dot` files of `src/examples` and assert that the editor holds the text of
+  the example (white space ignored), and that a label of the example that the first render does not
+  show appears in the SVG. The test with two examples said that the second example replaces the
+  first one. The app opens each example in a new tab and hides the old editor, so the test is now named
+  for that: the tab count goes from 1 to 2 to 3, and the editor and the preview follow the second
+  example. The SVG export test asserted `toBeEnabled` on an item that no code disables. It now types a
+  diagram, exports SVG, polls the saved file until it holds the last node name (the file exists,
+  empty, before the write ends), and asserts the node names of the diagram and that the start text
+  is not in the file. The unit tests that asserted `toBeDefined()` or `toBeTruthy()` now assert the
+  effect: the Mod-=, Mod-+, Mod-- and Mod-0 keys change the editor zoom level and font size, a new
+  editor starts at 16px, the theme sets the border, background, caret, gutter, font and line height
+  from the `--editor` variables, the search panel opens at the top, and `lintGutter()` adds the lint
+  gutter. Seven tests that asserted only that a member exists (a type that tsc already guarantees) or
+  that an extension could be built are deleted. The behavior tests of the same modules cover them.
+  `test/architecture/no-vacuous-assertions.test.ts` also fails on an `if` that awaits `isVisible`,
+  `isHidden`, `isEnabled`, `isDisabled`, `isChecked`, `isEditable` or `count`, with `!`, `(`, `&&` or
+  `||` before the query. It does not flag a query that the test stores first, and it does not scan
+  helper files. Each rewritten test failed against a change of the source that it must catch (12
+  changes for the end-to-end tests, 13 for the unit tests, and 2 for the guard), and the old zoom test
+  fails the guard. The helpers `readExamples`, `withoutWhiteSpace` and the `zoomLevel` selector are new
+  in `test/e2e/helpers.ts`. `.claude/CLAUDE.md` and `ARCHITECTURE.md` name the new check. The line
+  counts in `FILE_INVENTORY` and the counts in the Verification tables of four architecture
+  documents (lines of code, exports, interfaces, functions) follow the new test files. No source
+  file changed.
 - **Eight end-to-end tests assert what their names say, and a guard test keeps always-true assertions out.**
   Four assertions could not fail: `expect(svgVisible || hasError || true)` in the empty-editor test,
   `expect(isVisible || true)` in the Ctrl+? test, and `expect(hasFocus >= 0)` in the Tab test and in the

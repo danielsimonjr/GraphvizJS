@@ -42,35 +42,6 @@ describe('editor/linting', () => {
     }
   });
 
-  describe('createDotLinter()', () => {
-    it('returns a CodeMirror extension', () => {
-      const linterExt = createDotLinter({ getEngine: mockGetEngine, validate: mockValidate });
-      expect(linterExt).toBeDefined();
-    });
-
-    it('extension can be used in EditorState', () => {
-      const linterExt = createDotLinter({ getEngine: mockGetEngine, validate: mockValidate });
-      const state = EditorState.create({
-        doc: 'digraph { a -> b }',
-        extensions: [linterExt],
-      });
-      expect(state).toBeDefined();
-    });
-
-    it('extension can be used in EditorView', () => {
-      const linterExt = createDotLinter({ getEngine: mockGetEngine, validate: mockValidate });
-      const view = new EditorView({
-        state: EditorState.create({
-          doc: 'digraph { a -> b }',
-          extensions: [linterExt],
-        }),
-        parent: container,
-      });
-      expect(view.dom).toBeDefined();
-      view.destroy();
-    });
-  });
-
   describe('linter behavior', () => {
     /**
      * Helper to run the linter and capture diagnostics.
@@ -411,23 +382,15 @@ describe('editor/linting', () => {
   });
 
   describe('lintGutter export', () => {
-    it('exports lintGutter function', () => {
-      expect(lintGutter).toBeDefined();
-      expect(typeof lintGutter).toBe('function');
-    });
-
-    it('lintGutter returns an extension', () => {
-      const gutterExt = lintGutter();
-      expect(gutterExt).toBeDefined();
-    });
-
-    it('lintGutter extension can be used with editor', () => {
-      const gutterExt = lintGutter();
-      const state = EditorState.create({
-        doc: 'test',
-        extensions: [gutterExt],
+    it('adds the lint gutter to an editor', () => {
+      const view = new EditorView({
+        state: EditorState.create({ doc: 'test', extensions: [lintGutter()] }),
+        parent: container,
       });
-      expect(state).toBeDefined();
+
+      expect(view.dom.querySelector('.cm-gutter-lint')).not.toBeNull();
+
+      view.destroy();
     });
   });
 });

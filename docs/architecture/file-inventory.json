@@ -538,7 +538,7 @@
       "package": "(root)",
       "area": "tests",
       "disposition": "test",
-      "loc": 114
+      "loc": 157
     },
     {
       "file": "test/architecture/renderer-purity.test.ts",
@@ -734,14 +734,14 @@
       "package": "(root)",
       "area": "tests",
       "disposition": "test",
-      "loc": 121
+      "loc": 129
     },
     {
       "file": "test/e2e/export.spec.ts",
       "package": "(root)",
       "area": "tests",
       "disposition": "test",
-      "loc": 158
+      "loc": 163
     },
     {
       "file": "test/e2e/external-change.spec.ts",
@@ -769,7 +769,7 @@
       "package": "(root)",
       "area": "tests",
       "disposition": "test",
-      "loc": 148
+      "loc": 191
     },
     {
       "file": "test/e2e/keyboard-shortcuts.spec.ts",
@@ -797,7 +797,7 @@
       "package": "(root)",
       "area": "tests",
       "disposition": "test",
-      "loc": 131
+      "loc": 136
     },
     {
       "file": "test/e2e/save-as.spec.ts",
@@ -839,14 +839,14 @@
       "package": "(root)",
       "area": "tests",
       "disposition": "test",
-      "loc": 433
+      "loc": 396
     },
     {
       "file": "test/editor/search.test.ts",
       "package": "(root)",
       "area": "tests",
       "disposition": "test",
-      "loc": 9
+      "loc": 24
     },
     {
       "file": "test/editor/theme.test.ts",
@@ -860,7 +860,7 @@
       "package": "(root)",
       "area": "tests",
       "disposition": "test",
-      "loc": 322
+      "loc": 331
     },
     {
       "file": "test/help/dialog.test.ts",
@@ -923,7 +923,7 @@
       "package": "(root)",
       "area": "tests",
       "disposition": "test",
-      "loc": 150
+      "loc": 139
     },
     {
       "file": "test/recent/recent-files.test.ts",

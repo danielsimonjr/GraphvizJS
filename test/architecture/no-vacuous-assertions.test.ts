@@ -9,8 +9,17 @@ import { describe, expect, it } from 'vitest';
  * of it appeared in the end-to-end tests: `expect(x || true).toBe(true)` is always
  * true, and `expect(count >= 0).toBe(true)` is true for every count. This test scans
  * every `*.test.ts` and `*.spec.ts` file under `test/` for these shapes and fails
- * when it finds one. It does not look for a test that guards its assertion with an
- * `if`, or for a test with no assertion at all.
+ * when it finds one.
+ *
+ * A third shape is a step that runs only `if (await locator.isVisible())`. When the
+ * locator is not there, the step is skipped and the test still passes. A test must wait
+ * for the element with `expect(locator).toBeVisible()`, so that a missing element fails.
+ * The scan flags an `if` whose condition awaits `isVisible`, `isHidden`, `isEnabled`,
+ * `isDisabled`, `isChecked`, `isEditable` or `count`, also inside a `&&` or `||` condition.
+ * It does not flag a query that the test stores first, as in
+ * `const shown = await x.isVisible(); if (shown) {`. It does not scan helper files, which
+ * can query state for a purpose.
+ * This test does not look for a test with no assertion at all.
  */
 
 const TEST_ROOT = path.resolve(__dirname, '..');
@@ -35,16 +44,35 @@ const VACUOUS_PATTERNS: RegExp[] = [
   /\bexpect\([^;]*?\)\.toBeGreaterThanOrEqual\(0\)/g,
 ];
 
+/**
+ * The patterns that match a step that a missing element skips: an `if` whose condition awaits
+ * a state query of a locator, as in `if (await locator.isVisible()) {`. The query can follow
+ * `!`, `(`, `&&` or `||`. `[^;{]` stops the match at the end of the condition.
+ */
+const CONDITIONAL_GUARD_PATTERNS: RegExp[] = [
+  /\bif\s*\([^;{]*?\bawait\s+[^;{]*?\.(?:isVisible|isHidden|isEnabled|isDisabled|isChecked|isEditable|count)\(/g,
+];
+
 /** `indexOf(...) >= 0` is a real test: the call returns -1 for a missing value. */
 const SEARCH_CALL = /\b(?:indexOf|lastIndexOf|findIndex|findLastIndex|search)\(/;
 
-/** The 1-based numbers of the lines where an assertion that cannot fail starts. */
+/** The 1-based number of the line where a match starts. */
+function lineOf(source: string, index: number | undefined): number {
+  return source.slice(0, index).split('\n').length;
+}
+
+/** The 1-based numbers of the lines where a vacuous assertion or a skipped step starts. */
 function vacuousAssertionLines(source: string): number[] {
   const lines = new Set<number>();
   for (const pattern of VACUOUS_PATTERNS) {
     for (const match of source.matchAll(pattern)) {
       if (SEARCH_CALL.test(match[0])) continue;
-      lines.add(source.slice(0, match.index).split('\n').length);
+      lines.add(lineOf(source, match.index));
+    }
+  }
+  for (const pattern of CONDITIONAL_GUARD_PATTERNS) {
+    for (const match of source.matchAll(pattern)) {
+      lines.add(lineOf(source, match.index));
     }
   }
   return [...lines].sort((a, b) => a - b);
@@ -80,8 +108,17 @@ describe('no always-true assertions', () => {
       'expect(',
       '  a || b || true',
       ').toBe(true);',
+      'if (await zoomIn.isVisible()) {',
+      "if (await page.locator('#x').isEnabled()) {",
+      'if (!(await menu.isHidden())) {',
+      'if (ready && (await zoomIn.isVisible())) {',
+      'if (ready || await zoomIn.isVisible()) {',
+      'if ((await items.count()) > 0) {',
+      '} else if (await menu.isEnabled()) {',
     ].join('\n');
-    expect(vacuousAssertionLines(source)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(vacuousAssertionLines(source)).toEqual([
+      1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17,
+    ]);
   });
 
   it('leaves a real assertion alone (control)', () => {
@@ -94,6 +131,12 @@ describe('no always-true assertions', () => {
       'expect(Boolean(a)).toBe(true);',
       'expect(trueValue).toBe(true);',
       'expect(n).toBeGreaterThanOrEqual(1);',
+      'await expect(zoomIn).toBeVisible();',
+      'const shown = await zoomIn.isVisible();',
+      'const n = await items.count();',
+      'if (await store.has(key)) {',
+      'if (count > 0) {',
+      'if (ready) await zoomIn.click();',
     ].join('\n');
     expect(vacuousAssertionLines(source)).toEqual([]);
   });
